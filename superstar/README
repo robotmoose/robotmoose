@@ -1,0 +1,3 @@
+Superstar is our web-based robotic information hub.
+Using a "star" topology allows both robot and pilot to sit behind firewalls,
+and communicate by connecting to the superstar server.
