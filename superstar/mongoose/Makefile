@@ -10,3 +10,8 @@ demo: demo.cpp
 
 clean:
 	- rm demo
+
+
+# Windows make:
+#  cl mongoose.c demo.cpp /EHsc /MT
+

@@ -9,6 +9,9 @@
 
 std::string my_itos(int i) {
 	char buf[100];
+#ifdef _WIN32
+#define snprintf _snprintf
+#endif
 	snprintf(buf,sizeof(buf),"%d",i);
 	return buf;
 }
