@@ -43,18 +43,31 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
   return MG_TRUE;
 }
 
-int main(void) {
+/*
+  This code runs a mongoose server in a dedicated thread.
+  They're all listening on the same port, so the OS will
+  hopefully distribute the load among threads.
+*/
+void *thread_code(void *) {
   struct mg_server *server= mg_create_server(NULL, http_handler);
   mg_set_option(server, "listening_port", "8080");
   mg_set_option(server, "document_root", "."); // files served from here
-  
-  // Wait until user hits "enter". Server is running in separate thread.
+
   printf("OK, listening!  Visit http://localhost:%s to see the site!\n",
   	mg_get_option(server, "listening_port"));
   
   while (1) {
   	mg_poll_server(server,1000);
   }
+  return 0;
+}
 
+
+int main(void) {
+  for (int thread=0;thread<3;thread++)
+  {
+	mg_start_thread(thread_code,0);
+  }
+  thread_code(0); // devote main thread to listening as well
   return 0;
 }

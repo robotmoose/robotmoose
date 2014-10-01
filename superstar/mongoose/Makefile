@@ -1,6 +1,6 @@
 CXX=g++
-OPT=-O
-CFLAGS=$(OPT) -I. -Wall
+OPTS=-O
+CFLAGS=$(OPTS) -I. -Wall
 LIBS=-lpthread
 
 all: demo
