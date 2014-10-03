@@ -70,7 +70,7 @@ int main(void) {
   /* Start threads to be redundant servers.
      Multiple servers reduces the worst-case wait time,
      although it increases the average case slightly! */
-  for (int thread=0;thread<3;thread++)
+  for (int thread=0;thread<0;thread++)
   {
 	mg_start_thread(thread_code,0);
   }

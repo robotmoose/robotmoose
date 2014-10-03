@@ -1,3 +1,24 @@
 Superstar is our web-based robotic information hub.
 Using a "star" topology allows both robot and pilot to sit behind firewalls,
 and communicate by connecting to the superstar server.
+
+
+Protocol examples:
+   beingthere.cs.uaf.edu/superstar/layla/uaf/battery?get
+Read the current (most recent) state of the battery in the UAF layla robot.
+Returns raw JSON object as text/json, or empty object if none available.
+
+   beingthere.cs.uaf.edu/superstar/layla/uaf/battery?set={percent:"84";time:"12345"}
+Set a new value for the battery state, as an URL-encoded string.  
+This overwrites the existing JSON object.
+
+   beingthere.cs.uaf.edu/superstar/layla/?sub
+Extract a list of substrings stored starting at this path.
+In this case, returns ["uaf"].
+
+TODO: comet-style interface, for non-blocking reads:
+   beingthere.cs.uaf.edu/superstar/layla/uaf/battery?after={time:"12345"}
+Read any value for the battery state newer than this version.
+Blocks until the battery state is newer than this, waiting until
+a newer version is set.
+
