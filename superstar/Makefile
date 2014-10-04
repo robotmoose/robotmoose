@@ -1,12 +1,15 @@
 CXX=g++
 OPTS=-O
-CFLAGS=$(OPTS) -I. -Imongoose -Wall
+CFLAGS=$(OPTS) -I. -Imongoose -I../include -Wall
 LIBS=-lpthread
 
-all: superstar
+all: superstar netbench
 
 superstar: superstar.cpp
-	$(CXX) $(CFLAGS) $< mongoose/mongoose.c -I. -o $@ $(LIBS)
+	$(CXX) $(CFLAGS) $< mongoose/mongoose.c -o $@ $(LIBS)
+
+netbench: netbench.cpp
+	$(CXX) $(CFLAGS) $< -o $@ $(LIBS)
 
 clean:
 	- rm superstar

@@ -13,7 +13,7 @@ Set a new value for the battery state, as an URL-encoded string.
 This overwrites the existing JSON object.
 
    beingthere.cs.uaf.edu/superstar/layla/?sub
-Extract a list of substrings stored starting at this path.
+Extract a JSON array of substrings stored starting at this path.
 In this case, returns ["uaf"].
 
 TODO: comet-style interface, for non-blocking reads:
