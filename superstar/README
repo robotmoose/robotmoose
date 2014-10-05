@@ -45,4 +45,5 @@ Home ACS DSL to UAF:
 
 Curiously, DNS is limiting factor on non-keepalive version.  This implies hardcoding an IP is the right thing.
 In keepalive version, "GET" and "OK" are each a single packet, only a few hundred bytes.  Very clean, and UDP wouldn't do much better.
+At 32 req/sec, bandwidth usage is 9KB/s down, 6KB/s up.
 
