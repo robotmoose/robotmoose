@@ -88,7 +88,7 @@ int backend(std::string superstarURL, std::string robotName, int baudrate,simabl
 
 int main(int argc, char *argv[])
 {
-	bool sim = true; //turned sim off for now
+	bool sim = false; //turned sim off for now
 
 	std::string superstarURL = "http://sandy.cs.uaf.edu/";
 	std::string robotName = "layla/uaf";
