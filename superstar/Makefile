@@ -1,6 +1,6 @@
 CXX=g++
 OPTS=-O
-CFLAGS=$(OPTS) -I. -Imongoose -I../include -Wall
+CFLAGS=$(OPTS) -Wall
 LIBS=-lpthread
 
 all: superstar netbench

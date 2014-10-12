@@ -11,7 +11,7 @@
 #include <string.h>
 #include <string>
 #include <map>
-#include "mongoose.h"
+#include "mongoose/mongoose.h"
 
 /// Utility: integer to string
 std::string my_itos(int i) {

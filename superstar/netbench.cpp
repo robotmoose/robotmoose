@@ -5,12 +5,12 @@
 */
 #include <iostream>
 #include <fstream>
-#include "osl/time_function.h"
-#include "osl/webservice.h"
+#include "../include/osl/time_function.h"
+#include "../include/osl/webservice.h"
 
 /* Do linking right here */
-#include "osl/webservice.cpp"
-#include "osl/socket.cpp"
+#include "../include/osl/webservice.cpp"
+#include "../include/osl/socket.cpp"
 
 
 int main(int argc,char *argv[]) {
