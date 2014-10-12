@@ -23,6 +23,14 @@
 #include "../../include/json.cpp"
 
 
+double limit_power(double raw) {
+	double m=0.3;
+	if (raw>m) return m;
+	if (raw<-m) return -m;
+	else return raw;
+}
+
+
 int main(int argc,char *argv[]) {
 	// Superstar host name:
 	std::string superstarURL="http://sandy.cs.uaf.edu/";
@@ -37,12 +45,10 @@ int main(int argc,char *argv[]) {
 			printf("Unrecognized command line argument '%s'\n",argv[argi]);
 		}
 	}
-	SerialPort *serial=0;
 	A_packet_formatter<SerialPort> *pkt=0;
 	if (baudrate) {
-		serial=new SerialPort();
-		serial->begin(baudrate);
-		pkt=new A_packet_formatter<SerialPort>(*serial);
+		Serial.begin(baudrate);
+		pkt=new A_packet_formatter<SerialPort>(Serial);
 	}
 	
 	// double program_start=time_in_seconds();
@@ -52,18 +58,18 @@ int main(int argc,char *argv[]) {
 	while (1) {
 		std::string path="/superstar/"+robotName+"/pilot?get";
 		double start=time_in_seconds();
-		printf("Path %s\n",path.c_str());
+		//printf("Path %s\n",path.c_str());
 		superstar.send_get(path);
 		std::string json_data=superstar.receive();
 		
 		try {
 			json::Value v=json::Deserialize(json_data);
-			double L=v["power"]["L"];
-			double R=v["power"]["R"];
+			double L=limit_power(v["power"]["L"]);
+			double R=limit_power(v["power"]["R"]);
 			
 			robot_power power;
-			power.left=64+64*L;
-			power.right=64+64*R;
+			power.left=(int)(64+63*L);
+			power.right=(int)(64+63*R);
 			printf("Power commands: %.2f L  %.2f R\n",L,R);
 			
 			if (pkt) {
@@ -71,7 +77,7 @@ int main(int argc,char *argv[]) {
 				while (Serial.available()) { // read any robot response
 					int got_data=0;
 					A_packet p;
-					while (-1==pkt->read_packet(p)) {got_data++;}
+					while (-1==pkt->read_packet(p)) {got_data++; printf("s"); }
 					if (p.valid) {
 						printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data);
 						if (p.command==0) printf("    Arduino echo request\n");
@@ -87,7 +93,7 @@ int main(int argc,char *argv[]) {
 		}
 		double elapsed=time_in_seconds()-start;
 		double per=elapsed;
-		printf("	%.1f ms/request, %.1f req/sec\n",per*1.0e3, 1.0/per);	
+		//printf("	%.1f ms/request, %.1f req/sec\n",per*1.0e3, 1.0/per);	
 	}
 }
 
