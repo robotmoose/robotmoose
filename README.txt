@@ -5,4 +5,5 @@ Seta Bogosyan <sbogosyan@alaska.edu>, PI
 Orion Lawlor <lawlor@alaska.edu>, Co-PI
 Cindy Hmelo-Silver <chmelosi@gmail.com>, Co-PI
 Selma Sabanovic <selmas@indiana.edu>, Co-PI
+Michael Tait <mtait33@gmail.com> RA
 
