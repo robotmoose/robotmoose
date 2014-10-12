@@ -16,11 +16,18 @@
 #include "../../include/osl/webservice.h" // web client
 #include "../../include/json.h" // JSON parsing ("super easy JSON" library)
 
+//simulator
+#include <thread>
+#include "../../include/spritelib/spritelib.h" // 2d graphics
+#include "../../layla/firmware/simable_serial_packet.h"
+
+
 /* Do linking right here */
 #include "../../include/serial.cpp"
 #include "../../include/osl/socket.cpp"
 #include "../../include/osl/webservice.cpp"
 #include "../../include/json.cpp"
+#include "../../include/spritelib/spritelib.cpp"
 
 
 double limit_power(double raw) {
@@ -30,31 +37,13 @@ double limit_power(double raw) {
 	else return raw;
 }
 
+int backend(std::string superstarURL, std::string robotName, int baudrate,simable_A_packet_formatter<SerialPort> *pkt) 
+{
 
-int main(int argc,char *argv[]) {
-	// Superstar host name:
-	std::string superstarURL="http://sandy.cs.uaf.edu/";
-	std::string robotName="layla/uaf";
-	int baudrate=9600;  // serial comms
-	for (int argi=1;argi<argc;argi++) {
-		if (0==strcmp(argv[argi],"--robot")) robotName=argv[++argi];
-		else if (0==strcmp(argv[argi],"--superstar")) superstarURL=argv[++argi]; 
-		else if (0==strcmp(argv[argi],"--baudrate")) baudrate=atoi(argv[++argi]); 
-		else if (0==strcmp(argv[argi],"--sim")) baudrate=0; // no hardware, for debugging 
-		else {
-			printf("Unrecognized command line argument '%s'\n",argv[argi]);
-		}
-	}
-	A_packet_formatter<SerialPort> *pkt=0;
-	if (baudrate) {
-		Serial.begin(baudrate);
-		pkt=new A_packet_formatter<SerialPort>(Serial);
-	}
-	
 	// double program_start=time_in_seconds();
 	osl::url_parser pu(superstarURL);
 	osl::http_connection superstar(pu.host,0,pu.port);
-	
+
 	while (1) {
 		std::string path="/superstar/"+robotName+"/pilot?get";
 		double start=time_in_seconds();
@@ -97,3 +86,44 @@ int main(int argc,char *argv[]) {
 	}
 }
 
+int main(int argc, char *argv[])
+{
+	bool sim = true; //turned sim off for now
+
+	std::string superstarURL = "http://sandy.cs.uaf.edu/";
+	std::string robotName = "layla/uaf";
+	int baudrate = 9600;  // serial comms
+	for (int argi = 1; argi<argc; argi++) {
+		if (0 == strcmp(argv[argi], "--robot")) robotName = argv[++argi];
+		else if (0 == strcmp(argv[argi], "--superstar")) superstarURL = argv[++argi];
+		else if (0 == strcmp(argv[argi], "--baudrate")) baudrate = atoi(argv[++argi]);
+		else if (0 == strcmp(argv[argi], "--sim")) sim = true; // no hardware, for debugging 
+		else {
+			printf("Unrecognized command line argument '%s'\n", argv[argi]);
+		}
+	}
+	Serial.begin(baudrate);
+	simable_A_packet_formatter<SerialPort> *pkt = new simable_A_packet_formatter<SerialPort>(Serial,sim);
+
+	if (sim == true)
+	{
+		std::thread sim(spritelib_run, "SpriteLib Demo", 800, 600);     // spritelib sim
+		std::thread backend(backend, superstarURL, robotName, baudrate, pkt);  
+		// synchronize threads: but backend runs forever so kind of pointless
+		sim.join();                
+		backend.join();              
+	}
+	else
+	{
+		return backend(superstarURL, robotName, baudrate, pkt); //run it like normal
+	}
+	return 0;
+}
+
+
+
+
+void spritelib_draw_screen(spritelib &lib) 
+{
+	// do sim with shared R,L mem 
+}
