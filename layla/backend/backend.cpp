@@ -45,7 +45,7 @@ int main(int argc,char *argv[]) {
 		pkt=new A_packet_formatter<SerialPort>(*serial);
 	}
 	
-	double program_start=time_in_seconds();
+	// double program_start=time_in_seconds();
 	osl::url_parser pu(superstarURL);
 	osl::http_connection superstar(pu.host,0,pu.port);
 	
@@ -69,11 +69,11 @@ int main(int argc,char *argv[]) {
 			if (pkt) {
 				pkt->write_packet(0x7,sizeof(power),&power);
 				while (Serial.available()) { // read any robot response
-					bool got_data=false;
+					int got_data=0;
 					A_packet p;
-					while (-1==pkt->read_packet(p)) {got_data=true;}
+					while (-1==pkt->read_packet(p)) {got_data++;}
 					if (p.valid) {
-						printf("Arduino sent packet type %x:\n",p.command);
+						printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data);
 						if (p.command==0) printf("    Arduino echo request\n");
 						else if (p.command==0xE) printf("    Arduino error packet: %d bytes, '%s'\n", p.length,p.data);
 						else printf("    Arduino unknown packet %d bytes\n",p.length);
