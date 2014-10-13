@@ -57,12 +57,6 @@ public:
 	{
 		stop();
 	}
-	
-	/** Talk to this real Arudino device over this serial port.
-		We will delete the packet formatter when destructed.
-	*/
-	void add_serial(A_packet_formatter<SerialPort> *pkt_) { pkt=pkt_; }
-	
 	~robot_backend() {
 		delete pkt;
 	}
@@ -70,6 +64,11 @@ public:
 	/** Update pilot commands from network */
 	void read_network(void);
 	
+	/** Talk to this real Arudino device over this serial port.
+		We will delete the packet formatter when destructed. 
+		The serial commands are no-ops until this is run.
+	*/
+	void add_serial(A_packet_formatter<SerialPort> *pkt_) { pkt=pkt_; }
 	/** Send pilot commands to robot. */
 	void send_serial();
 	/** Read anything the robot wants to send to us. */
@@ -107,7 +106,6 @@ void robot_backend::read_network()
 {
 	std::string path="/superstar/"+robotName+"/pilot?get";
 	double start=time_in_seconds();
-	//printf("Path %s\n",path.c_str());
 	superstar.send_get(path);
 	std::string json_data=superstar.receive();
 	
@@ -175,9 +173,11 @@ int main(int argc, char *argv[])
 */
 class robot_simulator {
 public:
+	float wheelbase; // feet between center of wheels (effective distance)
 	vec2 locL,locR; // location of robot's left and right wheels, in *feet*
 	
-	robot_simulator() :locL(0.0,0.0), locR(2.0,0.0) {}
+	robot_simulator() :wheelbase(1.6),
+		locL(0.0,0.0), locR(wheelbase,0.0) {}
 	
 	void draw(spritelib &lib,const spritelib_tex &tex,const vec2 &loc,float size,float angle_rads) {
 		float angle_deg=angle_rads*(180.0/3.141592);
@@ -186,10 +186,21 @@ public:
 	}
 	
 	void simulate(spritelib &lib) {
-		locL.y+=lib.dt*backend->L; // PLACEHOLDER physics
-		locR.y+=lib.dt*backend->R;
+		// Drive wheels forward
+		vec2 across=locR-locL;
+		vec2 forward(-across.y,across.x); // counterclockwise perpendicular vector
+		double speed=6.0; // feet/sec at power==1.0
+		locL+=lib.dt*speed*backend->L*forward;
+		locR+=lib.dt*speed*backend->R*forward;
 		
-		vec2 dir=locR-locL;
+		// Force distance between wheels to be constant
+		vec2 cen=0.5*(locR+locL); // center
+		vec2 dir=locR-locL; // faces right
+		dir=normalize(dir)*wheelbase;
+		locL=cen-0.5*dir;
+		locR=cen+0.5*dir;
+		
+		// Draw robot onscreen
 		static spritelib_tex wheel=lib.read_tex("face.png");
 		float ang=atan2(dir.y,dir.x);
 		draw(lib,wheel,locL,40,ang);
