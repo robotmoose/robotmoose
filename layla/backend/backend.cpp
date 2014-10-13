@@ -175,9 +175,11 @@ class robot_simulator {
 public:
 	float wheelbase; // feet between center of wheels (effective distance)
 	vec2 locL,locR; // location of robot's left and right wheels, in *feet*
+	vec2 caster; // last-known location of caster wheel
+	vec2 cast_dir; // travel direction of caster wheel
 	
 	robot_simulator() :wheelbase(1.6),
-		locL(0.0,0.0), locR(wheelbase,0.0) {}
+		locL(0.0,0.0), locR(wheelbase,0.0), caster(0,-100), cast_dir(0.0,1.0) {}
 	
 	void draw(spritelib &lib,const spritelib_tex &tex,const vec2 &loc,float size,float angle_rads) {
 		float angle_deg=angle_rads*(180.0/3.141592);
@@ -187,7 +189,7 @@ public:
 	
 	void simulate(spritelib &lib) {
 		// Drive wheels forward
-		vec2 across=locR-locL;
+		vec2 across=normalize(locR-locL); // robot right hand direction
 		vec2 forward(-across.y,across.x); // counterclockwise perpendicular vector
 		double speed=6.0; // feet/sec at power==1.0
 		locL+=lib.dt*speed*backend->L*forward;
@@ -200,11 +202,26 @@ public:
 		locL=cen-0.5*dir;
 		locR=cen+0.5*dir;
 		
+		// Update coordinate system
+		across=normalize(locR-locL); 
+		forward=vec2(-across.y,across.x); 
+		
+		// Calculate location of caster wheel
+		double caster_dist=1.5; // feet
+		vec2 new_caster=cen-forward*caster_dist;
+		vec2 rel_caster=new_caster-caster;
+		if (length(rel_caster)>0.05) {
+			caster=new_caster;
+			double caster_speed=4.0;
+			cast_dir=normalize(cast_dir+caster_speed*lib.dt*normalize(rel_caster));
+		}
+		
 		// Draw robot onscreen
 		static spritelib_tex wheel=lib.read_tex("face.png");
 		float ang=atan2(dir.y,dir.x);
 		draw(lib,wheel,locL,40,ang);
 		draw(lib,wheel,locR,40,ang);
+		draw(lib,wheel,new_caster,30,atan2(-cast_dir.x,cast_dir.y));
 	}
 };
 
