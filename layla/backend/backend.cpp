@@ -217,11 +217,11 @@ public:
 		}
 		
 		// Draw robot onscreen
-		static spritelib_tex wheel=lib.read_tex("face.png");
+		static spritelib_tex wheel=lib.read_tex("tire.png");
 		float ang=atan2(dir.y,dir.x);
 		draw(lib,wheel,locL,40,ang);
 		draw(lib,wheel,locR,40,ang);
-		draw(lib,wheel,new_caster,30,atan2(-cast_dir.x,cast_dir.y));
+		draw(lib,wheel,new_caster-0.5*cast_dir,30,atan2(-cast_dir.x,cast_dir.y));
 	}
 };
 
