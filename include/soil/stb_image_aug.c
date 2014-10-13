@@ -129,6 +129,7 @@ static int stbi_error(const char *str)
 #elif defined(STBI_FAILURE_USERMSG)
    #define stbi_error(x,y)  stbi_error(y)
 #else
+   #define STBI_FAILURE_FULL_STRINGS 1
    #define stbi_error(x,y)  stbi_error(x)
 #endif
 
@@ -2325,7 +2326,7 @@ static int parse_png_file(png *z, int scan, int req_comp)
          default:
             // if critical, fail
             if ((c.type & (1 << 29)) == 0) {
-               #ifndef STBI_NO_FAILURE_STRINGS
+               #if STBI_FAILURE_FULL_STRINGS
                // not threadsafe
                static char invalid_chunk[] = "XXXX chunk not known";
                invalid_chunk[0] = (uint8) (c.type >> 24);

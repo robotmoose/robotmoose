@@ -37,7 +37,7 @@ double limit_power(double raw) {
 	else return raw;
 }
 
-int backend(std::string superstarURL, std::string robotName, int baudrate,simable_A_packet_formatter<SerialPort> *pkt) 
+void backend(std::string superstarURL, std::string robotName, int baudrate,simable_A_packet_formatter<SerialPort> *pkt) 
 {
 
 	// double program_start=time_in_seconds();
@@ -82,7 +82,7 @@ int backend(std::string superstarURL, std::string robotName, int baudrate,simabl
 		}
 		double elapsed=time_in_seconds()-start;
 		double per=elapsed;
-		//printf("	%.1f ms/request, %.1f req/sec\n",per*1.0e3, 1.0/per);	
+		printf("Time:	%.1f ms/request, %.1f req/sec\n",per*1.0e3, 1.0/per);	
 	}
 }
 
@@ -108,14 +108,15 @@ int main(int argc, char *argv[])
 	if (sim == true)
 	{
 		std::thread sim(spritelib_run, "SpriteLib Demo", 800, 600);     // spritelib sim
-		std::thread backend(backend, superstarURL, robotName, baudrate, pkt);  
+		
+		backend(superstarURL, robotName, baudrate, pkt);
+		
 		// synchronize threads: but backend runs forever so kind of pointless
-		sim.join();                
-		backend.join();              
+		sim.join();
 	}
 	else
 	{
-		return backend(superstarURL, robotName, baudrate, pkt); //run it like normal
+		backend(superstarURL, robotName, baudrate, pkt); //run it like normal
 	}
 	return 0;
 }

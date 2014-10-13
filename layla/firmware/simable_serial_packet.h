@@ -14,7 +14,7 @@ public:
 	Create an A-packet send/receive object for this serial device.
 	The device must be ready to send/receive bytes.
 	*/
-	simable_A_packet_formatter(serial_port &serial_) :myPacket(serial_) : sim(false)
+	simable_A_packet_formatter(serial_port &serial_) :myPacket(serial_), sim(false)
 	{
 	}
 
