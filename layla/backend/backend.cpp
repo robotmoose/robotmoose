@@ -19,7 +19,8 @@
 //simulator
 #include <thread>
 #include "../../include/spritelib/spritelib.h" // 2d graphics
-#include "../../layla/firmware/simable_serial_packet.h"
+#include "../../include/osl/vec2.h" // 2d vector
+// #include "../../layla/firmware/simable_serial_packet.h" // not needed
 
 
 /* Do linking right here */
@@ -37,59 +38,100 @@ double limit_power(double raw) {
 	else return raw;
 }
 
-void backend(std::string superstarURL, std::string robotName, int baudrate,simable_A_packet_formatter<SerialPort> *pkt) 
-{
+/**
+  Read commands from superstar, and send them to the robot. 
+*/
+class robot_backend {
+private:
+	osl::url_parser parseURL;
+	osl::http_connection superstar; // HTTP keepalive connection
+	std::string robotName;
+	A_packet_formatter<SerialPort> *pkt;
+public:
+	double L,R; // current power values from pilot
+	void stop(void) { L=R=0.0; }
 
-	// double program_start=time_in_seconds();
-	osl::url_parser pu(superstarURL);
-	osl::http_connection superstar(pu.host,0,pu.port);
+	robot_backend(std::string superstarURL, std::string robotName_)
+		:parseURL(superstarURL), superstar(parseURL.host,0,parseURL.port),
+		robotName(robotName_), pkt(0)
+	{
+		stop();
+	}
+	
+	/** Talk to this real Arudino device over this serial port.
+		We will delete the packet formatter when destructed.
+	*/
+	void add_serial(A_packet_formatter<SerialPort> *pkt_) { pkt=pkt_; }
+	
+	~robot_backend() {
+		delete pkt;
+	}
+	
+	/** Update pilot commands from network */
+	void read_network(void);
+	
+	/** Send pilot commands to robot. */
+	void send_serial();
+	/** Read anything the robot wants to send to us. */
+	void read_serial(void);
+};
 
-	while (1) {
-		std::string path="/superstar/"+robotName+"/pilot?get";
-		double start=time_in_seconds();
-		//printf("Path %s\n",path.c_str());
-		superstar.send_get(path);
-		std::string json_data=superstar.receive();
-		
-		try {
-			json::Value v=json::Deserialize(json_data);
-			double L=limit_power(v["power"]["L"]);
-			double R=limit_power(v["power"]["R"]);
-			
-			robot_power power;
-			power.left=(int)(64+63*L);
-			power.right=(int)(64+63*R);
-			printf("Power commands: %.2f L  %.2f R\n",L,R);
-			
-			if (pkt) {
-				pkt->write_packet(0x7,sizeof(power),&power);
-				while (Serial.available()) { // read any robot response
-					int got_data=0;
-					A_packet p;
-					while (-1==pkt->read_packet(p)) {got_data++; printf("s"); }
-					if (p.valid) {
-						printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data);
-						if (p.command==0) printf("    Arduino echo request\n");
-						else if (p.command==0xE) printf("    Arduino error packet: %d bytes, '%s'\n", p.length,p.data);
-						else printf("    Arduino unknown packet %d bytes\n",p.length);
-					}
-				}
-			}
-			
-		} catch (std::exception &e) {
-			printf("Exception while processing network JSON: %s\n",e.what());
-			printf("   Network data: %ld bytes, '%s'\n", json_data.size(),json_data.c_str());
+/** Read anything the robot wants to send to us. */
+void robot_backend::read_serial(void) {
+	if (pkt==0) return; // simulation only
+	while (Serial.available()) { // read any robot response
+		int got_data=0;
+		A_packet p;
+		while (-1==pkt->read_packet(p)) {got_data++; printf("s"); }
+		if (p.valid) {
+			printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data);
+			if (p.command==0) printf("    Arduino echo request\n");
+			else if (p.command==0xE) printf("    Arduino error packet: %d bytes, '%s'\n", p.length,p.data);
+			else printf("    Arduino unknown packet %d bytes\n",p.length);
 		}
-		double elapsed=time_in_seconds()-start;
-		double per=elapsed;
-		printf("Time:	%.1f ms/request, %.1f req/sec\n",per*1.0e3, 1.0/per);	
 	}
 }
 
+/** Send data to the robot over serial connection */
+void robot_backend::send_serial(void) {
+	if (pkt==0) return; // simulation only
+	
+	robot_power power;
+	power.left=(int)(64+63*L);
+	power.right=(int)(64+63*R);
+	pkt->write_packet(0x7,sizeof(power),&power);
+}
+
+/** Read pilot data from superstar, and store into ourselves */
+void robot_backend::read_network()
+{
+	std::string path="/superstar/"+robotName+"/pilot?get";
+	double start=time_in_seconds();
+	//printf("Path %s\n",path.c_str());
+	superstar.send_get(path);
+	std::string json_data=superstar.receive();
+	
+	try {
+		json::Value v=json::Deserialize(json_data);
+		L=limit_power(v["power"]["L"]);
+		R=limit_power(v["power"]["R"]);
+		printf("Power commands: %.2f L  %.2f R\n",L,R);
+	} catch (std::exception &e) {
+		printf("Exception while processing network JSON: %s\n",e.what());
+		printf("   Network data: %ld bytes, '%s'\n", json_data.size(),json_data.c_str());
+		stop();
+	}
+	double elapsed=time_in_seconds()-start;
+	double per=elapsed;
+	printf("Time:	%.1f ms/request, %.1f req/sec\n",per*1.0e3, 1.0/per);	
+}
+
+
+robot_backend *backend=NULL; // the singleton robot
+
 int main(int argc, char *argv[])
 {
-	bool sim = false; //turned sim off for now
-
+	bool sim = false; // use --sim to enable simulation mode
 	std::string superstarURL = "http://sandy.cs.uaf.edu/";
 	std::string robotName = "layla/uaf";
 	int baudrate = 9600;  // serial comms
@@ -97,34 +139,68 @@ int main(int argc, char *argv[])
 		if (0 == strcmp(argv[argi], "--robot")) robotName = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--superstar")) superstarURL = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--baudrate")) baudrate = atoi(argv[++argi]);
-		else if (0 == strcmp(argv[argi], "--sim")) sim = true; // no hardware, for debugging 
+		else if (0 == strcmp(argv[argi], "--sim")) { // no hardware, for debugging 
+			robotName="sim/uaf";
+			sim = true; 
+			baudrate=0;
+		}
 		else {
 			printf("Unrecognized command line argument '%s'\n", argv[argi]);
 		}
 	}
-	Serial.begin(baudrate);
-	simable_A_packet_formatter<SerialPort> *pkt = new simable_A_packet_formatter<SerialPort>(Serial,sim);
-
+	backend=new robot_backend(superstarURL, robotName);
+	if (!sim) {
+		Serial.begin(baudrate);
+		backend->add_serial(new A_packet_formatter<SerialPort>(Serial));
+	}
+	
 	if (sim == true)
-	{
+	{ // run GUI in a separate thread
 		std::thread sim(spritelib_run, "SpriteLib Demo", 800, 600);     // spritelib sim
-		
-		backend(superstarURL, robotName, baudrate, pkt);
-		
-		// synchronize threads: but backend runs forever so kind of pointless
-		sim.join();
+		sim.detach();
 	}
-	else
-	{
-		backend(superstarURL, robotName, baudrate, pkt); //run it like normal
+	
+	while (1) { // talk to robot via backend
+		backend->read_network();
+		backend->send_serial();
+		backend->read_serial();
 	}
+	
 	return 0;
 }
 
 
+/**
+  Simulates the robot onscreen.
+*/
+class robot_simulator {
+public:
+	vec2 locL,locR; // location of robot's left and right wheels, in *feet*
+	
+	robot_simulator() :locL(0.0,0.0), locR(2.0,0.0) {}
+	
+	void draw(spritelib &lib,const spritelib_tex &tex,const vec2 &loc,float size,float angle_rads) {
+		float angle_deg=angle_rads*(180.0/3.141592);
+		vec2 l=loc*30.0;
+		lib.draw(tex,400+l.x,300-l.y,size,size,angle_deg);
+	}
+	
+	void simulate(spritelib &lib) {
+		locL.y+=lib.dt*backend->L; // PLACEHOLDER physics
+		locR.y+=lib.dt*backend->R;
+		
+		vec2 dir=locR-locL;
+		static spritelib_tex wheel=lib.read_tex("face.png");
+		float ang=atan2(dir.y,dir.x);
+		draw(lib,wheel,locL,40,ang);
+		draw(lib,wheel,locR,40,ang);
+	}
+};
 
-
+robot_simulator *sim=0;
 void spritelib_draw_screen(spritelib &lib) 
 {
-	// do sim with shared R,L mem 
+	if (sim==0) sim=new robot_simulator();
+	sim->simulate(lib);
 }
+

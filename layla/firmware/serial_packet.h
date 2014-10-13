@@ -106,7 +106,7 @@ public:
 	void reset() {
 		read_state=0; read_length=0; read_index=0; read_sumpay=0;
 	}
-	~A_packet_formatter() {
+	virtual ~A_packet_formatter() {
 		if (read_data_long) { free(read_data_long); read_data_long=NULL; }
 	}
 	
