@@ -1,0 +1,5 @@
+#!/bin/sh
+#  Backend script: start video chat via firefox
+killall firefox
+DISPLAY=:0 firefox https://www.gruveo.com/#laylarobot
+

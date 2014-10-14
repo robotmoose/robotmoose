@@ -1,0 +1,2 @@
+#!/bin/sh
+killall run_backend backend
