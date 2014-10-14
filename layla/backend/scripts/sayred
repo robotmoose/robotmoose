@@ -1,0 +1,8 @@
+#!/bin/sh
+# Show text on screen on red background. 
+killall display
+text="$@"
+file="say.png"
+convert -size 1210x200 -pointsize 150 -draw "gravity Center   text 0,0 '""$text""'" canvas:red "$file"
+DISPLAY=:0 display "$file" &
+
