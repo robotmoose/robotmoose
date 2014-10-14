@@ -1,0 +1,7 @@
+#!/bin/sh
+# Show text on screen on white background. 
+killall display
+text="$@"
+convert -size 1200x200 -pointsize 150 -draw "gravity Center   text 0,0 '""$text""'" canvas:white foo.png
+DISPLAY=:0 display foo.png &
+
