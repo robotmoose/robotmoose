@@ -1,0 +1,3 @@
+#!/bin/sh
+killall run_backend backend firefox display
+

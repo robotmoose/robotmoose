@@ -1,0 +1,15 @@
+#!/bin/sh
+killall backend
+dir=`dirname $0`
+cd $dir
+cd ..
+mkdir logs
+
+while [ true ]
+do
+	echo "Starting backend on " `date` >> logs/run_backend
+	echo "Starting backend on " `date` >> logs/backend
+	ifconfig >> logs/backend
+	./backend >> logs/backend
+	sleep 2 # avoid 100% cpu when instant crashing
+done
