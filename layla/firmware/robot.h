@@ -83,13 +83,13 @@ public:
 	unsigned char right:7; // right drive wheels
 	unsigned char backMode:1; // Drive backwards (for final dump)
 	
-	unsigned char front:7; // deploy front drive wheels
+	unsigned char front:7; // For now front is servo1 
 	unsigned char frontUnused:1; // spare bit
 	
-	unsigned char mine:7; // mining head dig
+	unsigned char mine:7; // servo2
 	unsigned char mineMode:1; // if true, autonomously run mining head
 	
-	unsigned char dump:7; // storage bucket lift
+	unsigned char dump:7; // servo3
 	unsigned char dumpMode:1; // dock-and-dump mode 
 	
 	robot_power() { stop(); }

@@ -6,8 +6,12 @@
 #include "serial_packet.h" /* CYBER-Alaska packetized serial comms */
 
 #include <SoftwareSerial.h>
+#include <Servo.h>
 
 SoftwareSerial saberSerial(9,8); // RX (not used), TX
+Servo servo1;  //servo objects for pins look at setup servo.attach
+Servo servo2;
+Servo servo3;
 
 
 void sendMotor(int motorSide,int power) {
@@ -74,7 +78,13 @@ void setup()
 {
   Serial.begin(9600); // Control connection to PC
   saberSerial.begin(9600); // sabertooth motor controller
-
+ 
+  //servo signal pins
+  servo1.attach(9);
+  servo2.attach(10);
+  servo3.attach(11);
+  
+  
   // Our ONE debug LED!
   pinMode(13,OUTPUT);
   digitalWrite(13,LOW);
@@ -88,6 +98,16 @@ robot_current robot;
 void read_sensors(void) {
   /* no sensors on LAYLA, so far! */
   low_latency_ops();
+}
+
+
+// Sends servo values 0-180
+// command is quick and nonblocking
+void send_servos(void) 
+{
+  servo1.write(robot.power.front*(180/127));  //front is 0-127 and servo range is 0-180
+  servo2.write(robot.power.mine*(180/127));  // servo2
+  servo3.write(robot.power.dump*(180/127));  //servo3
 }
 
 // Send current motor values to sabertooths.
@@ -141,10 +161,9 @@ void loop()
     send_motors();
     next_micro_send=micro+25*1024; // send_motors takes 20ms
   }
-
   low_latency_ops();
+  send_servos();
 }
-
 
 
 
