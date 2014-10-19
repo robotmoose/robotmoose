@@ -84,6 +84,10 @@ void setup()
   servo2.attach(10);
   servo3.attach(11);
   
+  //set servos to known state in case of power cycle
+  servo1.write(90);
+  servo2.write(90);
+  servo3.write(90);
   
   // Our ONE debug LED!
   pinMode(13,OUTPUT);
