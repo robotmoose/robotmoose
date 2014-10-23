@@ -115,11 +115,17 @@ function pilot_send() {
 //   upState: 0 if down, 1 if up, 2 if not changing
 var mouse_down=0;
 function pilot_mouse(event,upState) {
-	var maxPower=0.4;
+// Allow user to set maximum power
+	var maxPower=0.7;
+	var powerUI=document.getElementById('robot_power').value*0.01;
+	if (isNaN(powerUI)) maxPower=0.0;
+	else if (powerUI<maxPower) { maxPower=powerUI; }
+	if (maxPower<0.15) { maxPower=0.15; }
+	
 	var arrowDiv=document.getElementById('pilot_arrows');
 	var frac=getMouseFraction(event,arrowDiv);
 	var str="";
-	str+="Mouse "+frac.x+" "+frac.y+"<br>\n";
+	// str+="Mouse "+frac.x+" "+frac.y+"<br>\n";
 
 	var dir={ forward: pretty(0.5-frac.y), turn:pretty(frac.x-0.5) };
 	// if (Math.abs(dir.turn)<0.1) dir.turn=0; // <- turning deadband
@@ -179,6 +185,8 @@ function pilot_mouse(event,upState) {
 <form name="costEst">
 
 <p>Robot Name: <input type="text" id="robot_name" rows="1" cols="30" onChange="run()" value="layla/uaf"><br>
+Power Level: <input type="text" id="robot_power" rows="1" cols="30" onChange="run()" value="15"><br>
+
 Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""></p>
 
 <!-- <p><input name="Run" value="Go!" type="button" onClick="run()"></p>  -->
