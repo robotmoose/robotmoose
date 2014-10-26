@@ -43,7 +43,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.979899"
-     inkscape:cx="71.632506"
+     inkscape:cx="88.879831"
      inkscape:cy="139.41442"
      inkscape:document-units="in"
      inkscape:current-layer="layer1"
@@ -211,5 +211,17 @@
          style="color:#000000;fill:#bfbfbf;fill-opacity:1;stroke:none;stroke-width:0.44999999;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
          transform="matrix(0,-1,1,0,0,0)" />
     </g>
+    <text
+       xml:space="preserve"
+       style="font-size:12.75488091px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Arial Black;-inkscape-font-specification:'Arial Black,'"
+       x="191.65883"
+       y="211.69522"
+       id="text3001"
+       sodipodi:linespacing="125%"
+       transform="scale(0.83014517,1.2046086)"><tspan
+         sodipodi:role="line"
+         id="tspan3003"
+         x="191.65883"
+         y="211.69522">STOP</tspan></text>
   </g>
 </svg>

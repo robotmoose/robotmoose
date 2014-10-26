@@ -115,14 +115,20 @@ function pilot_send() {
 //   upState: 0 if down, 1 if up, 2 if not changing
 var mouse_down=0;
 function pilot_mouse(event,upState) {
-	var maxPower=0.5;
+// Allow user to set maximum power
+	var maxPower=0.7;
+	var powerUI=document.getElementById('robot_power').value*0.01;
+	if (isNaN(powerUI)) maxPower=0.0;
+	else if (powerUI<maxPower) { maxPower=powerUI; }
+	if (maxPower<0.15) { maxPower=0.15; }
+	
 	var arrowDiv=document.getElementById('pilot_arrows');
 	var frac=getMouseFraction(event,arrowDiv);
 	var str="";
-	str+="Mouse "+frac.x+" "+frac.y+"<br>\n";
+	// str+="Mouse "+frac.x+" "+frac.y+"<br>\n";
 
 	var dir={ forward: pretty(0.5-frac.y), turn:pretty(frac.x-0.5) };
-	if (Math.abs(dir.turn)<0.1) dir.turn=0;
+	// if (Math.abs(dir.turn)<0.1) dir.turn=0; // <- turning deadband
 	str+="Move "+dir.forward+" forward, "+dir.turn+" turn<br>\n";
 	var totPower=Math.abs(dir.forward)+Math.abs(dir.turn);
 	var newPower=emptyPower();
@@ -171,14 +177,16 @@ function pilot_mouse(event,upState) {
 <body onLoad="run()">
 <h1>ITEST: Being There Pilot Interface</h1>
 
-<div id="pilot_arrows" style="background-color:#808080;position:relative;width:200px;height:200px;" onmousedown="pilot_mouse(event,0)" ondblclick="pilot_mouse(event,2)" ondragstart="pilot_mouse(event,0)" onmouseout="pilot_mouse(event,1)"  onmouseup="pilot_mouse(event,1)" onmousemove="pilot_mouse(event,2)">
-<img src="/img/arrows_hard.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;">
-<img id="glow" src="/img/arrows_glow.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;">
+<div id="pilot_arrows" style="background-color:#808080;position:relative;width:400px;height:400px;" onmousedown="pilot_mouse(event,0)" ondblclick="pilot_mouse(event,2)" ondragstart="pilot_mouse(event,0)" onmouseout="pilot_mouse(event,1)"  onmouseup="pilot_mouse(event,1)" onmousemove="pilot_mouse(event,2)">
+<img src="img/arrows_hard.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;">
+<img id="glow" src="img/arrows_glow.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;">
 </div>
 
 <form name="costEst">
 
 <p>Robot Name: <input type="text" id="robot_name" rows="1" cols="30" onChange="run()" value="layla/uaf"><br>
+Power Level: <input type="text" id="robot_power" rows="1" cols="30" onChange="run()" value="15"><br>
+
 Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""></p>
 
 <!-- <p><input name="Run" value="Go!" type="button" onClick="run()"></p>  -->
