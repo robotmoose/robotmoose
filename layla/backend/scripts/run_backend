@@ -2,14 +2,15 @@
 killall backend
 dir=`dirname $0`
 cd $dir
+. ./config
 cd ..
-mkdir logs
+mkdir -p logs
 
 while [ true ]
 do
 	echo "Starting backend on " `date` >> logs/run_backend
-	echo "Starting backend on " `date` >> logs/backend
+	echo "Starting backend $backend_args on " `date` >> logs/backend
 	ifconfig >> logs/backend
-	./backend >> logs/backend
+	./backend $backend_args >> logs/backend
 	sleep 2 # avoid 100% cpu when instant crashing
 done
