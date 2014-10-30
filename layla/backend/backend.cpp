@@ -48,7 +48,7 @@ private:
 	std::string robotName;
 	A_packet_formatter<SerialPort> *pkt;
 public:
-	double L,R; // current power values from pilot
+	double L,R,S1,S2,S3; // current power values from pilot
 	void stop(void) { L=R=0.0; }
 
 	robot_backend(std::string superstarURL, std::string robotName_)
@@ -96,8 +96,11 @@ void robot_backend::send_serial(void) {
 	if (pkt==0) return; // simulation only
 	
 	robot_power power;
-	power.left=(int)(64+63*L);
+	power.left=(int)(64+63*L);  
 	power.right=(int)(64+63*R);
+	power.front = (int)(127*(S1+.5));
+	power.mine = (int)(127* (S2+.5));
+	power.dump = (int)(127* (S3+.5));
 	pkt->write_packet(0x7,sizeof(power),&power);
 }
 
@@ -113,7 +116,10 @@ void robot_backend::read_network()
 		json::Value v=json::Deserialize(json_data);
 		L=limit_power(v["power"]["L"]);
 		R=limit_power(v["power"]["R"]);
-		printf("Power commands: %.2f L  %.2f R\n",L,R);
+		S1 = v["power"]["arms"];
+		S2 = v["power"]["mine"];
+		S3 = v["power"]["dump"];
+		printf("Power commands: %.2f L  %.2f R  %.2f S1  %.2f S2 %.2f S3\n",L,R,S1,S2,S3);
 	} catch (std::exception &e) {
 		printf("Exception while processing network JSON: %s\n",e.what());
 		printf("   Network data: %ld bytes, '%s'\n", json_data.size(),json_data.c_str());
