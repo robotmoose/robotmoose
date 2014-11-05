@@ -11,7 +11,7 @@
 
 /* Main update: display costs for user's selected values. */
 function run() {
-  document.getElementById('p_errorout').innerHTML="";
+  document.getElementById('p_errorout').innerHTML=" ";
   try {
 	
   } catch (err) {
@@ -19,6 +19,14 @@ function run() {
   }
 }
 
+var LEDactivated = false; // True: If LED strip is on.Javascript does not do static variables thus using global
+function LEDtoggle(){
+	console.log(LEDactivated);
+	LEDactivated = !LEDactivated;
+	if(!LEDactivated) document.getElementById('p_LEDStatus').innerHTML="LED's Off";
+	else document.getElementById('p_LEDStatus').innerHTML="LED's On";
+}
+	
 /* Walk the DOM to get the client X,Y position of this element's topleft corner.
   From www.kirupa.com/snippets/examples/move_to_click_position.htm */
 function getClientPosition(element) {
@@ -67,6 +75,7 @@ var pilot={
 	time:0,
 	/* Authorization hash (todo) */
 	auth:"ffe0"
+	
 };
 
 // Return the current wall clock time, in seconds
@@ -188,6 +197,7 @@ function pilot_mouse(event,upState) {
 Power Level: <input type="text" id="robot_power" rows="1" cols="30" onChange="run()" value="15"><br>
 
 Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""></p>
+Light Switch: <input name ="LED" value="Toggle_LED" type="button" onClick=LEDtoggle()"><p>
 
 <!-- <p><input name="Run" value="Go!" type="button" onClick="run()"></p>  -->
 </form>
@@ -196,8 +206,10 @@ Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run(
 
 <div id="status_area" style="font-style:italic;">
 <P id="p_outputRobot">Robot Status</p>
+
 <P id="p_outputNet">Network Status</p>
 <P id="p_outputPilot">Pilot Status</p>
+
 </div>
 
 </body></html>
