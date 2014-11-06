@@ -11,7 +11,7 @@
 
 /* Main update: display costs for user's selected values. */
 function run() {
-  document.getElementById('p_errorout').innerHTML=" ";
+  document.getElementById('p_errorout').innerHTML="";
   try {
 	
   } catch (err) {
@@ -20,12 +20,8 @@ function run() {
 }
 
 var LEDactivated = false; // True: If LED strip is on.Javascript does not do static variables thus using global
-function LEDtoggle(){
-	console.log(LEDactivated);
-	LEDactivated = !LEDactivated;
-	if(!LEDactivated) document.getElementById('p_LEDStatus').innerHTML="LED's Off";
-	else document.getElementById('p_LEDStatus').innerHTML="LED's On";
-}
+
+
 	
 /* Walk the DOM to get the client X,Y position of this element's topleft corner.
   From www.kirupa.com/snippets/examples/move_to_click_position.htm */
@@ -175,6 +171,15 @@ function pilot_mouse(event,upState) {
 	document.getElementById('glow').style.opacity=clamp(totPower*3.0,0.0,1.0);
 	event.stopPropagation();
 }
+// Toggles the LED strip. Yet to be implented on the back end
+//FIXME: document.getElmentById reurns null 
+function LEDtoggle(){
+	LEDactivated = !LEDactivated;
+	console.log(LEDactivated); // print current value of LEDtoggle onto the console for debugging 
+	if(!LEDactivated) {document.getElementById('p_LEDStatus').innerHTML="LED Off";}
+	else {document.getElementById('p_LEDStatus').innerHTML="LED On";}
+	return;
+}
 
 </script>
 
@@ -197,16 +202,15 @@ function pilot_mouse(event,upState) {
 Power Level: <input type="text" id="robot_power" rows="1" cols="30" onChange="run()" value="15"><br>
 
 Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""></p>
-Light Switch: <input name ="LED" value="Toggle_LED" type="button" onClick=LEDtoggle()"><p>
+Light Switch: <input name ="LED" value="Toggle_LED" type="button" onClick="LEDtoggle()"><p>
 
 <!-- <p><input name="Run" value="Go!" type="button" onClick="run()"></p>  -->
 </form>
 
-<P id="p_errorout" style="color:red;">ERROR: JavaScript not enabled.</p>
-
 <div id="status_area" style="font-style:italic;">
+<P id="p_errorout" style="color:red;">ERROR: JavaScript not enabled.</p>
+<P id="p_LEDstatus">LED Status</p>
 <P id="p_outputRobot">Robot Status</p>
-
 <P id="p_outputNet">Network Status</p>
 <P id="p_outputPilot">Pilot Status</p>
 
