@@ -20,6 +20,15 @@ function run() {
 }
 
 var LEDactivated = false; // True: If LED strip is on.Javascript does not do static variables thus using global
+// Toggles the LED strip. Yet to be implmented on the back end
+
+function LEDtoggle(){
+	LEDactivated = !LEDactivated;
+	console.log(LEDactivated); // print current value of LEDtoggle onto the console for debugging 
+	if(!LEDactivated) {document.getElementById('p_LEDstatus').innerHTML="LED Off";}
+	else {document.getElementById('p_LEDstatus').innerHTML="LED On";}
+	return;
+}
 
 
 	
@@ -171,15 +180,6 @@ function pilot_mouse(event,upState) {
 	document.getElementById('glow').style.opacity=clamp(totPower*3.0,0.0,1.0);
 	event.stopPropagation();
 }
-// Toggles the LED strip. Yet to be implented on the back end
-//FIXME: document.getElmentById reurns null 
-function LEDtoggle(){
-	LEDactivated = !LEDactivated;
-	console.log(LEDactivated); // print current value of LEDtoggle onto the console for debugging 
-	if(!LEDactivated) {document.getElementById('p_LEDStatus').innerHTML="LED Off";}
-	else {document.getElementById('p_LEDStatus').innerHTML="LED On";}
-	return;
-}
 
 </script>
 
@@ -202,15 +202,16 @@ function LEDtoggle(){
 Power Level: <input type="text" id="robot_power" rows="1" cols="30" onChange="run()" value="15"><br>
 
 Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""></p>
-Light Switch: <input name ="LED" value="Toggle_LED" type="button" onClick="LEDtoggle()"><p>
+Light Switch: <input name ="LED" value="Toggle LED" type="button" onClick="LEDtoggle()"><p>
 
 <!-- <p><input name="Run" value="Go!" type="button" onClick="run()"></p>  -->
 </form>
 
 <div id="status_area" style="font-style:italic;">
 <P id="p_errorout" style="color:red;">ERROR: JavaScript not enabled.</p>
-<P id="p_LEDstatus">LED Status</p>
+
 <P id="p_outputRobot">Robot Status</p>
+<P id="p_LEDstatus">LED Status</p>
 <P id="p_outputNet">Network Status</p>
 <P id="p_outputPilot">Pilot Status</p>
 
