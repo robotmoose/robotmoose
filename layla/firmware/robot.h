@@ -78,7 +78,7 @@ public:
 	enum { drive_stop=64 };
 
 	unsigned char left:7; // left drive wheels
-	unsigned char high:1; // High power mode
+	unsigned char high:1; // bool for LED system
 	
 	unsigned char right:7; // right drive wheels
 	unsigned char backMode:1; // Drive backwards (for final dump)
