@@ -194,6 +194,7 @@ function openVideo()
   var video = "https://www.gruveo.com/#" + splitName[0] + splitName[1];
 
   window.open(video);
+  window.alert("Video opened in New Tab");
 }
 
 </script>
@@ -226,7 +227,13 @@ Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run(
   <tr> 
      <td><input name ="LED" value="Toggle LED" type="button" onClick="LEDtoggle()"></td>
      <td><input name ="open_video" value="Open Video" type="button" onClick="openVideo()"></td>
+     
   </tr>
+  <tr>
+  <td><P id="p_LEDstatus"></p></td><!-- Dsiplay LED Status below the toggle button -->
+  <td></td> <!-- Empty Cell ro Keep Table alignment -->
+  </tr>
+     
   </table>
 
 </div>
@@ -236,7 +243,6 @@ Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run(
 <P id="p_errorout" style="color:red;">ERROR: JavaScript not enabled.</p>
 
 <P id="p_outputRobot">Robot Status</p>
-<P id="p_LEDstatus">LED Status</p>
 <P id="p_outputNet">Network Status</p>
 <P id="p_outputPilot">Pilot Status</p>
 
