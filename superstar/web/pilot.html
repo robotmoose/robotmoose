@@ -19,8 +19,6 @@ function run() {
   }
 }
 
-
-
 	
 /* Walk the DOM to get the client X,Y position of this element's topleft corner.
   From www.kirupa.com/snippets/examples/move_to_click_position.htm */
@@ -186,6 +184,18 @@ function pilot_mouse(event,upState) {
 	event.stopPropagation();
 }
 
+//Open correct gruveo feed according to robot name entered by pilot
+//Opens in new tab/window depending on User Setting(no way to force new window)
+function openVideo()
+{
+  var currentRobot = document.getElementById('robot_name').value;
+  var splitName = currentRobot.split('/');
+ 
+  var video = "https://www.gruveo.com/#" + splitName[0] + splitName[1];
+
+  window.open(video);
+}
+
 </script>
 
 
@@ -206,12 +216,22 @@ function pilot_mouse(event,upState) {
 <p>Robot Name: <input type="text" id="robot_name" rows="1" cols="30" onChange="run()" value="layla/uaf"><br>
 Power Level: <input type="text" id="robot_power" rows="1" cols="30" onChange="run()" value="15"><br>
 
-Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""></p>
-Light Switch: <input name ="LED" value="Toggle LED" type="button" onClick="LEDtoggle()"><p>
+Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""><br>
+
 
 <!-- <p><input name="Run" value="Go!" type="button" onClick="run()"></p>  -->
-</form>
 
+<div id="button_area" style="font-style:italic">
+<table>
+  <tr> 
+     <td><input name ="LED" value="Toggle LED" type="button" onClick="LEDtoggle()"></td>
+     <td><input name ="open_video" value="Open Video" type="button" onClick="openVideo()"></td>
+  </tr>
+  </table>
+
+</div>
+</p>
+</form>
 <div id="status_area" style="font-style:italic;">
 <P id="p_errorout" style="color:red;">ERROR: JavaScript not enabled.</p>
 
