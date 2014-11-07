@@ -49,6 +49,7 @@ private:
 	A_packet_formatter<SerialPort> *pkt;
 public:
 	double L,R,S1,S2,S3; // current power values from pilot
+	bool ledOn;
 	void stop(void) { L=R=0.0; }
 
 	robot_backend(std::string superstarURL, std::string robotName_)
@@ -101,6 +102,7 @@ void robot_backend::send_serial(void) {
 	power.front = (int)(127*(S1+.5));
 	power.mine = (int)(127* (S2+.5));
 	power.dump = (int)(127* (S3+.5));
+	power.high = ledOn;
 	pkt->write_packet(0x7,sizeof(power),&power);
 }
 
@@ -119,7 +121,9 @@ void robot_backend::read_network()
 		S1 = v["power"]["arms"];
 		S2 = v["power"]["mine"];
 		S3 = v["power"]["dump"];
-		printf("Power commands: %.2f L  %.2f R  %.2f S1  %.2f S2 %.2f S3\n",L,R,S1,S2,S3);
+		ledOn = v["LED"];
+		printf("Power commands: %.2f L  %.2f R  %.2f S1  %.2f S2 %.2f S3 LED Status: ",L,R,S1,S2,S3);
+		printf(ledOn ? "true\n" : "false\n");
 	} catch (std::exception &e) {
 		printf("Exception while processing network JSON: %s\n",e.what());
 		printf("   Network data: %ld bytes, '%s'\n", json_data.size(),json_data.c_str());
