@@ -19,16 +19,6 @@ function run() {
   }
 }
 
-var LEDactivated = false; // True: If LED strip is on.Javascript does not do static variables thus using global
-// Toggles the LED strip. Yet to be implmented on the back end
-
-function LEDtoggle(){
-	LEDactivated = !LEDactivated;
-	console.log(LEDactivated); // print current value of LEDtoggle onto the console for debugging 
-	if(!LEDactivated) {document.getElementById('p_LEDstatus').innerHTML="LED Off";}
-	else {document.getElementById('p_LEDstatus').innerHTML="LED On";}
-	return;
-}
 
 
 	
@@ -79,9 +69,22 @@ var pilot={
 	/* Time, in seconds, of last pilot command */
 	time:0,
 	/* Authorization hash (todo) */
-	auth:"ffe0"
+	auth:"ffe0",
+	/*Current LED state*/
+	LED:"false" // set initial state to false 
 	
 };
+pilot.LED = false; // HACK: Wihtout this the first time LEDtoggle is called it is set to false
+function LEDtoggle(){
+	pilot.LED = !pilot.LED
+	console.log(pilot.LED); // print current value of LEDtoggle onto the console for debugging 
+	if(!pilot.LED) {document.getElementById('p_LEDstatus').innerHTML="LED Off";}
+	else {document.getElementById('p_LEDstatus').innerHTML="LED On";}
+	pilot_send();
+	
+}
+	
+
 
 // Return the current wall clock time, in seconds
 function pilot_time() {
@@ -107,6 +110,8 @@ function pilot_send() {
 	networkBusy++; 
 	var send_time=pilot.time=pilot_time();
 	var pilotStr=JSON.stringify(pilot);
+	console.log(pilotStr);
+	//var LEDStr=JSON.stringify(LED); // send current LED state
 	var url=url_start+"/pilot?set="+encodeURIComponent(pilotStr);
 	var xmlhttp=new XMLHttpRequest();
 	xmlhttp.onreadystatechange=function()
