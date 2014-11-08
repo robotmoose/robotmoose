@@ -59,6 +59,11 @@ function emptyPower()
 	return {L:0, R:0, dump:0, mine:0, arms:0};
 }
 
+// Returns an "empty" LED RGB object. Actually white light (0,0,0)
+function led_RGB()
+{
+	return {R:0, G:0, B:0};
+}
 // This class stores our last-used piloting command
 var pilot={
 	/* Power to each actuator */
@@ -69,7 +74,9 @@ var pilot={
 	/* Authorization hash (todo) */
 	auth:"ffe0",
 	/*Current LED state*/
-	LED:"false" // set initial state to false 
+	LED:"false", // set initial state to false 
+        /*LED RGB*/
+        RGB: led_RGB()
 	
 };
 pilot.LED = false; // HACK: Wihtout this the first time LEDtoggle is called it is set to false
@@ -208,9 +215,13 @@ function openVideo()
 
 ColorPicker(document.getElementById('color-picker'),
           function(hex, hsv, rgb) {
-          console.log(hsv.h, hsv.s, hsv.v);         // [0-359], [0-1], [0-1]
+          //console.log(hsv.h, hsv.s, hsv.v);         // [0-359], [0-1], [0-1]
           console.log(rgb.r, rgb.g, rgb.b);         // [0-255], [0-255], [0-255]
-          document.body.style.backgroundColor = hex;        // #HEX
+          //var RGB=led_RGB()
+          pilot.RGB.R=rgb.r; pilot.RGB.G=rgb.g; pilot.RGB.B=rgb.b; // Set rgb values selected by user to pilot RGB variable
+	  console.log(pilot.RGB.R, pilot.RGB.G, pilot.RGB.B);  
+          pilot_send() // send commands when color is changed
+          
         });
 
 
