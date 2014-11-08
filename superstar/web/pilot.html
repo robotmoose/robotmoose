@@ -198,7 +198,24 @@ function openVideo()
 }
 
 </script>
+<!-- Color picker for LED. Trying to figure out how to move it so that it does not get overlayed by the arrow -->
+<div id=color_picker>
+<div id="color-picker" class="cp-default"></div>
+<script type="text/javascript" src="colorpicker.js"></script>
+<link rel="stylesheet" type="text/css" href="themes.css" />
 
+<script>
+
+ColorPicker(document.getElementById('color-picker'),
+          function(hex, hsv, rgb) {
+          console.log(hsv.h, hsv.s, hsv.v);         // [0-359], [0-1], [0-1]
+          console.log(rgb.r, rgb.g, rgb.b);         // [0-255], [0-255], [0-255]
+          document.body.style.backgroundColor = hex;        // #HEX
+        });
+
+
+</script>
+</div>
 
 <head><title>Pilot for ITEST: Being There</title>
 
@@ -207,10 +224,26 @@ function openVideo()
 <body onLoad="run()">
 <h1>ITEST: Being There Pilot Interface</h1>
 
+<!-- Attempt to launch color picker in a table -->
+<p><table> 
+  <tr>
+    <td>
 <div id="pilot_arrows" style="background-color:#808080;position:relative;width:400px;height:400px;" onmousedown="pilot_mouse(event,0)" ondblclick="pilot_mouse(event,2)" ondragstart="pilot_mouse(event,0)" onmouseout="pilot_mouse(event,1)"  onmouseup="pilot_mouse(event,1)" onmousemove="pilot_mouse(event,2)">
 <img src="img/arrows_hard.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;">
 <img id="glow" src="img/arrows_glow.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;">
 </div>
+   </td>
+    <td><p id="color_picker"></p></td>
+</tr>
+</table></p>
+<!-- Attempt to launch color picker in a table -->
+<!--<table style="width:100%"> 
+  <tr>
+    <td></td>
+    <td><p id="color_picker"></p></td>
+  </tr>
+</table> -->
+
 
 <form name="costEst">
 
@@ -224,14 +257,18 @@ Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run(
 
 <div id="button_area" style="font-style:italic">
 <table>
+  
   <tr> 
+     
      <td><input name ="LED" value="Toggle LED" type="button" onClick="LEDtoggle()"></td>
      <td><input name ="open_video" value="Open Video" type="button" onClick="openVideo()"></td>
+     <!--<td><input name = "color_picker" value="Pick LED color" type="button" onClick=color_picker()"></td> -->
      
   </tr>
   <tr>
   <td><P id="p_LEDstatus"></p></td><!-- Dsiplay LED Status below the toggle button -->
   <td></td> <!-- Empty Cell ro Keep Table alignment -->
+  <td><P id="color_picker"></p></td>
   </tr>
      
   </table>
