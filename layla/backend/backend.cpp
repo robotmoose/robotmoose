@@ -50,6 +50,7 @@ private:
 public:
 	double L,R,S1,S2,S3; // current power values from pilot
 	bool ledOn;
+	int led_red,led_green,led_blue; // LED RGB values send by pilot 
 	void stop(void) { L=R=0.0; }
 
 	robot_backend(std::string superstarURL, std::string robotName_)
@@ -122,8 +123,12 @@ void robot_backend::read_network()
 		S2 = v["power"]["mine"];
 		S3 = v["power"]["dump"];
 		ledOn = v["LED"];
+	        led_red=v["RGB"]["R"];
+		led_green=v["RGB"]["G"];
+		led_blue=v["RGB"]["B"];		
 		printf("Power commands: %.2f L  %.2f R  %.2f S1  %.2f S2 %.2f S3 LED Status: ",L,R,S1,S2,S3);
 		printf(ledOn ? "true\n" : "false\n");
+                printf("RGB Values: %d R %d G %d B \n",led_red,led_blue,led_green);
 	} catch (std::exception &e) {
 		printf("Exception while processing network JSON: %s\n",e.what());
 		printf("   Network data: %ld bytes, '%s'\n", json_data.size(),json_data.c_str());
