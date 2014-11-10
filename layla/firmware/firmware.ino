@@ -9,26 +9,38 @@
 #include "SoftwareServo.h"
 //#include <Servo.h>
 
-SoftwareSerial saberSerial(9,8); // RX (not used), TX
-SoftwareServo servo1;  //servo objects for pins look at setup servo.attach
-SoftwareServo servo2;
-SoftwareServo servo3;
+void LEDdemo();
+void sendMotor(int motorSide,int power);
+void low_latency_ops();
+void read_sensors(void);
+void send_servos(void) ;
+void send_motors(void);
+void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p);
+void LEDdemo();
 
+struct leds
+{
+  leds(int b, int r, int g): blue(b), red(r), green(g)
+  {
+  }
+  int blue;
+  int red;
+  int green;
+};
 
-void sendMotor(int motorSide,int power) {
-  if (power<1) power=1;
-  if (power>126) power=126;
-  if (motorSide) power+=128;
-  saberSerial.write((unsigned char)power);
-}
+struct ramp 
+{
+  ramp(leds a,unsigned long s): active(a), slowness(s), lastrun(0), brightness(0), up(true)
+  {
+  }
+  void run();
+  bool up;
+  unsigned long lastrun;
+  leds active;
+  int brightness;
+  unsigned long slowness;
+};
 
-
-// All PC commands go via this (onboard USB) port
-HardwareSerial &PCport=Serial; // direct PC
-
-// Call this function frequently--it's for minimum-latency operations
-void low_latency_ops() {
-}
 
 /** This class manages communication via an A_packet_formatter,
  including timeouts. */
@@ -71,7 +83,29 @@ public:
     return false;
   }
 };
+
+//-------------
+SoftwareSerial saberSerial(9,8); // RX (not used), TX
+
+leds ledpins(11,10,9);  // which pins are used for RGB led's
+ramp colors(leds(1,0,0),10);  //which colors to ramp though (led(RED,GREEN,Blue),Speed)
+
+SoftwareServo servo1;  //servo objects for pins look at setup servo.attach
+SoftwareServo servo2;
+SoftwareServo servo3;
+
+
+// All PC commands go via this (onboard USB) port
+HardwareSerial &PCport=Serial; // direct PC
 CommunicationChannel PC(PCport);
+// Robot's current state:
+robot_current robot;
+
+unsigned long next_micro_send=0;
+//--------------
+
+
+
 
 /***************** Robot Control Logic ****************/
 
@@ -81,14 +115,22 @@ void setup()
   saberSerial.begin(9600); // sabertooth motor controller
  
   //servo signal pins
-  servo1.attach(9);
-  servo2.attach(10);
-  servo3.attach(11);
+  servo1.attach(3);
+  servo2.attach(5);
+  servo3.attach(6);
   
   //set servos to known state in case of power cycle
   servo1.write(90);
   servo2.write(90);
   servo3.write(90);
+  
+  //set led pin's up
+  pinMode(ledpins.blue, OUTPUT);
+  pinMode(ledpins.red, OUTPUT);
+  pinMode(ledpins.green, OUTPUT);
+  analogWrite(ledpins.blue,0); // turn them off
+  analogWrite(ledpins.red,0);
+  analogWrite(ledpins.green,0);
   
   // Our ONE debug LED!
   pinMode(13,OUTPUT);
@@ -96,15 +138,54 @@ void setup()
 
 }
 
-// Robot's current state:
-robot_current robot;
+
+void loop()
+{
+  unsigned long micro=micros();
+  unsigned long milli=micro>>10; // approximately == milliseconds
+
+  A_packet p;
+  if (PC.read_packet(milli,p)) handle_packet(PC.pkt,p);
+  if (!(PC.is_connected)) robot.power.stop(); // disconnected?
+
+  if (micro>=next_micro_send) 
+  { // Send commands to motors
+    send_motors();
+   // send_servos();
+    next_micro_send=micro+25*1024; // send_motors takes 20ms
+  }
+  low_latency_ops();
+  if(robot.power.high)
+    LEDdemo();
+  else
+   {
+    analogWrite(ledpins.blue,0);
+    analogWrite(ledpins.red,0);
+    analogWrite(ledpins.green,0);
+   }
+     
+  //SoftwareServo::refresh();
+}
+
+
+// Call this function frequently--it's for minimum-latency operations
+void low_latency_ops() {
+  if(robot.power.high)
+    colors.run();
+}
+
+void sendMotor(int motorSide,int power) {
+  if (power<1) power=1;
+  if (power>126) power=126;
+  if (motorSide) power+=128;
+  saberSerial.write((unsigned char)power);
+}
 
 // Read all robot sensors into robot.sensor
 void read_sensors(void) {
   /* no sensors on LAYLA, so far! */
   low_latency_ops();
 }
-
 
 // Sends servo values 0-180
 // command is quick and nonblocking
@@ -151,25 +232,112 @@ void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p)
   }
 }
 
-unsigned long next_micro_send=0;
-void loop()
+//lights demo code (needs cleaned)
+void LEDdemo()
 {
-  unsigned long micro=micros();
-  unsigned long milli=micro>>10; // approximately == milliseconds
 
-  A_packet p;
-  if (PC.read_packet(milli,p)) handle_packet(PC.pkt,p);
-  if (!(PC.is_connected)) robot.power.stop(); // disconnected?
-
-  if (micro>=next_micro_send) 
-  { // Send commands to motors
-    send_motors();
-   // send_servos();
-    next_micro_send=micro+25*1024; // send_motors takes 20ms
+static int count=0;
+static int countspace=5000;
+static unsigned long lastcount=0;
+  if(lastcount+countspace<millis())
+  {
+    lastcount=millis();
+    count++;
+  
+    if(count>7)
+      count=0;
+    
+    if(count==0)
+    {
+      colors.active.blue=1;
+      colors.active.red=0;
+      colors.active.green=0;
+      analogWrite(ledpins.blue,0);
+      analogWrite(ledpins.red,0);
+      analogWrite(ledpins.green,0);
+    }
+    if(count==1)
+    {
+      colors.active.blue=0;
+      colors.active.red=1;
+      colors.active.green=0;
+      analogWrite(ledpins.blue,0);
+      analogWrite(ledpins.red,0);
+      analogWrite(ledpins.green,0);
+    }
+    if(count==3)
+    {
+      colors.active.blue=0;
+      colors.active.red=0;
+      colors.active.green=1;
+      analogWrite(ledpins.blue,0);
+      analogWrite(ledpins.red,0);
+      analogWrite(ledpins.green,0);
+    }
+    if(count==4)
+    {
+      colors.active.blue=0;
+      colors.active.red=1;
+      colors.active.green=1;
+      analogWrite(ledpins.blue,0);
+      analogWrite(ledpins.red,0);
+      analogWrite(ledpins.green,0);
+    }
+    if(count==5)
+    {
+      colors.active.blue=1;
+      colors.active.red=1;
+      colors.active.green=0;
+      analogWrite(ledpins.blue,0);
+      analogWrite(ledpins.red,0);
+      analogWrite(ledpins.green,0);
+    }
+    if(count==6)
+    {
+      colors.active.blue=1;
+      colors.active.red=0;
+      colors.active.green=1;
+      analogWrite(ledpins.blue,0);
+      analogWrite(ledpins.red,0);
+      analogWrite(ledpins.green,0);
+    }
+    if(count==7)
+    {
+      colors.active.blue=1;
+      colors.active.red=1;
+      colors.active.green=1;
+      analogWrite(ledpins.blue,0);
+      analogWrite(ledpins.red,0);
+      analogWrite(ledpins.green,0);
+    }
   }
-  low_latency_ops();
-  //SoftwareServo::refresh();
 }
 
 
-
+void ramp::run()
+{
+  if(lastrun+slowness<millis())
+  {
+    if(up)
+      brightness++;
+    else
+      brightness--;
+    lastrun=millis();
+    if(brightness<0)
+    {
+      brightness=0;
+      up=true;
+    }
+    if(brightness>255)
+    {
+      brightness=255;
+      up=false;
+    }
+    if(active.blue==1)
+      analogWrite(ledpins.blue, brightness);
+    if(active.red==1)
+      analogWrite(ledpins.red, brightness);
+    if(active.green==1)
+      analogWrite(ledpins.green, brightness);
+  }
+}
