@@ -210,9 +210,10 @@ function openVideo()
 //Update pilot.RGB variable with currently selected RGB values
 function updateRGB()
 {
-  pilot.RGB.R=document.getElementById('LED_red').value;
-  pilot.RGB.G=document.getElementById('LED_green').value;
-  pilot.RGB.B=document.getElementById('LED_blue').value;
+  // parseFloat converts the string literal returned by getElementByid to a floating point
+  pilot.RGB.R=parseFloat(document.getElementById('LED_red').value);
+  pilot.RGB.G=parseFloat(document.getElementById('LED_green').value);
+  pilot.RGB.B=parseFloat(document.getElementById('LED_blue').value);
   pilot_send();
 }
 </script>
