@@ -201,10 +201,11 @@ function openVideo()
   var currentRobot = document.getElementById('robot_name').value;
   var splitName = currentRobot.split('/');
  
-  var video = "https://www.gruveo.com/#" + splitName[0] + splitName[1];
+  var videoURL = "https://www.gruveo.com/#" + splitName[0] + splitName[1];
 
-  window.open(video);
-  window.alert("Video opened in New Tab");
+  // On Firefox or Chrome, specifying a width and height opens a new window, not a tab.
+  //  (On IE, it's up to the user's preferences)
+  window.open(videoURL,"video",'width=800,height=600');
 }
 
 //Update pilot.RGB variable with currently selected RGB values
