@@ -49,9 +49,7 @@ function pretty(number) {
 }
 // Clamp this value between lo and hi
 function clamp(v,lo,hi) {
-	if (v<lo) return lo;
-	if (v>hi) return hi;
-	return v;
+	return v*hi;  //dynamic scaling
 }
 
 // Return an "empty" robot power object, with everything stationary
@@ -147,7 +145,7 @@ function pilot_mouse(event,upState) {
 	var powerUI=document.getElementById('robot_power').value*0.01;
 	if (isNaN(powerUI)) maxPower=0.0;
 	else if (powerUI<maxPower) { maxPower=powerUI; }
-	if (maxPower<0.15) { maxPower=0.15; }
+	//if (maxPower<0.15) { maxPower=0.15; } // limit's low end speed
 	
 	var arrowDiv=document.getElementById('pilot_arrows');
 	var frac=getMouseFraction(event,arrowDiv);
