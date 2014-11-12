@@ -194,17 +194,19 @@ function pilot_mouse(event,upState) {
 
 //Open correct gruveo feed according to robot name entered by pilot
 //Opens in new tab/window depending on User Setting(no way to force new window)
-function openVideo()
+/*function openVideo()
 {
   var currentRobot = document.getElementById('robot_name').value;
   var splitName = currentRobot.split('/');
  
-  var videoURL = "https://www.gruveo.com/#" + splitName[0] + splitName[1];
-
+  //var videoURL = "https://www.gruveo.com/#" + splitName[0] + splitName[1];
+ // Use AppRTC instead of gruveo for video
+  var videoURL = "https://apprtc.appspot.com/?r=" + splitName[0] + splitName[1];
   // On Firefox or Chrome, specifying a width and height opens a new window, not a tab.
   //  (On IE, it's up to the user's preferences)
-  window.open(videoURL,"video",'width=800,height=600');
-}
+  //window.open(videoURL,"video",'width=800,height=600');
+  
+}*/
 
 //Update pilot.RGB variable with currently selected RGB values
 function updateRGB()
@@ -225,11 +227,17 @@ function updateRGB()
 <body onLoad="run()">
 <h1>ITEST: Being There Pilot Interface</h1>
 
-
-<div id="pilot_arrows" style="background-color:#808080;position:relative;width:400px;height:400px;" onmousedown="pilot_mouse(event,0)" ondblclick="pilot_mouse(event,2)" ondragstart="pilot_mouse(event,0)" onmouseout="pilot_mouse(event,1)"  onmouseup="pilot_mouse(event,1)" onmousemove="pilot_mouse(event,2)">
+<table>
+<tr>
+<td><div id="pilot_arrows" style="background-color:#808080;position:relative;width:400px;height:400px;" onmousedown="pilot_mouse(event,0)" ondblclick="pilot_mouse(event,2)" ondragstart="pilot_mouse(event,0)" onmouseout="pilot_mouse(event,1)"  onmouseup="pilot_mouse(event,1)" onmousemove="pilot_mouse(event,2)">
 <img src="img/arrows_hard.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;">
 <img id="glow" src="img/arrows_glow.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;">
-</div>
+</div></td>
+<td style="width:100%;height:100%"><div id="video_area" style="width:100%;height:100%"><iframe style="width:400px;height:400px" src="https://apprtc.appspot.com/?r="+ "document.getElementById('robot_name').value"></iframe></div></td>
+<tr>
+</table>
+
+
    
 
 
@@ -249,13 +257,13 @@ Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run(
   <tr> 
      
      <td><input name ="LED" value="Toggle LED" type="button" onClick="LEDtoggle()"></td>
-     <td><input name ="open_video" value="Open Video" type="button" onClick="openVideo()"></td> 
+     <!--<td><input name ="open_video" value="Open Video" type="button" onClick="openVideo()"></td> -->
      <td><input class="color{pickerOnfocus:true}" id="color_picker" onchange = "updateRGB();document.getElementById('LED_red').value = this.color.rgb[0]; document.getElementById('LED_green').value= this.color.rgb[1]; document.getElementById('LED_blue').value = this.color.rgb[2]"></td>
  </tr>
 
   <tr>
   <td><P id="p_LEDstatus"></p></td><!-- Dsiplay LED Status below the toggle button -->
-  <td></td> <!-- Empty Cell to Keep Table alignment -->
+ 
   <td colspan="3">R<input id="LED_red" size="5">  G<input id="LED_green" size="5">  B<input id="LED_blue" size="5">   
   </tr>
      
