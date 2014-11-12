@@ -8,7 +8,7 @@
  * @updated 2014-07-16
  * @link    http://jscolor.com
  */
-
+ 
 
 var jscolor = {
 
@@ -626,6 +626,8 @@ var jscolor = {
 					}
 					dispatchImmediateChange();
 				}
+				updateRGB();
+				pilot_send();
 			};
 			if('ontouchstart' in window) { // if touch device
 				var handle_touchmove = function(e) {
