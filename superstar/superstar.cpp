@@ -171,7 +171,7 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 */
 void *thread_code(void *) {
   struct mg_server *server= mg_create_server(NULL, http_handler);
-  mg_set_option(server, "listening_port", "8080");
+  mg_set_option(server, "listening_port", "80");
   mg_set_option(server, "document_root", "web"); // files served from here
 
   printf("OK, listening!  Visit http://localhost:%s to see the site!\n",
