@@ -86,13 +86,18 @@ var pilot={
 	
 	/* Time, in seconds, of last pilot command */
 	time:0,
-	/* Authorization hash (todo) */
-	auth:"ffe0",
+	
 	/*Current LED state*/
 	LED:"false", // set initial state to false 
-        /*LED RGB*/
-        RGB: ledRGB()
 	
+        /*LED RGB*/
+        RGB: ledRGB(),
+
+        /* Scripted command to run */
+	cmd: { run: "", arg:"" }
+	
+	/* Authorization hash (todo) */
+	auth:"ffe0",
 };
 pilot.LED = true; // HACK: Without this the first time LEDtoggle is called it is set to false
 function LEDtoggle(newValue){
@@ -260,6 +265,14 @@ function updateRGB()
   pilot.RGB.B=parseFloat(document.getElementById('LED_blue').value);
   pilot_send();
 }
+
+//Run scripted command, like say or play
+function runCmd(run,arg) {
+	pilot.cmd.run=run;
+	pilot.cmd.arg=arg;
+	pilot_send();
+}
+
 </script>
 
 
@@ -294,6 +307,8 @@ Drive Power: <input type="text" id="robot_power" rows="1" cols="30" onChange="ru
 
 Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""><br>
 
+Sound: 
+<input value="Beep" type="button" onClick="runCmd('play','music/whistle1.mp3')"><br>
 
 <!--   -->
 
