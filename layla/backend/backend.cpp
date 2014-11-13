@@ -137,15 +137,18 @@ void robot_backend::read_network()
 		if (run.find_first_of("./\\\"")==std::string::npos) { // looks clean
 			std::string cmd_arg=run+arg;
 			if (last_cmd_arg!=cmd_arg) { // new script command: run it
-				std::string path=run;
+				std::string path="./"+run;
 				printf("RUNNING SCRIPT: '%s' with arg '%s'\n",
 					path.c_str(),arg.c_str());
 				if (fork()==0) {
-					if (!chdir("scripts")) printf("SCRIPT chdir FAILED\n");
-					else {
-						execl(path.c_str(),path.c_str(),arg.c_str());
-						printf("SCRIPT EXECUTE FAILED\n");
+					if (chdir("scripts")!=0) {
+						printf("SCRIPT chdir FAILED\n");
 					}
+					else {
+						execl(path.c_str(),path.c_str(),arg.c_str(),(char *)NULL);
+						perror("SCRIPT EXECUTE FAILED\n");
+					}
+					exit(0);
 				}
 			}
 			last_cmd_arg=cmd_arg;
