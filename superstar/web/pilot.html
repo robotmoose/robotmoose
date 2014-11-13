@@ -203,13 +203,18 @@ function pilot_mouse(event,upState) {
 //Open correct AppRTC feed based on robot name entered. Gets run evry time the robot name is changed
 function updateVideo()
 {
-  var currentRobot = document.getElementById('robot_name').value;
+  var currentRobot = document.getElementById('robot_videoname').value;
   var splitName = currentRobot.split('/');
  
 
  // Use AppRTC instead of gruveo for video
   var videoURL = "https://apprtc.appspot.com/?r=" + splitName[0] + splitName[1];
-  document.getElementById("video_frame").src = "https://apprtc.appspot.com/?r=" + splitName[0] + splitName[1];;
+  // Add parameters to improve video responsiveness
+  videoURL+="&hd=false";
+  // videoURL+="&video=optional:minWidth=640,optional:minHeight=320";
+  videoURL+="&vsbr=1000&vrbr=1000"; // cut bitrate to 1000 kilobits?
+   
+  document.getElementById("video_frame").src = videoURL;
   // On Firefox or Chrome, specifying a width and height opens a new window, not a tab.
   //  (On IE, it's up to the user's preferences)
   //window.open(videoURL,"video",'width=800,height=600');
@@ -241,7 +246,7 @@ function updateRGB()
 <img src="img/arrows_hard.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;">
 <img id="glow" src="img/arrows_glow.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;">
 </div></td>
-<td style="width:100%;height:100%"><div id="video_area" style="width:100%;height:100%"><iframe id="video_frame" style="width:400px;height:400px" src=""></iframe></div></td>
+<td style="width:100%;height:100%"><div id="video_area" style="width:100%;height:100%"><iframe id="video_frame" style="width:100%;height:400px" src=""></iframe></div></td>
 <tr>
 </table>
 
@@ -251,7 +256,9 @@ function updateRGB()
 
 <form name="costEst">
 
-<p>Robot Name: <input type="text" id="robot_name" rows="1" cols="30" onChange="run();updateVideo()" value="layla/uaf"><br>
+<p>
+Robot Name: <input type="text" id="robot_name" rows="1" cols="30" onChange="run();" value="layla/uaf"><br>
+Video Name: <input type="text" id="robot_videoname" rows="1" cols="30" onChange="updateVideo()" value="layla/uaf"><br>
 Power Level: <input type="text" id="robot_power" rows="1" cols="30" onChange="run()" value="15"><br>
 
 Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""><br>
