@@ -47,9 +47,12 @@ function getMouseFraction(event,domElement) {
 function pretty(number) {
 	return Math.round(number*1000)/1000.0;
 }
+
 // Clamp this value between lo and hi
 function clamp(v,lo,hi) {
-	return v*hi;  //dynamic scaling
+	if (v<lo) return lo;
+	if (v>hi) return hi;
+	else return v;
 }
 
 // Return an "empty" robot power object, with everything stationary
@@ -155,6 +158,11 @@ function pilot_mouse(event,upState) {
 	var dir={ forward: pretty(0.5-frac.y), turn:pretty(frac.x-0.5) };
 	// if (Math.abs(dir.turn)<0.1) dir.turn=0; // <- turning deadband
 	str+="Move "+dir.forward+" forward, "+dir.turn+" turn<br>\n";
+
+//Proportional control.  The 2.0 is because mouse is from -0.5 to +0.5
+	dir.forward=dir.forward*2.0*powerUI;
+	dir.turn=dir.turn*2.0*powerUI;
+
 	var totPower=Math.abs(dir.forward)+Math.abs(dir.turn);
 	var newPower=emptyPower();
 	if (frac.x<0.9) { /* normal driving */
