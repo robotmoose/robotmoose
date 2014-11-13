@@ -22,6 +22,9 @@
 #include "../../include/osl/vec2.h" // 2d vector
 // #include "../../layla/firmware/simable_serial_packet.h" // not needed
 
+// Script execution
+#include <unistd.h> /* for fork(), execl() */
+
 
 /* Do linking right here */
 #include "../../include/serial.cpp"
@@ -127,9 +130,31 @@ void robot_backend::read_network()
 	        led_red=v["RGB"]["R"];
 		led_green=v["RGB"]["G"];
 		led_blue=v["RGB"]["B"];	
+		
+		static std::string last_cmd_arg="";
+		std::string run=v["cmd"]["run"];
+		std::string arg=v["cmd"]["arg"];
+		if (run.find_first_of("./\\\"")==std::string::npos) { // looks clean
+			std::string cmd_arg=run+arg;
+			if (last_cmd_arg!=cmd_arg) { // new script command: run it
+				std::string path=run;
+				printf("RUNNING SCRIPT: '%s' with arg '%s'\n",
+					path.c_str(),arg.c_str());
+				if (fork()==0) {
+					if (!chdir("scripts")) printf("SCRIPT chdir FAILED\n");
+					else {
+						execl(path.c_str(),path.c_str(),arg.c_str());
+						printf("SCRIPT EXECUTE FAILED\n");
+					}
+				}
+			}
+		}
+	
+	/*
 		printf("Power commands: %.2f L  %.2f R  %.2f S1  %.2f S2 %.2f S3 LED Status: ",L,R,S1,S2,S3);
 		printf(ledOn ? "true\n" : "false\n");
                 printf("RGB Values: %0.2f R %0.2f G %0.2f B \n",led_red,led_blue,led_green);
+	*/
 	} catch (std::exception &e) {
 		printf("Exception while processing network JSON: %s\n",e.what());
 		printf("   Network data: %ld bytes, '%s'\n", json_data.size(),json_data.c_str());
