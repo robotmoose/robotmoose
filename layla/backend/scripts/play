@@ -1,0 +1,4 @@
+#!/bin/sh
+#  Play .mp3 audio file out loud.
+killall mpg123
+mpg123 "$@"
