@@ -211,6 +211,10 @@ function updateVideo()
   var videoURL = "https://apprtc.appspot.com/?r=" + splitName[0] + splitName[1];
   // Add parameters to improve video responsiveness
   videoURL+="&hd=false";
+  videoURL+="&tt=1"; // <- timeout on client very fast
+  videoURL+="&audio=googNoiseReduction=true"; // Google noise reduction
+  videoURL+="&audio=googEchoCancellation=true"; // Google noise reduction
+  
   // videoURL+="&video=optional:minWidth=640,optional:minHeight=320";
   videoURL+="&vsbr=1000&vrbr=1000"; // cut bitrate to 1000 kilobits?
    
