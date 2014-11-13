@@ -83,9 +83,9 @@ var pilot={
         RGB: ledRGB()
 	
 };
-pilot.LED = false; // HACK: Wihtout this the first time LEDtoggle is called it is set to false
-function LEDtoggle(){
-	pilot.LED = !pilot.LED
+pilot.LED = true; // HACK: Without this the first time LEDtoggle is called it is set to false
+function LEDtoggle(newValue){
+	pilot.LED = newValue;
 	console.log(pilot.LED); // print current value of LEDtoggle onto the console for debugging 
 	if(!pilot.LED) {document.getElementById('p_LEDstatus').innerHTML="LED Off";}
 	else {document.getElementById('p_LEDstatus').innerHTML="LED On";}
@@ -183,7 +183,7 @@ function pilot_mouse(event,upState) {
 	if (upState==1) mouse_down=0;
 	if (upState==0) mouse_down=1;
 	if (mouse_down) {
-		arrowDiv.style.backgroundColor='#000000';
+		arrowDiv.style.backgroundColor='#222222';
 		str+=" SENDING";
 	} else {
 		arrowDiv.style.backgroundColor='#404040';
@@ -256,8 +256,10 @@ function updateRGB()
 
 </head>
 
-<body onLoad="run();">
+<body onLoad="run();" style="background-color:#222222;color:#ffccff;">
+<center>
 <h1>ITEST: Being There Pilot Interface</h1>
+</center>
 
 <table>
 <tr>
@@ -289,9 +291,10 @@ Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run(
   
   <tr> 
      
-     <td><input name ="LED" value="Toggle LED" type="button" onClick="LEDtoggle()"></td>
+     <td><input name ="LEDon" value="LED On" type="button" onClick="LEDtoggle(true)"></td>
      <!--<td><input name ="update_video" value="Open Video" type="button" onClick="updateVideo()"></td>< --> 
      <td><input class="color{pickerOnfocus:true}" id="color_picker" onchange = "updateRGB();document.getElementById('LED_red').value = this.color.rgb[0]; document.getElementById('LED_green').value= this.color.rgb[1]; document.getElementById('LED_blue').value = this.color.rgb[2]"></td>
+     <td><input name ="LEDoff" value="LED Off" type="button" onClick="LEDtoggle(false)"></td>
  </tr>
 
   <tr>
