@@ -148,6 +148,7 @@ void robot_backend::read_network()
 					}
 				}
 			}
+			last_cmd_arg=cmd_arg;
 		}
 	
 	/*
