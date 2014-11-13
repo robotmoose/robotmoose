@@ -49,13 +49,14 @@ private:
 	A_packet_formatter<SerialPort> *pkt;
 public:
 	double L,R,S1,S2,S3; // current power values from pilot
+	double LRtrim; // motor speed bias scaling for left wheel
 	bool ledOn;
 	float led_red,led_green,led_blue; // LED RGB values send by pilot 
 	void stop(void) { L=R=0.0; }
 
 	robot_backend(std::string superstarURL, std::string robotName_)
 		:parseURL(superstarURL), superstar(parseURL.host,0,parseURL.port),
-		robotName(robotName_), pkt(0)
+		robotName(robotName_), pkt(0), LRtrim(1.0)
 	{
 		stop();
 	}
@@ -118,7 +119,7 @@ void robot_backend::read_network()
 	try {
 		json::Value v=json::Deserialize(json_data);
 		L=limit_power(v["power"]["L"]);
-		R=limit_power(v["power"]["R"]);
+		R=limit_power(LRtrim*float(v["power"]["R"]));
 		S1 = v["power"]["arms"];
 		S2 = v["power"]["mine"];
 		S3 = v["power"]["dump"];
@@ -144,6 +145,7 @@ robot_backend *backend=NULL; // the singleton robot
 
 int main(int argc, char *argv[])
 {
+	double LRtrim=1.0;
 	bool sim = false; // use --sim to enable simulation mode
 	std::string superstarURL = "http://sandy.cs.uaf.edu/";
 	std::string robotName = "layla/uaf";
@@ -152,6 +154,7 @@ int main(int argc, char *argv[])
 		if (0 == strcmp(argv[argi], "--robot")) robotName = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--superstar")) superstarURL = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--baudrate")) baudrate = atoi(argv[++argi]);
+		else if (0 == strcmp(argv[argi], "--trim")) LRtrim = atof(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--sim")) { // no hardware, for debugging 
 			robotName="sim/uaf";
 			sim = true; 
@@ -162,6 +165,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	backend=new robot_backend(superstarURL, robotName);
+	backend->LRtrim=LRtrim;
 	if (!sim) {
 		Serial.begin(baudrate);
 		backend->add_serial(new A_packet_formatter<SerialPort>(Serial));

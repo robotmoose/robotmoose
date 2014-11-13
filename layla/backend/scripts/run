@@ -1,5 +1,6 @@
 #!/bin/sh
 d=`dirname $0`
 killall backend run_backend
+make
 "$d"/run_backend &
 "$d"/video
