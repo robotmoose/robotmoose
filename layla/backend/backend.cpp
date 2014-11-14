@@ -55,7 +55,7 @@ private:
 public:
 	double L,R,S1,S2,S3; // current power values from pilot
 	double LRtrim; // motor speed bias scaling for left wheel
-	bool ledOn,ledDemo;
+	bool ledOn, ledDemo;
 	bool debug; // are we in debug mode
 	int led_red,led_green,led_blue; // LED RGB values send by pilot 
 	void stop(void) { L=R=0.0; }
@@ -142,9 +142,13 @@ void robot_backend::read_network()
 		S3 = v["power"]["dump"];
 		ledOn = v["LED"]["On"];
 		ledDemo = v["LED"]["Demo"];
-		led_red = v["LED"]["R"];
-		led_green = v["LED"]["G"];
-		led_blue = v["LED"]["B"];	
+		double tempRBG = 0;
+		tempRBG = v["LED"]["R"];
+		led_red = tempRBG;
+		tempRBG = v["LED"]["G"];
+		led_green= tempRBG;
+		tempRBG = v["LED"]["B"];
+		led_blue= tempRBG;
 #ifndef	_WIN32
 		static std::string last_cmd_arg="";
 		std::string run=v["cmd"]["run"];
