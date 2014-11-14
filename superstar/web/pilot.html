@@ -260,9 +260,9 @@ function openGruveoVideo()
 function updateRGB()
 {
   // parseFloat converts the string literal returned by getElementByid to a floating point
-  pilot.RGB.R=parseFloat(document.getElementById('LED_red').value);
-  pilot.RGB.G=parseFloat(document.getElementById('LED_green').value);
-  pilot.RGB.B=parseFloat(document.getElementById('LED_blue').value);
+  pilot.RGB.R=(parseInt(document.getElementById('LED_red').value)*255);
+  pilot.RGB.G=(parseInt(document.getElementById('LED_green').value)*255);
+  pilot.RGB.B=(parseInt(document.getElementById('LED_blue').value)*255);
   pilot_send();
 }
 
