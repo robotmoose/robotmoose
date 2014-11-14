@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
 
-<!-- example of how to style buttons and such 
+<!-- example of how to style buttons and such
 <style>
 input[type="button"] {
     background-color: #FF33FF;
@@ -13,7 +13,7 @@ input[type="button"] {
 </style>
 -->
 
-<script type="text/javascript" src="jscolor/jscolor.js"></script> <!-- Jscolor library for color picker--> 
+<script type="text/javascript" src="jscolor/jscolor.js"></script> <!-- Jscolor library for color picker-->
 <script type=text/javascript>
 /*
   JSON Testing
@@ -25,13 +25,13 @@ input[type="button"] {
 function run() {
   document.getElementById('p_errorout').innerHTML="";
   try {
-	
+
   } catch (err) {
     document.getElementById('p_errorout').innerHTML="Exception: "+err;
   }
 }
 
-	
+
 /* Walk the DOM to get the client X,Y position of this element's topleft corner.
   From www.kirupa.com/snippets/examples/move_to_click_position.htm */
 function getClientPosition(element) {
@@ -67,7 +67,7 @@ function clamp(v,lo,hi) {
 }
 
 // Return an "empty" robot power object, with everything stationary
-function emptyPower() 
+function emptyPower()
 {
 	return {L:0, R:0, dump:0, mine:0, arms:0};
 }
@@ -83,27 +83,27 @@ function emptyLED()
 var pilot={
 	/* Power to each actuator */
 	power: emptyPower(),
-	
+
 	/* Time, in seconds, of last pilot command */
 	time:0,
-	
+
 	/*LED bits */
-	LED: emptyLED(), 
+	LED: emptyLED(),
 
         /* Scripted command to run */
 	cmd: { run: "", arg:"" },
-	
+
 	/* Authorization hash (todo) */
 	auth:"ffe0"
 };
 
 function LEDtoggle(newValue){
 	pilot.LED.On = newValue;
-	console.log(pilot.LED.On); // print current value of LEDtoggle onto the console for debugging 
+	console.log(pilot.LED.On); // print current value of LEDtoggle onto the console for debugging
 	if(!pilot.LED.On) {document.getElementById('p_LEDstatus').innerHTML="LED Off";}
 	else {document.getElementById('p_LEDstatus').innerHTML="LED On";}
 	pilot_send();
-	
+
 }
 //Toggle Demo mode. LED's will spell out DEMO
 function LEDdemo()
@@ -112,7 +112,7 @@ function LEDdemo()
         else pilot.LED.Demo=false;
 	pilot_send();
 }
-	
+
 
 
 // Return the current wall clock time, in seconds
@@ -129,14 +129,14 @@ function pilot_send() {
 		"/superstar/";
 	var robot=document.getElementById('robot_name').value;
 	var url_start=host+robot;
-	
-	if (networkBusy>1) 
+
+	if (networkBusy>1)
 	{ // prevent overloading network: skip sending if already busy
 		document.getElementById('p_outputNet').innerHTML="network lag";
 		return;
 	}
 
-	networkBusy++; 
+	networkBusy++;
 	var send_time=pilot.time=pilot_time();
 	var pilotStr=JSON.stringify(pilot);
 	console.log(pilotStr);
@@ -169,7 +169,7 @@ function pilot_mouse(event,upState) {
 	if (isNaN(powerUI)) maxPower=0.0;
 	else if (powerUI<maxPower) { maxPower=powerUI; }
 	//if (maxPower<0.15) { maxPower=0.15; } // limit's low end speed
-	
+
 	var arrowDiv=document.getElementById('pilot_arrows');
 	var frac=getMouseFraction(event,arrowDiv);
 	var str="";
@@ -187,7 +187,7 @@ function pilot_mouse(event,upState) {
 	var newPower=emptyPower();
 	if (frac.x<0.9) { /* normal driving */
 		newPower.L=pretty(clamp(dir.forward+dir.turn,-maxPower,maxPower));
-		newPower.R=pretty(clamp(dir.forward-dir.turn,-maxPower,maxPower)); 
+		newPower.R=pretty(clamp(dir.forward-dir.turn,-maxPower,maxPower));
 	} else { /* right hand corner of screen: special magic values */
 		if (frac.y<0.33) {
 			newPower.dump=pretty((1.0/6-frac.y)*3);
@@ -225,7 +225,7 @@ function updateRTCVideo()
 {
   var currentRobot = document.getElementById('robot_videoname').value;
   var splitName = currentRobot.split('/');
- 
+
 
  // Use AppRTC instead of gruveo for video
   var videoURL = "https://appear.in/" + splitName[0] + splitName[1];
@@ -233,16 +233,24 @@ function updateRTCVideo()
   /*videoURL+="&hd=false";
   videoURL+="&tt=1"; // <- timeout on client very fast
   videoURL+="&audio=googNoiseReduction=true"; // Google noise reduction
+<<<<<<< HEAD
   videoURL+="&audio=googEchoCancellation=true"; // Google noise reduction*/
   
   // videoURL+="&video=optional:minWidth=640,optional:minHeight=320";
   //videoURL+="&vsbr=1000&vrbr=1000"; // cut bitrate to 1000 kilobits?
    
+=======
+  videoURL+="&audio=googEchoCancellation=true"; // Google noise reduction
+
+  // videoURL+="&video=optional:minWidth=640,optional:minHeight=320";
+  videoURL+="&vsbr=1000&vrbr=1000"; // cut bitrate to 1000 kilobits?
+
+>>>>>>> 7dd8b70731ab3350170d3a3d69cc3d4ea06998ff
   document.getElementById("video_frame").src = videoURL;
   // On Firefox or Chrome, specifying a width and height opens a new window, not a tab.
   //  (On IE, it's up to the user's preferences)
   //window.open(videoURL,"video",'width=800,height=600');
-  
+
 }
 
 //Open Gruveo Video
@@ -253,7 +261,7 @@ function openGruveoVideo()
 
  // Use AppRTC instead of gruveo for video
   var videoURL = "http://gruveo.com/#" + splitName[0] + splitName[1];
-  
+
   // On Firefox or Chrome, specifying a width and height opens a new window, not a tab.
   //  (On IE, it's up to the user's preferences)
   window.open(videoURL,"video",'width=800,height=600');
@@ -263,10 +271,19 @@ function openGruveoVideo()
 //Update pilot.RGB variable with currently selected RGB values
 function updateRGB()
 {
+  var the_color_picker=document.getElementById("color_picker");
+  var rgb=the_color_picker.color.rgb;
+
   // parseFloat converts the string literal returned by getElementByid to a floating point
-  pilot.LED.R=(parseFloat(document.getElementById('LED_red').value));
-  pilot.LED.G=(parseFloat(document.getElementById('LED_green').value));
-  pilot.LED.B=(parseFloat(document.getElementById('LED_blue').value));
+  pilot.LED.R=rgb[0];
+  document.getElementById('LED_red').value=rgb[0];
+
+  pilot.LED.G=rgb[1];
+  document.getElementById('LED_green').value=rgb[1];
+
+  pilot.LED.B=rgb[2];
+  document.getElementById('LED_blue').value=rgb[2];
+
   pilot_send();
 }
 
@@ -311,11 +328,11 @@ Drive Power: <input type="text" id="robot_power" rows="1" cols="30" onChange="ru
 
 Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""><br>
 
-Show text: 
+Show text:
 <input type="text" id="robot_showtext" rows="1" cols="30" onChange="runCmd('say',this.value)" value="Hi! ">
 <br>
 
-Play sounds: 
+Play sounds:
 <input value="Beep 1" type="button" onClick="runCmd('play','music/whistle1.mp3')">
 <input value="Beep 2" type="button" onClick="runCmd('play','music/whistle2.mp3')">
 <input value="Stop" type="button" onClick="runCmd('play','')"><br>
@@ -324,21 +341,21 @@ Play sounds:
 
 <div id="button_area" style="font-style:italic">
 <table>
-  
-  <tr> 
-     
+
+  <tr>
+
      <td><input name ="LEDon" value="LED On" type="button" onClick="LEDtoggle(true)"></td>
      <td><input name ="LEDdemo" value="LED Demo" type="button" onClick="LEDdemo()"></td> <!-- Print Demo via the lights -->
-     <!--<td><input name ="update_video" value="Open Video" type="button" onClick="updateVideo()"></td>< --> 
-     <td><input class="color{pickerOnfocus:true}" id="color_picker" onchange = "updateRGB();document.getElementById('LED_red').value = this.color.rgb[0]; document.getElementById('LED_green').value= this.color.rgb[1]; document.getElementById('LED_blue').value = this.color.rgb[2]"></td>
+     <!--<td><input name ="update_video" value="Open Video" type="button" onClick="updateVideo()"></td>< -->
+     <td><input class="color{pickerOnfocus:true}" id="color_picker" onchange = "updateRGB();"></td>
      <td><input name ="LEDoff" value="LED Off" type="button" onClick="LEDtoggle(false)"></td>
  </tr>
   <tr>
   <td><P id="p_LEDstatus"></p></td><!-- Dsiplay LED Status below the toggle button -->
   <!--<td></td> -->
-  <td colspan="3">R<input id="LED_red" size="5">  G<input id="LED_green" size="5">  B<input id="LED_blue" size="5">   
+  <td colspan="3">R<input id="LED_red" size="5">  G<input id="LED_green" size="5">  B<input id="LED_blue" size="5">
   </tr>
-     
+
   </table>
 
 </div>
