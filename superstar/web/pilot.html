@@ -72,10 +72,10 @@ function emptyPower()
 	return {L:0, R:0, dump:0, mine:0, arms:0};
 }
 
-function ledRGB()
+function emptyLED()
 {
  	//return {R:this.color.rgb[0], G:this.color.rgb[1], B:this.color.rgb[3]};
-         return{R:0,G:0,B:0};
+         return{On:"false", Demo:"false", R:0, G:0, B:0};
 }
 
 
@@ -87,11 +87,8 @@ var pilot={
 	/* Time, in seconds, of last pilot command */
 	time:0,
 	
-	/*Current LED state*/
-	LED:"false", // set initial state to false 
-	
-        /*LED RGB*/
-        RGB: ledRGB(),
+	/*LED bits */
+	LED: emptyLED, 
 
         /* Scripted command to run */
 	cmd: { run: "", arg:"" },
@@ -99,14 +96,21 @@ var pilot={
 	/* Authorization hash (todo) */
 	auth:"ffe0"
 };
-pilot.LED = true; // HACK: Without this the first time LEDtoggle is called it is set to false
+pilot.LED.On = true; // HACK: Without this the first time LEDtoggle is called it is set to false
 function LEDtoggle(newValue){
-	pilot.LED = newValue;
-	console.log(pilot.LED); // print current value of LEDtoggle onto the console for debugging 
-	if(!pilot.LED) {document.getElementById('p_LEDstatus').innerHTML="LED Off";}
+	pilot.LED.On = newValue;
+	console.log(pilot.LED.On); // print current value of LEDtoggle onto the console for debugging 
+	if(!pilot.LED.On) {document.getElementById('p_LEDstatus').innerHTML="LED Off";}
 	else {document.getElementById('p_LEDstatus').innerHTML="LED On";}
 	pilot_send();
 	
+}
+//Toggle Demo mode. LED's will spell out DEMO
+function LEDdemo()
+{
+	if(!pilot.LED.Demo)pilot.LED.Demo=true;
+        else pilot.LED.Demo=false;
+	pilot_send();
 }
 	
 
@@ -260,9 +264,9 @@ function openGruveoVideo()
 function updateRGB()
 {
   // parseFloat converts the string literal returned by getElementByid to a floating point
-  pilot.RGB.R=parseFloat(document.getElementById('LED_red').value);
-  pilot.RGB.G=parseFloat(document.getElementById('LED_green').value);
-  pilot.RGB.B=parseFloat(document.getElementById('LED_blue').value);
+  pilot.LED.R=(parseInt(document.getElementById('LED_red').value)*255);
+  pilot.LED.G=(parseInt(document.getElementById('LED_green').value)*255);
+  pilot.LED.B=(parseInt(document.getElementById('LED_blue').value)*255);
   pilot_send();
 }
 
@@ -298,7 +302,7 @@ function runCmd(run,arg) {
 
 <p>
 Robot Name: <input type="text" id="robot_name" rows="1" cols="30" onChange="run();" value="layla/uaf">
-<input value="Video - Gruveo" type="button" onClick="openGruveoVideo()"><br>
+<input value="Video - Gruveo" type="button" onClick="runCmd('video','r'+((new Date()).getTime())); openGruveoVideo()"><br>
 
 RTC video name: <input type="text" id="robot_videoname" rows="1" cols="30" onChange="updateRTCVideo()" value="layla/uaf">
 <input value="Video - RTC" type="button" onClick="updateRTCVideo()"><br>
@@ -324,11 +328,11 @@ Play sounds:
   <tr> 
      
      <td><input name ="LEDon" value="LED On" type="button" onClick="LEDtoggle(true)"></td>
+     <td><input name ="LEDdemo" value="LED Demo" type="button" onClick="LEDdemo()"></td> <!-- Print Demo via the lights -->
      <!--<td><input name ="update_video" value="Open Video" type="button" onClick="updateVideo()"></td>< --> 
      <td><input class="color{pickerOnfocus:true}" id="color_picker" onchange = "updateRGB();document.getElementById('LED_red').value = this.color.rgb[0]; document.getElementById('LED_green').value= this.color.rgb[1]; document.getElementById('LED_blue').value = this.color.rgb[2]"></td>
      <td><input name ="LEDoff" value="LED Off" type="button" onClick="LEDtoggle(false)"></td>
  </tr>
-
   <tr>
   <td><P id="p_LEDstatus"></p></td><!-- Dsiplay LED Status below the toggle button -->
   <!--<td></td> -->
