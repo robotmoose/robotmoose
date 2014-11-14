@@ -81,7 +81,7 @@ public:
 	unsigned char high:1; // bool for LED system
 	
 	unsigned char right:7; // right drive wheels
-	unsigned char backMode:1; // Drive backwards (for final dump)
+	unsigned char backMode:1; //bool for LED demo
 	
 	unsigned char front:7; // For now front is servo1 
 	unsigned char frontUnused:1; // spare bit
@@ -99,6 +99,18 @@ public:
 	}
 };
 
+
+class robot_led {
+public:
+	unsigned char red; // 0-255
+	unsigned char green; // 0-255
+	unsigned char blue; // 0-255
+
+	unsigned char ledon : 1; // bool for led on
+	unsigned char demo : 1; // bool for demo mode
+	unsigned char unused : 6;
+};
+
 /**
  This class contains everything we currently know about the robot.
 */
@@ -107,6 +119,7 @@ public:
 	robot_status_bits status; ///< Current software status bits
 	robot_sensors_arduino sensor;  ///< Current hardware sensor values
 	robot_power power; // Current drive commands
+	robot_led led;
 
 	bool autonomous; 
 };

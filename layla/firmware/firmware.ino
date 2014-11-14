@@ -155,8 +155,11 @@ void loop()
     next_micro_send=micro+25*1024; // send_motors takes 20ms
   }
   low_latency_ops();
-  if(robot.power.high)
-    LEDdemo();
+  if(robot.led.ledon)
+  {
+    if(robot.led.demo)
+      LEDdemo();
+  }
   else
    {
     analogWrite(ledpins.blue,0);
@@ -170,8 +173,9 @@ void loop()
 
 // Call this function frequently--it's for minimum-latency operations
 void low_latency_ops() {
-  if(robot.power.high)
-    colors.run();
+  if(robot.led.ledon)
+    if(robot.led.demo)
+       colors.run();
 }
 
 void sendMotor(int motorSide,int power) {
@@ -229,6 +233,19 @@ void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p)
   }
   else if (p.command==0) { // ping request
     pkt.write_packet(0,p.length,p.data); // ping reply
+  }
+  else if (p.command==0xC) // led command
+  { // Led change
+	 if (!p.get(robot.led)) 
+	 { // error
+            pkt.write_packet(0xE,0,0);
+         }
+	else // packet is good
+	{
+         analogWrite(ledpins.blue,robot.led.blue); // turn them to what we got
+         analogWrite(ledpins.red,robot.led.red);
+         analogWrite(ledpins.green,robot.led.green);
+	}
   }
 }
 

@@ -24,6 +24,7 @@ Current robot command codes:
 	0xD: Depth data request/response, for Neato laser distance sensor
 		Request data is empty
 		Response data is an entire NeatoLDSbatch struct
+	0xC: led packet
 	0xA: NOT RECOMMENDED (command code matches the packet start sync code)
 	0x5: Sensor request (5 looks like backwards S)
 		Request data is empty

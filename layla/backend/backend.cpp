@@ -55,9 +55,9 @@ private:
 public:
 	double L,R,S1,S2,S3; // current power values from pilot
 	double LRtrim; // motor speed bias scaling for left wheel
-	bool ledOn;
+	bool ledOn,ledDemo;
 	bool debug; // are we in debug mode
-	float led_red,led_green,led_blue; // LED RGB values send by pilot 
+	int led_red,led_green,led_blue; // LED RGB values send by pilot 
 	void stop(void) { L=R=0.0; }
 
 	robot_backend(std::string superstarURL, std::string robotName_)
@@ -105,12 +105,23 @@ void robot_backend::send_serial(void) {
 	if (pkt==0) return; // simulation only
 	
 	robot_power power;
+	static robot_led led;  // does not need to defualt off unlike power
+	robot_led new_led;
+
 	power.left=(int)(64+63*L);  
 	power.right=(int)(64+63*R);
 	power.front = (int)(127*(S1+.5));
 	power.mine = (int)(127* (S2+.5));
 	power.dump = (int)(127* (S3+.5));
-	power.high = ledOn;
+	
+	new_led.red = (int)(led_red);
+	new_led.green = (int)(led_green);
+	new_led.blue = (int)(led_blue);
+	new_led.ledon = (bool)(ledOn);
+	new_led.demo = (bool)(ledDemo);
+
+	if (memcmp(&led, &new_led, sizeof(led)) == 0)  //did it change
+		pkt->write_packet(0xC, sizeof(led), &led);
 	pkt->write_packet(0x7,sizeof(power),&power);
 }
 
@@ -129,10 +140,11 @@ void robot_backend::read_network()
 		S1 = v["power"]["arms"];
 		S2 = v["power"]["mine"];
 		S3 = v["power"]["dump"];
-		ledOn = v["LED"];
-	        led_red=v["RGB"]["R"];
-		led_green=v["RGB"]["G"];
-		led_blue=v["RGB"]["B"];	
+		ledOn = v["LED"]["On"];
+		ledDemo = v["LED"]["Demo"];
+		led_red = v["LED"]["R"];
+		led_green = v["LED"]["G"];
+		led_blue = v["LED"]["B"];	
 #ifndef	_WIN32
 		static std::string last_cmd_arg="";
 		std::string run=v["cmd"]["run"];
