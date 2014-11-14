@@ -75,7 +75,7 @@ function emptyPower()
 function emptyLED()
 {
  	//return {R:this.color.rgb[0], G:this.color.rgb[1], B:this.color.rgb[3]};
-         return{On:"false", Demo:"false", R:0, G:0, B:0};
+         return{On:false, Demo:false, R:0, G:0, B:0};
 }
 
 
@@ -264,9 +264,9 @@ function openGruveoVideo()
 function updateRGB()
 {
   // parseFloat converts the string literal returned by getElementByid to a floating point
-  pilot.LED.R=(parseInt(document.getElementById('LED_red').value)*255);
-  pilot.LED.G=(parseInt(document.getElementById('LED_green').value)*255);
-  pilot.LED.B=(parseInt(document.getElementById('LED_blue').value)*255);
+  pilot.LED.R=(parseFloat(document.getElementById('LED_red').value)*255);
+  pilot.LED.G=(parseFloat(document.getElementById('LED_green').value)*255);
+  pilot.LED.B=(parseFloat(document.getElementById('LED_blue').value)*255);
   pilot_send();
 }
 
