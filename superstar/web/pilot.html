@@ -233,19 +233,11 @@ function updateRTCVideo()
   /*videoURL+="&hd=false";
   videoURL+="&tt=1"; // <- timeout on client very fast
   videoURL+="&audio=googNoiseReduction=true"; // Google noise reduction
-<<<<<<< HEAD
   videoURL+="&audio=googEchoCancellation=true"; // Google noise reduction*/
   
   // videoURL+="&video=optional:minWidth=640,optional:minHeight=320";
   //videoURL+="&vsbr=1000&vrbr=1000"; // cut bitrate to 1000 kilobits?
    
-=======
-  videoURL+="&audio=googEchoCancellation=true"; // Google noise reduction
-
-  // videoURL+="&video=optional:minWidth=640,optional:minHeight=320";
-  videoURL+="&vsbr=1000&vrbr=1000"; // cut bitrate to 1000 kilobits?
-
->>>>>>> 7dd8b70731ab3350170d3a3d69cc3d4ea06998ff
   document.getElementById("video_frame").src = videoURL;
   // On Firefox or Chrome, specifying a width and height opens a new window, not a tab.
   //  (On IE, it's up to the user's preferences)
