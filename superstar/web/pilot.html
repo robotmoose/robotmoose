@@ -228,15 +228,15 @@ function updateRTCVideo()
  
 
  // Use AppRTC instead of gruveo for video
-  var videoURL = "https://apprtc.appspot.com/?r=" + splitName[0] + splitName[1];
+  var videoURL = "https://appear.in/" + splitName[0] + splitName[1];
   // Add parameters to improve video responsiveness
-  videoURL+="&hd=false";
+  /*videoURL+="&hd=false";
   videoURL+="&tt=1"; // <- timeout on client very fast
   videoURL+="&audio=googNoiseReduction=true"; // Google noise reduction
-  videoURL+="&audio=googEchoCancellation=true"; // Google noise reduction
+  videoURL+="&audio=googEchoCancellation=true"; // Google noise reduction*/
   
   // videoURL+="&video=optional:minWidth=640,optional:minHeight=320";
-  videoURL+="&vsbr=1000&vrbr=1000"; // cut bitrate to 1000 kilobits?
+  //videoURL+="&vsbr=1000&vrbr=1000"; // cut bitrate to 1000 kilobits?
    
   document.getElementById("video_frame").src = videoURL;
   // On Firefox or Chrome, specifying a width and height opens a new window, not a tab.
