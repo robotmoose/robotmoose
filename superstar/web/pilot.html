@@ -302,7 +302,7 @@ function runCmd(run,arg) {
 
 <p>
 Robot Name: <input type="text" id="robot_name" rows="1" cols="30" onChange="run();" value="layla/uaf">
-<input value="Video - Gruveo" type="button" onClick="runCmd('video',''); openGruveoVideo()"><br>
+<input value="Video - Gruveo" type="button" onClick="runCmd('video','r'+((new Date()).getTime())); openGruveoVideo()"><br>
 
 RTC video name: <input type="text" id="robot_videoname" rows="1" cols="30" onChange="updateRTCVideo()" value="layla/uaf">
 <input value="Video - RTC" type="button" onClick="updateRTCVideo()"><br>
