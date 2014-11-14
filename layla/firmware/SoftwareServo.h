@@ -1,7 +1,7 @@
 #ifndef SoftwareServo_h
 #define SoftwareServo_h
 
-#include "arduino.h"
+#include "Arduino.h"
 #include <inttypes.h>
 
 class SoftwareServo
