@@ -23,7 +23,9 @@
 // #include "../../layla/firmware/simable_serial_packet.h" // not needed
 
 // Script execution
+#ifndef	_WIN32
 #include <unistd.h> /* for fork(), execl() */
+#endif
 
 
 /* Do linking right here */
@@ -54,6 +56,7 @@ public:
 	double L,R,S1,S2,S3; // current power values from pilot
 	double LRtrim; // motor speed bias scaling for left wheel
 	bool ledOn;
+	bool debug; // are we in debug mode
 	float led_red,led_green,led_blue; // LED RGB values send by pilot 
 	void stop(void) { L=R=0.0; }
 
@@ -130,7 +133,7 @@ void robot_backend::read_network()
 	        led_red=v["RGB"]["R"];
 		led_green=v["RGB"]["G"];
 		led_blue=v["RGB"]["B"];	
-		
+#ifndef	_WIN32
 		static std::string last_cmd_arg="";
 		std::string run=v["cmd"]["run"];
 		std::string arg=v["cmd"]["arg"];
@@ -153,12 +156,13 @@ void robot_backend::read_network()
 			}
 			last_cmd_arg=cmd_arg;
 		}
-	
-	/*
-		printf("Power commands: %.2f L  %.2f R  %.2f S1  %.2f S2 %.2f S3 LED Status: ",L,R,S1,S2,S3);
-		printf(ledOn ? "true\n" : "false\n");
-                printf("RGB Values: %0.2f R %0.2f G %0.2f B \n",led_red,led_blue,led_green);
-	*/
+#endif
+		if (debug)
+		{
+			printf("Power commands: %.2f L  %.2f R  %.2f S1  %.2f S2 %.2f S3 LED Status: ", L, R, S1, S2, S3);
+			printf(ledOn ? "true\n" : "false\n");
+			printf("RGB Values: %0.2f R %0.2f G %0.2f B \n", led_red, led_blue, led_green);
+		}
 	} catch (std::exception &e) {
 		printf("Exception while processing network JSON: %s\n",e.what());
 		printf("   Network data: %ld bytes, '%s'\n", json_data.size(),json_data.c_str());
@@ -175,7 +179,8 @@ robot_backend *backend=NULL; // the singleton robot
 int main(int argc, char *argv[])
 {
 	double LRtrim=1.0;
-	bool sim = false; // use --sim to enable simulation mode
+	bool sim = false; // use --sim to enable simulation mode'
+	bool debug = false;  // spams more output data
 	std::string superstarURL = "http://sandy.cs.uaf.edu/";
 	std::string robotName = "layla/uaf";
 	int baudrate = 9600;  // serial comms
@@ -184,6 +189,7 @@ int main(int argc, char *argv[])
 		else if (0 == strcmp(argv[argi], "--superstar")) superstarURL = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--baudrate")) baudrate = atoi(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--trim")) LRtrim = atof(argv[++argi]);
+		else if (0 == strcmp(argv[argi], "--debug")) debug = true;
 		else if (0 == strcmp(argv[argi], "--sim")) { // no hardware, for debugging 
 			robotName="sim/uaf";
 			sim = true; 
@@ -195,6 +201,7 @@ int main(int argc, char *argv[])
 	}
 	backend=new robot_backend(superstarURL, robotName);
 	backend->LRtrim=LRtrim;
+	backend->debug = debug; // more output, more messs, but more fixing
 	if (!sim) {
 		Serial.begin(baudrate);
 		backend->add_serial(new A_packet_formatter<SerialPort>(Serial));
