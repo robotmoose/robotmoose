@@ -246,6 +246,9 @@ void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p)
          analogWrite(ledpins.red,robot.led.red);
          analogWrite(ledpins.green,robot.led.green);
 	}
+      read_sensors();
+      low_latency_ops();
+      pkt.write_packet(0x3,sizeof(robot.sensor),&robot.sensor);
   }
 }
 

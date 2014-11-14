@@ -120,8 +120,12 @@ void robot_backend::send_serial(void) {
 	new_led.ledon = (bool)(ledOn);
 	new_led.demo = (bool)(ledDemo);
 
-	if (memcmp(&led, &new_led, sizeof(led)) == 0)  //did it change
+	//if (memcmp(&led, &new_led, sizeof(led)) == 0)  //did it change
+	//{
+		led = new_led;
 		pkt->write_packet(0xC, sizeof(led), &led);
+		//printf("sent rgb stuff");
+	//}
 	pkt->write_packet(0x7,sizeof(power),&power);
 }
 
@@ -144,11 +148,11 @@ void robot_backend::read_network()
 		ledDemo = v["LED"]["Demo"];
 		double tempRBG = 0;
 		tempRBG = v["LED"]["R"];
-		led_red = tempRBG;
+		led_red = (int)(tempRBG * 255);
 		tempRBG = v["LED"]["G"];
-		led_green= tempRBG;
+		led_green = (int)(tempRBG * 255);
 		tempRBG = v["LED"]["B"];
-		led_blue= tempRBG;
+		led_blue = (int)(tempRBG * 255);
 #ifndef	_WIN32
 		static std::string last_cmd_arg="";
 		std::string run=v["cmd"]["run"];
@@ -175,9 +179,11 @@ void robot_backend::read_network()
 #endif
 		if (debug)
 		{
-			printf("Power commands: %.2f L  %.2f R  %.2f S1  %.2f S2 %.2f S3 LED Status: ", L, R, S1, S2, S3);
-			printf(ledOn ? "true\n" : "false\n");
+			printf("Power commands: %.2f L  %.2f R  %.2f S1  %.2f S2 %.2f S3\nLED on/demo : ", L, R, S1, S2, S3);
+			printf(ledOn ? "true/" : "false/");
+			printf(ledDemo ? "true\n" : "false\n");
 			printf("RGB Values: %d R %d G %d B \n", led_red, led_blue, led_green);
+			//printf("   Network data: %ld bytes, '%s'\n", json_data.size(), json_data.c_str());
 		}
 	} catch (std::exception &e) {
 		printf("Exception while processing network JSON: %s\n",e.what());
