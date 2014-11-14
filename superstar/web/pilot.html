@@ -96,7 +96,7 @@ var pilot={
 	/* Authorization hash (todo) */
 	auth:"ffe0"
 };
-pilot.LED.On = true; // HACK: Without this the first time LEDtoggle is called it is set to false
+
 function LEDtoggle(newValue){
 	pilot.LED.On = newValue;
 	console.log(pilot.LED.On); // print current value of LEDtoggle onto the console for debugging 
