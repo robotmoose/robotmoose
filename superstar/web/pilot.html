@@ -97,19 +97,27 @@ var pilot={
 	auth:"ffe0"
 };
 
-function LEDtoggle(newValue){
-	pilot.LED.On = newValue;
+function LEDtoggle(){
+	pilot.LED.On = document.getElementById("LEDtoggle").checked;
+        if(!pilot.LED.On) { 
+		pilot.LED.Demo=false; // Auto turn-off demo mode when LED is disabled 
+		document.getElementById("LEDdemo").checked=false; // Untick LED Demo checkbox
+	}
+        console.log(document.getElementById("LEDtoggle").checked);
 	console.log(pilot.LED.On); // print current value of LEDtoggle onto the console for debugging
-	if(!pilot.LED.On) {document.getElementById('p_LEDstatus').innerHTML="LED Off";}
-	else {document.getElementById('p_LEDstatus').innerHTML="LED On";}
+
+// If LED is Off, make LED Demo unclickable 
+	if(document.getElementById("LEDtoggle").checked) {document.getElementById("LEDdemo").disabled=false;}
+	else {document.getElementById("LEDdemo").disabled=true;}
 	pilot_send();
 
 }
-//Toggle Demo mode. LED's will spell out DEMO
+//Toggle Demo mode. LED ramp up and turn off cycle
 function LEDdemo()
 {
-	if(!pilot.LED.Demo)pilot.LED.Demo=true;
-        else pilot.LED.Demo=false;
+         pilot.LED.Demo=document.getElementById("LEDdemo").checked;
+	/*if(!pilot.LED.Demo)pilot.LED.Demo=true;
+        else pilot.LED.Demo=false;*/
 	pilot_send();
 }
 
@@ -336,15 +344,17 @@ Play sounds:
 
   <tr>
 
-     <td><input name ="LEDon" value="LED On" type="button" onClick="LEDtoggle(true)"></td>
-     <td><input name ="LEDdemo" value="LED Demo" type="button" onClick="LEDdemo()"></td> <!-- Print Demo via the lights -->
+     <td>Toggle LED<input id="LEDtoggle" value="LED On" type="checkbox" onClick="LEDtoggle()"></td>
+     <td>LED Demo <input  id="LEDdemo" value="LED Demo" type="checkbox" onClick="LEDdemo()" disabled></td> 
      <!--<td><input name ="update_video" value="Open Video" type="button" onClick="updateVideo()"></td>< -->
      <td><input class="color{pickerOnfocus:true}" id="color_picker" onchange = "updateRGB();"></td>
-     <td><input name ="LEDoff" value="LED Off" type="button" onClick="LEDtoggle(false)"></td>
+     <!--<td><input name ="LEDoff" value="LED Off" type="button" onClick="LEDtoggle(false)"></td> -->
  </tr>
   <tr>
-  <td><P id="p_LEDstatus"></p></td><!-- Dsiplay LED Status below the toggle button -->
-  <!--<td></td> -->
+  <!-- <td><P id="p_LEDstatus"></p></td><!-- Dsiplay LED Status below the toggle button -->
+  <td></td> <!-- 2 empty cells for Alignment -->
+  <td></td>
+ 
   <td colspan="3">R<input id="LED_red" size="5">  G<input id="LED_green" size="5">  B<input id="LED_blue" size="5">
   </tr>
 
