@@ -9,14 +9,16 @@
 #include "SoftwareServo.h"
 //#include <Servo.h>
 
-void LEDdemo();
-void sendMotor(int motorSide,int power);
-void low_latency_ops();
-void read_sensors(void);
-void send_servos(void) ;
-void send_motors(void);
-void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p);
-void LEDdemo();
+void LEDdemo();  //auto change lights
+void sendMotor(int motorSide,int power); //sends power level of motor to sabortooth
+void low_latency_ops();  // fast operations
+void read_sensors(void);  //get sensor values and store in robot.sensors (preportory for sending)
+//void send_sensors(void); //sends the sensor values to PC
+void send_servos(void) ;  //requests servos to be at angle however, (SoftwareServo::refresh()) set servor to that angle
+void send_motors(void);  //sets all motors power levels
+void send_leds(void) ;   //sets RGB led color
+void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p);  //reads serial packets, and sometimes read/sends sensors
+void LEDdemo();  //auto changing led colors
 
 struct leds
 {
@@ -84,7 +86,7 @@ public:
   }
 };
 
-//-------------
+//------------- globals
 SoftwareSerial saberSerial(9,8); // RX (not used), TX
 
 leds ledpins(11,10,9);  // which pins are used for RGB led's
@@ -155,9 +157,9 @@ void loop()
     next_micro_send=micro+25*1024; // send_motors takes 20ms
   }
   low_latency_ops();
-  send_leds();
+  send_leds();  // only needs to be called once every 5sec for demo
      
-  //SoftwareServo::refresh();
+  //SoftwareServo::refresh();  // can be slow and blocking (no interupts)
 }
 
 
@@ -181,6 +183,17 @@ void read_sensors(void) {
   low_latency_ops();
 }
 
+/*
+//sends serial sensor packet to PC
+void send_sensors(void)
+{
+  read_sensors();
+  low_latency_ops();
+  PC.pkt.write_packet(0x3,sizeof(robot.sensor),&robot.sensor);
+  robot.sensor.latency=0; // reset latency metric
+}
+*/
+
 // Sends servo values 0-180
 // command is quick and nonblocking
 void send_servos(void) 
@@ -199,6 +212,8 @@ void send_motors(void) {
   low_latency_ops();
 }
 
+//sets LED based on current mode (off on), demo/one color
+// command is quick and nonblocking (only "has" to happen on change of robot.led or when demo changes color(5secounds))
 void send_leds(void) {
    if(robot.led.ledon)
   {
@@ -231,10 +246,14 @@ void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p)
     else 
     { // got power request successfully: read and send sensors
       low_latency_ops(); /* while reading sensors */
+      
+      //serial write of sensor data (could be in function and called more offen maybe related to latency)
       read_sensors();
       low_latency_ops();
       pkt.write_packet(0x3,sizeof(robot.sensor),&robot.sensor);
       robot.sensor.latency=0; // reset latency metric
+      //end of serial sensor data write 
+      
       low_latency_ops();
 
       static bool blink=0;
@@ -253,11 +272,8 @@ void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p)
          }
 	else // packet is good
 	{
-        send_leds();
+        send_leds(); // set the led's
 	}
-      read_sensors();
-      low_latency_ops();
-      pkt.write_packet(0x3,sizeof(robot.sensor),&robot.sensor);
   }
 }
 
@@ -342,7 +358,7 @@ static unsigned long lastcount=0;
   }
 }
 
-
+//ramps all selected led's (ramp.active) power levels from 0-255
 void ramp::run()
 {
   if(lastrun+slowness<millis())
