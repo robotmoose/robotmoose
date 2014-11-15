@@ -90,12 +90,17 @@ void robot_backend::read_serial(void) {
 	while (Serial.available()) { // read any robot response
 		int got_data=0;
 		A_packet p;
-		while (-1==pkt->read_packet(p)) {got_data++; printf("s"); }
+		while (-1==pkt->read_packet(p)) 
+		{
+			//got_data++;   //packet p.length will give us this
+			//printf("s");
+		}
 		if (p.valid) {
-			printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data);
-			if (p.command==0) printf("    Arduino echo request\n");
-			else if (p.command==0xE) printf("    Arduino error packet: %d bytes, '%s'\n", p.length,p.data);
-			else printf("    Arduino unknown packet %d bytes\n",p.length);
+			//printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data); // last printf give all of this (no longer need)
+			if (p.command == 0) printf("    Arduino sent echo request %d bytes, '%s'\n", p.length, p.data);
+			else if (p.command==0xE) printf("    Arduino sent error packet: %d bytes, '%s'\n", p.length,p.data);
+			else if (p.command == 0x3) printf("    Arduino sent sensor data: %d bytes, '%s'\n", p.length, p.data);
+			else printf("    Arduino sent unknown packet %d command %d bytes, '%s'\n",p.command, p.length, p.data);
 		}
 	}
 }
@@ -106,7 +111,7 @@ void robot_backend::send_serial(void) {
 	
 	robot_power power;
 	static robot_led led;  // does not need to defualt off unlike power
-	robot_led new_led;
+	//robot_led new_led; // always sending dont need this right now
 
 	power.left=(int)(64+63*L);  
 	power.right=(int)(64+63*R);
@@ -114,15 +119,15 @@ void robot_backend::send_serial(void) {
 	power.mine = (int)(127* (S2+.5));
 	power.dump = (int)(127* (S3+.5));
 	
-	new_led.red = (int)(led_red);
-	new_led.green = (int)(led_green);
-	new_led.blue = (int)(led_blue);
-	new_led.ledon = (bool)(ledOn);
-	new_led.demo = (bool)(ledDemo);
+	led.red = (int)(led_red);
+	led.green = (int)(led_green);
+	led.blue = (int)(led_blue);
+	led.ledon = (bool)(ledOn);
+	led.demo = (bool)(ledDemo);
 
 	//if (memcmp(&led, &new_led, sizeof(led)) == 0)  //did it change
 	//{
-		led = new_led;
+		//led = new_led;
 		pkt->write_packet(0xC, sizeof(led), &led);
 		//printf("sent rgb stuff");
 	//}

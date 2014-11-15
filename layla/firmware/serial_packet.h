@@ -26,6 +26,7 @@ Current robot command codes:
 		Response data is an entire NeatoLDSbatch struct
 	0xC: led packet
 	0xA: NOT RECOMMENDED (command code matches the packet start sync code)
+	0x7: power commaneds
 	0x5: Sensor request (5 looks like backwards S)
 		Request data is empty
 		Response data is a list of sensor values
