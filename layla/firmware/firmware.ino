@@ -155,17 +155,7 @@ void loop()
     next_micro_send=micro+25*1024; // send_motors takes 20ms
   }
   low_latency_ops();
-  if(robot.led.ledon)
-  {
-    if(robot.led.demo)
-      LEDdemo();
-  }
-  else
-   {
-    analogWrite(ledpins.blue,0);
-    analogWrite(ledpins.red,0);
-    analogWrite(ledpins.green,0);
-   }
+  send_leds();
      
   //SoftwareServo::refresh();
 }
@@ -209,6 +199,27 @@ void send_motors(void) {
   low_latency_ops();
 }
 
+void send_leds(void) {
+   if(robot.led.ledon)
+  {
+    if(robot.led.demo)
+    {
+      LEDdemo();
+    }
+    else
+    {
+    analogWrite(ledpins.blue,robot.led.blue);
+    analogWrite(ledpins.red,robot.led.red);
+    analogWrite(ledpins.green,robot.led.green);
+    }
+  }
+  else
+  {
+    analogWrite(ledpins.blue,0);
+    analogWrite(ledpins.red,0);
+    analogWrite(ledpins.green,0);
+  }
+}
 // Structured communication with PC:
 void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p)
 {
@@ -242,9 +253,7 @@ void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p)
          }
 	else // packet is good
 	{
-         analogWrite(ledpins.blue,robot.led.blue); // turn them to what we got
-         analogWrite(ledpins.red,robot.led.red);
-         analogWrite(ledpins.green,robot.led.green);
+        send_leds();
 	}
       read_sensors();
       low_latency_ops();
