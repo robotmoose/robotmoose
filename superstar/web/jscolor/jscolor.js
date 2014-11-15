@@ -626,7 +626,7 @@ var jscolor = {
 					}
 					dispatchImmediateChange();
 				}
-				//updateRGB();
+				updateRGB();
 				//pilot_send();
 			};
 			if('ontouchstart' in window) { // if touch device

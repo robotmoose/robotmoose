@@ -99,13 +99,13 @@ var pilot={
 
 function LEDtoggle(){
 	pilot.LED.On = document.getElementById("LEDtoggle").checked;
-        if(!pilot.LED.On) { 
+/*      if(!pilot.LED.On) { 
 		pilot.LED.Demo=false; // Auto turn-off demo mode when LED is disabled 
 		document.getElementById("LEDdemo").checked=false; // Untick LED Demo checkbox
 	}
         console.log(document.getElementById("LEDtoggle").checked);
 	console.log(pilot.LED.On); // print current value of LEDtoggle onto the console for debugging
-
+*/
 // If LED is Off, make LED Demo unclickable 
 	if(document.getElementById("LEDtoggle").checked) {document.getElementById("LEDdemo").disabled=false;}
 	else {document.getElementById("LEDdemo").disabled=true;}
@@ -347,7 +347,7 @@ Play sounds:
      <td>Toggle LED<input id="LEDtoggle" value="LED On" type="checkbox" onClick="LEDtoggle()"></td>
      <td>LED Demo <input  id="LEDdemo" value="LED Demo" type="checkbox" onClick="LEDdemo()" disabled></td> 
      <!--<td><input name ="update_video" value="Open Video" type="button" onClick="updateVideo()"></td>< -->
-     <td><input class="color{pickerOnfocus:true}" id="color_picker" onchange = "updateRGB();"></td>
+     <td><input class="color{pickerOnfocus:true}" id="color_picker" onchange = "updateRGB()"></td>
      <!--<td><input name ="LEDoff" value="LED Off" type="button" onClick="LEDtoggle(false)"></td> -->
  </tr>
   <tr>
