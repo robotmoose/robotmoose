@@ -14,6 +14,12 @@ input[type="button"] {
 -->
 
 <script type="text/javascript" src="jscolor/jscolor.js"></script> <!-- Jscolor library for color picker-->
+
+<!--Jquery files for interface additions-->
+<script src="jquery/external/jquery/jquery.js"></script>
+<script src="jquery/jquery-ui.js"></script>
+<link href="jquery/jquery-ui.css" rel="stylesheet">
+
 <script type=text/javascript>
 /*
   JSON Testing
@@ -316,52 +322,67 @@ function runCmd(run,arg) {
 <tr>
 </table>
 
+<div id="tabs">
+	<ul>
+		<li><a href="#tabs-1">Setup</a></li>
+		<li><a href="#tabs-2">Runtime</a></li>
+	</ul>
+	
+	<div id="tabs-1">
+		<p>
+		Robot Name: <input type="text" id="robot_name" rows="1" cols="30" onChange="run();" value="layla/uaf">
+		<input value="Video - Gruveo" type="button" onClick="runCmd('video','r'+((new Date()).getTime())); openGruveoVideo()"><br>
 
-<p>
-Robot Name: <input type="text" id="robot_name" rows="1" cols="30" onChange="run();" value="layla/uaf">
-<input value="Video - Gruveo" type="button" onClick="runCmd('video','r'+((new Date()).getTime())); openGruveoVideo()"><br>
+		RTC video name: <input type="text" id="robot_videoname" rows="1" cols="30" onChange="updateRTCVideo()" value="layla/uaf">
+		<input value="Video - RTC" type="button" onClick="updateRTCVideo()"><br>
 
-RTC video name: <input type="text" id="robot_videoname" rows="1" cols="30" onChange="updateRTCVideo()" value="layla/uaf">
-<input value="Video - RTC" type="button" onClick="updateRTCVideo()"><br>
+		Drive Power: <input type="text" id="robot_power" rows="1" cols="30" onChange="run()" value="15"><br>
 
-Drive Power: <input type="text" id="robot_power" rows="1" cols="30" onChange="run()" value="15"><br>
+		Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""><br>
+		</p>
+	</div>
 
-Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""><br>
+	<div id="tabs-2">
+		<p>
+		Show text:
+		<input type="text" id="robot_showtext" rows="1" cols="30" onChange="runCmd('say',this.value)" value="Hi! ">
+		<br>
 
-Show text:
-<input type="text" id="robot_showtext" rows="1" cols="30" onChange="runCmd('say',this.value)" value="Hi! ">
-<br>
+		Play sounds:
+		<input value="Beep 1" type="button" onClick="runCmd('play','music/whistle1.mp3')">
+		<input value="Beep 2" type="button" onClick="runCmd('play','music/whistle2.mp3')">
+		<input value="Stop" type="button" onClick="runCmd('play','')"><br>
 
-Play sounds:
-<input value="Beep 1" type="button" onClick="runCmd('play','music/whistle1.mp3')">
-<input value="Beep 2" type="button" onClick="runCmd('play','music/whistle2.mp3')">
-<input value="Stop" type="button" onClick="runCmd('play','')"><br>
+		<!--   -->
 
-<!--   -->
+		<div id="button_area" style="font-style:italic">
+			<table>
 
-<div id="button_area" style="font-style:italic">
-<table>
+			<tr>
 
-  <tr>
-
-     <td>Toggle LED<input id="LEDtoggle" value="LED On" type="checkbox" onClick="LEDtoggle()"></td>
-     <td>LED Demo <input  id="LEDdemo" value="LED Demo" type="checkbox" onClick="LEDdemo()" disabled></td> 
-     <!--<td><input name ="update_video" value="Open Video" type="button" onClick="updateVideo()"></td>< -->
-     <td><input class="color{pickerOnfocus:true}" id="color_picker" onchange = "updateRGB()"></td>
-     <!--<td><input name ="LEDoff" value="LED Off" type="button" onClick="LEDtoggle(false)"></td> -->
- </tr>
-  <tr>
-  <!-- <td><P id="p_LEDstatus"></p></td><!-- Dsiplay LED Status below the toggle button -->
-  <td></td> <!-- 2 empty cells for Alignment -->
-  <td></td>
+			<td>Toggle LED<input id="LEDtoggle" value="LED On" type="checkbox" onClick="LEDtoggle()"></td>
+			<td>LED Demo <input  id="LEDdemo" value="LED Demo" type="checkbox" onClick="LEDdemo()" disabled></td> 
+			<!--<td><input name ="update_video" value="Open Video" type="button" onClick="updateVideo()"></td>< -->
+			<td><input class="color{pickerOnfocus:true}" id="color_picker" onchange = "updateRGB()"></td>
+			<!--<td><input name ="LEDoff" value="LED Off" type="button" onClick="LEDtoggle(false)"></td> -->
+			</tr>
+			<tr>
+			<!-- <td><P id="p_LEDstatus"></p></td><!-- Display LED Status below the toggle button -->
+			<td></td> <!-- 2 empty cells for Alignment -->
+			<td></td>
  
-  <td colspan="3">R<input id="LED_red" size="5">  G<input id="LED_green" size="5">  B<input id="LED_blue" size="5">
-  </tr>
+			<td colspan="3">R <input id="LED_red" size="5">  G <input id="LED_green" size="5">  B <input id="LED_blue" size="5">
+			</tr>
 
-  </table>
+			</table>
 
+		</div>
+		</p>
+	</div>
 </div>
-</p>
+<script> $( "#tabs" ).tabs(); </script> <!--Has to be placed after tabs-->
+
+
 
 <div id="status_area" style="font-style:italic;">
 <P id="p_errorout" style="color:red;">ERROR: JavaScript not enabled.</p>
@@ -371,5 +392,4 @@ Play sounds:
 <P id="p_outputPilot">Pilot Status</p>
 
 </div>
-
 </body></html>
