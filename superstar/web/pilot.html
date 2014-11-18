@@ -15,6 +15,8 @@ input[type="button"] {
 
 <script type="text/javascript" src="jscolor/jscolor.js"></script> <!-- Jscolor library for color picker-->
 
+<script src="js/sha2_auth.js"></script> <!-- authentication crypto support -->
+
 <!--Jquery files for interface additions-->
 <script src="jquery/external/jquery/jquery.js"></script>
 <script src="jquery/jquery-ui.js"></script>
@@ -97,10 +99,7 @@ var pilot={
 	LED: emptyLED(),
 
         /* Scripted command to run */
-	cmd: { run: "", arg:"" },
-
-	/* Authorization hash (todo) */
-	auth:"ffe0"
+	cmd: { run: "", arg:"" }
 };
 
 function LEDtoggle(){
@@ -141,8 +140,7 @@ var networkBusy=0;
 function pilot_send() {
 	var host=// "http://localhost:8080"+ // <- explicit host not needed, browser will use the .html server by default.
 		"/superstar/";
-	var robot=document.getElementById('robot_name').value;
-	var url_start=host+robot;
+	var url_start=host;
 
 	if (networkBusy>1)
 	{ // prevent overloading network: skip sending if already busy
@@ -155,7 +153,18 @@ function pilot_send() {
 	var pilotStr=JSON.stringify(pilot);
 	console.log(pilotStr);
 	//var LEDStr=JSON.stringify(LED); // send current LED state
-	var url=url_start+"/pilot?set="+encodeURIComponent(pilotStr);
+	
+	var robot=document.getElementById('robot_name').value;
+	var starpath=robot+"/pilot";
+	var url=url_start+starpath+"?set="+encodeURIComponent(pilotStr);
+	
+	var password=document.getElementById('robot_auth').value;
+	if (password) { // append authentication code
+		var seq="0"; //<- FIXME: get sequence number on first connection
+		var auth=getAuthCode(password,starpath,pilotStr,seq);
+		url+="&auth="+auth;
+	}
+	
 	var xmlhttp=new XMLHttpRequest();
 	xmlhttp.onreadystatechange=function()
 	{ // this function called when network progress happens

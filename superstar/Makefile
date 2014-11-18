@@ -1,6 +1,7 @@
 CXX=g++
 OPTS=-O
-CFLAGS=$(OPTS) -Wall
+CFLAGS=$(OPTS) -Wall -I../include
+# CFLAGS+=-DLISTEN80
 LIBS=-lpthread
 
 all: superstar netbench

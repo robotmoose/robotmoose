@@ -9,9 +9,14 @@
 */
 #include <stdio.h>
 #include <string.h>
+#include <fstream>
 #include <string>
 #include <map>
-#include "mongoose/mongoose.h"
+#include "mongoose/mongoose.h" /* central webserver library */
+
+#include "osl/sha2_auth.h" /* for authentication */
+#include "osl/sha2.cpp" /* for easier linking */
+
 
 /// Utility: integer to string
 std::string my_itos(int i) {
@@ -95,6 +100,29 @@ public:
 
 superstar_db_t superstar_db;
 
+/**
+  Return true if a write to this starpath is allowed.
+*/
+bool write_is_authorized(const std::string &starpath,
+	const std::string &new_data,const std::string &new_auth)
+{
+// Read password from file of passwords
+	std::ifstream f(("auth/"+starpath).c_str());
+	if (!f.good()) return true; // no such auth file exists.
+	std::string pass; std::getline(f,pass);
+	
+// If we get here, there is a password.  Verify there is an authentication code.
+	if (new_auth.size()<=0) return false; // need authentication code
+	
+	// FIXME: extract sequence number (read JSON in new_data?)
+	int seq=0;
+	std::string alldata=pass+":"+starpath+":"+new_data+":"+my_itos(seq);
+
+// Check to see what auth code should be
+	std::string should_auth=getAuthCode<SHA256>(alldata);
+	if (should_auth!=new_auth) return false; // authentication mismatch
+	else return true;
+}
 
 // This function will be called by mongoose on every new request.
 int http_handler(struct mg_connection *conn, enum mg_event ev) {
@@ -114,15 +142,25 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
   
   std::string content="<HTML><BODY>Hello from mongoose!  "
   	"I see you're using source IP "+std::string(conn->remote_ip)+" and port "+my_itos(conn->remote_port)+"\n";
-  content+="<P>Superstar path: ";
-    content+=starpath;
+  content+="<P>Superstar path: "+starpath+"\n";
   
   enum {NBUF=8192}; // maximum length for JSON data being set
   char buf[NBUF];
   if (0<=mg_get_var(conn,"set",buf,NBUF)) { /* writing new value */
   	std::string newval(buf);
-	content+="<P>Setting new value='"+newval+"'\n";
-	superstar_db.set(starpath,newval);
+  	char sentauth[NBUF];
+  	if (0>mg_get_var(conn,"auth",sentauth,NBUF)) {
+  		sentauth[0]=0; // empty authentication string
+  	}
+  	if (write_is_authorized(starpath,newval,sentauth)) {
+		content+="<P>Setting new value='"+newval+"'\n";
+		superstar_db.set(starpath,newval);
+	}
+	else {
+		content+="AUTHENTICATION MISMATCH";
+		printf("  Authentication mismatch: write to '%s' not authorized by '%s'\n",
+			starpath.c_str(), sentauth);
+	}
   }
   else { /* Not writing a new value */
   	if (query=="get") 
@@ -171,7 +209,11 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 */
 void *thread_code(void *) {
   struct mg_server *server= mg_create_server(NULL, http_handler);
+#ifdef LISTEN80 /* production server */
   mg_set_option(server, "listening_port", "80");
+#else /* normal development case */
+  mg_set_option(server, "listening_port", "8080");
+#endif
   mg_set_option(server, "document_root", "web"); // files served from here
 
   printf("OK, listening!  Visit http://localhost:%s to see the site!\n",
