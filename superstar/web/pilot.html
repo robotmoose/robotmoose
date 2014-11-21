@@ -42,14 +42,17 @@ function run() {
 
 /* Walk the DOM to get the client X,Y position of this element's topleft corner.
   From www.kirupa.com/snippets/examples/move_to_click_position.htm */
+ /*Gets the client X,Y position with .getBoundingClientRectangle
+		https://developer.mozilla.org/en-US/docs/Web/API/Element.getBoundingClientRect*/
 function getClientPosition(element) {
-	var xPosition = 0;
-	var yPosition = 0;
-	while (element) {
+	var temp = element.getBoundingClientRect(); //Gets coordinate data
+	var xPosition = temp.left;
+	var yPosition = temp.top;
+	/*while (element) {
 		xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
 		yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
 		element = element.offsetParent;
-	}
+	}*/
 	return { x: xPosition, y: yPosition };
 }
 /* Return the fractional mouse position of the mouse relative to this element.
@@ -86,6 +89,10 @@ function emptyLED()
          return{On:false, Demo:false, R:0, G:0, B:0};
 }
 
+function emptySensors()
+{
+	return { uSensor1:0, uSensor2:0, uSensor3:0, uSensor4:0, uSensor5:0};
+}
 
 // This class stores our last-used piloting command
 var pilot={
@@ -99,7 +106,10 @@ var pilot={
 	LED: emptyLED(),
 
         /* Scripted command to run */
-	cmd: { run: "", arg:"" }
+	cmd: { run: "", arg:"" },
+
+	/*Sensor Values*/
+        Sensors:emptySensors()
 };
 
 function LEDtoggle(){
@@ -180,7 +190,31 @@ function pilot_send() {
 	}
 	xmlhttp.open("GET",url,true);
 	xmlhttp.send(null);
+	pilot_receive();
 }
+// Recieve Sensor Values sent by backend 
+function pilot_receive()
+{
+
+	var host=// "http://localhost:8080"+ // <- explicit host not needed, browser will use the .html server by default.
+		"/superstar/";
+	var url_start=host;
+	var robot=document.getElementById('robot_name').value;
+	var starpath=robot+"/pilot";
+	var url_rec=url_start+starpath+"?get";
+	var xmlrec=new XMLHttpRequest();
+	xmlrec.open("GET",url_rec,true);
+	xmlrec.send(null);
+	var pilot_received = JSON.parse(xmlrec.responseText);
+/* we can attach upto 5 ultrasonic sensors*/
+	pilot.Sensors.uSound1 = pilot_received.Sensors.uSound1;
+	pilot.Sensors.uSound2 = pilot_received.Sensors.uSound2;
+	pilot.Sensors.uSound3 = pilot_received.Sensors.uSound3;
+	pilot.Sensors.uSound4 = pilot_received.Sensors.uSound4;
+	pilot.Sensors.uSound5 = pilot_received.Sensors.uSound5; 
+	
+}
+
 
 // This function is called at every mouse event.
 //   upState: 0 if down, 1 if up, 2 if not changing
