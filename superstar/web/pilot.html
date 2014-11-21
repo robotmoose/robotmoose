@@ -42,14 +42,17 @@ function run() {
 
 /* Walk the DOM to get the client X,Y position of this element's topleft corner.
   From www.kirupa.com/snippets/examples/move_to_click_position.htm */
+ /*Gets the client X,Y position with .getBoundingClientRectangle
+		https://developer.mozilla.org/en-US/docs/Web/API/Element.getBoundingClientRect*/
 function getClientPosition(element) {
-	var xPosition = 0;
-	var yPosition = 0;
-	while (element) {
+	var temp = element.getBoundingClientRect(); //Gets coordinate data
+	var xPosition = temp.left;
+	var yPosition = temp.top;
+	/*while (element) {
 		xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
 		yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
 		element = element.offsetParent;
-	}
+	}*/
 	return { x: xPosition, y: yPosition };
 }
 /* Return the fractional mouse position of the mouse relative to this element.
