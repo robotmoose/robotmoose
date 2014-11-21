@@ -41,28 +41,40 @@ Raw sensor values go as bitfields, because many of them are 10-bit quantities:
 	- Arena positions in cm are 9-10 bits each (arena is 378x738cm)
 	- Blinky angle reports are about 9 bits each (500 samples per rotation)
 */
-class robot_sensors_arduino {
+class robot_sensors_fast {
 public:
-	uint32_t battery:10; // raw A/D reading at top of battery stack (voltage = this*5*2000/384)
-	uint32_t mining:10; // raw A/D value of mining head drive voltage (stalled when much less than battery)
-	uint32_t bucket:10; // raw A/D value from dump bucket lift encoder
-	
-	uint32_t stalled:1; ///< mining head seems to be stalled out
-	uint32_t stop:1; ///< EMERGENCY STOP button engaged
-	
-	uint32_t frontL:10; // raw A/D value from front-left wheel deploy encoder
-	uint32_t frontR:10; // raw A/D value from front-right wheel deploy encoder
-	uint32_t latency:10; // Arduino control loop latency
-	
-	uint32_t backL:1; ///< back left contact detected
-	uint32_t backR:1; ///< back right contact detected
+	uint32_t uSound1:10; // ultra sound value 1-600ish 10 gives us 1024
+	uint32_t uSound2: 10; 
+	uint32_t uSound3: 10; 
+	uint32_t padding : 2; // probly not needed
 
-	uint32_t bucketFill:6; /// Bits for 6 infrared detectors
-	uint32_t mineMoving:10; /// leaky-bucket, incremented on mine motion (200 is max motion; 0 is stopped)
-	uint32_t avgStall:10; /// stall detection average
-	uint32_t padding: 6;
+
+	uint32_t uSound4 : 10;
+	uint32_t uSound5 : 10;
+	uint32_t padding2 : 12;// probly not needed
 };
 
+class robot_sensors_slow {
+public:
+	uint32_t battery : 10; // raw A/D reading at top of battery stack (voltage = this*5*2000/384)
+	uint32_t mining : 10; // raw A/D value of mining head drive voltage (stalled when much less than battery)
+	uint32_t bucket : 10; // raw A/D value from dump bucket lift encoder
+
+	uint32_t stalled : 1; ///< mining head seems to be stalled out
+	uint32_t stop : 1; ///< EMERGENCY STOP button engaged
+
+	uint32_t frontL : 10; // raw A/D value from front-left wheel deploy encoder
+	uint32_t frontR : 10; // raw A/D value from front-right wheel deploy encoder
+	uint32_t latency : 10; // Arduino control loop latency
+
+	uint32_t backL : 1; ///< back left contact detected
+	uint32_t backR : 1; ///< back right contact detected
+
+	uint32_t bucketFill : 6; /// Bits for 6 infrared detectors
+	uint32_t mineMoving : 10; /// leaky-bucket, incremented on mine motion (200 is max motion; 0 is stopped)
+	uint32_t avgStall : 10; /// stall detection average
+	uint32_t padding : 6;
+};
 
 
 /**
@@ -117,7 +129,8 @@ public:
 class robot_current {
 public:
 	robot_status_bits status; ///< Current software status bits
-	robot_sensors_arduino sensor;  ///< Current hardware sensor values
+	robot_sensors_fast f_sensors;  ///< fast responce sensor data
+	robot_sensors_slow s_sensors;  ///< Current hardware sensor values
 	robot_power power; // Current drive commands
 	robot_led led;
 

@@ -13,7 +13,7 @@ void LEDdemo();  //auto change lights
 void sendMotor(int motorSide,int power); //sends power level of motor to sabortooth
 void low_latency_ops();  // fast operations
 void read_sensors(void);  //get sensor values and store in robot.sensors (preportory for sending)
-//void send_sensors(void); //sends the sensor values to PC
+void send_sensors(void); //sends the sensor values to PC
 void send_servos(void) ;  //requests servos to be at angle however, (SoftwareServo::refresh()) set servor to that angle
 void send_motors(void);  //sets all motors power levels
 void send_leds(void) ;   //sets RGB led color
@@ -179,20 +179,25 @@ void sendMotor(int motorSide,int power) {
 
 // Read all robot sensors into robot.sensor
 void read_sensors(void) {
-  /* no sensors on LAYLA, so far! */
+  //dumby sensor values until we get non blocking sensor read going
+  robot.f_sensors.uSound1 = millis();
+  robot.f_sensors.uSound2 = 100;
+  robot.f_sensors.uSound3 = micros();
+  robot.f_sensors.uSound4 = 100;
+  robot.f_sensors.uSound5 = 400;
+  //end of dumby sensor data
   low_latency_ops();
 }
 
-/*
 //sends serial sensor packet to PC
 void send_sensors(void)
 {
   read_sensors();
   low_latency_ops();
-  PC.pkt.write_packet(0x3,sizeof(robot.sensor),&robot.sensor);
-  robot.sensor.latency=0; // reset latency metric
+  PC.pkt.write_packet(0x5,sizeof(robot.f_sensors),&robot.f_sensors); //fast sensor
+ // robot.f_sensors.latency=0; // reset latency metric
 }
-*/
+
 
 // Sends servo values 0-180
 // command is quick and nonblocking
@@ -245,15 +250,8 @@ void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p)
     }
     else 
     { // got power request successfully: read and send sensors
-      low_latency_ops(); /* while reading sensors */
-      
-      //serial write of sensor data (could be in function and called more offen maybe related to latency)
       read_sensors();
-      low_latency_ops();
-      pkt.write_packet(0x3,sizeof(robot.sensor),&robot.sensor);
-      robot.sensor.latency=0; // reset latency metric
-      //end of serial sensor data write 
-      
+      send_sensors();
       low_latency_ops();
 
       static bool blink=0;

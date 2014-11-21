@@ -5,6 +5,7 @@
   Dr. Orion Lawlor, lawlor@alaska.edu, 2014-10-11 (public domain)
 */
 #include <stdexcept>
+#include <string>
 
 // Arduino comms:
 #include "../firmware/robot.h" // robot structs
@@ -43,6 +44,20 @@ double limit_power(double raw) {
 	else return raw;
 }
 
+struct sensors {
+	//rg45 8 pin setup
+	//vcc
+	//data back
+	int uSound1=0; // not array so json looks good
+	int uSound2=0;
+	int uSound3=0;
+	int uSound4=0;
+	int uSound5=0;
+	//ground
+};
+
+
+
 /**
   Read commands from superstar, and send them to the robot. 
 */
@@ -55,9 +70,11 @@ private:
 public:
 	double L,R,S1,S2,S3; // current power values from pilot
 	double LRtrim; // motor speed bias scaling for left wheel
+	sensors current_sensors; //all the sensors data
 	bool ledOn, ledDemo;
 	bool debug; // are we in debug mode
 	int led_red,led_green,led_blue; // LED RGB values send by pilot 
+	
 	void stop(void) { L=R=0.0; }
 
 	robot_backend(std::string superstarURL, std::string robotName_)
@@ -69,10 +86,10 @@ public:
 	~robot_backend() {
 		delete pkt;
 	}
-	
+	void read_sensors(const A_packet& current_p);
 	/** Update pilot commands from network */
 	void read_network(void);
-	
+	void send_network(void);
 	/** Talk to this real Arudino device over this serial port.
 		We will delete the packet formatter when destructed. 
 		The serial commands are no-ops until this is run.
@@ -84,6 +101,25 @@ public:
 	void read_serial(void);
 };
 
+void robot_backend::read_sensors(const A_packet& current_p)
+{
+	robot_sensors_fast sensor_data; // temp
+	if (current_p.get(sensor_data))// valid sesnor packet and copy to our temp
+	{
+		current_sensors.uSound1 = sensor_data.uSound1;
+		current_sensors.uSound2 = sensor_data.uSound2;
+		current_sensors.uSound3 = sensor_data.uSound3;
+		current_sensors.uSound4 = sensor_data.uSound4;
+		current_sensors.uSound5 = sensor_data.uSound5;
+		if (debug)
+		{
+			printf("Ultrasound values 1,2,3,4,5 \n");
+			printf("%d , %d , %d ,%d ,%d \n", current_sensors.uSound1, current_sensors.uSound2, current_sensors.uSound3, current_sensors.uSound4, current_sensors.uSound5);
+		}
+	}
+	else
+		printf("error with the serial sensor data we got, could not convert");
+}
 /** Read anything the robot wants to send to us. */
 void robot_backend::read_serial(void) {
 	if (pkt==0) return; // simulation only
@@ -99,7 +135,12 @@ void robot_backend::read_serial(void) {
 			//printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data); // last printf give all of this (no longer need)
 			if (p.command == 0) printf("    Arduino sent echo request %d bytes, '%s'\n", p.length, p.data);
 			else if (p.command==0xE) printf("    Arduino sent error packet: %d bytes, '%s'\n", p.length,p.data);
-			else if (p.command == 0x3) printf("    Arduino sent sensor data: %d bytes, '%s'\n", p.length, p.data);
+			else if (p.command == 0x5)
+			{
+				//printf("    Arduino sent sensor data: %d bytes, '%s'\n", p.length, p.data);
+				read_sensors(p);
+			}
+			else if (p.command == 0x4) printf("    Arduino sent slow sensor data: %d bytes, '%s'\n", p.length, p.data);
 			else printf("    Arduino sent unknown packet %d command %d bytes, '%s'\n",p.command, p.length, p.data);
 		}
 	}
@@ -128,10 +169,10 @@ void robot_backend::send_serial(void) {
 	//if (memcmp(&led, &new_led, sizeof(led)) == 0)  //did it change
 	//{
 		//led = new_led;
-		pkt->write_packet(0xC, sizeof(led), &led);
+		pkt->write_packet(0xC, sizeof(led), &led); //led
 		//printf("sent rgb stuff");
 	//}
-	pkt->write_packet(0x7,sizeof(power),&power);
+	pkt->write_packet(0x7,sizeof(power),&power); //motor
 }
 
 /** Read pilot data from superstar, and store into ourselves */
@@ -197,9 +238,29 @@ void robot_backend::read_network()
 	}
 	double elapsed=time_in_seconds()-start;
 	double per=elapsed;
-	printf("Time:	%.1f ms/request, %.1f req/sec\n",per*1.0e3, 1.0/per);	
+	printf("\nRead Time:	%.1f ms/request, %.1f req/sec\n",per*1.0e3, 1.0/per);	
 }
 
+void robot_backend::send_network(void)
+{
+	double start = time_in_seconds();
+	std::string path = "/superstar/" + robotName + "/data?set="; //data from robot 
+	//uggly will fix this so that its not converting so much
+	json::Object temp;
+	temp["uSound1"] = current_sensors.uSound1;
+	temp["uSound2"] = current_sensors.uSound2;
+	temp["uSound3"] = current_sensors.uSound3;
+	temp["uSound4"] = current_sensors.uSound4;
+	temp["uSound5"] = current_sensors.uSound5;
+	//end uggly
+	std::string data = json::Serialize(temp);
+	//auth!!!! grrr
+	superstar.send_get(path+data); //auth will fail this
+	// above needs fixed!!! but its not braking anything right now just not setting
+	double elapsed = time_in_seconds() - start;
+	double per = elapsed;
+	printf("Send Time:	%.1f ms/request, %.1f req/sec\n", per*1.0e3, 1.0 / per);
+}
 
 robot_backend *backend=NULL; // the singleton robot
 
@@ -244,6 +305,7 @@ int main(int argc, char *argv[])
 		backend->read_network();
 		backend->send_serial();
 		backend->read_serial();
+		backend->send_network();
 	}
 	
 	return 0;

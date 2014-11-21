@@ -28,6 +28,9 @@ Current robot command codes:
 	0xA: NOT RECOMMENDED (command code matches the packet start sync code)
 	0x7: power commaneds
 	0x5: Sensor request (5 looks like backwards S)
+		Request: no requests it will send as fast as posible to you
+		Response data is a list of sensor values
+	0x4: Sensor request (4 its 1 below 5)
 		Request data is empty
 		Response data is a list of sensor values
 	0x3: Motor command (3 looks like sideways M)
