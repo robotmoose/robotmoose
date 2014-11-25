@@ -1,0 +1,12 @@
+Sabertooth Wiring:
+
+Looking at the back of the robot this is how the motors are wired for correct direction:
+M1A:Left Motor Rear Red Dot
+M1B:Left Motor Other
+M2A:Right Motor Red Dot
+M1B:Right Motor Other
+
+Arduino Pins:
+Serial to Saberteeh: Pin 8
+
+
