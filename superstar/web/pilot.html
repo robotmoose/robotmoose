@@ -193,7 +193,7 @@ function pilot_send() {
 	}
 	xmlhttp.open("GET",url,true);
 	xmlhttp.send(null);
-	data_receive();
+	data_receive(); // Read Sensor Data at every Send
 }
 // Recieve Sensor Values sent by backend 
 function data_receive()
@@ -209,7 +209,7 @@ function data_receive()
 	xmlrec.open("GET",url_rec,true);
 	xmlrec.send(null);
 	var pilot_received = JSON.parse(xmlrec.responseText);
-/* Read Ultrasonic sensor data sent by backen*/
+/* Read Ultrasonic sensor data sent by backend*/
 	document.getElementById('USonic1').value=Sensors.USonic.USensor1 = pilot_received.Sensors.uSound1;
 	document.getElementById('USonic2').value=Sensors.USonic.USensor2 = pilot_received.Sensors.uSound2;
 	document.getElementById('USonic3').value=Sensors.USonic.USensor3 = pilot_received.Sensors.uSound3;
@@ -380,7 +380,7 @@ $(function(){
 <tr>
 </table>
 
-<div id="tabs">
+<div id="tabs"> 
 	<ul>
 		<li><a href="#tabs-1">Setup</a></li>
 		<li><a href="#tabs-2">Interaction</a></li>
@@ -441,8 +441,8 @@ $(function(){
 	<div id="tabs-3">
 		<table>
 		<CAPTION> Current Sensor Values</SENSORS>
-		<tr>
-		<td colspan="5">Ultrasonic Sensors <input id="USonic1" size ="3"> <input id="USonic2" size ="3"> <input id="USonic3" size ="3"> <input id="USonic4" size ="3"> <input id="USonic5" size ="3"> </td>
+		<tr> <!-- Display Utrasonic Sensor Values -->
+		<td colspan="5">Ultrasonic Sensors <input id="USonic1" size ="3" disabled> <input id="USonic2" size ="3" disabled> <input id="USonic3" size ="3" disabled> <input id="USonic4" size ="3" disabled> <input id="USonic5" size ="3" disabled> </td>
 		</tr>
 		</table>
 	</div> <!-- Close Telemetry Tab -->
