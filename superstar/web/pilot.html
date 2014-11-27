@@ -88,10 +88,10 @@ function emptyLED()
  	//return {R:this.color.rgb[0], G:this.color.rgb[1], B:this.color.rgb[3]};
          return{On:false, Demo:false, R:0, G:0, B:0};
 }
-
-function emptySensors()
+//Returns empty UltraSonic Sensors
+function emptyUSonic()
 {
-	return { uSensor1:0, uSensor2:0, uSensor3:0, uSensor4:0, uSensor5:0};
+	return { USensor1:0, USensor2:0, USensor3:0, USensor4:0, USensor5:0};
 }
 
 // This class stores our last-used piloting command
@@ -106,11 +106,14 @@ var pilot={
 	LED: emptyLED(),
 
         /* Scripted command to run */
-	cmd: { run: "", arg:"" },
-
-	/*Sensor Values*/
-        Sensors:emptySensors()
+	cmd: { run: "", arg:"" }
 };
+
+
+var Sensors={
+	USonic:emptyUSonic()
+};
+	
 
 function LEDtoggle(){
 	pilot.LED.On = document.getElementById("LEDtoggle").checked;
@@ -190,28 +193,35 @@ function pilot_send() {
 	}
 	xmlhttp.open("GET",url,true);
 	xmlhttp.send(null);
-	pilot_receive();
+	data_receive();
 }
 // Recieve Sensor Values sent by backend 
-function pilot_receive()
+function data_receive()
 {
 
 	var host=// "http://localhost:8080"+ // <- explicit host not needed, browser will use the .html server by default.
 		"/superstar/";
 	var url_start=host;
 	var robot=document.getElementById('robot_name').value;
-	var starpath=robot+"/pilot";
+	var starpath=robot+"/data";
 	var url_rec=url_start+starpath+"?get";
 	var xmlrec=new XMLHttpRequest();
 	xmlrec.open("GET",url_rec,true);
 	xmlrec.send(null);
 	var pilot_received = JSON.parse(xmlrec.responseText);
-/* we can attach upto 5 ultrasonic sensors*/
-	pilot.Sensors.uSound1 = pilot_received.Sensors.uSound1;
-	pilot.Sensors.uSound2 = pilot_received.Sensors.uSound2;
-	pilot.Sensors.uSound3 = pilot_received.Sensors.uSound3;
-	pilot.Sensors.uSound4 = pilot_received.Sensors.uSound4;
-	pilot.Sensors.uSound5 = pilot_received.Sensors.uSound5; 
+/* Read Ultrasonic sensor data sent by backen*/
+	Sensors.USonic.USensor1 = pilot_received.Sensors.uSound1;
+	Sensors.USonic.USensor2 = pilot_received.Sensors.uSound2;
+	Sensors.USonic.USensor3 = pilot_received.Sensors.uSound3;
+	Sensors.USonic.USensor4 = pilot_received.Sensors.uSound4;
+	Sensors.USonic.USensor5 = pilot_received.Sensors.uSound5; 
+	
+/* Log values to console for debugging*/
+	console.log(Sensors.USonic.USensor1);
+	console.log(Sensors.USonic.USensor1);
+	console.log(Sensors.USonic.USensor1);
+	console.log(Sensors.USonic.USensor1);
+	console.log(Sensors.USonic.USensor1);
 	
 }
 
