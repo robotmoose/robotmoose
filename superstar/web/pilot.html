@@ -210,11 +210,11 @@ function data_receive()
 	xmlrec.send(null);
 	var pilot_received = JSON.parse(xmlrec.responseText);
 /* Read Ultrasonic sensor data sent by backen*/
-	Sensors.USonic.USensor1 = pilot_received.Sensors.uSound1;
-	Sensors.USonic.USensor2 = pilot_received.Sensors.uSound2;
-	Sensors.USonic.USensor3 = pilot_received.Sensors.uSound3;
-	Sensors.USonic.USensor4 = pilot_received.Sensors.uSound4;
-	Sensors.USonic.USensor5 = pilot_received.Sensors.uSound5; 
+	document.getElementById('USonic1').value=Sensors.USonic.USensor1 = pilot_received.Sensors.uSound1;
+	document.getElementById('USonic2').value=Sensors.USonic.USensor2 = pilot_received.Sensors.uSound2;
+	document.getElementById('USonic3').value=Sensors.USonic.USensor3 = pilot_received.Sensors.uSound3;
+	document.getElementById('USonic4').value=Sensors.USonic.USensor4 = pilot_received.Sensors.uSound4;
+	document.getElementById('USonic5').value=Sensors.USonic.USensor5 = pilot_received.Sensors.uSound5; 
 	
 /* Log values to console for debugging*/
 	console.log(Sensors.USonic.USensor1);
@@ -353,6 +353,11 @@ function runCmd(run,arg) {
 	pilot_send();
 }
 
+//Make Tabs collapsible 
+$(function(){
+	$( "#tabs").tabs({collapsible: true});
+});
+
 </script>
 
 
@@ -378,7 +383,8 @@ function runCmd(run,arg) {
 <div id="tabs">
 	<ul>
 		<li><a href="#tabs-1">Setup</a></li>
-		<li><a href="#tabs-2">Runtime</a></li>
+		<li><a href="#tabs-2">Interaction</a></li>
+		<li><a href="#tabs-3">Telemetry</a></li>
 	</ul>
 	
 	<div id="tabs-1">
@@ -431,7 +437,15 @@ function runCmd(run,arg) {
 
 		</div>
 		</p>
-	</div>
+	</div> <!-- Close Interaction Tab -->
+	<div id="tabs-3">
+		<table>
+		<CAPTION> Current Sensor Values</SENSORS>
+		<tr>
+		<td colspan="5">Ultrasonic Sensors <input id="USonic1" size ="3"> <input id="USonic2" size ="3"> <input id="USonic3" size ="3"> <input id="USonic4" size ="3"> <input id="USonic5" size ="3"> </td>
+		</tr>
+		</table>
+	</div> <!-- Close Telemetry Tab -->
 </div>
 <script> $( "#tabs" ).tabs(); </script> <!--Has to be placed after tabs-->
 
