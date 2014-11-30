@@ -7,10 +7,7 @@
 
 // Nov 20 2014
 
-
-//Registers
-
-
+#include <SPI.h> 
 
 // LTC6803 parameters
 
@@ -32,27 +29,33 @@
 #define STCVDC       0x60 // Start cell voltage ADC conversions and poll status, with discharge permitted
 #define STOWDC       0x70 // Start open-wire ADC conversions and poll status, with discharge permitted
 
+// Configuration Registers
+
+#define CFGR0       0xE1
+#define CFGR1       0x00
+#define CFGR2       0x00
+#define CFGR3       0xFF
+#define CFGR4       0x00
+#define CFGR5       0x00
+
 #define SS_PIN        10  // Designate Chip select pin 
 #define ADDRESS      0x80 // Designate Chip address: 10000000
-byte CFGR0 = 0xE1;
-byte CFGR1 = 0x00;
-byte CFGR2 = 0x00;
-byte CFGR3 = 0xFF;
-byte CFGR4 = 0x00;
-byte CFGR5 = 0x00;
-byte conf[6];
 
-#include <SPI.h> 
+//---------------------------------------------------------------------------------------------------------------------
+// Calculation Variables
+//byte conf[6];                // Only needed when GetConfig() function is in use.
+unsigned int RawData[6];       // Raw data from voltage registers
+float cellVoltage[3];          // Calculated voltages for each cell
 
 // PEC Variables
-static byte crc8_table[256];    // 8-bit table for PEC calc
+static byte crc8_table[256];   // 8-bit table for PEC calc
 static int made_table = 0;     // table made flag
 byte packet[18]={0};           // used for PEC calc
-byte PECbyte;                  // PEC of a byte
-byte PECpacket;                // PEC of packet
-byte PECpacketREAD;            // value that PECpacket should be as read from 6803
-unsigned int Response[20];
-float cellVoltage[18];
+// NOT NEEDED PEC Variables
+//byte PECbyte;                // PEC of a byte
+//byte PECpacket;              // PEC of packet
+//byte PECpacketREAD;          // value that PECpacket should be as read from 6803
+//---------------------------------------------------------------------------------------------------------------------
 
 void setup()
 {
@@ -69,7 +72,7 @@ void setup()
 
 }
 
-void SetConfig()
+void SetConfig()  // Send configuration registers to put LTC6803 into "Measure mode."
 {
   Serial.println("Writing Configuration Registers");
   digitalWrite(SS_PIN, LOW); // Chip Select
@@ -91,6 +94,7 @@ void SetConfig()
   digitalWrite(SS_PIN, HIGH); // Chip Deselect
 }
 
+/* This code is only needed to verify that the configuration registers are getting written to correctly
 void GetConfig()
 {
   Serial.println("Reading Configuration Registers");
@@ -103,9 +107,11 @@ void GetConfig()
   }
   digitalWrite(SS_PIN, HIGH);
 }
+*/
 
-void getCellVolts()
+unsigned int getCellVolts()
 {
+  //unsigned int Respon
   digitalWrite(SS_PIN, LOW); // Chip Select
   SPI.transfer(RDCV); // Send command to read cells 1-4
   SPI.transfer(0xDC); // Send PEC byte for command
@@ -113,16 +119,16 @@ void getCellVolts()
 
   for(int i=0; i<6; i++)
   {
-    Response[i] = SPI.transfer(0x00);   // send command to read voltage registers
+    RawData[i] = SPI.transfer(0x00);   // send command to read voltage registers
     //Serial.println(Response[i], HEX);
   }
   byte PECresponse;
   PECresponse=SPI.transfer(0x00);
   digitalWrite(SS_PIN, HIGH); // Chip Deselect
-
+  return RawData[6];
 }
 
-void ADCconvert()
+void ADCconvert()  // Send command to run ADC conversion
 {
   Serial.println("ADC conversion started");
   digitalWrite(SS_PIN, LOW); // Chip Select
@@ -130,12 +136,12 @@ void ADCconvert()
   SPI.transfer(0xB0); // Send PEC byte for command
   while (byte i=LOW)
   {
-    i = SPI.transfer(0x000);
+    i = SPI.transfer(0x00);
   }
   digitalWrite(SS_PIN, HIGH); // Chip Deselect
 }
 
-unsigned int BitShiftCombine(unsigned char x_high, unsigned char x_low)
+unsigned int BitShiftCombine(unsigned char x_high, unsigned char x_low)  // Combine 2 registers into 16-bit number
 {
   unsigned int combined;
   unsigned int Cell0;
@@ -145,19 +151,18 @@ unsigned int BitShiftCombine(unsigned char x_high, unsigned char x_low)
   return combined;
 }
 
-int CellConvert(unsigned int combined1, unsigned int combined2, unsigned int combined3, unsigned int combined4)
+int CellConvert(unsigned int combined1, unsigned int combined2, unsigned int combined3)  // Conver 16-bit number to correct 12-bit number for voltage calculation
 {
-  int Cell[4];
+  int Cell[3];
   Cell[0] = combined1 & 4095;
   Cell[1] = combined2 >> 4;
   Cell[2] = combined3 & 4095;
-  Cell[3] = combined4 >> 4;
-  float cellVoltage[4];
-  for(int i=0; i<4; i++)
+  //float cellVoltage[3];
+  for(int i=0; i<3; i++)
   {
     cellVoltage[i] = 1.5/1000*(Cell[i] - 512);
-    Serial.println(cellVoltage[i]);
   }
+  return cellVoltage[4];
 }
 
 // Following PEC code by Dale (KiloOne) on Endless Sphere
@@ -165,6 +170,7 @@ int CellConvert(unsigned int combined1, unsigned int combined2, unsigned int com
 
 static void init_crc8() // Generate PEC lookup table
 {
+  
   int z,j;
   byte cr;
   if (!made_table) {
@@ -205,21 +211,22 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
 
 void loop()
 {
- // Serial.println("Old Config");
-  GetConfig();
-  //Serial.println("New Config");
+  //GetConfig();                    // Only needed for debugging purpose.
   SetConfig();
-  //GetConfig();
+  //GetConfig();                    // Only needed for debugging purpose.
   ADCconvert();
   getCellVolts();
-  //Serial.println("Combined bytes:");
-  int combined1=BitShiftCombine(Response[1], Response[0]);
-  int combined2=BitShiftCombine(Response[2], Response[1]);
-  int combined3=BitShiftCombine(Response[4], Response[3]);
-  int combined4=BitShiftCombine(Response[5], Response[4]);
-  CellConvert(combined1, combined2, combined3, combined4);
+  cellVoltage[3]=CellConvert(BitShiftCombine(RawData[1], RawData[0]), BitShiftCombine(RawData[2], RawData[1]), BitShiftCombine(RawData[4], RawData[3]));
+  for(int i=0; i<3; i++)
+  {
+    Serial.print("Cell ");
+    Serial.print(i);
+    Serial.print(": ");
+    Serial.print(cellVoltage[i]);
+    Serial.println(" V");
+  }
   Serial.println("-------------------------------------");
   Serial.println(" ");
-  delay(900);
+  delay(1200);
 }
 
