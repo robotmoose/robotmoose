@@ -1,10 +1,5 @@
 // Written By Clayton Auld
 // clayauld@gmail.com
-
-// Some Variable names and values borrowed from 
-// Ricky Gu's Open BMS Project
-// https://github.com/rickygu/openBMS
-
 // Nov 20 2014
 
 #include <SPI.h> 
@@ -74,7 +69,7 @@ void setup()
 
 void SetConfig()  // Send configuration registers to put LTC6803 into "Measure mode."
 {
-  Serial.println("Writing Configuration Registers");
+  //Serial.println("Writing Configuration Registers");
   digitalWrite(SS_PIN, LOW); // Chip Select
   SPI.transfer(WRCFG);
   SPI.transfer(0xC7);
@@ -111,11 +106,10 @@ void GetConfig()
 
 unsigned int getCellVolts()
 {
-  //unsigned int Respon
   digitalWrite(SS_PIN, LOW); // Chip Select
   SPI.transfer(RDCV); // Send command to read cells 1-4
   SPI.transfer(0xDC); // Send PEC byte for command
-  Serial.println("Reading Cell Voltage Registers");
+  //Serial.println("Reading Cell Voltage Registers");
 
   for(int i=0; i<6; i++)
   {
@@ -130,14 +124,10 @@ unsigned int getCellVolts()
 
 void ADCconvert()  // Send command to run ADC conversion
 {
-  Serial.println("ADC conversion started");
+  //Serial.println("ADC conversion started");
   digitalWrite(SS_PIN, LOW); // Chip Select
   SPI.transfer(STCVAD); // Send command to start ADC conversion
   SPI.transfer(0xB0); // Send PEC byte for command
-  /* while (byte i==LOW)
-  {
-    i = SPI.transfer(0x00);
-  }*/
   digitalWrite(SS_PIN, HIGH); // Chip Deselect
 }
 
@@ -157,7 +147,6 @@ int CellConvert(unsigned int combined1, unsigned int combined2, unsigned int com
   Cell[0] = combined1 & 4095;
   Cell[1] = combined2 >> 4;
   Cell[2] = combined3 & 4095;
-  //float cellVoltage[3];
   for(int i=0; i<3; i++)
   {
     cellVoltage[i] = 1.5/1000*(Cell[i] - 512);
@@ -226,7 +215,6 @@ void loop()
     Serial.println(" V");
   }
   Serial.println("-------------------------------------");
-  Serial.println(" ");
   delay(1200);
 }
 
