@@ -62,7 +62,7 @@ void setup()
   pinMode(SS_PIN, OUTPUT);
   digitalWrite(SS_PIN, HIGH); // Chip Deselect
 
-  //SPI Configuration: MSB First, CPOL = 1, CPHA = 1, DIV16 = 1Mhz
+  // SPI Configuration: MSB First, CPOL = 1, CPHA = 1, DIV16 = 1Mhz
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE3);
   SPI.setClockDivider(SPI_CLOCK_DIV16);
@@ -134,10 +134,10 @@ void ADCconvert()  // Send command to run ADC conversion
   digitalWrite(SS_PIN, LOW); // Chip Select
   SPI.transfer(STCVAD); // Send command to start ADC conversion
   SPI.transfer(0xB0); // Send PEC byte for command
-  while (byte i=LOW)
+  /* while (byte i==LOW)
   {
     i = SPI.transfer(0x00);
-  }
+  }*/
   digitalWrite(SS_PIN, HIGH); // Chip Deselect
 }
 
@@ -145,8 +145,8 @@ unsigned int BitShiftCombine(unsigned char x_high, unsigned char x_low)  // Comb
 {
   unsigned int combined;
   unsigned int Cell0;
-  combined = x_high;                //send x_high to rightmost 8 bits
-  combined = combined << 8;         //shift x_high over to leftmost 8 bits
+  combined = x_high;                        //send x_high to rightmost 8 bits
+  combined = combined << 8;                 //shift x_high over to leftmost 8 bits
   combined = combined | x_low;              //logical OR keeps x_high intact in combined and fills in rightmost 8 bits
   return combined;
 }
@@ -162,7 +162,7 @@ int CellConvert(unsigned int combined1, unsigned int combined2, unsigned int com
   {
     cellVoltage[i] = 1.5/1000*(Cell[i] - 512);
   }
-  return cellVoltage[4];
+  return cellVoltage[3];
 }
 
 // Following PEC code by Dale (KiloOne) on Endless Sphere
