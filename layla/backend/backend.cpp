@@ -18,7 +18,7 @@
 #include "../../include/json.h" // JSON parsing ("super easy JSON" library)
 
 //simulator
-#include <thread>
+// #include <thread>
 #include "../../include/spritelib/spritelib.h" // 2d graphics
 #include "../../include/osl/vec2.h" // 2d vector
 // #include "../../layla/firmware/simable_serial_packet.h" // not needed
@@ -48,12 +48,13 @@ struct sensors {
 	//rg45 8 pin setup
 	//vcc
 	//data back
-	int uSound1=0; // not array so json looks good
-	int uSound2=0;
-	int uSound3=0;
-	int uSound4=0;
-	int uSound5=0;
+	int uSound1; // not array so json looks good
+	int uSound2;
+	int uSound3;
+	int uSound4;
+	int uSound5;
 	//ground
+	sensors() { uSound1=uSound2=uSound3=uSound4=uSound5=0; }
 };
 
 
@@ -296,9 +297,9 @@ int main(int argc, char *argv[])
 	}
 	
 	if (sim == true)
-	{ // run GUI in a separate thread
-		std::thread sim(spritelib_run, "SpriteLib Demo", 800, 600);     // spritelib sim
-		sim.detach();
+	{ // run GUI in a separate thread (disabled for non-C++11 compile)
+	//	std::thread sim(spritelib_run, "SpriteLib Demo", 800, 600);     // spritelib sim
+	//	sim.detach();
 	}
 	
 	while (1) { // talk to robot via backend

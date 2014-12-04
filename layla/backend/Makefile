@@ -1,6 +1,6 @@
 CXX=g++
 OPTS=-O
-CFLAGS=$(OPTS) -Wall -std=c++11
+CFLAGS=$(OPTS) -Wall 
 LIBS=-lglut -lGL -lpthread
 
 all: backend
