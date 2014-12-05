@@ -4,15 +4,6 @@
 */
 
 
-//<!--Jquery files for interface additions -->
-<script src="jquery/external/jquery/jquery.js"></script>
-<script src="jquery/jquery-ui.js"></script>
-<link href="jquery/jquery-ui.css" rel="stylesheet">
-
-<script src="js/sha2_auth.js"></script> //<!-- auth support -->
-
-<script type="text/javascript" src="jscolor/jscolor.js"></script>// <!-- Jscolor library for color picker -->
-
 /* Main update: display costs for user's selected values. */
 function run() {
   document.getElementById('p_errorout').innerHTML="";
@@ -179,6 +170,9 @@ function pilot_send() {
 	xmlhttp.send(null);
 	data_receive(); // Read Sensor Data at every Send
 }
+//Read sensor data every 250 ms
+window.setInterval(function(){data_receive()},250);
+
 // Recieve Sensor Values sent by backend 
 function data_receive()
 {
