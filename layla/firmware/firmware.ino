@@ -24,7 +24,10 @@ void u_received();  //interupt function for
 void send_leds(void) ;   //sets RGB led color
 void LEDdemo();  //auto changing led colors
 
+//#define LAYLA_UNO
 
+
+#ifdef LAYLA_UNO
 #define PIN_LED_RED 11
 #define PIN_LED_GREEN 10
 #define PIN_LED_BLUE 9  
@@ -43,7 +46,30 @@ void LEDdemo();  //auto changing led colors
 // All PC commands go via this (onboard USB) port
 HardwareSerial &PCport=Serial; // direct PC
 #define INTTERUPT_USOUND 0
+SoftwareSerial saberSerial(PIN_SABER_RX,PIN_SABER_TX); // RX (not used), TX
 
+
+#else
+#define PIN_LED_RED 11
+#define PIN_LED_GREEN 10
+#define PIN_LED_BLUE 9  
+//#define PIN_SABER_RX 19
+//#define PIN_SABER_TX 18
+HardwareSerial &saberSerial=Serial1; // RX (not used), TX
+#define PIN_USOUND1_TRG 12
+#define PIN_USOUND2_TRG 7
+#define PIN_USOUND3_TRG 4
+#define PIN_USOUND4_TRG A5
+#define PIN_USOUND5_TRG A4
+#define PIN_SERVO1 3
+#define PIN_SERVO2 5
+#define PIN_SERVO3 6
+#define PIN_DEBUG 13
+#define PIN_USOUND_READ 2
+// All PC commands go via this (onboard USB) port
+HardwareSerial &PCport=Serial; // direct PC
+#define INTTERUPT_USOUND 0
+#endif
 
 struct leds
 {
@@ -125,7 +151,6 @@ public:
 
 
 //------------- globals
-SoftwareSerial saberSerial(PIN_SABER_RX,PIN_SABER_TX); // RX (not used), TX
 
 leds ledpins(PIN_LED_RED,PIN_LED_GREEN,PIN_LED_BLUE);  // which pins are used for RGB led's
 ramp colors(leds(1,0,0),10);  //which colors to ramp though (led(RED,GREEN,Blue),Speed)
@@ -299,7 +324,7 @@ void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p)
 
 // Read all robot sensors into robot.sensor
 void read_sensors(void) {
- /* 
+ 
   //dumby sensor values until we get non blocking sensor read going
   static int trig_pin;
  switch (ultraSound.current)  //select pin
@@ -383,7 +408,7 @@ void read_sensors(void) {
    default:
    ;     //digitalWrite(PIN_DEBUG,HIGH);
  }
- */
+ /*
   robot.f_sensors.uSound1 = millis();
   robot.f_sensors.uSound2 = 100;
   robot.f_sensors.uSound3 = micros();
@@ -415,19 +440,19 @@ void u_received()
    switch (ultraSound.current) //where we recored data
  {
    case 1:
-     robot.f_sensors.uSound1 =(micros()-start)/58; 
+     robot.f_sensors.uSound1 =(micros()-start)/120; 
    break;  
    case 2:
-     robot.f_sensors.uSound2 =(micros()-start)/58; 
+     robot.f_sensors.uSound2 =(micros()-start)/120; 
    break;
    case 3:
-     robot.f_sensors.uSound3 =(micros()-start)/58; 
+     robot.f_sensors.uSound3 =(micros()-start)/120; 
    break;
    case 4:
-     robot.f_sensors.uSound4 =(micros()-start)/58; 
+     robot.f_sensors.uSound4 =(micros()-start)/120; 
    break;
    case 5:
-     robot.f_sensors.uSound5 =(micros()-start)/58; 
+     robot.f_sensors.uSound5 =(micros()-start)/120; 
    break;
    default:
    ;   //  digitalWrite(PIN_DEBUG,HIGH); //this should not happen
