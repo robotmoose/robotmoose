@@ -66,9 +66,10 @@ function emptyLED()
 }
 //Returns empty UltraSonic Sensors
 function emptyUSonic()
-{
-	return { USensor1:0, USensor2:0, USensor3:0, USensor4:0, USensor5:0};
+{	
+	return {USound1:0, USound2:0, USound3:0, USound4:0, USound5:0};
 }
+
 
 // This class stores our last-used piloting command
 var pilot={
@@ -177,30 +178,30 @@ window.setInterval(function(){data_receive()},250);
 // Recieve Sensor Values sent by backend 
 function data_receive()
 {
-
+	var xmlrec=new XMLHttpRequest();
 	var host=// "http://localhost:8080"+ // <- explicit host not needed, browser will use the .html server by default.
 		"/superstar/";
 	var url_start=host;
 	var robot=document.getElementById('robot_name').value;
 	var starpath=robot+"/data";
 	var url_rec=url_start+starpath+"?get";
-	var xmlrec=new XMLHttpRequest();
+	
 	xmlrec.open("GET",url_rec,true);
 	xmlrec.send(null);
+	var pilot_received = emptyUSonic();
+	console.log(pilot_received);
+	xmlrec.onreadystatechange = function(){
+	if(this.readyState==4){ //check for network change
 	var pilot_received = JSON.parse(xmlrec.responseText);
+	console.log(pilot_received);
 /* Read Ultrasonic sensor data sent by backend*/
 	document.getElementById('USonic1').value=Sensors.USonic.USensor1 = pilot_received.uSound1;
 	document.getElementById('USonic2').value=Sensors.USonic.USensor2 = pilot_received.uSound2;
 	document.getElementById('USonic3').value=Sensors.USonic.USensor3 = pilot_received.uSound3;
 	document.getElementById('USonic4').value=Sensors.USonic.USensor4 = pilot_received.uSound4;
 	document.getElementById('USonic5').value=Sensors.USonic.USensor5 = pilot_received.uSound5; 
-	
-/* Log values to console for debugging*/
-	console.log(Sensors.USonic.USensor1);
-	console.log(Sensors.USonic.USensor1);
-	console.log(Sensors.USonic.USensor1);
-	console.log(Sensors.USonic.USensor1);
-	console.log(Sensors.USonic.USensor1);
+	}
+}
 	
 }
 
