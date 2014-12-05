@@ -4,6 +4,7 @@
 */
 
 
+
 /* Main update: display costs for user's selected values. */
 function run() {
   document.getElementById('p_errorout').innerHTML="";
@@ -171,7 +172,7 @@ function pilot_send() {
 	data_receive(); // Read Sensor Data at every Send
 }
 //Read sensor data every 250 ms
-window.setInterval(function(){data_receive()},250);
+//window.setInterval(function(){data_receive()},250);
 
 // Recieve Sensor Values sent by backend 
 function data_receive()
