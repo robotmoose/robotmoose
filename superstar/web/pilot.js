@@ -1,18 +1,3 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
-
-<!-- Our Javascript functions -->
-<script type="text/javascript" src="pilot.js"></script>
-
-<!--Jquery files for interface additions -->
-<script src="jquery/external/jquery/jquery.js"></script>
-<script src="jquery/jquery-ui.js"></script>
-<link href="jquery/jquery-ui.css" rel="stylesheet">
-
-<<<<<<< HEAD
-<script src="js/sha2_auth.js"></script> <!-- auth support -->
-=======
-<script type=text/javascript>
 /*
   JSON Testing
   Dr. Orion Lawlor, lawlor@alaska.edu, 2012-02-17
@@ -81,7 +66,7 @@ function emptyLED()
 //Returns empty UltraSonic Sensors
 function emptyUSonic()
 {
-	return {USound1:0, USound2:0, USound3:0, USound4:0, USound5:0};
+	return { USensor1:0, USensor2:0, USensor3:0, USensor4:0, USensor5:0};
 }
 
 // This class stores our last-used piloting command
@@ -101,7 +86,7 @@ var pilot={
 
 
 var Sensors={
-	USonic:emptyUSonic()
+	USonic:emptyUSonic() 
 };
 	
 
@@ -185,36 +170,36 @@ function pilot_send() {
 	xmlhttp.send(null);
 	data_receive(); // Read Sensor Data at every Send
 }
+//Read sensor data every 250 ms
+window.setInterval(function(){data_receive()},250);
+
 // Recieve Sensor Values sent by backend 
 function data_receive()
 {
-	var xmlrec=new XMLHttpRequest();
-	
+
 	var host=// "http://localhost:8080"+ // <- explicit host not needed, browser will use the .html server by default.
 		"/superstar/";
 	var url_start=host;
 	var robot=document.getElementById('robot_name').value;
 	var starpath=robot+"/data";
 	var url_rec=url_start+starpath+"?get";
+	var xmlrec=new XMLHttpRequest();
 	xmlrec.open("GET",url_rec,true);
-	xmlrec.send();
-	var pilot_received = emptyUSonic();
-	console.log(pilot_received);
-	
-	xmlrec.onreadystatechange = function(){
-        if(this.readyState==4){// Read Sensor values evrytime network progress  happens 
-	pilot_received=JSON.parse(xmlrec.responseText);
-	console.log(pilot_received);
-	/* Read Ultrasonic sensor data sent by backend*/
+	xmlrec.send(null);
+	var pilot_received = JSON.parse(xmlrec.responseText);
+/* Read Ultrasonic sensor data sent by backend*/
 	document.getElementById('USonic1').value=Sensors.USonic.USensor1 = pilot_received.uSound1;
 	document.getElementById('USonic2').value=Sensors.USonic.USensor2 = pilot_received.uSound2;
 	document.getElementById('USonic3').value=Sensors.USonic.USensor3 = pilot_received.uSound3;
 	document.getElementById('USonic4').value=Sensors.USonic.USensor4 = pilot_received.uSound4;
 	document.getElementById('USonic5').value=Sensors.USonic.USensor5 = pilot_received.uSound5; 
-		}
-	}	
-
 	
+/* Log values to console for debugging*/
+	console.log(Sensors.USonic.USensor1);
+	console.log(Sensors.USonic.USensor1);
+	console.log(Sensors.USonic.USensor1);
+	console.log(Sensors.USonic.USensor1);
+	console.log(Sensors.USonic.USensor1);
 	
 }
 
@@ -245,7 +230,6 @@ function pilot_mouse(event,upState) {
 
 	var totPower=Math.abs(dir.forward)+Math.abs(dir.turn);
 	var newPower=emptyPower();
-	
 	if (frac.x<0.9) { /* normal driving */
 		newPower.L=pretty(clamp(dir.forward+dir.turn,-maxPower,maxPower));
 		newPower.R=pretty(clamp(dir.forward-dir.turn,-maxPower,maxPower));
@@ -346,108 +330,11 @@ function runCmd(run,arg) {
 	pilot.cmd.arg=arg;
 	pilot_send();
 }
->>>>>>> d23b3d90ee65b39d6810ba40d254f6e92b18649c
 
-<script type="text/javascript" src="jscolor/jscolor.js"></script> <!-- Jscolor library for color picker -->
-
-
-
-<head><title>Pilot for ITEST: Being There</title>
-
-</head>
-
-<body onLoad="run();" style="background-color:#222222;color:#ffccff;">
-<center>
-<h1>ITEST: Being There Pilot Interface</h1>
-</center>
-
-<table>
-<tr>
-<td><div id="pilot_arrows" style="background-color:#808080;position:relative;width:400px;height:400px;" onmousedown="pilot_mouse(event,0)" ondblclick="pilot_mouse(event,2)" ondragstart="pilot_mouse(event,0)" onmouseout="pilot_mouse(event,1)"  onmouseup="pilot_mouse(event,1)" onmousemove="pilot_mouse(event,2)">
-<img src="img/arrows_hard.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;">
-<img id="glow" src="img/arrows_glow.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;">
-</div></td>
-<td style="width:100%;height:100%"><div id="video_area" style="width:100%;height:100%"><iframe id="video_frame" style="width:100%;height:400px" src=""></iframe></div></td>
-<tr>
-</table>
-
-<div id="tabs"> 
-	<ul>
-		<li><a href="#tabs-1">Setup</a></li>
-		<li><a href="#tabs-2">Interaction</a></li>
-		<li><a href="#tabs-3">Telemetry</a></li>
-	</ul>
-	
-	<div id="tabs-1">
-		<p>
-		Robot Name: <input type="text" id="robot_name" rows="1" cols="30" onChange="run();" value="layla/uaf">
-		<input value="Video - Gruveo" type="button" onClick="runCmd('video','r'+((new Date()).getTime())); openGruveoVideo()"><br>
-
-		RTC video name: <input type="text" id="robot_videoname" rows="1" cols="30" onChange="updateRTCVideo()" value="layla/uaf">
-		<input value="Video - RTC" type="button" onClick="updateRTCVideo()"><br>
-
-		Drive Power: <input type="text" id="robot_power" rows="1" cols="30" onChange="run()" value="15"><br>
-
-		Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""><br>
-		</p>
-	</div>
-
-	<div id="tabs-2">
-		<p>
-		Show text:
-		<input type="text" id="robot_showtext" rows="1" cols="30" onChange="runCmd('say',this.value)" value="Hi! ">
-		<br>
-
-		Play sounds:
-		<input value="Beep 1" type="button" onClick="runCmd('play','music/whistle1.mp3')">
-		<input value="Beep 2" type="button" onClick="runCmd('play','music/whistle2.mp3')">
-		<input value="Stop" type="button" onClick="runCmd('play','')"><br>
-
-		<!--   -->
-
-		<div id="button_area" style="font-style:italic">
-			<table>
-
-			<tr>
-
-			<td>Toggle LED<input id="LEDtoggle" value="LED On" type="checkbox" onClick="LEDtoggle()"></td>
-			<td>LED Demo <input  id="LEDdemo" value="LED Demo" type="checkbox" onClick="LEDdemo()" disabled></td> 
-			<!--<td><input name ="update_video" value="Open Video" type="button" onClick="updateVideo()"></td>< -->
-			<td><input class="color{pickerOnfocus:true}" id="color_picker" onchange = "updateRGB()"></td>
-			<!--<td><input name ="LEDoff" value="LED Off" type="button" onClick="LEDtoggle(false)"></td> -->
-			</tr>
-			<tr>
-			<!-- <td><P id="p_LEDstatus"></p></td><!-- Display LED Status below the toggle button -->
-			<td></td> <!-- 2 empty cells for Alignment -->
-			<td></td>
- 
-			<td colspan="3">R <input id="LED_red" size="5">  G <input id="LED_green" size="5">  B <input id="LED_blue" size="5">
-			</tr>
-
-			</table>
-
-		</div>
-		</p>
-	</div> <!-- Close Interaction Tab -->
-	<div id="tabs-3">
-		<table>
-		<CAPTION> Current Sensor Values</SENSORS>
-		<tr> <!-- Display Utrasonic Sensor Values -->
-		<td colspan="5">Ultrasonic Sensors <input id="USonic1" size ="3" disabled> <input id="USonic2" size ="3" disabled> <input id="USonic3" size ="3" disabled> <input id="USonic4" size ="3" disabled> <input id="USonic5" size ="3" disabled> </td>
-		</tr>
-		</table>
-	</div> <!-- Close Telemetry Tab -->
-</div>
-<script> $( "#tabs" ).tabs(); </script> <!--Has to be placed after tabs-->
+//Make Tabs collapsible 
+$(function(){
+	$( "#tabs").tabs({collapsible: true});
+});
 
 
 
-<div id="status_area" style="font-style:italic;">
-<P id="p_errorout" style="color:red;">ERROR: JavaScript not enabled.</p>
-
-<P id="p_outputRobot">Robot Status</p>
-<P id="p_outputNet">Network Status</p>
-<P id="p_outputPilot">Pilot Status</p>
-
-</div>
-</body></html>
