@@ -23,6 +23,7 @@
 #define RDDGNR       0x54 // Read Diagnostic register
 #define STCVDC       0x60 // Start cell voltage ADC conversions and poll status, with discharge permitted
 #define STOWDC       0x70 // Start open-wire ADC conversions and poll status, with discharge permitted
+#define CLEAR        0x1D // Clear the cell voltage registers and temperature registers
 
 // Configuration Registers
 
@@ -89,20 +90,21 @@ void SetConfig()  // Send configuration registers to put LTC6803 into "Measure m
   digitalWrite(SS_PIN, HIGH); // Chip Deselect
 }
 
-/* This code is only needed to verify that the configuration registers are getting written to correctly
+// This code is only needed to verify that the configuration registers are getting written to correctly
 void GetConfig()
 {
-  Serial.println("Reading Configuration Registers");
   digitalWrite(SS_PIN, LOW);
   SPI.transfer(RDCFG);
   SPI.transfer(0xCE);
+  int conf[6];
   for(int i=0; i<6; i++)
   {
     conf[i] = SPI.transfer(0x00);
+    Serial.println(conf[i], HEX);
   }
   digitalWrite(SS_PIN, HIGH);
 }
-*/
+
 
 unsigned int getCellVolts()
 {
@@ -126,7 +128,7 @@ void ADCconvert()  // Send command to run ADC conversion
 {
   //Serial.println("ADC conversion started");
   digitalWrite(SS_PIN, LOW); // Chip Select
-  SPI.transfer(STCVAD); // Send command to start ADC conversion
+  SPI.transfer(STCVDC); // Send command to start ADC conversion
   SPI.transfer(0xB0); // Send PEC byte for command
   digitalWrite(SS_PIN, HIGH); // Chip Deselect
 }
@@ -141,7 +143,7 @@ unsigned int BitShiftCombine(unsigned char x_high, unsigned char x_low)  // Comb
   return combined;
 }
 
-int CellConvert(unsigned int combined1, unsigned int combined2, unsigned int combined3)  // Conver 16-bit number to correct 12-bit number for voltage calculation
+int CellConvert(unsigned int combined1, unsigned int combined2, unsigned int combined3)  // Convert 16-bit number to correct 12-bit number for voltage calculation
 {
   int Cell[3];
   Cell[0] = combined1 & 4095;
@@ -154,6 +156,15 @@ int CellConvert(unsigned int combined1, unsigned int combined2, unsigned int com
   return cellVoltage[3];
 }
 
+void ClearReg()  // Clear the cell voltage registers and temperature registers
+{
+  digitalWrite(SS_PIN, LOW); // Chip Select
+  SPI.transfer(CLEAR); // Send command to start ADC conversion
+  SPI.transfer(0x93); // Send PEC byte for command
+  digitalWrite(SS_PIN, HIGH); // Chip Deselect
+}
+
+//---------------------------------------------------------------------------------------------------------------------
 // Following PEC code by Dale (KiloOne) on Endless Sphere
 // http://endless-sphere.com/forums/viewtopic.php?f=14&t=40962
 
@@ -196,13 +207,14 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
   }
   return PECpacket;
 }
-
+//---------------------------------------------------------------------------------------------------------------------
 
 void loop()
 {
   //GetConfig();                    // Only needed for debugging purpose.
   SetConfig();
   //GetConfig();                    // Only needed for debugging purpose.
+  //ClearReg();
   ADCconvert();
   getCellVolts();
   cellVoltage[3]=CellConvert(BitShiftCombine(RawData[1], RawData[0]), BitShiftCombine(RawData[2], RawData[1]), BitShiftCombine(RawData[4], RawData[3]));
@@ -211,7 +223,7 @@ void loop()
     Serial.print("Cell ");
     Serial.print(i);
     Serial.print(": ");
-    Serial.print(cellVoltage[i]);
+    Serial.print(cellVoltage[i], 3);
     Serial.println(" V");
   }
   Serial.println("-------------------------------------");
