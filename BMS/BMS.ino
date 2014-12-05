@@ -35,7 +35,7 @@
 // Configuration Registers for measure mode
 
 #define CFGR0       0xE1
-#define CFGR1       0x00
+byte CFGR1=0x00;   
 #define CFGR2       0x00
 #define CFGR3       0xFF
 #define CFGR4       0x00
@@ -44,7 +44,7 @@
 // Arduino Pins
 
 #define SS_PIN        10   // Designate Chip select pin ***Change this to pin 53 when uploading to Mega***
-#define CHARGE_INPUT  6    // Set to high when AC power is available
+#define CHARGE_INPUT  6    // Will be pulled high when AC power is available
 #define CHARGE_RELAY  9    // Set to high to turn on charging relay
 #define ADDRESS       0x80 // Designate Chip address: 10000000
 
@@ -54,6 +54,7 @@
 unsigned int RawData[6];       // Raw data from voltage registers
 float cellVoltage[3];          // Calculated voltages for each cell
 float AvgCellVolts;
+int chargeflag;
 
 // PEC Variables
 static byte crc8_table[256];   // 8-bit table for PEC calc
@@ -68,6 +69,8 @@ byte packet[18]={0};           // used for PEC calc
 void setup()
 {
   pinMode(SS_PIN, OUTPUT);
+  pinMode(CHARGE_INPUT, INPUT);
+  pinMode(CHARGE_RELAY, OUTPUT);
   digitalWrite(SS_PIN, HIGH); // Chip Deselect
 
   // SPI Configuration: MSB First, CPOL = 1, CPHA = 1, DIV16 = 1Mhz
@@ -174,7 +177,7 @@ float AvgerageCell()
   return AvgCellVolts;
 }
 
-unsigned char setCR1(float cellVoltage[])
+unsigned char setCFGR1(float cellVoltage[])
 {
 	static float vlimit = 4.18; //Upper maximum for cell voltage
 	unsigned char configReg1 = 0; //GFGR1
@@ -194,6 +197,30 @@ unsigned char setCR1(float cellVoltage[])
 	return configReg1;
 }
 
+void Charge()    // Function to turn on charging and cell balancing
+{ 
+  //cellVoltage[0]=4.19;                    // Artificially set to test if statements
+  //digitalWrite(CHARGE_INPUT, LOW);    // Artificially set to test if statements
+  //chargeflag=2;                        // Artificially set to test if statements
+  if (digitalRead(CHARGE_INPUT) == HIGH)
+  {
+    if ((cellVoltage[0] >= ABS_max) || (cellVoltage[1] >= ABS_max) || (cellVoltage[2] >= ABS_max))
+    {
+      digitalWrite(CHARGE_RELAY, LOW);
+      chargeflag=0;
+    }
+    CFGR1=setCFGR1(cellVoltage);
+    SetConfig();
+  }
+  if (digitalRead(CHARGE_INPUT) == LOW)
+  {
+    digitalWrite(CHARGE_RELAY, LOW);
+    CFGR1=0x00;
+    SetConfig();
+    chargeflag=0;
+  }
+}
+  
 /*
 int findHighCell(float cellVoltage[])
 {
@@ -214,7 +241,6 @@ return highCell;
 
 static void init_crc8() // Generate PEC lookup table
 {
-  
   int z,j;
   byte cr;
   if (!made_table) {
@@ -267,6 +293,7 @@ void loop()
   getCellVolts();
   cellVoltage[3]=CellConvert(BitShiftCombine(RawData[1], RawData[0]), BitShiftCombine(RawData[2], RawData[1]), BitShiftCombine(RawData[4], RawData[3]));
   AvgerageCell();
+  Charge();
   //findHighCell;
   for(int i=0; i<3; i++)
   {
@@ -279,6 +306,8 @@ void loop()
   Serial.print("Average Cell Voltage: ");
   Serial.print(AvgCellVolts, 3);
   Serial.println(" V");
+  Serial.print("Charge flag: ");
+  Serial.println(chargeflag);
   Serial.println("-------------------------------------");
   delay(1200);
 }
