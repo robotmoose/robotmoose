@@ -174,6 +174,26 @@ float AvgerageCell()
   return AvgCellVolts;
 }
 
+unsigned char setCR1(float cellVoltage[])
+{
+	static float vlimit = 4.18; //Upper maximum for cell voltage
+	unsigned char configReg1 = 0; //GFGR1
+
+	if (cellVoltage[0] >= vlimit)
+	{
+		configReg1 += 1; //Sets DCC1 = 1
+	}
+	if (cellVoltage[1] >= vlimit)
+	{
+		configReg1 += 2; //Sets DCC2 = 1
+	}
+	if (cellVoltage[2] >= vlimit)
+	{
+		configReg1 += 4; //Sets DCC3 = 1
+	}
+	return configReg1;
+}
+
 /*
 int findHighCell(float cellVoltage[])
 {
