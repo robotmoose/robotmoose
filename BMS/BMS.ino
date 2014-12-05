@@ -25,7 +25,14 @@
 #define STOWDC       0x70 // Start open-wire ADC conversions and poll status, with discharge permitted
 #define CLEAR        0x1D // Clear the cell voltage registers and temperature registers
 
-// Configuration Registers
+// Charge function parameters
+
+#define ABS_max           4.200  // Max Cell voltage: DO NOT CHARGE HIGHER
+#define max_working       4.180  // Discharge cells higher than this value
+#define low_cell_working  3.500  // Warning Voltage
+#define ABS_min           3.200  //E-Stop or risk damage
+
+// Configuration Registers for measure mode
 
 #define CFGR0       0xE1
 #define CFGR1       0x00
@@ -34,14 +41,19 @@
 #define CFGR4       0x00
 #define CFGR5       0x00
 
-#define SS_PIN        10  // Designate Chip select pin 
-#define ADDRESS      0x80 // Designate Chip address: 10000000
+// Arduino Pins
+
+#define SS_PIN        10   // Designate Chip select pin ***Change this to pin 53 when uploading to Mega***
+#define CHARGE_INPUT  6    // Set to high when AC power is available
+#define CHARGE_RELAY  9    // Set to high to turn on charging relay
+#define ADDRESS       0x80 // Designate Chip address: 10000000
 
 //---------------------------------------------------------------------------------------------------------------------
 // Calculation Variables
 //byte conf[6];                // Only needed when GetConfig() function is in use.
 unsigned int RawData[6];       // Raw data from voltage registers
 float cellVoltage[3];          // Calculated voltages for each cell
+float AvgCellVolts;
 
 // PEC Variables
 static byte crc8_table[256];   // 8-bit table for PEC calc
@@ -156,6 +168,12 @@ int CellConvert(unsigned int combined1, unsigned int combined2, unsigned int com
   return cellVoltage[3];
 }
 
+float AvgerageCell()
+{
+  AvgCellVolts=(cellVoltage[0]+cellVoltage[1]+cellVoltage[2])/3;
+  return AvgCellVolts;
+}
+
 /*
 int findHighCell(float cellVoltage[])
 {
@@ -215,8 +233,12 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
 }
 //---------------------------------------------------------------------------------------------------------------------
 
+
+//---------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 void loop()
 {
+  
   //GetConfig();                    // Only needed for debugging purpose.
   SetConfig();
   //GetConfig();                    // Only needed for debugging purpose.
@@ -224,6 +246,7 @@ void loop()
   ADCconvert();
   getCellVolts();
   cellVoltage[3]=CellConvert(BitShiftCombine(RawData[1], RawData[0]), BitShiftCombine(RawData[2], RawData[1]), BitShiftCombine(RawData[4], RawData[3]));
+  AvgerageCell();
   //findHighCell;
   for(int i=0; i<3; i++)
   {
@@ -233,8 +256,13 @@ void loop()
     Serial.print(cellVoltage[i], 3);
     Serial.println(" V");
   }
+  Serial.print("Average Cell Voltage: ");
+  Serial.print(AvgCellVolts, 3);
+  Serial.println(" V");
   Serial.println("-------------------------------------");
   delay(1200);
 }
+//---------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 
 
