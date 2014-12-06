@@ -28,7 +28,7 @@
 // Charge function parameters
 
 #define ABS_max           4.200  // Max Cell voltage: DO NOT CHARGE HIGHER
-#define max_working       4.180  // Discharge cells higher than this value
+#define max_working       4.100  // Discharge cells higher than this value
 #define low_cell_working  3.500  // Warning Voltage
 #define ABS_min           3.200  //E-Stop or risk damage
 
@@ -43,7 +43,7 @@ byte CFGR1=0x00;
 
 // Arduino Pins
 
-#define SS_PIN        10   // Designate Chip select pin ***Change this to pin 53 when uploading to Mega***
+#define SS_PIN        53//10   // Designate Chip select pin ***Change this to pin 53 when uploading to Mega***
 #define CHARGE_INPUT  6    // Will be pulled high when AC power is available
 #define CHARGE_RELAY  9    // Set to high to turn on charging relay
 #define ADDRESS       0x80 // Designate Chip address: 10000000
@@ -54,6 +54,7 @@ byte CFGR1=0x00;
 unsigned int RawData[6];       // Raw data from voltage registers
 float cellVoltage[3];          // Calculated voltages for each cell
 float AvgCellVolts;
+float cellVoltTotal;
 int chargeflag;
 
 // PEC Variables
@@ -177,46 +178,60 @@ float AvgerageCell()
   return AvgCellVolts;
 }
 
-unsigned char setCFGR1(float cellVoltage[])
+float totalCell()
 {
-	static float vlimit = 4.18; //Upper maximum for cell voltage
-	unsigned char configReg1 = 0; //GFGR1
+  cellVoltTotal = cellVoltage[0] + cellVoltage[1] + cellVoltage[2];
+  return cellVoltTotal;
+}
 
-	if (cellVoltage[0] >= vlimit)
-	{
-		configReg1 += 1; //Sets DCC1 = 1
-	}
-	if (cellVoltage[1] >= vlimit)
-	{
-		configReg1 += 2; //Sets DCC2 = 1
-	}
-	if (cellVoltage[2] >= vlimit)
-	{
-		configReg1 += 4; //Sets DCC3 = 1
-	}
-	return configReg1;
+void setCFGR1( float cellVoltage[], byte & CFGR1 )
+{
+  CFGR1 = 0; //Clears out GFGR1
+  if (cellVoltage[0] >= max_working)
+  {
+    CFGR1 += 0x01; //Sets DCC1 = 1
+  }
+  if (cellVoltage[1] >= max_working)
+  {
+    CFGR1 += 0x02; //Sets DCC2 = 1
+  }
+  if (cellVoltage[2] >= max_working)
+  {
+    CFGR1 += 0x04; //Sets DCC3 = 1
+  }
 }
 
 void Charge()    // Function to turn on charging and cell balancing
 { 
-  //cellVoltage[0]=4.19;                    // Artificially set to test if statements
-  //digitalWrite(CHARGE_INPUT, LOW);    // Artificially set to test if statements
-  //chargeflag=2;                        // Artificially set to test if statements
+  // Artificially set to test if statements:
+  //cellVoltage[0] = 4.3;
+  //cellVoltage[1] = 4.1;
+  //cellVoltage[2]=4.19;                   
+  //digitalWrite(CHARGE_INPUT, LOW);
+  
+  
+  //Sets CFGR1 to manage cell discharging
+  setCFGR1(cellVoltage, CFGR1);
+  SetConfig();
+    
   if (digitalRead(CHARGE_INPUT) == HIGH)
   {
+    //If a single cell's voltage is greater than the absolute max, turns off charging
     if ((cellVoltage[0] >= ABS_max) || (cellVoltage[1] >= ABS_max) || (cellVoltage[2] >= ABS_max))
     {
       digitalWrite(CHARGE_RELAY, LOW);
       chargeflag=0;
     }
-    CFGR1=setCFGR1(cellVoltage);
-    SetConfig();
+    //If not charging is OK
+    else
+    {
+      chargeflag=1;
+      digitalWrite(CHARGE_RELAY, HIGH);
+    }
   }
-  if (digitalRead(CHARGE_INPUT) == LOW)
+  else if (digitalRead(CHARGE_INPUT) == LOW)
   {
     digitalWrite(CHARGE_RELAY, LOW);
-    CFGR1=0x00;
-    SetConfig();
     chargeflag=0;
   }
 }
@@ -293,6 +308,7 @@ void loop()
   getCellVolts();
   cellVoltage[3]=CellConvert(BitShiftCombine(RawData[1], RawData[0]), BitShiftCombine(RawData[2], RawData[1]), BitShiftCombine(RawData[4], RawData[3]));
   AvgerageCell();
+  totalCell();
   Charge();
   //findHighCell;
   for(int i=0; i<3; i++)
@@ -304,8 +320,13 @@ void loop()
     Serial.println(" V");
   }
   Serial.print("Average Cell Voltage: ");
-  Serial.print(AvgCellVolts, 3);
+  Serial.print(AvgCellVolts);
   Serial.println(" V");
+  
+  Serial.print("Total Cell Voltages: ");
+  Serial.print(cellVoltTotal);
+  Serial.println(" V");
+  
   Serial.print("Charge flag: ");
   Serial.println(chargeflag);
   Serial.println("-------------------------------------");
