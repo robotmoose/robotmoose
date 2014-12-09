@@ -246,6 +246,20 @@ void Charge()    // Function to turn on charging and cell balancing
   }
 }
 
+/*
+int findHighCell(float cellVoltage[])
+{
+int cell[4];
+int highCell = cell[0];
+for(int i = 1; i <= totalCells; i++)
+{
+if(cellVoltage[i] > cellVoltage[i-1])
+highCell = cell[i];
+}
+return highCell;
+}
+*/
+
 //---------------------------------------------------------------------------------------------------------------------
 // Following PEC code by Dale (KiloOne) on Endless Sphere
 // http://endless-sphere.com/forums/viewtopic.php?f=14&t=40962

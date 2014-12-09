@@ -4,6 +4,7 @@
 
 #include <SPI.h> 
 #include <Wire.h>
+#include <stdlib.h>
 
 // LTC6803 parameters
 
@@ -68,6 +69,8 @@ byte packet[18]={0};           // used for PEC calc
 //byte PECpacketREAD;          // value that PECpacket should be as read from 6803
 //---------------------------------------------------------------------------------------------------------------------
 
+int x=0;
+
 void setup()
 {
   pinMode(SS_PIN, OUTPUT);
@@ -83,9 +86,11 @@ void setup()
   SPI.begin();          // Start SPI 
   Serial.begin(9600);   // Open serial port
 //---------------------------------------------------------------------------------------------------------------------
-// I2C confi
-  Wire.begin(2);                // join i2c bus with address #2
-  Wire.onRequest(requestEvent); // register event
+// I2C configs
+ Wire.begin(2);                // join i2c bus with address #2
+ Wire.onRequest(requestEvent); // register event
+ Wire.onReceive(receiveEvent);
+  
 //---------------------------------------------------------------------------------------------------------------------
 
 }
@@ -240,7 +245,7 @@ void Charge()    // Function to turn on charging and cell balancing
     chargeflag=0;
   }
 }
-  
+
 /*
 int findHighCell(float cellVoltage[])
 {
@@ -297,45 +302,62 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
   }
   return PECpacket;
 }
-
+/*
 //---------------------------------------------------------------------------------------------------------------------
-// I2C communication code
+// I2C communication code **CURRENTLY NOT WORKING PROPERLY**
 
-// Wire Slave Sender
-// by Nicholas Zambetti <http://www.zambetti.com>
-
-// Demonstrates use of the Wire library
-// Sends data as an I2C/TWI slave device
-// Refer to the "Wire Master Reader" example for use with this
-
-// Created 29 March 2006
-
-// This example code is in the public domain.
-
-// function that executes whenever data is requested by master
-// this function is registered as an event, see setup()
-void requestEvent()
+void receiveEvent(int command)
 {
-  Wire.write("hello "); // respond with message of 6 bytes
-                       // as expected by master
+  x = Wire.read();    // receive byte as an integer
 }
 
+void requestEvent()
+{
+     //If value received is 0 
+  if (x == 0) 
+  {
+    char Cell[5];
+    //cellVoltage[0]=-3.24;
+    dtostrf(cellVoltage[0],5,3,Cell);
+    int testflag=0;
+    Serial.println(testflag);
+    //Serial.println(Cell);
+  }
+  //If value received is 1 
+  if (x == 1) 
+  {
+    char Cell[5];
+   // cellVoltage[1]=4.36;
+    dtostrf(cellVoltage[1],5,3,Cell);
+    int testflag=1;
+    Serial.println(testflag);
+    //Serial.println(Cell);
+  }
+  if (x == 2) 
+  {
+    char Cell[5];
+   // cellVoltage[2]=2.45;
+    dtostrf(cellVoltage[2],5,3,Cell);
+    int testflag=2;
+    Serial.println(testflag);
+    //Serial.println(Cell);
+  }
+}
+
+*/
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
 void loop()
 {
-  
-  //GetConfig();                    // Only needed for debugging purpose.
+  //GetConfig();                    // Only needed for debugging purposes.
   SetConfig();
-  //GetConfig();                    // Only needed for debugging purpose.
-  //ClearReg();
+  //GetConfig();                    // Only needed for debugging purposes.
   ADCconvert();
   getCellVolts();
   cellVoltage[3]=CellConvert(BitShiftCombine(RawData[1], RawData[0]), BitShiftCombine(RawData[2], RawData[1]), BitShiftCombine(RawData[4], RawData[3]));
   AvgerageCell();
   totalCell();
   Charge();
-  //findHighCell;
   for(int i=0; i<3; i++)
   {
     Serial.print("Cell ");
@@ -345,15 +367,15 @@ void loop()
     Serial.println(" V");
   }
   Serial.print("Average Cell Voltage: ");
-  Serial.print(AvgCellVolts);
+  Serial.print(AvgCellVolts,3);
   Serial.println(" V");
   
   Serial.print("Total Cell Voltages: ");
-  Serial.print(cellVoltTotal);
+  Serial.print(cellVoltTotal,3);
   Serial.println(" V");
   
   Serial.print("Charge flag: ");
-  Serial.println(chargeflag);
+  Serial.println(chargeflag,3);
   Serial.println("-------------------------------------");
   delay(1200);
 }
