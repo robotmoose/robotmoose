@@ -125,15 +125,17 @@ void robot_backend::read_sensors(const A_packet& current_p)
 void robot_backend::read_serial(void) {
 	if (pkt==0) return; // simulation only
 	while (Serial.available()) { // read any robot response
+		if (debug) printf("A");
 		int got_data=0;
 		A_packet p;
 		while (-1==pkt->read_packet(p)) 
 		{
 			//got_data++;   //packet p.length will give us this
-			//printf("s");
+			if (debug) printf("S");
 		}
 		if (p.valid) {
-			//printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data); // last printf give all of this (no longer need)
+			if (debug) printf("P");
+			printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data); // last printf give all of this (no longer need)
 			if (p.command == 0) printf("    Arduino sent echo request %d bytes, '%s'\n", p.length, p.data);
 			else if (p.command==0xE) printf("    Arduino sent error packet: %d bytes, '%s'\n", p.length,p.data);
 			else if (p.command == 0x5)
@@ -167,6 +169,7 @@ void robot_backend::send_serial(void) {
 	led.ledon = (bool)(ledOn);
 	led.demo = (bool)(ledDemo);
 
+	if (debug) printf("Sending serial data\n");
 	//if (memcmp(&led, &new_led, sizeof(led)) == 0)  //did it change
 	//{
 		//led = new_led;
@@ -307,6 +310,9 @@ int main(int argc, char *argv[])
 		backend->send_serial();
 		backend->read_serial();
 		backend->send_network();
+#ifdef __unix__
+		usleep(10*1000); // limit rate, to be kind to serial port and network
+#endif
 	}
 	
 	return 0;
