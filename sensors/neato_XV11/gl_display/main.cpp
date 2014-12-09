@@ -5,7 +5,9 @@
   Dr. Orion Lawlor, lawlor@alaska.edu, 2014-02-19 (Public Domain)
 */
 #include <GL/glut.h>
-#include <math.h>
+//#include <math.h>
+#define _USE_MATH_DEFINES
+#include <cmath>
 
 #include <iostream>
 #include <stdio.h>
@@ -113,7 +115,7 @@ public:
 		while (1) {
 			int n=pkt.read_packet(p);
 			if (n==1) break;
-			if (n==0) sleep(0);
+			if (n == 0);//sleep(0);
 			// else n==-1
 			leash--;
 			if (leash%1000==0) {
