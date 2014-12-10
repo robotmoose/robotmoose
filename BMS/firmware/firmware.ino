@@ -46,8 +46,9 @@ byte CFGR1=0x00;
 // Arduino Pins
 
 #define SS_PIN        10   // Designate Chip select pin ***Change this to pin 53 when uploading to Mega***
-#define CHARGE_INPUT  6    // Will be pulled high when AC power is available
+#define CHARGE_INPUT  5    // Will be pulled high when AC power is available
 #define CHARGE_RELAY  9    // Set to high to turn on charging relay
+#define POWER         6
 #define ADDRESS       0x80 // Designate Chip address: 10000000
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -75,6 +76,7 @@ void setup()
 {
   pinMode(SS_PIN, OUTPUT);
   pinMode(CHARGE_INPUT, INPUT);
+  pinMode(POWER, OUTPUT);
   pinMode(CHARGE_RELAY, OUTPUT);
   digitalWrite(SS_PIN, HIGH); // Chip Deselect
 
@@ -219,7 +221,7 @@ void Charge()    // Function to turn on charging and cell balancing
   //cellVoltage[0] = 4.3;
   //cellVoltage[1] = 4.1;
   //cellVoltage[2]=4.19;                   
-  //digitalWrite(CHARGE_INPUT, HIGH);
+  digitalWrite(CHARGE_INPUT, HIGH);
   
   
   //Sets CFGR1 to manage cell discharging
@@ -350,6 +352,7 @@ void requestEvent()
 //---------------------------------------------------------------------------------------------------------------------
 void loop()
 {
+  digitalWrite(POWER, HIGH);
   //GetConfig();                    // Only needed for debugging purposes.
   SetConfig();
   //GetConfig();                    // Only needed for debugging purposes.
