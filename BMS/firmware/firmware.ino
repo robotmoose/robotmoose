@@ -86,11 +86,12 @@ void setup()
   SPI.begin();          // Start SPI 
   Serial.begin(9600);   // Open serial port
 //---------------------------------------------------------------------------------------------------------------------
+/*
 // I2C configs
  Wire.begin(2);                // join i2c bus with address #2
  Wire.onRequest(requestEvent); // register event
  Wire.onReceive(receiveEvent);
-  
+  */
 //---------------------------------------------------------------------------------------------------------------------
 
 }
