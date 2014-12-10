@@ -17,6 +17,8 @@
 #define RDFLG        0x0C // Read flag register group
 #define RDTMP        0x0E // Read temperature register group
 #define STCVAD       0x10 // Start cell voltage ADC conversions and poll status
+#define STCST1       0x1E // ADC conversion self test 1
+#define STCST2       0x1F // ADC conversion self test 2
 #define STOWAD       0x20 // Start open-wire ADC conversions and poll status
 #define STTMPAD      0x30 // Start temperature ADC conversions and poll status
 #define PLADC        0x40 // Poll ADC Converter status
@@ -48,7 +50,7 @@ byte CFGR1=0x00;
 #define SS_PIN        10   // Designate Chip select pin ***Change this to pin 53 when uploading to Mega***
 #define CHARGE_INPUT  5    // Will be pulled high when AC power is available
 #define CHARGE_RELAY  9    // Set to high to turn on charging relay
-#define POWER         6
+#define POWER         6    // Power pin for BMS shield
 #define ADDRESS       0x80 // Designate Chip address: 10000000
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -146,7 +148,7 @@ unsigned int getCellVolts()
   for(int i=0; i<6; i++)
   {
     RawData[i] = SPI.transfer(0x00);   // send command to read voltage registers
-    //Serial.println(Response[i], HEX);
+    Serial.println(RawData[i], HEX);
   }
   byte PECresponse;
   PECresponse=SPI.transfer(0x00);
@@ -221,7 +223,7 @@ void Charge()    // Function to turn on charging and cell balancing
   //cellVoltage[0] = 4.3;
   //cellVoltage[1] = 4.1;
   //cellVoltage[2]=4.19;                   
-  digitalWrite(CHARGE_INPUT, HIGH);
+  //digitalWrite(CHARGE_INPUT, HIGH);
   
   
   //Sets CFGR1 to manage cell discharging
@@ -355,7 +357,7 @@ void loop()
   digitalWrite(POWER, HIGH);
   //GetConfig();                    // Only needed for debugging purposes.
   SetConfig();
-  //GetConfig();                    // Only needed for debugging purposes.
+  GetConfig();                    // Only needed for debugging purposes.
   ADCconvert();
   getCellVolts();
   cellVoltage[3]=CellConvert(BitShiftCombine(RawData[1], RawData[0]), BitShiftCombine(RawData[2], RawData[1]), BitShiftCombine(RawData[4], RawData[3]));
