@@ -24,11 +24,6 @@ function getClientPosition(element) {
 	var temp = element.getBoundingClientRect(); //Gets coordinate data
 	var xPosition = temp.left;
 	var yPosition = temp.top;
-	/*while (element) {
-		xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
-		yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
-		element = element.offsetParent;
-	}*/
 	return { x: xPosition, y: yPosition };
 }
 /* Return the fractional mouse position of the mouse relative to this element.
@@ -94,13 +89,7 @@ var Sensors={
 
 function LEDtoggle(){
 	pilot.LED.On = document.getElementById("LEDtoggle").checked;
-/*      if(!pilot.LED.On) { 
-		pilot.LED.Demo=false; // Auto turn-off demo mode when LED is disabled 
-		document.getElementById("LEDdemo").checked=false; // Untick LED Demo checkbox
-	}
-        console.log(document.getElementById("LEDtoggle").checked);
-	console.log(pilot.LED.On); // print current value of LEDtoggle onto the console for debugging
-*/
+
 // If LED is Off, make LED Demo unclickable 
 	if(document.getElementById("LEDtoggle").checked) {document.getElementById("LEDdemo").disabled=false;}
 	else {document.getElementById("LEDdemo").disabled=true;}
@@ -111,9 +100,7 @@ function LEDtoggle(){
 function LEDdemo()
 {
          pilot.LED.Demo=document.getElementById("LEDdemo").checked;
-	/*if(!pilot.LED.Demo)pilot.LED.Demo=true;
-        else pilot.LED.Demo=false;*/
-	pilot_send();
+	 pilot_send();
 }
 
 
@@ -142,7 +129,6 @@ function pilot_send() {
 	var send_time=pilot.time=pilot_time();
 	var pilotStr=JSON.stringify(pilot);
 	console.log(pilotStr);
-	//var LEDStr=JSON.stringify(LED); // send current LED state
 	
 	var robot=document.getElementById('robot_name').value;
 	var starpath=robot+"/pilot";
@@ -215,15 +201,15 @@ function pilot_mouse(event,upState) {
 	var powerUI=document.getElementById('robot_power').value*0.01;
 	if (isNaN(powerUI)) maxPower=0.0;
 	else if (powerUI<maxPower) { maxPower=powerUI; }
-	//if (maxPower<0.15) { maxPower=0.15; } // limit's low end speed
+	
 
 	var arrowDiv=document.getElementById('pilot_arrows');
 	var frac=getMouseFraction(event,arrowDiv);
 	var str="";
-	// str+="Mouse "+frac.x+" "+frac.y+"<br>\n";
+	
 
 	var dir={ forward: pretty(0.5-frac.y), turn:pretty(frac.x-0.5) };
-	// if (Math.abs(dir.turn)<0.1) dir.turn=0; // <- turning deadband
+	
 	str+="Move "+dir.forward+" forward, "+dir.turn+" turn<br>\n";
 
 //Proportional control.  The 2.0 is because mouse is from -0.5 to +0.5
@@ -276,19 +262,7 @@ function updateRTCVideo()
 
  // Use AppRTC instead of gruveo for video
   var videoURL = "https://appear.in/" + splitName[0] + splitName[1];
-  // Add parameters to improve video responsiveness
-  /*videoURL+="&hd=false";
-  videoURL+="&tt=1"; // <- timeout on client very fast
-  videoURL+="&audio=googNoiseReduction=true"; // Google noise reduction
-  videoURL+="&audio=googEchoCancellation=true"; // Google noise reduction*/
-  
-  // videoURL+="&video=optional:minWidth=640,optional:minHeight=320";
-  //videoURL+="&vsbr=1000&vrbr=1000"; // cut bitrate to 1000 kilobits?
-   
   document.getElementById("video_frame").src = videoURL;
-  // On Firefox or Chrome, specifying a width and height opens a new window, not a tab.
-  //  (On IE, it's up to the user's preferences)
-  //window.open(videoURL,"video",'width=800,height=600');
 
 }
 
@@ -298,7 +272,7 @@ function openGruveoVideo()
   var currentRobot = document.getElementById('robot_name').value;
   var splitName = currentRobot.split('/');
 
- // Use AppRTC instead of gruveo for video
+ 
   var videoURL = "http://gruveo.com/#" + splitName[0] + splitName[1];
 
   // On Firefox or Chrome, specifying a width and height opens a new window, not a tab.

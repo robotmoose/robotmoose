@@ -19,6 +19,7 @@
 $(function(){
 	$( "#tabs").tabs({collapsible: true});
 });
+
 </script>
 <head><title>Pilot for ITEST: Being There</title>
 
@@ -43,7 +44,8 @@ $(function(){
 	<ul>
 		<li><a href="#tabs-1">Setup</a></li>
 		<li><a href="#tabs-2">Interaction</a></li>
-		<li><a href="#tabs-3">Telemetry</a></li>
+		<li><a href="#tabs-3">Sensors</a></li>
+		<li><a href="#tabs-4">Robot Health</a></li> 
 	</ul>
 	
 	<div id="tabs-1">
@@ -80,12 +82,9 @@ $(function(){
 
 			<td>Toggle LED<input id="LEDtoggle" value="LED On" type="checkbox" onClick="LEDtoggle()"></td>
 			<td>LED Demo <input  id="LEDdemo" value="LED Demo" type="checkbox" onClick="LEDdemo()" disabled></td> 
-			<!--<td><input name ="update_video" value="Open Video" type="button" onClick="updateVideo()"></td>< -->
 			<td><input class="color{pickerOnfocus:true}" id="color_picker" onchange = "updateRGB()"></td>
-			<!--<td><input name ="LEDoff" value="LED Off" type="button" onClick="LEDtoggle(false)"></td> -->
 			</tr>
 			<tr>
-			<!-- <td><P id="p_LEDstatus"></p></td><!-- Display LED Status below the toggle button -->
 			<td></td> <!-- 2 empty cells for Alignment -->
 			<td></td>
  
@@ -99,12 +98,24 @@ $(function(){
 	</div> <!-- Close Interaction Tab -->
 	<div id="tabs-3">
 		<table>
-		<CAPTION> Current Sensor Values</SENSORS>
-		<tr> <!-- Display Utrasonic Sensor Values -->
+		 <CAPTION> Current Sensor Values</CAPTION> 
+		 <!-- Display Utrasonic Sensor Values -->
 		<td colspan="5">Ultrasonic Sensors <input id="USonic1" size ="3" disabled> <input id="USonic2" size ="3" disabled> <input id="USonic3" size ="3" disabled> <input id="USonic4" size ="3" disabled> <input id="USonic5" size ="3" disabled> </td>
 		</tr>
 		</table>
-	</div> <!-- Close Telemetry Tab -->
+				
+	</div> <!-- Close Sensors Tab -->
+	
+	<div id="tabs-4">
+		<table>
+		<tr>
+		<p id="p_outputNet"> Network Status</p>
+		</tr>
+		<tr>
+		<P id="p_outputPilot">Pilot Status</p>
+		</tr>
+		</table>
+	</div> <!-- Close Robot health Tab -->	
 </div>
 <script> $( "#tabs" ).tabs(); </script> <!--Has to be placed after tabs-->
 
@@ -112,10 +123,5 @@ $(function(){
 
 <div id="status_area" style="font-style:italic;">
 <P id="p_errorout" style="color:red;">ERROR: JavaScript not enabled.</p>
-
-<P id="p_outputRobot">Robot Status</p>
-<P id="p_outputNet">Network Status</p>
-<P id="p_outputPilot">Pilot Status</p>
-
 </div>
 </body></html>
