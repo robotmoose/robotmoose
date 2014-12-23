@@ -304,7 +304,7 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
 }
 
 //---------------------------------------------------------------------------------------------------------------------
-// I2C communication code **CURRENTLY NOT WORKING PROPERLY**
+// I2C communication code
 
 void receiveEvent(int command)
 {
@@ -317,29 +317,29 @@ void requestEvent()
   if (x == 0) 
   {
     char Cell[5];
-    //cellVoltage[0]=-3.24;
-    dtostrf(cellVoltage[0],5,3,Cell);
+    //cellVoltage[0]=2.567482309;  // Artificially set to test I2C
+    Wire.write(dtostrf(cellVoltage[0],7,5,Cell));
     int testflag=0;
-    Serial.println(testflag);
+    //Serial.println(testflag);
     //Serial.println(Cell);
   }
   //If value received is 1 
-  if (x == 1) 
+  else if (x == 1) 
   {
     char Cell[5];
-   // cellVoltage[1]=4.36;
-    dtostrf(cellVoltage[1],5,3,Cell);
+    //cellVoltage[1]=-3.3473632; // Artificially set to test I2C
+    Wire.write(dtostrf(cellVoltage[1],7,5,Cell));
     int testflag=1;
-    Serial.println(testflag);
+    //Serial.println(testflag);
     //Serial.println(Cell);
   }
-  if (x == 2) 
+  else if (x == 2) 
   {
     char Cell[5];
-   // cellVoltage[2]=2.45;
-    dtostrf(cellVoltage[2],5,3,Cell);
+    //cellVoltage[2]=1.48236372; // Artificially set to test I2C
+    Wire.write(dtostrf(cellVoltage[2],7,5,Cell));
     int testflag=2;
-    Serial.println(testflag);
+    //Serial.println(testflag);
     //Serial.println(Cell);
   }
 }

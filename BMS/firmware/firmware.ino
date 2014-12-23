@@ -17,8 +17,6 @@
 #define RDFLG        0x0C // Read flag register group
 #define RDTMP        0x0E // Read temperature register group
 #define STCVAD       0x10 // Start cell voltage ADC conversions and poll status
-#define STCST1       0x1E // ADC conversion self test 1
-#define STCST2       0x1F // ADC conversion self test 2
 #define STOWAD       0x20 // Start open-wire ADC conversions and poll status
 #define STTMPAD      0x30 // Start temperature ADC conversions and poll status
 #define PLADC        0x40 // Poll ADC Converter status
@@ -48,9 +46,8 @@ byte CFGR1=0x00;
 // Arduino Pins
 
 #define SS_PIN        10   // Designate Chip select pin ***Change this to pin 53 when uploading to Mega***
-#define CHARGE_INPUT  5    // Will be pulled high when AC power is available
+#define CHARGE_INPUT  6    // Will be pulled high when AC power is available
 #define CHARGE_RELAY  9    // Set to high to turn on charging relay
-#define POWER         6    // Power pin for BMS shield
 #define ADDRESS       0x80 // Designate Chip address: 10000000
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -78,7 +75,6 @@ void setup()
 {
   pinMode(SS_PIN, OUTPUT);
   pinMode(CHARGE_INPUT, INPUT);
-  pinMode(POWER, OUTPUT);
   pinMode(CHARGE_RELAY, OUTPUT);
   digitalWrite(SS_PIN, HIGH); // Chip Deselect
 
@@ -90,12 +86,11 @@ void setup()
   SPI.begin();          // Start SPI 
   Serial.begin(9600);   // Open serial port
 //---------------------------------------------------------------------------------------------------------------------
-/*
 // I2C configs
  Wire.begin(2);                // join i2c bus with address #2
  Wire.onRequest(requestEvent); // register event
  Wire.onReceive(receiveEvent);
-  */
+  
 //---------------------------------------------------------------------------------------------------------------------
 
 }
@@ -148,7 +143,7 @@ unsigned int getCellVolts()
   for(int i=0; i<6; i++)
   {
     RawData[i] = SPI.transfer(0x00);   // send command to read voltage registers
-    Serial.println(RawData[i], HEX);
+    //Serial.println(Response[i], HEX);
   }
   byte PECresponse;
   PECresponse=SPI.transfer(0x00);
@@ -307,9 +302,9 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
   }
   return PECpacket;
 }
-/*
+
 //---------------------------------------------------------------------------------------------------------------------
-// I2C communication code **CURRENTLY NOT WORKING PROPERLY**
+// I2C communication code
 
 void receiveEvent(int command)
 {
@@ -322,42 +317,41 @@ void requestEvent()
   if (x == 0) 
   {
     char Cell[5];
-    //cellVoltage[0]=-3.24;
-    dtostrf(cellVoltage[0],5,3,Cell);
+    //cellVoltage[0]=2.567482309;  // Artificially set to test I2C
+    Wire.write(dtostrf(cellVoltage[0],7,5,Cell));
     int testflag=0;
-    Serial.println(testflag);
+    //Serial.println(testflag);
     //Serial.println(Cell);
   }
   //If value received is 1 
-  if (x == 1) 
+  else if (x == 1) 
   {
     char Cell[5];
-   // cellVoltage[1]=4.36;
-    dtostrf(cellVoltage[1],5,3,Cell);
+    //cellVoltage[1]=-3.3473632; // Artificially set to test I2C
+    Wire.write(dtostrf(cellVoltage[1],7,5,Cell));
     int testflag=1;
-    Serial.println(testflag);
+    //Serial.println(testflag);
     //Serial.println(Cell);
   }
-  if (x == 2) 
+  else if (x == 2) 
   {
     char Cell[5];
-   // cellVoltage[2]=2.45;
-    dtostrf(cellVoltage[2],5,3,Cell);
+    //cellVoltage[2]=1.48236372; // Artificially set to test I2C
+    Wire.write(dtostrf(cellVoltage[2],7,5,Cell));
     int testflag=2;
-    Serial.println(testflag);
+    //Serial.println(testflag);
     //Serial.println(Cell);
   }
 }
 
-*/
+
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
 void loop()
 {
-  digitalWrite(POWER, HIGH);
   //GetConfig();                    // Only needed for debugging purposes.
   SetConfig();
-  GetConfig();                    // Only needed for debugging purposes.
+  //GetConfig();                    // Only needed for debugging purposes.
   ADCconvert();
   getCellVolts();
   cellVoltage[3]=CellConvert(BitShiftCombine(RawData[1], RawData[0]), BitShiftCombine(RawData[2], RawData[1]), BitShiftCombine(RawData[4], RawData[3]));
