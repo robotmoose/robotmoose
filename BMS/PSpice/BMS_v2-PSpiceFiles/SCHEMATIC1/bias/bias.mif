@@ -1,1 +1,2 @@
  lib=C:\Cadence\SPB_16.6\tools\PSpice\Library\fairchild.lib, offset=253214, size=924
+ lib=C:\Cadence\SPB_16.6\tools\PSpice\Library\opamp.lib, offset=101320, size=1093

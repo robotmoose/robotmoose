@@ -39,9 +39,15 @@
     (File ".\bms_v2-pspicefiles\schematic1\schematic1.net"
       (Type "Report")))
   (Folder "PSpice Resources"
-    (Folder "Model Libraries")
-    (Folder "Stimulus Files")
-    (Folder "Include Files")
+    (Folder "Model Libraries"
+      (Sort User)
+      (File "C:\Users\Clayton\Desktop\CAuld.lib"
+        (Type "PSpiceLibrary")
+        (DisplayName "C:\Users\Clayton\Desktop\CAuld.lib")))
+    (Folder "Stimulus Files"
+      (Sort User))
+    (Folder "Include Files"
+      (Sort User))
     (Folder "Simulation Profiles"
       (ActiveProfile ".\bms_v2-pspicefiles\schematic1\bias.sim")
       (File.PSpice.{09528990-3187-11D2-BC7B-00A0C90CBF91}
@@ -50,6 +56,22 @@
         (Type "PSpice Profile"))))
   (DefaultLibraryBrowseDirectory "library\PSpice")
   (PartMRUSelector
+    (uA741
+      (FullPartName "uA741.Normal")
+      (LibraryName "C:\CADENCE\SPB_16.6\TOOLS\CAPTURE\LIBRARY\PSPICE\OPAMP.OLB")
+      (DeviceIndex "0"))
+    (LPV521
+      (FullPartName "LPV521.Normal")
+      (LibraryName "C:\CADENCE\SPB_16.6\TOOLS\CAPTURE\LIBRARY\PSPICE\CAULD.OLB")
+      (DeviceIndex "0"))
+    (UA772L
+      (FullPartName "UA772L.Normal")
+      (LibraryName "C:\CADENCE\SPB_16.6\TOOLS\CAPTURE\LIBRARY\PSPICE\OPAMP.OLB")
+      (DeviceIndex "0"))
+    (UA741
+      (FullPartName "UA741.Normal")
+      (LibraryName "C:\CADENCE\SPB_16.6\TOOLS\CAPTURE\LIBRARY\OPAMP.OLB")
+      (DeviceIndex "0"))
     (R
       (FullPartName "R.Normal")
       (LibraryName
@@ -145,9 +167,9 @@
     (FileView
       (Path "Design Resources")
       (Path "Design Resources"
-         "C:\Users\Clayton\Documents\Seafile\UAF\ITEST\PSpice\bms_v2.dsn")
+         "C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2.dsn")
       (Path "Design Resources"
-         "C:\Users\Clayton\Documents\Seafile\UAF\ITEST\PSpice\bms_v2.dsn"
+         "C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2.dsn"
          "SCHEMATIC1")
       (Path "Outputs"))
     (HierarchyView)
@@ -159,10 +181,11 @@
     (Doc
       (Type "COrSchematicDoc")
       (Frame
-        (Placement "44 2 3 -1 -1 -8 -31 0 807 0 284")
-        (Scroll "0 0")
-        (Zoom "100")
+        (Placement "44 2 3 -1 -1 -8 -31 52 1216 52 336")
+        (Scroll "0 57")
+        (Zoom "128")
         (Occurrence "/"))
-      (Path "C:\USERS\CLAYTON\DOCUMENTS\SEAFILE\UAF\ITEST\PSPICE\BMS_V2.DSN")
+      (Path
+         "C:\USERS\CLAYTON\DOCUMENTS\SEAFILE\UAF\ITEST\GIT REPO\BMS\PSPICE\BMS_V2.DSN")
       (Schematic "SCHEMATIC1")
       (Page "PAGE1"))))

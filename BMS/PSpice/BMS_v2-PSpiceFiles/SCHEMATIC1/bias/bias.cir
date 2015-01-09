@@ -1,4 +1,4 @@
-** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\PSpice\bms_v2-pspicefiles\schematic1\bias.sim ] 
+** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2-pspicefiles\schematic1\bias.sim ] 
 
 ** Creating circuit file "bias.cir" 
 ** WARNING: THIS AUTOMATICALLY GENERATED FILE MAY BE OVERWRITTEN BY SUBSEQUENT SIMULATIONS
@@ -6,6 +6,7 @@
 *Libraries: 
 * Profile Libraries :
 * Local Libraries :
+.LIB "C:/Users/Clayton/Desktop/CAuld.lib" 
 * From [PSPICE NETLIST] section of C:\SPB_Data\cdssetup\OrCAD_PSpice/16.6.0/PSpice.ini file:
 .lib "nom.lib" 
 
