@@ -19,7 +19,9 @@ void setup()
   Serial.begin(57600);
   tilt.attach(tilt_pin);
   pan.attach(pan_pin);
+  nod_yes();
   face_forward();
+  delay(500);
 
   Serial.println("Quizbot!");
   Serial.println(question);
