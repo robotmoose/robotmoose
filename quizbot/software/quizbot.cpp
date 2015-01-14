@@ -13,6 +13,7 @@
 json::Object setup(json::Deserialize
 (R"(
 	{"port":"8080"},
+	{"webroot":"web"},
 	{"serial":"/dev/ttyUSB0"},
 	{"baud":"57600"}
 )"));
@@ -47,15 +48,16 @@ int main(int argc,char* argv[])
 	//Create Server
 	auto server=mg_create_server(nullptr,client_func);
 	mg_set_option(server,"listening_port",std::string(setup["port"]).c_str());
-	mg_set_option(server,"document_root","web");
+	mg_set_option(server,"document_root",std::string(setup["webroot"]).c_str());
 
 	if(!mg_poll_server(server,10))
 	{
-		std::cout<<"Web server failed to start."<<std::endl;
+		std::cout<<"Web server failed to start on port "<<std::string(setup["port"])<<"."<<std::endl;
 		return 0;
 	}
 
-	std::cout<<"Web server started."<<std::endl;
+	std::cout<<"Web server started on port "<<std::string(setup["port"])<<"."<<std::endl;
+	std::cout<<"Web root is \""<<std::string(setup["webroot"])<<"\"."<<std::endl;
 
 	//Create Arduino Thread
 	arduino=msl::serial(setup["serial"],std::stoi(setup["baud"]));
@@ -98,10 +100,7 @@ json::Object args_to_json(const int argc,char* argv[])
 				++ii;
 		}
 
-		if(val.size()>0)
-			args[var]=val;
-		else
-			args[var]=true;
+		args[var]=val;
 	}
 
 	return args;
@@ -180,7 +179,7 @@ void arduino_thread_func()
 			std::cout<<"Arduino found on "<<(std::string)setup["serial"]<<"@"<<(std::string)setup["baud"]<<"."<<std::endl;
 
 			while(arduino.good())
-			{msl::delay_ms(1);}
+				msl::delay_ms(1);
 		}
 
 		arduino.close();
