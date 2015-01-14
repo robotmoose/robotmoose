@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <iostream>
 #include <mongoose/mongoose.h>
 #include <msl/serial.hpp>
@@ -5,28 +6,27 @@
 #include <msl/time.hpp>
 #include <mutex>
 #include <string>
-#include <rapidjson/document.h>
-#include <rapidjson/writer.h>
-#include <rapidjson/stringbuffer.h>
 #include <thread>
+#include <json.h>
 
 std::string port="/dev/ttyUSB0";
 size_t baud=57600;
 msl::serial arduino(port,baud);
-rapidjson::Document quiz;
+json::Object quiz;
 
-std::string stringify(const rapidjson::Document& json);
+json::Object args_to_json(const int argc,char* argv[]);
 void send_data(mg_connection* connection,const std::string& type,const std::string& str);
 int client_func(mg_connection* connection,enum mg_event event);
 void arduino_thread_func();
 
-int main()
+int main(int argc,char* argv[])
 {
-	quiz.SetObject();
-	quiz.AddMember("question","What is 9*8?",quiz.GetAllocator());
-	quiz.AddMember("answer_a",9*8,quiz.GetAllocator());
-	quiz.AddMember("answer_b",9*9,quiz.GetAllocator());
-	quiz.AddMember("answer_c",9+8,quiz.GetAllocator());
+	auto args=args_to_json(argc,argv);
+
+	quiz["question"]="What is 9*8?";
+	quiz["answer_a"]=9*8;
+	quiz["answer_b"]=9*9;
+	quiz["answer_c"]=9+8;
 
 	std::thread arduino_thread(arduino_thread_func);
 	arduino_thread.detach();
@@ -46,12 +46,46 @@ int main()
 	return 0;
 }
 
-std::string stringify(const rapidjson::Document& json)
+json::Object args_to_json(const int argc,char* argv[])
 {
-	rapidjson::StringBuffer strbuf;
-	rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
-	json.Accept(writer);
-	return strbuf.GetString();
+	json::Object args;
+
+	/*for(int ii=1;ii<argc;++ii)
+	{
+		std::string var(argv[ii]);
+		bool valid=false;
+
+		if(var.size()>2&&msl::starts_with(var,"--"))
+		{
+			valid=true;
+			var=var.substr(2,var.size()-2);
+		}
+		else if(var.size()>1&&msl::starts_with(var,"-"))
+		{
+			valid=true;
+			var=var.substr(1,var.size()-1);
+		}
+
+		if(!valid)
+			throw std::runtime_error("args_to_json invalid argument \""+var+"\".");
+
+		std::string val="";
+
+		if(ii+1<argc)
+		{
+			val=std::string(argv[ii]);
+
+			if(msl::starts_with(val,"--")||msl::starts_with(val,"-"))
+				val="";
+		}
+
+		//if(val.size()>0)
+			//args.AddMember(var,val,args.GetAllocator());
+		//else
+			//args.AddMember(var,true,args.GetAllocator());
+	}*/
+
+	return args;
 }
 
 void send_data(mg_connection* connection,const std::string& type,const std::string& str)
@@ -82,15 +116,14 @@ int client_func(mg_connection* connection,enum mg_event event)
 
 	if(request=="/status")
 	{
-		rapidjson::Document status;
-		status.SetObject();
-		status.AddMember("connected",arduino.good(),status.GetAllocator());
-		send_data(connection,"text/json",stringify(status));
+		json::Object status;
+		status["connected"]=arduino.good();
+		send_data(connection,"text/json",json::Serialize(status));
 		return true;
 	}
 	else if(request=="/quiz")
 	{
-		send_data(connection,"text/json",stringify(quiz));
+		send_data(connection,"text/json",json::Serialize(quiz));
 		return true;
 	}
 	else if(request.size()==6&&msl::starts_with(request,"/ans="))
@@ -102,10 +135,9 @@ int client_func(mg_connection* connection,enum mg_event event)
 		else if(request!="/ans=B"&&request!="/ans=C")
 			return false;
 
-		rapidjson::Document reply;
-		reply.SetObject();
-		reply.AddMember("correct",correct,reply.GetAllocator());
-		send_data(connection,"text/json",stringify(reply));
+		json::Object reply;
+		reply["correct"]=correct;
+		send_data(connection,"text/json",json::Serialize(reply));
 
 		if(correct)
 			arduino.write("y");
