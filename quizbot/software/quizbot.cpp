@@ -34,15 +34,25 @@ void arduino_thread_func();
 
 int main(int argc,char* argv[])
 {
-	//Get Arguments (needs a help...)
+	//Get Command Line Arguments
 	auto args=args_to_json(argc,argv);
 
 	for(auto ii:args)
 	{
-		if(setup.HasKey(ii.first))
-			setup[ii.first]=ii.second;
-		else
-			throw std::runtime_error("unknown command line argument \""+ii.first+"\".");
+		if(ii.first=="help")
+		{
+			std::cout<<"\tusage: ./quizbot --port 8080 --webroot web --serial /dev/ttyUSB0 --baud 57600"<<std::endl;
+			return 0;
+		}
+
+		if(!setup.HasKey(ii.first))
+		{
+			std::cout<<"\tunknown command line argument \""+ii.first+"\"."<<std::endl;
+			std::cout<<"\tusage: ./quizbot --port 8080 --webroot web --serial /dev/ttyUSB0 --baud 57600"<<std::endl;
+			return 1;
+		}
+
+		setup[ii.first]=ii.second;
 	}
 
 	//Create Server
@@ -53,7 +63,7 @@ int main(int argc,char* argv[])
 	if(!mg_poll_server(server,10))
 	{
 		std::cout<<"Web server failed to start on port "<<std::string(setup["port"])<<"."<<std::endl;
-		return 0;
+		return 1;
 	}
 
 	std::cout<<"Web server started on port "<<std::string(setup["port"])<<"."<<std::endl;
