@@ -10,41 +10,28 @@ int pan_pin=10;
 int pan_forward=90;
 int pan_amount=30;
 
-char* question="  What is 9*8?";
-char* answers[3]={"    1  72","    2  81","    3  17"};
-char correct_answer='1';
-
 void setup()
 {
   Serial.begin(57600);
   tilt.attach(tilt_pin);
   pan.attach(pan_pin);
-  nod_yes();
   face_forward();
   delay(500);
-
-  Serial.println("Quizbot!");
-  Serial.println(question);
-
-  for(int ii=0;ii<3;++ii)
-    Serial.println(answers[ii]);
 }
 
 void loop()
 {
-  char answer=Serial.read();
+  char temp;
 
-  if(answer!=-1)
+  while(Serial.available()>0&&Serial.readBytes(&temp,1)==1)
   {
-    if(answer==correct_answer)
+    if(temp=='n')
     {
-      Serial.println("  Correct! :)");
-      nod_yes();
-    }
-    else
-    {
-      Serial.println("  Incorrect! :(");
       nod_no();
+    }
+    else if(temp=='y')
+    {
+      nod_yes();
     }
 
     face_forward();

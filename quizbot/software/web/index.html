@@ -1,0 +1,144 @@
+<html>
+	<head>
+		<title>Quizbot!</title>
+
+		<script type="text/javascript">
+
+			function setup()
+			{
+				setInterval(get_status,100);
+				get_questions();
+			}
+
+			function get_status()
+			{
+				var xmlhttp=new XMLHttpRequest();
+
+				xmlhttp.onreadystatechange=function()
+				{
+					if(xmlhttp.readyState==4&&xmlhttp.status==200)
+					{
+						try
+						{
+							var json=JSON.parse(xmlhttp.responseText);
+
+							if(json)
+							{
+								var status_area="<p>Arduino: ";
+
+								if(json.connected)
+									status_area+="Connected"
+								else
+									status_area+="Disconnected";
+
+								status_area.innerHTML+="</p>";
+
+								document.getElementById("status_area").innerHTML=status_area;
+							}
+							else
+							{
+								alert("An unknown error occurred!");
+							}
+						}
+						catch(e)
+						{
+							alert("An unknown error occurred!");
+						}
+					}
+				}
+
+				xmlhttp.open("GET",encodeURIComponent("status"),true);
+				xmlhttp.send(null);
+			}
+
+			function get_questions()
+			{
+				var xmlhttp=new XMLHttpRequest();
+
+				xmlhttp.onreadystatechange=function()
+				{
+					if(xmlhttp.readyState==4&&xmlhttp.status==200)
+					{
+						try
+						{
+							var json=JSON.parse(xmlhttp.responseText);
+
+							if(json)
+							{
+								var question_area="<p>"+json.question+"</p>";
+								question_area+="<input type='radio' id='answers_a' name='answers' onchange='submit_disabled(false);'/>"+json.answer_a+"<br/>";
+								question_area+="<input type='radio' id='answers_b' name='answers' onchange='submit_disabled(false);'/>"+json.answer_b+"<br/>";
+								question_area+="<input type='radio' id='answers_c' name='answers' onchange='submit_disabled(false);'/>"+json.answer_c+"<br/>";
+								question_area+="</br>";
+								question_area+="<input type='button' id='submit_button' value='Submit' onclick='submit();' disabled/>";
+								document.getElementById("question_area").innerHTML=question_area;
+							}
+							else
+							{
+								alert("An unknown error occurred!");
+							}
+						}
+						catch(e)
+						{
+							alert("An unknown error occurred!");
+						}
+					}
+				}
+
+				xmlhttp.open("GET",encodeURIComponent("question"),true);
+				xmlhttp.send(null);
+			}
+
+
+			function submit()
+			{
+				var answer=' ';
+
+				if(document.getElementById("answers_a").checked)
+					answer='A';
+				else if(document.getElementById("answers_b").checked)
+					answer='B';
+				else if(document.getElementById("answers_c").checked)
+					answer='C';
+
+				var xmlhttp=new XMLHttpRequest();
+
+				xmlhttp.onreadystatechange=function()
+				{
+					if(xmlhttp.readyState==4&&xmlhttp.status==200)
+					{
+						try
+						{
+							var json=JSON.parse(xmlhttp.responseText);
+
+							if(json&&json.correct)
+								alert("Correct!");
+							else if(json&&!json.correct)
+								alert("Incorrect!");
+							else
+								alert("An unknown error occurred!");
+						}
+						catch(e)
+						{
+							alert("An unknown error occurred!");
+						}
+					}
+				}
+
+				xmlhttp.open("GET",encodeURIComponent("ans="+answer),true);
+				xmlhttp.send(null);
+			}
+
+			function submit_disabled(disabled)
+			{
+				document.getElementById("submit_button").disabled=disabled;
+			}
+
+		</script>
+	</head>
+	<body onload="setup();">
+		<h1>Quizbot!</h1>
+		<div id="status_area"></div>
+		<div id="question_area"></div>
+	</body>
+</html>
