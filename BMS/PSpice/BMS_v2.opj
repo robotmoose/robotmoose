@@ -40,10 +40,7 @@
       (Type "Report")))
   (Folder "PSpice Resources"
     (Folder "Model Libraries"
-      (Sort User)
-      (File "C:\Users\Clayton\Desktop\CAuld.lib"
-        (Type "PSpiceLibrary")
-        (DisplayName "C:\Users\Clayton\Desktop\CAuld.lib")))
+      (Sort User))
     (Folder "Stimulus Files"
       (Sort User))
     (Folder "Include Files"
@@ -56,6 +53,10 @@
         (Type "PSpice Profile"))))
   (DefaultLibraryBrowseDirectory "library\PSpice")
   (PartMRUSelector
+    (1N4376
+      (FullPartName "1N4376.Normal")
+      (LibraryName "C:\CADENCE\SPB_16.6\TOOLS\CAPTURE\LIBRARY\PSPICE\DIODE.OLB")
+      (DeviceIndex "0"))
     (uA741
       (FullPartName "uA741.Normal")
       (LibraryName "C:\CADENCE\SPB_16.6\TOOLS\CAPTURE\LIBRARY\PSPICE\OPAMP.OLB")
@@ -182,8 +183,8 @@
       (Type "COrSchematicDoc")
       (Frame
         (Placement "44 2 3 -1 -1 -8 -31 52 1216 52 336")
-        (Scroll "0 57")
-        (Zoom "128")
+        (Scroll "461 479")
+        (Zoom "256")
         (Occurrence "/"))
       (Path
          "C:\USERS\CLAYTON\DOCUMENTS\SEAFILE\UAF\ITEST\GIT REPO\BMS\PSPICE\BMS_V2.DSN")
