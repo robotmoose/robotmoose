@@ -104,7 +104,7 @@ void arduino_thread_func()
 		}
 
 		arduino.close();
-		//std::cout<<"Arduino not found on "<<port<<"@"<<baud<<"."<<std::endl;
+		std::cout<<"Arduino not found on "<<port<<"@"<<baud<<"."<<std::endl;
 		msl::delay_ms(500);
 	}
 }
