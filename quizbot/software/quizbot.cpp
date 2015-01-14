@@ -24,9 +24,9 @@ int main()
 {
 	quiz.SetObject();
 	quiz.AddMember("question","What is 9*8?",quiz.GetAllocator());
-	quiz.AddMember("answer_a",72,quiz.GetAllocator());
-	quiz.AddMember("answer_b",81,quiz.GetAllocator());
-	quiz.AddMember("answer_c",17,quiz.GetAllocator());
+	quiz.AddMember("answer_a",9*8,quiz.GetAllocator());
+	quiz.AddMember("answer_b",9*9,quiz.GetAllocator());
+	quiz.AddMember("answer_c",9+8,quiz.GetAllocator());
 
 	std::thread arduino_thread(arduino_thread_func);
 	arduino_thread.detach();
