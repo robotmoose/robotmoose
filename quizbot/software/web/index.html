@@ -24,25 +24,23 @@
 
 							if(json)
 							{
-								var status_area="<p>Arduino: ";
+								var status_area="Arduino: ";
 
 								if(json.connected)
 									status_area+="Connected"
 								else
 									status_area+="Disconnected";
 
-								status_area.innerHTML+="</p>";
-
-								document.getElementById("status_area").innerHTML=status_area;
+								document.getElementById("status_area").innerHTML="<p>"+status_area+"</p>";
 							}
 							else
 							{
-								alert("An unknown error occurred!");
+								alert("An unknown error occurred when trying to get the status!");
 							}
 						}
 						catch(e)
 						{
-							alert("An unknown error occurred!");
+							alert("An unknown error occurred when trying to get the status!");
 						}
 					}
 				}
@@ -75,12 +73,12 @@
 							}
 							else
 							{
-								alert("An unknown error occurred!");
+								alert("An unknown error occurred when trying to get the quiz!");
 							}
 						}
 						catch(e)
 						{
-							alert("An unknown error occurred!");
+							alert("An unknown error occurred when trying to get the quiz!");
 						}
 					}
 				}
@@ -116,11 +114,11 @@
 							else if(json&&!json.correct)
 								alert("Incorrect!");
 							else
-								alert("An unknown error occurred!");
+								alert("An unknown error occurred when trying to get the answer response!");
 						}
 						catch(e)
 						{
-							alert("An unknown error occurred!");
+							alert("An unknown error occurred when trying to get the answer response!");
 						}
 					}
 				}
