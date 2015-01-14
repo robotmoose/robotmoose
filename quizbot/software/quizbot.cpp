@@ -9,11 +9,23 @@
 #include <thread>
 #include <json.h>
 
-std::string port="/dev/ttyUSB0";
-size_t baud=57600;
-msl::serial arduino(port,baud);
-json::Object quiz;
+//Globals
+json::Object setup(json::Deserialize
+(R"(
+	{"port":"8080"},
+	{"serial":"/dev/ttyUSB0"},
+	{"baud":"57600"}
+)"));
+json::Object quiz(json::Deserialize
+(R"(
+	{"question":"What is 9*8?"},
+	{"answer_a":"72"},
+	{"answer_b":"81"},
+	{"answer_c":"17"}
+)"));
+msl::serial arduino("",0);
 
+//Function Declarations
 json::Object args_to_json(const int argc,char* argv[]);
 void send_data(mg_connection* connection,const std::string& type,const std::string& str);
 int client_func(mg_connection* connection,enum mg_event event);
@@ -21,27 +33,42 @@ void arduino_thread_func();
 
 int main(int argc,char* argv[])
 {
+	//Get Arguments (needs a help...)
 	auto args=args_to_json(argc,argv);
 
-	quiz["question"]="What is 9*8?";
-	quiz["answer_a"]=9*8;
-	quiz["answer_b"]=9*9;
-	quiz["answer_c"]=9+8;
+	for(auto ii:args)
+	{
+		if(setup.HasKey(ii.first))
+			setup[ii.first]=ii.second;
+		else
+			throw std::runtime_error("unknown command line argument \""+ii.first+"\".");
+	}
 
-	std::thread arduino_thread(arduino_thread_func);
-	arduino_thread.detach();
-	std::cout<<"Spawned arduino thread."<<std::endl;
-
+	//Create Server
 	auto server=mg_create_server(nullptr,client_func);
-	mg_set_option(server,"listening_port","8080");
+	mg_set_option(server,"listening_port",std::string(setup["port"]).c_str());
 	mg_set_option(server,"document_root","web");
+
+	if(!mg_poll_server(server,10))
+	{
+		std::cout<<"Web server failed to start."<<std::endl;
+		return 0;
+	}
+
 	std::cout<<"Web server started."<<std::endl;
 
-	while(true)
-	{
-		mg_poll_server(server,1000);
+	//Create Arduino Thread
+	arduino=msl::serial(setup["serial"],std::stoi(setup["baud"]));
+	std::thread arduino_thread(arduino_thread_func);
+	arduino_thread.detach();
+
+	std::cout<<"Arduino thread started."<<std::endl;
+
+	//Web Server Loop
+	while(mg_poll_server(server,10))
 		msl::delay_ms(1);
-	}
+
+	std::cout<<"Web server terminated."<<std::endl;
 
 	return 0;
 }
@@ -50,40 +77,32 @@ json::Object args_to_json(const int argc,char* argv[])
 {
 	json::Object args;
 
-	/*for(int ii=1;ii<argc;++ii)
+	for(int ii=1;ii<argc;++ii)
 	{
 		std::string var(argv[ii]);
-		bool valid=false;
 
 		if(var.size()>2&&msl::starts_with(var,"--"))
-		{
-			valid=true;
 			var=var.substr(2,var.size()-2);
-		}
 		else if(var.size()>1&&msl::starts_with(var,"-"))
-		{
-			valid=true;
 			var=var.substr(1,var.size()-1);
-		}
-
-		if(!valid)
-			throw std::runtime_error("args_to_json invalid argument \""+var+"\".");
 
 		std::string val="";
 
 		if(ii+1<argc)
 		{
-			val=std::string(argv[ii]);
+			val=std::string(argv[ii+1]);
 
 			if(msl::starts_with(val,"--")||msl::starts_with(val,"-"))
 				val="";
+			else
+				++ii;
 		}
 
-		//if(val.size()>0)
-			//args.AddMember(var,val,args.GetAllocator());
-		//else
-			//args.AddMember(var,true,args.GetAllocator());
-	}*/
+		if(val.size()>0)
+			args[var]=val;
+		else
+			args[var]=true;
+	}
 
 	return args;
 }
@@ -158,14 +177,14 @@ void arduino_thread_func()
 
 		if(arduino.good())
 		{
-			std::cout<<"Arduino found on "<<port<<"@"<<baud<<"."<<std::endl;
+			std::cout<<"Arduino found on "<<(std::string)setup["serial"]<<"@"<<(std::string)setup["baud"]<<"."<<std::endl;
 
 			while(arduino.good())
 			{msl::delay_ms(1);}
 		}
 
 		arduino.close();
-		std::cout<<"Arduino not found on "<<port<<"@"<<baud<<"."<<std::endl;
+		std::cout<<"Arduino not found on "<<(std::string)setup["serial"]<<"@"<<(std::string)setup["baud"]<<"."<<std::endl;
 		msl::delay_ms(500);
 	}
 }
