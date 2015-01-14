@@ -12,4 +12,4 @@ quizbot: quizbot.cpp
 	$(CXX) $(CFLAGS) $< $(mongoose_src) $(msl_src) -o $@ $(LIBS)
 
 clean:
-	- rm quizbot
+	-rm -f quizbot
