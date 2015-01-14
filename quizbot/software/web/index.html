@@ -7,7 +7,7 @@
 			function setup()
 			{
 				setInterval(get_status,100);
-				get_questions();
+				get_quiz();
 			}
 
 			function get_status()
@@ -51,7 +51,7 @@
 				xmlhttp.send(null);
 			}
 
-			function get_questions()
+			function get_quiz()
 			{
 				var xmlhttp=new XMLHttpRequest();
 
@@ -65,13 +65,13 @@
 
 							if(json)
 							{
-								var question_area="<p>"+json.question+"</p>";
-								question_area+="<input type='radio' id='answers_a' name='answers' onchange='submit_disabled(false);'/>"+json.answer_a+"<br/>";
-								question_area+="<input type='radio' id='answers_b' name='answers' onchange='submit_disabled(false);'/>"+json.answer_b+"<br/>";
-								question_area+="<input type='radio' id='answers_c' name='answers' onchange='submit_disabled(false);'/>"+json.answer_c+"<br/>";
-								question_area+="</br>";
-								question_area+="<input type='button' id='submit_button' value='Submit' onclick='submit();' disabled/>";
-								document.getElementById("question_area").innerHTML=question_area;
+								var quiz_area="<p>"+json.question+"</p>";
+								quiz_area+="<input type='radio' id='answers_a' name='answers' onchange='submit_disabled(false);'/>"+json.answer_a+"<br/>";
+								quiz_area+="<input type='radio' id='answers_b' name='answers' onchange='submit_disabled(false);'/>"+json.answer_b+"<br/>";
+								quiz_area+="<input type='radio' id='answers_c' name='answers' onchange='submit_disabled(false);'/>"+json.answer_c+"<br/>";
+								quiz_area+="</br>";
+								quiz_area+="<input type='button' id='submit_button' value='Submit' onclick='submit();' disabled/>";
+								document.getElementById("quiz_area").innerHTML=quiz_area;
 							}
 							else
 							{
@@ -85,7 +85,7 @@
 					}
 				}
 
-				xmlhttp.open("GET",encodeURIComponent("question"),true);
+				xmlhttp.open("GET",encodeURIComponent("quiz"),true);
 				xmlhttp.send(null);
 			}
 
@@ -139,6 +139,6 @@
 	<body onload="setup();">
 		<h1>Quizbot!</h1>
 		<div id="status_area"></div>
-		<div id="question_area"></div>
+		<div id="quiz_area"></div>
 	</body>
 </html>

@@ -5,11 +5,46 @@
 #include <msl/time.hpp>
 #include <mutex>
 #include <string>
-#include <thread>
-
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
-#include "rapidjson/stringbuffer.h"
+#include <rapidjson/stringbuffer.h>
+#include <thread>
+
+std::string port="/dev/ttyUSB0";
+size_t baud=57600;
+msl::serial arduino(port,baud);
+rapidjson::Document quiz;
+
+std::string stringify(const rapidjson::Document& json);
+void send_data(mg_connection* connection,const std::string& type,const std::string& str);
+int client_func(mg_connection* connection,enum mg_event event);
+void arduino_thread_func();
+
+int main()
+{
+	quiz.SetObject();
+	quiz.AddMember("question","What is 9*8?",quiz.GetAllocator());
+	quiz.AddMember("answer_a","72",quiz.GetAllocator());
+	quiz.AddMember("answer_b","81",quiz.GetAllocator());
+	quiz.AddMember("answer_c","17",quiz.GetAllocator());
+
+	std::thread arduino_thread(arduino_thread_func);
+	arduino_thread.detach();
+	std::cout<<"Spawned arduino thread."<<std::endl;
+
+	auto server=mg_create_server(nullptr,client_func);
+	mg_set_option(server,"listening_port","8080");
+	mg_set_option(server,"document_root","web");
+	std::cout<<"Web server started."<<std::endl;
+
+	while(true)
+	{
+		mg_poll_server(server,1000);
+		msl::delay_ms(1);
+	}
+
+	return 0;
+}
 
 std::string stringify(const rapidjson::Document& json)
 {
@@ -18,12 +53,6 @@ std::string stringify(const rapidjson::Document& json)
 	json.Accept(writer);
 	return strbuf.GetString();
 }
-
-std::string port="/dev/ttyUSB0";
-size_t baud=57600;
-msl::serial arduino(port,baud);
-
-rapidjson::Document quiz;
 
 void send_data(mg_connection* connection,const std::string& type,const std::string& str)
 {
@@ -59,7 +88,7 @@ int client_func(mg_connection* connection,enum mg_event event)
 		send_data(connection,"text/json",stringify(status));
 		return true;
 	}
-	else if(request=="/question")
+	else if(request=="/quiz")
 	{
 		send_data(connection,"text/json",stringify(quiz));
 		return true;
@@ -100,37 +129,11 @@ void arduino_thread_func()
 			std::cout<<"Arduino found on "<<port<<"@"<<baud<<"."<<std::endl;
 
 			while(arduino.good())
-			{}
+			{msl::delay_ms(1);}
 		}
 
 		arduino.close();
 		std::cout<<"Arduino not found on "<<port<<"@"<<baud<<"."<<std::endl;
 		msl::delay_ms(500);
 	}
-}
-
-int main()
-{
-	quiz.SetObject();
-	quiz.AddMember("question","What is 9*8?",quiz.GetAllocator());
-	quiz.AddMember("answer_a","72",quiz.GetAllocator());
-	quiz.AddMember("answer_b","81",quiz.GetAllocator());
-	quiz.AddMember("answer_c","17",quiz.GetAllocator());
-
-	std::thread arduino_thread(arduino_thread_func);
-	arduino_thread.detach();
-	std::cout<<"Spawned arduino thread."<<std::endl;
-
-	auto server=mg_create_server(nullptr,client_func);
-	mg_set_option(server,"listening_port","8080");
-	mg_set_option(server,"document_root","web");
-	std::cout<<"Web server started."<<std::endl;
-
-	while(true)
-	{
-		mg_poll_server(server,1000);
-		msl::delay_ms(1);
-	}
-
-	return 0;
 }
