@@ -7,14 +7,23 @@
 #include <string>
 #include <thread>
 
+#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include "rapidjson/stringbuffer.h"
+
+std::string stringify(const rapidjson::Document& json)
+{
+	rapidjson::StringBuffer strbuf;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
+	json.Accept(writer);
+	return strbuf.GetString();
+}
+
 std::string port="/dev/ttyUSB0";
 size_t baud=57600;
 msl::serial arduino(port,baud);
 
-std::string question="What is 9*8?";
-std::string answer_a="72";
-std::string answer_b="81";
-std::string answer_c="17";
+rapidjson::Document quiz;
 
 void send_data(mg_connection* connection,const std::string& type,const std::string& str)
 {
@@ -44,21 +53,15 @@ int client_func(mg_connection* connection,enum mg_event event)
 
 	if(request=="/status")
 	{
-		if(arduino.good())
-			send_data(connection,"text/json","{\"connected\":true}");
-		else
-			send_data(connection,"text/json","{\"connected\":false}");
-
+		rapidjson::Document status;
+		status.SetObject();
+		status.AddMember("connected",arduino.good(),status.GetAllocator());
+		send_data(connection,"text/json",stringify(status));
 		return true;
 	}
 	else if(request=="/question")
 	{
-		std::string json="{";
-		json+="\"question\":\""+question+"\",";
-		json+="\"answer_a\":\""+answer_a+"\",";
-		json+="\"answer_b\":\""+answer_b+"\",";
-		json+="\"answer_c\":\""+answer_c+"\"}";
-		send_data(connection,"text/json",json);
+		send_data(connection,"text/json",stringify(quiz));
 		return true;
 	}
 	else if(request.size()==6&&msl::starts_with(request,"/ans="))
@@ -70,16 +73,15 @@ int client_func(mg_connection* connection,enum mg_event event)
 		else if(request!="/ans=B"&&request!="/ans=C")
 			return false;
 
+		rapidjson::Document reply;
+		reply.SetObject();
+		reply.AddMember("correct",correct,reply.GetAllocator());
+		send_data(connection,"text/json",stringify(reply));
+
 		if(correct)
-		{
-			send_data(connection,"text/json","{\"correct\":true}");
 			arduino.write("y");
-		}
 		else
-		{
-			send_data(connection,"text/json","{\"correct\":false}");
 			arduino.write("n");
-		}
 
 		return true;
 	}
@@ -109,6 +111,12 @@ void arduino_thread_func()
 
 int main()
 {
+	quiz.SetObject();
+	quiz.AddMember("question","What is 9*8?",quiz.GetAllocator());
+	quiz.AddMember("answer_a","72",quiz.GetAllocator());
+	quiz.AddMember("answer_b","81",quiz.GetAllocator());
+	quiz.AddMember("answer_c","17",quiz.GetAllocator());
+
 	std::thread arduino_thread(arduino_thread_func);
 	arduino_thread.detach();
 	std::cout<<"Spawned arduino thread."<<std::endl;
