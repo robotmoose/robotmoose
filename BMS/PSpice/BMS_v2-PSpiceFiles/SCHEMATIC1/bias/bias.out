@@ -1,5 +1,5 @@
-
-**** 01/08/15 23:33:49 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
+
+**** 01/13/15 19:39:10 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
 
  ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2-pspicefiles\schematic1\bias
 
@@ -18,7 +18,6 @@
 *Libraries: 
 * Profile Libraries :
 * Local Libraries :
-.LIB "C:/Users/Clayton/Desktop/CAuld.lib" 
 * From [PSPICE NETLIST] section of C:\SPB_Data\cdssetup\OrCAD_PSpice/16.6.0/PSpice.ini file:
 .lib "nom.lib" 
 
@@ -33,24 +32,24 @@
 **** INCLUDING SCHEMATIC1.net ****
 * source BMS_V2
 V_V1         N22536 N14639 4Vdc
-V_V2         N14639 N26792 4Vdc
-V_V3         N26792 0 4Vdc
+V_V2         N14639 N27496 4Vdc
+V_V3         N27496 0 4Vdc
 V_V7         HIGH 0 5Vdc
 R_R9         N267101 N22536  10 TC=0,0 
 R_R10         N26778 N14639  10 TC=0,0 
-R_R11         N267421 N26792  10 TC=0,0 
-X_M25         N267421 N51698 0 NDS335N/FAI
-X_M26         N26778 N51480 N26792 NDS335N/FAI
-X_M27         N267101 N48782 N14639 NDS335N/FAI
+R_R11         N267421 N27496  10 TC=0,0 
+X_M25         N331562 N51698 0 NDS335N/FAI
+X_M26         N27496 N51480 N27496 NDS335N/FAI
+X_M27         N351702 N48782 N14639 NDS335N/FAI
 R_R12         N48782 N22536  1Meg TC=0,0 
 R_R13         N51480 N14639  1Meg TC=0,0 
-R_R14         N51698 N26792  1Meg TC=0,0 
+R_R14         N51698 N27496  1Meg TC=0,0 
 X_M28         N48782 HIGH 0 NDS335N/FAI
 X_M29         N51480 HIGH 0 NDS335N/FAI
-X_M30         N51698 HIGH 0 NDS335N/FAI
+X_M30         N51698 0 0 NDS335N/FAI
 R_R15         N55702 N22536  100Meg TC=0,0 
 R_R16         N58521 N14639  100Meg TC=0,0 
-R_R17         N56952 N26792  100Meg TC=0,0 
+R_R17         N56952 N27496  100Meg TC=0,0 
 R_R22         A2 N58521  100Meg TC=0,0 
 X_U4         N55702 N58521 HIGH 0 A2 uA741
 R_R23         0 N55702  100Meg TC=0,0 
@@ -58,12 +57,15 @@ R_R24         A1 N56952  100Meg TC=0,0
 X_U5         N64239 N56952 HIGH 0 A1 uA741
 R_R25         N64239 N14639  100Meg TC=0,0 
 R_R26         0 N64239  100Meg TC=0,0 
-R_R27         0 N26792  100Meg TC=0,0 
+R_R27         0 N27496  100Meg TC=0,0 
+D_D1         N26778 N27496 D1N4376 
+D_D2         N267101 N351702 D1N4376 
+D_D3         N267421 N331562 D1N4376 
 
 **** RESUMING bias.cir ****
 .END
 
-**** 01/08/15 23:33:49 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
+**** 01/13/15 19:39:10 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
 
  ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2-pspicefiles\schematic1\bias
 
@@ -76,7 +78,21 @@ R_R27         0 N26792  100Meg TC=0,0
 
 
 
-               X_M25.DDS       X_M25.DBODY     X_M25.DGD       X_M26.DDS       
+               D1N4376         X_M25.DDS       X_M25.DBODY     X_M25.DGD       
+          IS  857.890000E-12   10.000000E-15  140.000000E-15   10.000000E-15 
+           N    1.88811                                                      
+         ISR   40.817000E-09                                                 
+          NR    6.32069                                                      
+          BV   20.375          20.0336                                       
+         IBV   10                                                            
+          RS    2.53577                          .04                         
+          TT  662.000000E-12                  100.000000E-09                 
+         CJO    1.000000E-12  250.000000E-12                  450.000000E-12 
+          VJ     .75             .8                              .15         
+           M     .3333           .3                                          
+
+
+               X_M26.DDS       X_M26.DBODY     X_M26.DGD       X_M27.DDS       
           IS   10.000000E-15  140.000000E-15   10.000000E-15   10.000000E-15 
           BV   20.0336                                         20.0336       
           RS                     .04                                         
@@ -86,7 +102,7 @@ R_R27         0 N26792  100Meg TC=0,0
            M     .3                                              .3          
 
 
-               X_M26.DBODY     X_M26.DGD       X_M27.DDS       X_M27.DBODY     
+               X_M27.DBODY     X_M27.DGD       X_M28.DDS       X_M28.DBODY     
           IS  140.000000E-15   10.000000E-15   10.000000E-15  140.000000E-15 
           BV                                   20.0336                       
           RS     .04                                             .04         
@@ -96,7 +112,7 @@ R_R27         0 N26792  100Meg TC=0,0
            M                                     .3                          
 
 
-               X_M27.DGD       X_M28.DDS       X_M28.DBODY     X_M28.DGD       
+               X_M28.DGD       X_M29.DDS       X_M29.DBODY     X_M29.DGD       
           IS   10.000000E-15   10.000000E-15  140.000000E-15   10.000000E-15 
           BV                   20.0336                                       
           RS                                     .04                         
@@ -106,31 +122,23 @@ R_R27         0 N26792  100Meg TC=0,0
            M                     .3                                          
 
 
-               X_M29.DDS       X_M29.DBODY     X_M29.DGD       X_M30.DDS       
-          IS   10.000000E-15  140.000000E-15   10.000000E-15   10.000000E-15 
-          BV   20.0336                                         20.0336       
-          RS                     .04                                         
+               X_M30.DDS       X_M30.DBODY     X_M30.DGD       X_U4.dx         
+          IS   10.000000E-15  140.000000E-15   10.000000E-15  800.000000E-18 
+          BV   20.0336                                                       
+          RS                     .04                            1            
           TT                  100.000000E-09                                 
-         CJO  250.000000E-12                  450.000000E-12  250.000000E-12 
-          VJ     .8                              .15             .8          
-           M     .3                                              .3          
+         CJO  250.000000E-12                  450.000000E-12                 
+          VJ     .8                              .15                         
+           M     .3                                                          
 
 
-               X_M30.DBODY     X_M30.DGD       X_U4.dx         X_U4.dy         
-          IS  140.000000E-15   10.000000E-15  800.000000E-18  800.000000E-18 
-          RS     .04                            1               1.000000E-03 
-          TT  100.000000E-09                                                 
-         CJO                  450.000000E-12                   10.000000E-12 
-          VJ                     .15                                         
-
-
-               X_U5.dx         X_U5.dy         
-          IS  800.000000E-18  800.000000E-18 
-          RS    1               1.000000E-03 
-         CJO                   10.000000E-12 
+               X_U4.dy         X_U5.dx         X_U5.dy         
+          IS  800.000000E-18  800.000000E-18  800.000000E-18 
+          RS    1.000000E-03    1               1.000000E-03 
+         CJO   10.000000E-12                   10.000000E-12 
 
 
-**** 01/08/15 23:33:49 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
+**** 01/13/15 19:39:10 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
 
  ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2-pspicefiles\schematic1\bias
 
@@ -168,7 +176,7 @@ R_R27         0 N26792  100Meg TC=0,0
            D     .87             .87         
 
 
-**** 01/08/15 23:33:49 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
+**** 01/13/15 19:39:10 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
 
  ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2-pspicefiles\schematic1\bias
 
@@ -286,7 +294,7 @@ R_R27         0 N26792  100Meg TC=0,0
 
           JOB CONCLUDED
 
-**** 01/08/15 23:33:49 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
+**** 01/13/15 19:39:10 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
 
  ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2-pspicefiles\schematic1\bias
 
@@ -298,5 +306,5 @@ R_R27         0 N26792  100Meg TC=0,0
 
 
 
-  Total job time (using Solver 1)   =         .08
+  Total job time (using Solver 1)   =         .95
 

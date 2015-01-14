@@ -6,7 +6,6 @@
 *Libraries: 
 * Profile Libraries :
 * Local Libraries :
-.LIB "C:/Users/Clayton/Desktop/CAuld.lib" 
 * From [PSPICE NETLIST] section of C:\SPB_Data\cdssetup\OrCAD_PSpice/16.6.0/PSpice.ini file:
 .lib "nom.lib" 
 
