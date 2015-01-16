@@ -20,18 +20,20 @@ bool client_func(littlestar_client_t client)
 		client.reply();
 		return true;
 	}
-	else if(client.request["type"]=="answer"&&client.request["answer"]=="A")
+	else if(client.request["type"]=="answer")
 	{
-		client.response["correct"]=true;
+		if(client.request["answer"]=="A")
+		{
+			client.response["correct"]=true;
+			arduino.write("y");
+		}
+		else
+		{
+			client.response["correct"]=false;
+			arduino.write("n");
+		}
+
 		client.reply();
-		arduino.write("y");
-		return true;
-	}
-	else
-	{
-		client.response["correct"]=false;
-		client.reply();
-		arduino.write("n");
 		return true;
 	}
 
