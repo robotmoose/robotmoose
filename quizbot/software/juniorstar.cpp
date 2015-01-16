@@ -8,7 +8,7 @@ juniorstar_client_t::juniorstar_client_t(const json::Object& json,mg_connection*
 	request(json),connection_m(connection)
 {}
 
-void juniorstar_client_t::reply(const json::Object& json) const
+void juniorstar_client_t::reply() const
 {
 	if(connection_m!=nullptr)
 		mg_printf
@@ -20,7 +20,7 @@ void juniorstar_client_t::reply(const json::Object& json) const
 			"\r\n"
 			"%s",
 			"text/json",
-			json::Serialize(json).size(),json::Serialize(json).c_str()
+			json::Serialize(response).size(),json::Serialize(response).c_str()
 		);
 }
 

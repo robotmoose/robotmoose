@@ -11,9 +11,10 @@ class juniorstar_client_t
 {
 	public:
 		juniorstar_client_t(const json::Object& json,mg_connection* connection);
-		void reply(const json::Object& json) const;
+		void reply() const;
 
 		json::Object request;
+		json::Object response;
 
 	private:
 		mg_connection* connection_m;

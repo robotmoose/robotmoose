@@ -7,34 +7,30 @@ bool client_func(juniorstar_client_t client)
 {
 	if(client.request["status"]=="yes")
 	{
-		json::Object response;
-		response["connected"]=arduino.good();
-		client.reply(response);
+		client.response["connected"]=arduino.good();
+		client.reply();
 		return true;
 	}
 	else if(client.request["quiz"]=="yes")
 	{
-		json::Object response;
-		response["question"]="What is 9*8?";
-		response["answer_a"]=9*8;
-		response["answer_b"]=9*9;
-		response["answer_c"]=9+8;
-		client.reply(response);
+		client.response["question"]="What is 9*8?";
+		client.response["answer_a"]=9*8;
+		client.response["answer_b"]=9*9;
+		client.response["answer_c"]=9+8;
+		client.reply();
 		return true;
 	}
 	else if(client.request["answer"]=="A")
 	{
-		json::Object response;
-		response["correct"]=true;
-		client.reply(response);
+		client.response["correct"]=true;
+		client.reply();
 		arduino.write("y");
 		return true;
 	}
 	else
 	{
-		json::Object response;
-		response["correct"]=false;
-		client.reply(response);
+		client.response["correct"]=false;
+		client.reply();
 		arduino.write("n");
 		return true;
 	}
