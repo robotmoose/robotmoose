@@ -45,7 +45,7 @@
 					}
 				}
 
-				var response={status:"yes"};
+				var response={request:"status"};
 				xmlhttp.open("GET",encodeURIComponent(JSON.stringify(response)),true);
 				xmlhttp.send(null);
 			}
@@ -84,7 +84,7 @@
 					}
 				}
 
-				var response={quiz:"yes"};
+				var response={request:"quiz"};
 				xmlhttp.open("GET",encodeURIComponent(JSON.stringify(response)),true);
 				xmlhttp.send(null);
 			}
@@ -116,14 +116,14 @@
 					}
 				}
 
-				var response={};
+				var response={request:"answer"};
 
 				if(document.getElementById("answers_a").checked)
-					response.answer='A';
+					response.answer="A";
 				else if(document.getElementById("answers_b").checked)
-					response.answer='B';
+					response.answer="B";
 				else if(document.getElementById("answers_c").checked)
-					response.answer='C';
+					response.answer="C";
 
 				xmlhttp.open("GET",encodeURIComponent(JSON.stringify(response)),true);
 				xmlhttp.send(null);
