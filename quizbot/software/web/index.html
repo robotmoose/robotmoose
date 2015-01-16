@@ -45,7 +45,7 @@
 					}
 				}
 
-				var response={request:"status"};
+				var response={type:"status"};
 				xmlhttp.open("GET",encodeURIComponent(JSON.stringify(response)),true);
 				xmlhttp.send(null);
 			}
@@ -84,7 +84,7 @@
 					}
 				}
 
-				var response={request:"quiz"};
+				var response={type:"quiz"};
 				xmlhttp.open("GET",encodeURIComponent(JSON.stringify(response)),true);
 				xmlhttp.send(null);
 			}
@@ -116,7 +116,7 @@
 					}
 				}
 
-				var response={request:"answer"};
+				var response={type:"answer"};
 
 				if(document.getElementById("answers_a").checked)
 					response.answer="A";

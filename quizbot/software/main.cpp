@@ -5,13 +5,13 @@ arduino_t arduino("/dev/ttyUSB0",57600);
 
 bool client_func(juniorstar_client_t client)
 {
-	if(client.request["request"]=="status")
+	if(client.request["type"]=="status")
 	{
 		client.response["connected"]=arduino.good();
 		client.reply();
 		return true;
 	}
-	else if(client.request["request"]=="quiz")
+	else if(client.request["type"]=="quiz")
 	{
 		client.response["question"]="What is 9*8?";
 		client.response["answer_a"]=9*8;
@@ -20,7 +20,7 @@ bool client_func(juniorstar_client_t client)
 		client.reply();
 		return true;
 	}
-	else if(client.request["request"]=="answer"&&client.request["answer"]=="A")
+	else if(client.request["type"]=="answer"&&client.request["answer"]=="A")
 	{
 		client.response["correct"]=true;
 		client.reply();
