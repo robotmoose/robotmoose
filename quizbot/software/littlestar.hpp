@@ -1,5 +1,5 @@
-#ifndef JUNIORSTAR_HPP
-#define JUNIORSTAR_HPP
+#ifndef littlestar_HPP
+#define littlestar_HPP
 
 #include <cstdint>
 #include <json.h>
@@ -7,10 +7,10 @@
 #include <mongoose/mongoose.h>
 #include <string>
 
-class juniorstar_client_t
+class littlestar_client_t
 {
 	public:
-		juniorstar_client_t(const json::Object& json,mg_connection* connection);
+		littlestar_client_t(const json::Object& json,mg_connection* connection);
 		void reply() const;
 
 		json::Object request;
@@ -20,15 +20,15 @@ class juniorstar_client_t
 		mg_connection* connection_m;
 };
 
-class juniorstar_t
+class littlestar_t
 {
 	public:
-		typedef std::function<bool(juniorstar_client_t)> client_func_t;
+		typedef std::function<bool(littlestar_client_t)> client_func_t;
 
-		juniorstar_t(client_func_t client_func,const uint16_t port,const std::string webroot="web");
-		juniorstar_t(const juniorstar_t& copy)=delete;
-		~juniorstar_t();
-		juniorstar_t& operator=(const juniorstar_t& copy)=delete;
+		littlestar_t(client_func_t client_func,const uint16_t port,const std::string webroot="web");
+		littlestar_t(const littlestar_t& copy)=delete;
+		~littlestar_t();
+		littlestar_t& operator=(const littlestar_t& copy)=delete;
 
 		bool good() const;
 		void start(const bool detach=false);

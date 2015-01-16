@@ -7,12 +7,12 @@ arduino_src=arduino.cpp
 json_src=$(INC)/json.cpp
 mongoose_src=$(INC)/mongoose/mongoose.c
 msl_src=$(INC)/msl/serial.cpp $(INC)/msl/string.cpp $(INC)/msl/time.cpp
-juniorstar_src=juniorstar.cpp
+littlestar_src=littlestar.cpp
 
 all: quizbot
 
 quizbot: main.cpp
-	$(CXX) $(CFLAGS) $< $(arduino_src) $(json_src) $(mongoose_src) $(msl_src) $(juniorstar_src) -o $@ $(LIBS)
+	$(CXX) $(CFLAGS) $< $(arduino_src) $(json_src) $(mongoose_src) $(msl_src) $(littlestar_src) -o $@ $(LIBS)
 
 clean:
 	-rm -f quizbot

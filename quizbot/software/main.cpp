@@ -1,9 +1,9 @@
 #include "arduino.hpp"
-#include "juniorstar.hpp"
+#include "littlestar.hpp"
 
 arduino_t arduino("/dev/ttyUSB0",57600);
 
-bool client_func(juniorstar_client_t client)
+bool client_func(littlestar_client_t client)
 {
 	if(client.request["type"]=="status")
 	{
@@ -41,7 +41,7 @@ bool client_func(juniorstar_client_t client)
 int main()
 {
 	arduino.start();
-	juniorstar_t server(client_func,8080,"web");
+	littlestar_t server(client_func,8080,"web");
 	server.start();
 	return 0;
 }
