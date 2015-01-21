@@ -2,8 +2,8 @@
 #define littlestar_HPP
 
 #include <cstdint>
+#include <functional>
 #include <json.h>
-#include <mutex>
 #include <mongoose/mongoose.h>
 #include <string>
 
