@@ -30,7 +30,7 @@ class arduino_t
 		void arduino_thread_func_m();
 		std::string serial_m;
 		size_t baud_m;
-		msl::serial arduino_m;
+		msl::serial_t arduino_m;
 };
 
 #endif
