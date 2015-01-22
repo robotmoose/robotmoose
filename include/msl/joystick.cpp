@@ -233,7 +233,7 @@ static bool update_buttons(const HANDLE& handle,const std::string& report,std::v
 	return true;
 }
 
-std::vector<msl::js_info_t> msl::joystick::list()
+std::vector<msl::js_info_t> msl::joystick_t::list()
 {
 	static std::vector<msl::js_info_t> list;
 
@@ -321,7 +321,7 @@ static size_t joystick_button_count(const msl::js_fd_t& fd)
 
 #define INVALID_HANDLE_VALUE (-1)
 
-std::vector<msl::js_info_t> msl::joystick::list()
+std::vector<msl::js_info_t> msl::joystick_t::list()
 {
 	std::vector<msl::js_info_t> list;
 	std::vector<std::string> files;
@@ -406,15 +406,15 @@ static size_t joystick_button_count(const msl::js_fd_t& fd)
 
 #endif
 
-msl::joystick::joystick(const msl::js_info_t info):info_m(info),axes_m({}),buttons_m({})
+msl::joystick_t::joystick_t(const msl::js_info_t info):info_m(info),axes_m({}),buttons_m({})
 {}
 
-msl::joystick::~joystick()
+msl::joystick_t::~joystick_t()
 {
 	close();
 }
 
-void msl::joystick::open()
+void msl::joystick_t::open()
 {
 	fd_m=joystick_open(info_m);
 
@@ -423,13 +423,13 @@ void msl::joystick::open()
 		lock_m.lock();
 		axes_m.resize(joystick_axis_count(fd_m));
 		buttons_m.resize(joystick_button_count(fd_m));
-		std::thread test(std::bind(&msl::joystick::update_m,this));
+		std::thread test(std::bind(&msl::joystick_t::update_m,this));
 		test.detach();
 		lock_m.unlock();
 	}
 }
 
-void msl::joystick::close()
+void msl::joystick_t::close()
 {
 	lock_m.lock();
 	joystick_close(fd_m);
@@ -437,7 +437,7 @@ void msl::joystick::close()
 	lock_m.unlock();
 }
 
-bool msl::joystick::good()
+bool msl::joystick_t::good()
 {
 	lock_m.lock();
 	auto value=joystick_valid_fd(fd_m);
@@ -445,15 +445,15 @@ bool msl::joystick::good()
 	return value;
 }
 
-msl::js_info_t msl::joystick::info() const
+msl::js_info_t msl::joystick_t::info() const
 {
 	return info_m;
 }
 
-float msl::joystick::axis(const size_t index)
+float msl::joystick_t::axis(const size_t index)
 {
 	if(index>=axis_count())
-		throw std::out_of_range("joystick::axis");
+		throw std::out_of_range("joystick_t::axis");
 
 	lock_m.lock();
 	auto value=axes_m[index];
@@ -461,10 +461,10 @@ float msl::joystick::axis(const size_t index)
 	return value;
 }
 
-bool msl::joystick::button(const size_t index)
+bool msl::joystick_t::button(const size_t index)
 {
 	if(index>=button_count())
-		throw std::out_of_range("joystick::button");
+		throw std::out_of_range("joystick_t::button");
 
 	lock_m.lock();
 	auto value=buttons_m[index];
@@ -472,7 +472,7 @@ bool msl::joystick::button(const size_t index)
 	return value;
 }
 
-size_t msl::joystick::axis_count()
+size_t msl::joystick_t::axis_count()
 {
 	lock_m.lock();
 	auto count=axes_m.size();
@@ -480,7 +480,7 @@ size_t msl::joystick::axis_count()
 	return count;
 }
 
-size_t msl::joystick::button_count()
+size_t msl::joystick_t::button_count()
 {
 	lock_m.lock();
 	auto count=buttons_m.size();
@@ -488,7 +488,7 @@ size_t msl::joystick::button_count()
 	return count;
 }
 
-void msl::joystick::update_m()
+void msl::joystick_t::update_m()
 {
 	while(good())
 	{

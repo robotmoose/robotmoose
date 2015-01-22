@@ -260,7 +260,7 @@ static msl::socket_device_t socket_accept(const msl::socket_device_t& device)
 	return client;
 }
 
-msl::socket::socket(const std::string& ip,const bool tcp,const size_t buffer_size)
+msl::socket_t::socket_t(const std::string& ip,const bool tcp,const size_t buffer_size)
 {
 	bool host;
 	uint8_t ip_bind[4];
@@ -284,49 +284,49 @@ msl::socket::socket(const std::string& ip,const bool tcp,const size_t buffer_siz
 	device_m.tcp=tcp;
 }
 
-void msl::socket::open()
+void msl::socket_t::open()
 {
 	socket_open(device_m);
 }
 
-void msl::socket::close()
+void msl::socket_t::close()
 {
 	socket_close(device_m);
 }
 
-bool msl::socket::good() const
+bool msl::socket_t::good() const
 {
 	return socket_valid(device_m);
 }
 
-ssize_t msl::socket::available() const
+ssize_t msl::socket_t::available() const
 {
 	return socket_available(device_m);
 }
 
-ssize_t msl::socket::read(void* buf,const size_t count) const
+ssize_t msl::socket_t::read(void* buf,const size_t count) const
 {
 	return socket_read(device_m,buf,count);
 }
 
-ssize_t msl::socket::write(const void* buf,const size_t count) const
+ssize_t msl::socket_t::write(const void* buf,const size_t count) const
 {
 	return socket_write(device_m,buf,count);
 }
 
-ssize_t msl::socket::write(const std::string& buf) const
+ssize_t msl::socket_t::write(const std::string& buf) const
 {
 	return socket_write(device_m,buf.c_str(),buf.size());
 }
 
-msl::socket msl::socket::accept() const
+msl::socket_t msl::socket_t::accept() const
 {
-	msl::socket client("0.0.0.0:0>0.0.0.0:0",true);
+	msl::socket_t client("0.0.0.0:0>0.0.0.0:0",true);
 	client.device_m=socket_accept(device_m);
 	return client;
 }
 
-std::string msl::socket::address() const
+std::string msl::socket_t::address() const
 {
 	std::string address="";
 
@@ -358,13 +358,13 @@ std::string msl::socket::address() const
 	return address;
 }
 
-size_t msl::socket::buffer_size() const
+size_t msl::socket_t::buffer_size() const
 {
 	return device_m.buffer_size;
 }
 
-msl::tcp_socket::tcp_socket(const std::string& ip):socket(ip,true)
+msl::tcp_socket_t::tcp_socket_t(const std::string& ip):socket_t(ip,true)
 {}
 
-msl::udp_socket::udp_socket(const std::string& ip,const size_t buffer_size):socket(ip,false,buffer_size)
+msl::udp_socket_t::udp_socket_t(const std::string& ip,const size_t buffer_size):socket_t(ip,false,buffer_size)
 {}

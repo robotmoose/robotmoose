@@ -32,10 +32,10 @@ namespace msl
 		size_t buffer_size;
 	};
 
-	class socket
+	class socket_t
 	{
 		public:
-			socket(const std::string& ip,const bool tcp,const size_t buffer_size=200);
+			socket_t(const std::string& ip,const bool tcp,const size_t buffer_size=200);
 			virtual void open();
 			virtual void close();
 			virtual bool good() const;
@@ -43,7 +43,7 @@ namespace msl
 			virtual ssize_t read(void* buf,const size_t count) const;
 			virtual ssize_t write(const void* buf,const size_t count) const;
 			virtual ssize_t write(const std::string& buf) const;
-			virtual socket accept() const;
+			virtual socket_t accept() const;
 			virtual std::string address() const;
 			size_t buffer_size() const;
 
@@ -51,16 +51,16 @@ namespace msl
 			socket_device_t device_m;
 	};
 
-	class tcp_socket:public socket
+	class tcp_socket_t:public socket_t
 	{
 		public:
-			tcp_socket(const std::string& ip);
+			tcp_socket_t(const std::string& ip);
 	};
 
-	class udp_socket:public socket
+	class udp_socket_t:public socket_t
 	{
 		public:
-			udp_socket(const std::string& ip,const size_t buffer_size=200);
+			udp_socket_t(const std::string& ip,const size_t buffer_size=200);
 	};
 }
 

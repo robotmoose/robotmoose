@@ -54,13 +54,15 @@ namespace msl
 
 	#endif
 
-	class joystick
+	class joystick_t
 	{
 		public:
 			static std::vector<js_info_t> list();
 
-			joystick(const js_info_t info);
-			~joystick();
+			joystick_t(const js_info_t info);
+			joystick_t(const joystick_t& copy)=delete;
+			~joystick_t();
+			joystick_t& operator=(const joystick_t& copy)=delete;
 
 			void open();
 			void close();
