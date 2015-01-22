@@ -21,7 +21,7 @@ bool arduino_t::good() const
 void arduino_t::start(const bool detach)
 {
 	stop();
-	arduino_m=msl::serial(serial_m,baud_m);
+	arduino_m.open(serial_m,baud_m);
 	std::thread arduino_thread(&arduino_t::arduino_thread_func_m,this);
 
 	if(detach)
