@@ -8,9 +8,9 @@
 
 // Arduino Uno Pin Parameters
 
-#define A_Cell0    1
-#define A_Cell1    2
-#define A_Cell2    3
+#define A_Cell0    0
+#define A_Cell1    1
+#define A_Cell2    2
 #define D_Cell0    2
 #define D_Cell1    3
 #define D_Cell2    4
@@ -37,9 +37,11 @@ void ReadVoltage()
   int sensor1 = analogRead(A_Cell1);
   //Serial.println(sensor1);
   Cell1 = sensor1 * (5.0/1023.0);
+  Cell1 = Cell1 - Cell0;
   int sensor2 = analogRead(A_Cell2);
   //Serial.println(sensor2);
-  Cell2 = sensor2 * (5.0/1023.0);
+  Cell2 = sensor2 *2* (5.0/1023.0);
+  Cell2 = Cell2 - Cell1 - Cell0;
 }
   
 
@@ -87,6 +89,6 @@ void loop()
   ReadVoltage();
   Balance();
   PrintVoltage();
-  delay(1500);
+  delay(500);
 
 }
