@@ -168,12 +168,14 @@
     (FileView
       (Path "Design Resources")
       (Path "Design Resources"
-         "C:\Users\Clayton\Desktop\PSpice_BJTs\bms_v2.dsn")
+         "C:\Users\Clayton\Documents\Seafile\UAF\ITEST\ITEST Git\BMS\BMSv2.0\PSpice_BJTs\bms_v2.dsn")
       (Path "Design Resources"
-         "C:\Users\Clayton\Desktop\PSpice_BJTs\bms_v2.dsn" "SCHEMATIC1")
+         "C:\Users\Clayton\Documents\Seafile\UAF\ITEST\ITEST Git\BMS\BMSv2.0\PSpice_BJTs\bms_v2.dsn"
+         "SCHEMATIC1")
       (Path "Outputs")
       (Select "Design Resources"
-         "C:\Users\Clayton\Desktop\PSpice_BJTs\bms_v2.dsn" "SCHEMATIC1" "PAGE1"))
+         "C:\Users\Clayton\Documents\Seafile\UAF\ITEST\ITEST Git\BMS\BMSv2.0\PSpice_BJTs\bms_v2.dsn"
+         "SCHEMATIC1" "PAGE1"))
     (HierarchyView)
     (Doc
       (Type "COrCapturePMDoc")
@@ -187,6 +189,7 @@
         (Scroll "-101 0")
         (Zoom "100")
         (Occurrence "/"))
-      (Path "C:\USERS\CLAYTON\DESKTOP\PSPICE_BJTS\BMS_V2.DSN")
+      (Path
+         "C:\USERS\CLAYTON\DOCUMENTS\SEAFILE\UAF\ITEST\ITEST GIT\BMS\BMSV2.0\PSPICE_BJTS\BMS_V2.DSN")
       (Schematic "SCHEMATIC1")
       (Page "PAGE1"))))

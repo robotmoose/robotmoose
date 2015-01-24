@@ -53,6 +53,11 @@
         (Type "PSpice Profile"))))
   (DefaultLibraryBrowseDirectory "library\PSpice")
   (PartMRUSelector
+    (R
+      (FullPartName "R.Normal")
+      (LibraryName
+         "C:\CADENCE\SPB_16.6\TOOLS\CAPTURE\LIBRARY\PSPICE\ANALOG.OLB")
+      (DeviceIndex "0"))
     (1N4376
       (FullPartName "1N4376.Normal")
       (LibraryName "C:\CADENCE\SPB_16.6\TOOLS\CAPTURE\LIBRARY\PSPICE\DIODE.OLB")
@@ -72,11 +77,6 @@
     (UA741
       (FullPartName "UA741.Normal")
       (LibraryName "C:\CADENCE\SPB_16.6\TOOLS\CAPTURE\LIBRARY\OPAMP.OLB")
-      (DeviceIndex "0"))
-    (R
-      (FullPartName "R.Normal")
-      (LibraryName
-         "C:\CADENCE\SPB_16.6\TOOLS\CAPTURE\LIBRARY\PSPICE\ANALOG.OLB")
       (DeviceIndex "0"))
     (Q2N2222
       (FullPartName "Q2N2222.Normal")
@@ -168,11 +168,14 @@
     (FileView
       (Path "Design Resources")
       (Path "Design Resources"
-         "C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2.dsn")
+         "C:\Users\Clayton\Documents\Seafile\UAF\ITEST\ITEST Git\BMS\BMSv2.0\PSpice_MOSFETs\bms_v2.dsn")
       (Path "Design Resources"
-         "C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2.dsn"
+         "C:\Users\Clayton\Documents\Seafile\UAF\ITEST\ITEST Git\BMS\BMSv2.0\PSpice_MOSFETs\bms_v2.dsn"
          "SCHEMATIC1")
-      (Path "Outputs"))
+      (Path "Outputs")
+      (Select "Design Resources"
+         "C:\Users\Clayton\Documents\Seafile\UAF\ITEST\ITEST Git\BMS\BMSv2.0\PSpice_MOSFETs\bms_v2.dsn"
+         "SCHEMATIC1" "PAGE1"))
     (HierarchyView)
     (Doc
       (Type "COrCapturePMDoc")
@@ -182,11 +185,11 @@
     (Doc
       (Type "COrSchematicDoc")
       (Frame
-        (Placement "44 2 3 -1 -1 -8 -31 52 1216 52 336")
-        (Scroll "461 479")
-        (Zoom "256")
+        (Placement "44 2 3 -1 -1 -8 -31 52 1152 52 336")
+        (Scroll "-101 161")
+        (Zoom "100")
         (Occurrence "/"))
       (Path
-         "C:\USERS\CLAYTON\DOCUMENTS\SEAFILE\UAF\ITEST\GIT REPO\BMS\PSPICE\BMS_V2.DSN")
+         "C:\USERS\CLAYTON\DOCUMENTS\SEAFILE\UAF\ITEST\ITEST GIT\BMS\BMSV2.0\PSPICE_MOSFETS\BMS_V2.DSN")
       (Schematic "SCHEMATIC1")
       (Page "PAGE1"))))

@@ -1,7 +1,7 @@
 
-**** 01/13/15 19:39:10 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
+**** 01/21/15 23:39:11 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
 
- ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2-pspicefiles\schematic1\bias
+ ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\ITEST Git\BMS\BMSv2.0\PSpice_MOSFETs\bms_v2-pspicefile
 
 
  ****     CIRCUIT DESCRIPTION
@@ -39,35 +39,38 @@ R_R9         N267101 N22536  10 TC=0,0
 R_R10         N26778 N14639  10 TC=0,0 
 R_R11         N267421 N27496  10 TC=0,0 
 X_M25         N331562 N51698 0 NDS335N/FAI
-X_M26         N27496 N51480 N27496 NDS335N/FAI
-X_M27         N351702 N48782 N14639 NDS335N/FAI
-R_R12         N48782 N22536  1Meg TC=0,0 
+X_M26         N68976 N51480 N27496 NDS335N/FAI
+R_R12         N48782 N22536  100k TC=0,0 
 R_R13         N51480 N14639  1Meg TC=0,0 
 R_R14         N51698 N27496  1Meg TC=0,0 
-X_M28         N48782 HIGH 0 NDS335N/FAI
-X_M29         N51480 HIGH 0 NDS335N/FAI
+X_M29         N51480 0 0 NDS335N/FAI
 X_M30         N51698 0 0 NDS335N/FAI
-R_R15         N55702 N22536  100Meg TC=0,0 
-R_R16         N58521 N14639  100Meg TC=0,0 
-R_R17         N56952 N27496  100Meg TC=0,0 
-R_R22         A2 N58521  100Meg TC=0,0 
+R_R15         N55702 N22536  1Meg TC=0,0 
+R_R16         N58521 N14639  1Meg TC=0,0 
+R_R17         N56952 N27496  1Meg TC=0,0 
+R_R22         A2 N58521  1Meg TC=0,0 
 X_U4         N55702 N58521 HIGH 0 A2 uA741
-R_R23         0 N55702  100Meg TC=0,0 
-R_R24         A1 N56952  100Meg TC=0,0 
+R_R23         0 N55702  1Meg TC=0,0 
+R_R24         A1 N56952  1Meg TC=0,0 
 X_U5         N64239 N56952 HIGH 0 A1 uA741
-R_R25         N64239 N14639  100Meg TC=0,0 
-R_R26         0 N64239  100Meg TC=0,0 
-R_R27         0 N27496  100Meg TC=0,0 
-D_D1         N26778 N27496 D1N4376 
-D_D2         N267101 N351702 D1N4376 
+R_R25         N64239 N14639  1Meg TC=0,0 
+R_R26         0 N64239  1Meg TC=0,0 
+R_R27         0 N27496  1Meg TC=0,0 
+D_D1         N26778 N68976 D1N4376 
+D_D2         N267101 N687111 D1N4376 
 D_D3         N267421 N331562 D1N4376 
+R_R29         0 N48782  1Meg TC=0,0 
+R_R30         0 N48782  1Meg TC=0,0 
+X_M31         N48782 0 0 NDS335N/FAI
+X_M32         N687111 N48782 N14639 NDS335N/FAI
+R_R31         0 N48782  1Meg TC=0,0 
 
 **** RESUMING bias.cir ****
 .END
 
-**** 01/13/15 19:39:10 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
+**** 01/21/15 23:39:11 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
 
- ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2-pspicefiles\schematic1\bias
+ ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\ITEST Git\BMS\BMSv2.0\PSpice_MOSFETs\bms_v2-pspicefile
 
 
  ****     Diode MODEL PARAMETERS
@@ -92,7 +95,7 @@ D_D3         N267421 N331562 D1N4376
            M     .3333           .3                                          
 
 
-               X_M26.DDS       X_M26.DBODY     X_M26.DGD       X_M27.DDS       
+               X_M26.DDS       X_M26.DBODY     X_M26.DGD       X_M29.DDS       
           IS   10.000000E-15  140.000000E-15   10.000000E-15   10.000000E-15 
           BV   20.0336                                         20.0336       
           RS                     .04                                         
@@ -102,7 +105,7 @@ D_D3         N267421 N331562 D1N4376
            M     .3                                              .3          
 
 
-               X_M27.DBODY     X_M27.DGD       X_M28.DDS       X_M28.DBODY     
+               X_M29.DBODY     X_M29.DGD       X_M30.DDS       X_M30.DBODY     
           IS  140.000000E-15   10.000000E-15   10.000000E-15  140.000000E-15 
           BV                                   20.0336                       
           RS     .04                                             .04         
@@ -112,35 +115,36 @@ D_D3         N267421 N331562 D1N4376
            M                                     .3                          
 
 
-               X_M28.DGD       X_M29.DDS       X_M29.DBODY     X_M29.DGD       
-          IS   10.000000E-15   10.000000E-15  140.000000E-15   10.000000E-15 
+               X_M30.DGD       X_U4.dx         X_U4.dy         X_U5.dx         
+          IS   10.000000E-15  800.000000E-18  800.000000E-18  800.000000E-18 
+          RS                    1               1.000000E-03    1            
+         CJO  450.000000E-12                   10.000000E-12                 
+          VJ     .15                                                         
+
+
+               X_U5.dy         X_M31.DDS       X_M31.DBODY     X_M31.DGD       
+          IS  800.000000E-18   10.000000E-15  140.000000E-15   10.000000E-15 
           BV                   20.0336                                       
-          RS                                     .04                         
+          RS    1.000000E-03                     .04                         
           TT                                  100.000000E-09                 
-         CJO  450.000000E-12  250.000000E-12                  450.000000E-12 
-          VJ     .15             .8                              .15         
+         CJO   10.000000E-12  250.000000E-12                  450.000000E-12 
+          VJ                     .8                              .15         
            M                     .3                                          
 
 
-               X_M30.DDS       X_M30.DBODY     X_M30.DGD       X_U4.dx         
-          IS   10.000000E-15  140.000000E-15   10.000000E-15  800.000000E-18 
-          BV   20.0336                                                       
-          RS                     .04                            1            
-          TT                  100.000000E-09                                 
-         CJO  250.000000E-12                  450.000000E-12                 
-          VJ     .8                              .15                         
-           M     .3                                                          
-
-
-               X_U4.dy         X_U5.dx         X_U5.dy         
-          IS  800.000000E-18  800.000000E-18  800.000000E-18 
-          RS    1.000000E-03    1               1.000000E-03 
-         CJO   10.000000E-12                   10.000000E-12 
+               X_M32.DDS       X_M32.DBODY     X_M32.DGD       
+          IS   10.000000E-15  140.000000E-15   10.000000E-15 
+          BV   20.0336                                       
+          RS                     .04                         
+          TT                  100.000000E-09                 
+         CJO  250.000000E-12                  450.000000E-12 
+          VJ     .8                              .15         
+           M     .3                                          
 
 
-**** 01/13/15 19:39:10 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
+**** 01/21/15 23:39:11 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
 
- ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2-pspicefiles\schematic1\bias
+ ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\ITEST Git\BMS\BMSv2.0\PSpice_MOSFETs\bms_v2-pspicefile
 
 
  ****     BJT MODEL PARAMETERS
@@ -176,9 +180,9 @@ D_D3         N267421 N331562 D1N4376
            D     .87             .87         
 
 
-**** 01/13/15 19:39:10 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
+**** 01/21/15 23:39:11 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
 
- ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2-pspicefiles\schematic1\bias
+ ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\ITEST Git\BMS\BMSv2.0\PSpice_MOSFETs\bms_v2-pspicefile
 
 
  ****     MOSFET MODEL PARAMETERS
@@ -190,40 +194,6 @@ D_D3         N267421 N331562 D1N4376
 
 
                X_M25.DMOS      X_M25.INTER     X_M26.DMOS      X_M26.INTER     
-               NMOS            NMOS            NMOS            NMOS            
-       LEVEL    3               1               3               1            
-           L  100.000000E-06  100.000000E-06  100.000000E-06  100.000000E-06 
-           W  100.000000E-06  100.000000E-06  100.000000E-06  100.000000E-06 
-         VTO     .64584         0                .64584         0            
-          KP    8.164          10               8.164          10            
-       GAMMA    0               0               0               0            
-         PHI     .6              .6              .6              .6          
-      LAMBDA    0               0               0               0            
-          IS   10.000000E-15   10.000000E-15   10.000000E-15   10.000000E-15 
-          JS    0               0               0               0            
-          PB     .8              .8              .8              .8          
-        PBSW     .8              .8              .8              .8          
-          CJ    0               0               0               0            
-        CJSW    0               0               0               0            
-        CGSO    0               0               0               0            
-        CGDO    0               0               0               0            
-        CGBO    0               0               0               0            
-         TOX  100.000000E-09    0             100.000000E-09    0            
-          XJ    0               0               0               0            
-       UCRIT   10.000000E+03   10.000000E+03   10.000000E+03   10.000000E+03 
-        VMAX  400.000000E+03                  400.000000E+03                 
-       THETA     .096                            .096                        
-      DIOMOD    1               1               1               1            
-         VFB    0               0               0               0            
-        LETA    0               0               0               0            
-        WETA    0               0               0               0            
-          U0    0               0               0               0            
-        TEMP    0               0               0               0            
-         VDD    5               5               5               5            
-       XPART    0               0               0               0            
-
-
-               X_M27.DMOS      X_M27.INTER     X_M28.DMOS      X_M28.INTER     
                NMOS            NMOS            NMOS            NMOS            
        LEVEL    3               1               3               1            
            L  100.000000E-06  100.000000E-06  100.000000E-06  100.000000E-06 
@@ -291,12 +261,46 @@ D_D3         N267421 N331562 D1N4376
        XPART    0               0               0               0            
 
 
+               X_M31.DMOS      X_M31.INTER     X_M32.DMOS      X_M32.INTER     
+               NMOS            NMOS            NMOS            NMOS            
+       LEVEL    3               1               3               1            
+           L  100.000000E-06  100.000000E-06  100.000000E-06  100.000000E-06 
+           W  100.000000E-06  100.000000E-06  100.000000E-06  100.000000E-06 
+         VTO     .64584         0                .64584         0            
+          KP    8.164          10               8.164          10            
+       GAMMA    0               0               0               0            
+         PHI     .6              .6              .6              .6          
+      LAMBDA    0               0               0               0            
+          IS   10.000000E-15   10.000000E-15   10.000000E-15   10.000000E-15 
+          JS    0               0               0               0            
+          PB     .8              .8              .8              .8          
+        PBSW     .8              .8              .8              .8          
+          CJ    0               0               0               0            
+        CJSW    0               0               0               0            
+        CGSO    0               0               0               0            
+        CGDO    0               0               0               0            
+        CGBO    0               0               0               0            
+         TOX  100.000000E-09    0             100.000000E-09    0            
+          XJ    0               0               0               0            
+       UCRIT   10.000000E+03   10.000000E+03   10.000000E+03   10.000000E+03 
+        VMAX  400.000000E+03                  400.000000E+03                 
+       THETA     .096                            .096                        
+      DIOMOD    1               1               1               1            
+         VFB    0               0               0               0            
+        LETA    0               0               0               0            
+        WETA    0               0               0               0            
+          U0    0               0               0               0            
+        TEMP    0               0               0               0            
+         VDD    5               5               5               5            
+       XPART    0               0               0               0            
+
+
 
           JOB CONCLUDED
 
-**** 01/13/15 19:39:10 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
+**** 01/21/15 23:39:11 ***** PSpice 16.6.0 (October 2012) ***** ID# 0 ********
 
- ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\Git Repo\BMS\PSpice\bms_v2-pspicefiles\schematic1\bias
+ ** Profile: "SCHEMATIC1-bias"  [ C:\Users\Clayton\Documents\Seafile\UAF\ITEST\ITEST Git\BMS\BMSv2.0\PSpice_MOSFETs\bms_v2-pspicefile
 
 
  ****     JOB STATISTICS SUMMARY
@@ -306,5 +310,5 @@ D_D3         N267421 N331562 D1N4376
 
 
 
-  Total job time (using Solver 1)   =         .95
+  Total job time (using Solver 1)   =         .09
 

@@ -368,19 +368,19 @@ void loop()
     Serial.print("Cell ");
     Serial.print(i);
     Serial.print(": ");
-    Serial.print(cellVoltage[i], 3);
+    Serial.print(cellVoltage[i], 4);
     Serial.println(" V");
   }
   Serial.print("Average Cell Voltage: ");
-  Serial.print(AvgCellVolts,3);
+  Serial.print(AvgCellVolts,4);
   Serial.println(" V");
   
   Serial.print("Total Cell Voltages: ");
-  Serial.print(cellVoltTotal,3);
+  Serial.print(cellVoltTotal,4);
   Serial.println(" V");
   
   Serial.print("Charge flag: ");
-  Serial.println(chargeflag,3);
+  Serial.println(chargeflag);
   Serial.println("-------------------------------------");
   delay(1200);
 }
