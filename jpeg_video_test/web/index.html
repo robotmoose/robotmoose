@@ -1,0 +1,27 @@
+<html>
+	<head>
+		<title>Video Test</title>
+		<h1>Video Test</h1>
+
+		<script>
+			function refresh()
+			{
+				var img=document.getElementById('cam');
+				var address;
+
+				if(img.src.indexOf('?')>-1)
+					address=img.src.split('?')[0];
+				else
+					address=img.src;
+
+				img.src=address+"?time="+new Date().getTime();
+			}
+
+			setInterval(refresh,20);
+		</script>
+
+	</head>
+	<body>
+		<img id="cam" src="cam.jpg?quality=10"/>
+	</body>
+</html>
