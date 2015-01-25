@@ -1,12 +1,16 @@
 #include <iostream>
+#include <map>
+#include <mutex>
 #include <msl/time.hpp>
-#include <msl/webserver.hpp>
 #include "uri.hpp"
-#include <stdexcept>
+#include <msl/webserver.hpp>
 
 bool client_func(const mg_connection& connection,enum mg_event event);
 
 msl::webserver_t server(client_func,"0.0.0.0:80","web");
+
+std::mutex cam_lock;
+std::map<std::string,std::string> cams={{"172.20.227.15:8081",""}};
 
 int main()
 {
@@ -18,7 +22,13 @@ int main()
 		std::cout<<":("<<std::endl;
 
 	while(server.good())
-		msl::delay_ms(1);
+	{
+		auto jpg=get_jpg("172.20.227.15:8081","/cam.jpg");
+		cam_lock.lock();
+		cams["172.20.227.15:8081"]=jpg;
+		cam_lock.unlock();
+		msl::delay_ms(10);
+	}
 
 	server.close();
 
@@ -40,13 +50,19 @@ bool client_func(const mg_connection& connection,enum mg_event event)
 		if(request=="/cam.jpg")
 		{
 			std::string who="";
+			std::string jpg="";
 
 			if(connection.query_string!=nullptr)
 				for(auto ii:uri_parse_query("?"+std::string(connection.query_string)))
 					if(ii.first=="who")
 						who=ii.second;
 
-			auto jpg=get_jpg(who,request);
+			if(cams.count(who)>0)
+			{
+				cam_lock.lock();
+				jpg=cams[who];
+				cam_lock.unlock();
+			}
 
 			if(jpg!="")
 			{

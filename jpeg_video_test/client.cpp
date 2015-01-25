@@ -1,10 +1,9 @@
 #include <iostream>
 #include <mutex>
 #include <msl/time.hpp>
+#include "uri.hpp"
 #include "webcam.hpp"
 #include <msl/webserver.hpp>
-#include "uri.hpp"
-#include <stdexcept>
 
 bool client_func(const mg_connection& connection,enum mg_event event);
 
