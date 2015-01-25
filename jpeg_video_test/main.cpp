@@ -1,3 +1,5 @@
+//needs -luriparser
+
 #include <iostream>
 #include <msl/time.hpp>
 #include <msl/webserver.hpp>
