@@ -1,19 +1,19 @@
 //needs -luriparser
 
 #include <iostream>
+#include <msl/socket.hpp>
 #include <msl/time.hpp>
 #include <msl/webserver.hpp>
-#include "webcam.hpp"
-#include <fstream>
 #include <uriparser/Uri.h>
 #include <stdexcept>
+
+std::string get_jpg(const std::string& who,const size_t quality);
 
 void send_jpg(const mg_connection& connection,const std::string& jpg);
 
 bool client_func(const mg_connection& connection,enum mg_event event);
 
-msl::webserver_t server(client_func,"0.0.0.0:80","web");
-webcam_t cam;
+msl::webserver_t server(client_func,"0.0.0.0:8080","web");
 
 int main()
 {
@@ -25,23 +25,55 @@ int main()
 		std::cout<<":("<<std::endl;
 
 	while(server.good())
-	{
-		size_t num=0;
-		cam.open(num);
-
-		if(cam.good())
-			std::cout<<"Connected with camera "<<num<<"."<<std::endl;
-
-		while(cam.good())
-			msl::delay_ms(1);
-
-		std::cout<<"Lost connection with camera "<<num<<"."<<std::endl;
 		msl::delay_ms(1);
-	}
 
 	server.close();
 
 	return 0;
+}
+
+std::string get_jpg(const std::string& who,const size_t quality)
+{
+	msl::tcp_socket_t get("0.0.0.0:0>127.0.0.1:8081");
+	get.open();
+
+	if(!get.good())
+	{
+		std::cout<<"bad connection!"<<std::endl;
+		return "";
+	}
+
+	std::string request="GET /cam.jpg?quality="+std::to_string(quality)+" HTTP/1.1\r\n";
+	request+="Connection: close\r\n";
+	request+="\r\n";
+	get.write(request);
+
+	std::cout<<"requesting:\n"<<request<<std::endl;
+
+	std::string jpg="";
+	uint8_t temp;
+
+	while(get.available()>=0&&get.read(&temp,1)==1)
+		jpg+=temp;
+
+	get.close();
+
+	bool found=false;
+
+	for(size_t ii=0;ii<jpg.size();++ii)
+	{
+		if(ii+3<jpg.size()&&jpg[ii]==(char)0xff&&jpg[ii+1]==(char)0xd8&&jpg[ii+2]==(char)0xff&&jpg[ii+3]==(char)0xe0)
+		{
+			found=true;
+			jpg=jpg.substr(ii,jpg.size()-ii);
+			break;
+		}
+	}
+
+	if(!found)
+		return "";
+
+	return jpg;
 }
 
 void send_jpg(const mg_connection& connection,const std::string& jpg)
@@ -58,10 +90,12 @@ bool client_func(const mg_connection& connection,enum mg_event event)
 	if(event!=MG_REQUEST)
 		return false;
 
+	std::cout<<connection.uri<<std::endl;
 
 	if(std::string(connection.uri)=="/cam.jpg")
 	{
 		size_t quality=30;
+		std::string who="";
 
 		if(connection.query_string!=nullptr)
 		{
@@ -99,6 +133,10 @@ bool client_func(const mg_connection& connection,enum mg_event event)
 					try{quality=std::stoi(value);}
 					catch(...){}
 				}
+				else if(key=="who")
+				{
+					who=value;
+				}
 
 				head=head->next;
 			}
@@ -107,7 +145,7 @@ bool client_func(const mg_connection& connection,enum mg_event event)
 			uriFreeUriMembersA(&uri);
 		}
 
-		send_jpg(connection,cam.jpg(quality));
+		send_jpg(connection,get_jpg(who,quality));
 		return true;
 	}
 
