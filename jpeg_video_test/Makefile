@@ -1,7 +1,7 @@
 INC=../include
 CXX=g++
 CFLAGS=-O -std=c++11 -Wall -I$(INC)
-LIBS=-lpthread -lopencv_core -lopencv_highgui
+LIBS=-lpthread -lopencv_core -lopencv_highgui -luriparser -ggdb
 
 json_src=$(INC)/json.cpp
 mongoose_src=$(INC)/mongoose/mongoose.c

@@ -6,22 +6,16 @@
 		<script>
 			function refresh()
 			{
-				var img=document.getElementById('cam');
-				var address;
-
-				if(img.src.indexOf('?')>-1)
-					address=img.src.split('?')[0];
-				else
-					address=img.src;
-
-				img.src=address+"?time="+new Date().getTime();
+				var src="cam.jpg?";
+				src+="quality="+document.getElementById("quality").value+"&";
+				src+="time="+new Date().getTime()+"&";
+				document.getElementById("cam").src=src;
 			}
-
-			setInterval(refresh,20);
 		</script>
 
 	</head>
 	<body>
-		<img id="cam" src="cam.jpg?quality=10"/>
+		<img id="cam" src="cam.jpg" onload="refresh();"/><br/>
+		<input type="text" value="20" id="quality" onload="refresh();"/>
 	</body>
 </html>
