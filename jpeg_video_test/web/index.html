@@ -7,7 +7,6 @@
 			function refresh()
 			{
 				var src="cam.jpg?";
-				src+="quality="+document.getElementById("quality").value+"&";
 				src+="time="+new Date().getTime()+"&";
 				src+="who="+document.getElementById("host").value+"&";
 				document.getElementById("cam").src=src;
@@ -17,7 +16,6 @@
 	</head>
 	<body>
 		<img id="cam" src="cam.jpg" onload="refresh();" onerror="refresh();"/><br/>
-		quality:<input type="text" value="20" id="quality"/>
 		host:<input type="text" value="172.20.227.15:8081" id="host"/>
 	</body>
 </html>

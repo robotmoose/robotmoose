@@ -144,8 +144,15 @@ bool client_func(const mg_connection& connection,enum mg_event event)
 			uriFreeUriMembersA(&uri);
 		}
 
-		send_jpg(connection,get_jpg(who));
-		return true;
+		auto jpg=get_jpg(who);
+
+		if(jpg!="")
+		{
+			send_jpg(connection,get_jpg(who));
+			return true;
+		}
+
+		return false;
 	}
 
 	return false;
