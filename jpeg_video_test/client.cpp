@@ -1,11 +1,8 @@
-//needs -luriparser
-
 #include <iostream>
 #include <msl/time.hpp>
 #include <msl/webserver.hpp>
 #include "webcam.hpp"
-#include <fstream>
-#include <uriparser/Uri.h>
+#include <mutex>
 #include <stdexcept>
 
 void send_jpg(const mg_connection& connection,const std::string& jpg);
@@ -14,6 +11,8 @@ bool client_func(const mg_connection& connection,enum mg_event event);
 
 msl::webserver_t server(client_func,"0.0.0.0:8081","web");
 webcam_t cam;
+std::string jpg="";
+std::mutex jpg_lock;
 
 int main()
 {
@@ -33,7 +32,13 @@ int main()
 			std::cout<<"Connected with camera "<<num<<"."<<std::endl;
 
 		while(cam.good())
+		{
 			msl::delay_ms(1);
+			auto copy=cam.jpg(15);
+			jpg_lock.lock();
+			jpg=copy;
+			jpg_lock.unlock();
+		}
 
 		std::cout<<"Lost connection with camera "<<num<<"."<<std::endl;
 		msl::delay_ms(1);
@@ -62,53 +67,10 @@ bool client_func(const mg_connection& connection,enum mg_event event)
 
 	if(std::string(connection.uri)=="/cam.jpg")
 	{
-		size_t quality=30;
-
-		if(connection.query_string!=nullptr)
-		{
-			std::string request="?"+std::string(connection.query_string);
-
-			UriParserStateA state;
-			UriUriA uri;
-			state.uri=&uri;
-
-			if(uriParseUriA(&state,request.c_str())!=0)
-			{
-				std::cout<<"failed to parse \""<<request<<"\"!"<<std::endl;
-				uriFreeUriMembersA(&uri);
-				return false;
-			}
-
-			UriQueryListA* queries;
-
-			if(uriDissectQueryMallocA(&queries,nullptr,uri.query.first,uri.query.afterLast)!=0)
-			{
-				std::cout<<"failed to decode \""<<request<<"\"!"<<std::endl;
-				uriFreeUriMembersA(&uri);
-				return false;
-			}
-
-			auto head=queries;
-
-			while(head!=nullptr&&head->key!=nullptr&&head->value!=nullptr)
-			{
-				std::string key=head->key;
-				std::string value=head->value;
-
-				if(key=="quality")
-				{
-					try{quality=std::stoi(value);}
-					catch(...){}
-				}
-
-				head=head->next;
-			}
-
-			uriFreeQueryListA(queries);
-			uriFreeUriMembersA(&uri);
-		}
-
-		send_jpg(connection,cam.jpg(quality));
+		jpg_lock.lock();
+		auto copy=jpg;
+		jpg_lock.unlock();
+		send_jpg(connection,copy);
 		return true;
 	}
 
