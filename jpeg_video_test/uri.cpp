@@ -8,16 +8,10 @@ std::map<std::string,std::string> uri_parse_query(const std::string& query)
 	UriParserStateA state;
 	UriUriA uri;
 	state.uri=&uri;
-
-	if(uriParseUriA(&state,query.c_str())!=0)
-	{
-		uriFreeUriMembersA(&uri);
-		return {{"error","Bad string."}};
-	}
-
 	UriQueryListA* list;
 
-	if(uriDissectQueryMallocA(&list,nullptr,uri.query.first,uri.query.afterLast)!=0)
+	if(uriParseUriA(&state,query.c_str())!=0||
+		uriDissectQueryMallocA(&list,nullptr,uri.query.first,uri.query.afterLast)!=0)
 	{
 		uriFreeUriMembersA(&uri);
 		return {{"error","Bad string."}};
