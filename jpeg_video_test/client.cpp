@@ -55,15 +55,19 @@ bool client_func(const mg_connection& connection,enum mg_event event)
 	if(event!=MG_REQUEST)
 		return false;
 
-	std::cout<<connection.uri<<std::endl;
-
-	if(std::string(connection.uri)=="/cam.jpg")
+	if(connection.uri!=nullptr)
 	{
-		jpg_lock.lock();
-		auto jpg_copy=jpg;
-		jpg_lock.unlock();
-		send_jpg(connection,jpg_copy);
-		return true;
+		std::string request=connection.uri;
+		std::cout<<connection.remote_ip<<":"<<connection.remote_port<<"\t"<<request<<std::endl;
+
+		if(request=="/cam.jpg")
+		{
+			jpg_lock.lock();
+			auto jpg_copy=jpg;
+			jpg_lock.unlock();
+			send_jpg(connection,jpg_copy);
+			return true;
+		}
 	}
 
 	return false;

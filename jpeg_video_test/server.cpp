@@ -35,6 +35,7 @@ bool client_func(const mg_connection& connection,enum mg_event event)
 	if(connection.uri!=nullptr)
 	{
 		std::string request=connection.uri;
+		std::cout<<connection.remote_ip<<":"<<connection.remote_port<<"\t"<<request<<std::endl;
 
 		if(request=="/cam.jpg")
 		{
