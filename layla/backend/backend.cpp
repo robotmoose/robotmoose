@@ -1,7 +1,7 @@
 /**
   The backend reads HTTP commands from superstar, and writes serial
   commands to the arduino.
-  
+
   Dr. Orion Lawlor, lawlor@alaska.edu, 2014-10-11 (public domain)
 */
 #include <stdexcept>
@@ -48,11 +48,11 @@ struct sensors {
 	//rg45 8 pin setup
 	//vcc
 	//data back
-	int uSound1; // not array so json looks good
-	int uSound2;
-	int uSound3;
-	int uSound4;
-	int uSound5;
+	int16_t uSound1; // not array so json looks good
+	int16_t uSound2;
+	int16_t uSound3;
+	int16_t uSound4;
+	int16_t uSound5;
 	//ground
 	sensors() { uSound1=uSound2=uSound3=uSound4=uSound5=0; }
 };
@@ -60,7 +60,7 @@ struct sensors {
 
 
 /**
-  Read commands from superstar, and send them to the robot. 
+  Read commands from superstar, and send them to the robot.
 */
 class robot_backend {
 private:
@@ -74,8 +74,8 @@ public:
 	sensors current_sensors; //all the sensors data
 	bool ledOn, ledDemo;
 	bool debug; // are we in debug mode
-	int led_red,led_green,led_blue; // LED RGB values send by pilot 
-	
+	int16_t led_red,led_green,led_blue; // LED RGB values send by pilot
+
 	void stop(void) { L=R=0.0; }
 
 	robot_backend(std::string superstarURL, std::string robotName_)
@@ -92,7 +92,7 @@ public:
 	void read_network(void);
 	void send_network(void);
 	/** Talk to this real Arudino device over this serial port.
-		We will delete the packet formatter when destructed. 
+		We will delete the packet formatter when destructed.
 		The serial commands are no-ops until this is run.
 	*/
 	void add_serial(A_packet_formatter<SerialPort> *pkt_) { pkt=pkt_; }
@@ -126,9 +126,9 @@ void robot_backend::read_serial(void) {
 	if (pkt==0) return; // simulation only
 	while (Serial.available()) { // read any robot response
 		if (debug) printf("A");
-		int got_data=0;
+		int16_t got_data=0;
 		A_packet p;
-		while (-1==pkt->read_packet(p)) 
+		while (-1==pkt->read_packet(p))
 		{
 			//got_data++;   //packet p.length will give us this
 			if (debug) printf("S");
@@ -152,20 +152,20 @@ void robot_backend::read_serial(void) {
 /** Send data to the robot over serial connection */
 void robot_backend::send_serial(void) {
 	if (pkt==0) return; // simulation only
-	
+
 	robot_power power;
 	static robot_led led;  // does not need to defualt off unlike power
 	//robot_led new_led; // always sending dont need this right now
 
-	power.left=(int)(64+63*L);  
-	power.right=(int)(64+63*R);
-	power.front = (int)(127*(S1+.5));
-	power.mine = (int)(127* (S2+.5));
-	power.dump = (int)(127* (S3+.5));
-	
-	led.red = (int)(led_red);
-	led.green = (int)(led_green);
-	led.blue = (int)(led_blue);
+	power.left=(int16_t)(64+63*L);
+	power.right=(int16_t)(64+63*R);
+	power.front = (int16_t)(127*(S1+.5));
+	power.mine = (int16_t)(127* (S2+.5));
+	power.dump = (int16_t)(127* (S3+.5));
+
+	led.red = (int16_t)(led_red);
+	led.green = (int16_t)(led_green);
+	led.blue = (int16_t)(led_blue);
 	led.ledon = (bool)(ledOn);
 	led.demo = (bool)(ledDemo);
 
@@ -186,7 +186,7 @@ void robot_backend::read_network()
 	double start=time_in_seconds();
 	superstar.send_get(path);
 	std::string json_data=superstar.receive();
-	
+
 	try {
 		json::Value v=json::Deserialize(json_data);
 		L=limit_power(v["power"]["L"]);
@@ -198,11 +198,11 @@ void robot_backend::read_network()
 		ledDemo = v["LED"]["Demo"];
 		double tempRBG = 0;
 		tempRBG = v["LED"]["R"];
-		led_red = (int)(tempRBG * 255);
+		led_red = (int16_t)(tempRBG * 255);
 		tempRBG = v["LED"]["G"];
-		led_green = (int)(tempRBG * 255);
+		led_green = (int16_t)(tempRBG * 255);
 		tempRBG = v["LED"]["B"];
-		led_blue = (int)(tempRBG * 255);
+		led_blue = (int16_t)(tempRBG * 255);
 #ifndef	_WIN32
 		static std::string last_cmd_arg="";
 		std::string run=v["cmd"]["run"];
@@ -242,13 +242,13 @@ void robot_backend::read_network()
 	}
 	double elapsed=time_in_seconds()-start;
 	double per=elapsed;
-	printf("\nRead Time:	%.1f ms/request, %.1f req/sec\n",per*1.0e3, 1.0/per);	
+	printf("\nRead Time:	%.1f ms/request, %.1f req/sec\n",per*1.0e3, 1.0/per);
 }
 
 void robot_backend::send_network(void)
 {
 	double start = time_in_seconds();
-	std::string path = "/superstar/" + robotName + "/data?set="; //data from robot 
+	std::string path = "/superstar/" + robotName + "/data?set="; //data from robot
 	//uggly will fix this so that its not converting so much
 	json::Object temp;
 	temp["uSound1"] = current_sensors.uSound1;
@@ -282,9 +282,9 @@ int main(int argc, char *argv[])
 		else if (0 == strcmp(argv[argi], "--baudrate")) baudrate = atoi(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--trim")) LRtrim = atof(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--debug")) debug = true;
-		else if (0 == strcmp(argv[argi], "--sim")) { // no hardware, for debugging 
+		else if (0 == strcmp(argv[argi], "--sim")) { // no hardware, for debugging
 			robotName="sim/uaf";
-			sim = true; 
+			sim = true;
 			baudrate=0;
 		}
 		else {
@@ -298,13 +298,13 @@ int main(int argc, char *argv[])
 		Serial.begin(baudrate);
 		backend->add_serial(new A_packet_formatter<SerialPort>(Serial));
 	}
-	
+
 	if (sim == true)
 	{ // run GUI in a separate thread (disabled for non-C++11 compile)
 	//	std::thread sim(spritelib_run, "SpriteLib Demo", 800, 600);     // spritelib sim
 	//	sim.detach();
 	}
-	
+
 	while (1) { // talk to robot via backend
 		backend->read_network();
 		backend->send_serial();
@@ -314,7 +314,7 @@ int main(int argc, char *argv[])
 		usleep(10*1000); // limit rate, to be kind to serial port and network
 #endif
 	}
-	
+
 	return 0;
 }
 
@@ -328,16 +328,16 @@ public:
 	vec2 locL,locR; // location of robot's left and right wheels, in *feet*
 	vec2 caster; // last-known location of caster wheel
 	vec2 cast_dir; // travel direction of caster wheel
-	
+
 	robot_simulator() :wheelbase(1.6),
 		locL(0.0,0.0), locR(wheelbase,0.0), caster(0,-100), cast_dir(0.0,1.0) {}
-	
+
 	void draw(spritelib &lib,const spritelib_tex &tex,const vec2 &loc,float size,float angle_rads) {
 		float angle_deg=angle_rads*(180.0/3.141592);
 		vec2 l=loc*30.0;
 		lib.draw(tex,400+l.x,300-l.y,size,size,angle_deg);
 	}
-	
+
 	void simulate(spritelib &lib) {
 		// Drive wheels forward
 		vec2 across=normalize(locR-locL); // robot right hand direction
@@ -345,18 +345,18 @@ public:
 		double speed=6.0; // feet/sec at power==1.0
 		locL+=lib.dt*speed*backend->L*forward;
 		locR+=lib.dt*speed*backend->R*forward;
-		
+
 		// Force distance between wheels to be constant
 		vec2 cen=0.5*(locR+locL); // center
 		vec2 dir=locR-locL; // faces right
 		dir=normalize(dir)*wheelbase;
 		locL=cen-0.5*dir;
 		locR=cen+0.5*dir;
-		
+
 		// Update coordinate system
-		across=normalize(locR-locL); 
-		forward=vec2(-across.y,across.x); 
-		
+		across=normalize(locR-locL);
+		forward=vec2(-across.y,across.x);
+
 		// Calculate location of caster wheel
 		double caster_dist=1.5; // feet
 		vec2 new_caster=cen-forward*caster_dist;
@@ -366,7 +366,7 @@ public:
 			double caster_speed=4.0;
 			cast_dir=normalize(cast_dir+caster_speed*lib.dt*normalize(rel_caster));
 		}
-		
+
 		// Draw robot onscreen
 		static spritelib_tex wheel=lib.read_tex("tire.png");
 		float ang=atan2(dir.y,dir.x);
@@ -377,7 +377,7 @@ public:
 };
 
 robot_simulator *sim=0;
-void spritelib_draw_screen(spritelib &lib) 
+void spritelib_draw_screen(spritelib &lib)
 {
 	if (sim==0) sim=new robot_simulator();
 	sim->simulate(lib);

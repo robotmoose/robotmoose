@@ -17,7 +17,7 @@ void SoftwareServo::setMaximumPulse(uint16_t t)
     max16 = t/16;
 }
 
-uint8_t SoftwareServo::attach(int pinArg)
+uint8_t SoftwareServo::attach(int16_t pinArg)
 {
     pin = pinArg;
     angle = NO_ANGLE;
@@ -40,7 +40,7 @@ void SoftwareServo::detach()
     }
 }
 
-void SoftwareServo::write(int angleArg)
+void SoftwareServo::write(int16_t angleArg)
 {
     if ( angleArg < 0) angleArg = 0;
     if ( angleArg > 180) angleArg = 180;
@@ -69,8 +69,8 @@ void SoftwareServo::refresh()
     uint8_t count = 0, i = 0;
     uint16_t base = 0;
     SoftwareServo *p;
-    static unsigned long lastRefresh = 0;
-    unsigned long m = millis();
+    static uint32_t lastRefresh = 0;
+    uint32_t m = millis();
 
     // if we haven't wrapped millis, and 20ms have not passed, then don't do anything
     if ( m >= lastRefresh && m < lastRefresh + 20) return;

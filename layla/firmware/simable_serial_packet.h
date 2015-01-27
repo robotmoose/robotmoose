@@ -29,7 +29,7 @@ public:
 
 
 	/* Packet send */
-	virtual void write_packet(int command, int length, const void *data) 
+	virtual void write_packet(int16_t command, int16_t length, const void *data)
 	{
 		if (sim)
 		{
@@ -53,7 +53,7 @@ public:
 	if (p.valid) { // handle packet
 	}
 	*/
-	virtual int read_packet(A_packet &p) 
+	virtual int16_t read_packet(A_packet &p)
 	{
 		if (sim)
 		{

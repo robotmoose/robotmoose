@@ -44,41 +44,41 @@ Current robot command codes:
 #include <stdlib.h> /* for realloc and free */
 #include <string.h> /* for memcpy */
 
-/** Abstract representation for on-the-wire serial port. 
-  Obvious implementations 
+/** Abstract representation for on-the-wire serial port.
+  Obvious implementations
 */
 class serial_port_abstract {
 public:
 	/// Return 1 if data is available for reading.
-	virtual int available(void) =0;
+	virtual int16_t available(void) =0;
 	/// Return a read byte, or -1 if no byte is ready.
-	virtual int read(void) =0;
-	
+	virtual int16_t read(void) =0;
+
 	/// Send a byte out the serial port.
-	virtual void write(unsigned char data) =0;
+	virtual void write(const uint8_t data) =0;
 	/// Send a block of bytes out the serial port
-	virtual void write(const unsigned char *data,int length) {
-		for (int i=0;i<length;i++) write(data[i]);
+	virtual void write(const uint8_t *data,int16_t length) {
+		for (int16_t i=0;i<length;i++) write(data[i]);
 	}
-	
+
 	virtual ~serial_port_abstract() {}
 };
 
 /** Data about one packet */
 class A_packet {
 public:
-	unsigned char valid; ///< 1 if packet is correctly formatted
-	int command; ///< Command number.  Must be less than 16.
-	int length; ///< Command length.  Must be less than 250.
-	const unsigned char *data; ///< Command's associated data.
-	
+	uint8_t valid; ///< 1 if packet is correctly formatted
+	int16_t command; ///< Command number.  Must be less than 16.
+	int16_t length; ///< Command length.  Must be less than 250.
+	const uint8_t *data; ///< Command's associated data.
+
 	A_packet() {
 		valid=0;
 		command=0;
 		length=0;
 		data=0;
 	}
-	
+
 	/// Copy the packet data into this object.
 	///   If the data size doesn't match, return false.
 	template <class T>
@@ -96,13 +96,13 @@ public:
 	enum {max_command=15};
 	enum {max_short_length=15};
 	serial_port &serial;
-	
+
 	/**
 	  Create an A-packet send/receive object for this serial device.
 	  The device must be ready to send/receive bytes.
 	*/
-	A_packet_formatter(serial_port &serial_) 
-		:serial(serial_) 
+	A_packet_formatter(serial_port &serial_)
+		:serial(serial_)
 	{
 		reset();
 		read_data_long=read_data=NULL;
@@ -114,21 +114,21 @@ public:
 	virtual ~A_packet_formatter() {
 		if (read_data_long) { free(read_data_long); read_data_long=NULL; }
 	}
-	
+
 /* Packet send */
-	virtual void write_packet(int command,int length,const void *data) {
-		const unsigned char *cdata=(const unsigned char *)data;
-		unsigned char start=0xA0;
-		int sumpay=0;
-		for (int i=0;i<length;i++) sumpay+=cdata[i];
-		int checksum=0xf&(length+command+sumpay+(sumpay>>4));
-		unsigned char end=(command<<4)+(checksum);
-		
-		if (length<max_short_length) 
+	virtual void write_packet(int16_t command,int16_t length,const void *data) {
+		const uint8_t *cdata=(const uint8_t *)data;
+		uint8_t start=0xA0;
+		int16_t sumpay=0;
+		for (int16_t i=0;i<length;i++) sumpay+=cdata[i];
+		int16_t checksum=0xf&(length+command+sumpay+(sumpay>>4));
+		uint8_t end=(command<<4)+(checksum);
+
+		if (length<max_short_length)
 		{ // send short packets in one big buffer
-			start+=length; 
+			start+=length;
 			write_data[0]=start;
-			for (int i=0;i<length;i++) write_data[1+i]=cdata[i];
+			for (int16_t i=0;i<length;i++) write_data[1+i]=cdata[i];
 			write_data[1+length]=end;
 			serial.write(&write_data[0],2+length);
 		} else { // send longer packets in-place
@@ -140,7 +140,7 @@ public:
 			serial.write(&end,1);
 		}
 	}
-	
+
 /* Packet receive */
 
 	/**
@@ -148,26 +148,26 @@ public:
 	 Returns 0 if no data is available to read right now.
 	 Returns -1 if data was readable, but no packet is ready yet (call again).
 	 Fills out the packet and returns +1 if we received a correctly formatted packet.
-	 
+
 	 Idiomatic call code:
 	 	A_packet p;
 	 	while (-1==apak.read_packet(p)) {} // keep reading
-	 	if (p.valid) { // handle packet 
+	 	if (p.valid) { // handle packet
 	 	}
 	*/
-	virtual int read_packet(A_packet &p) {
+	virtual int16_t read_packet(A_packet &p) {
 		if (!serial.available()) return 0; // no data to read
-		int c=serial.read(); // else read next byte
+		int16_t c=serial.read(); // else read next byte
 		if (c==-1) return 0; // (hmmm, why did available return true then?)
 		p.valid=0;
-		
+
 		enum {
 			STATE_START=0,
 			STATE_LENGTH,
 			STATE_PAYLOAD,
 			STATE_END
 		};
-		
+
 		switch (read_state) {
 		case 0: /* start byte */
 			if ((c&0xf0) == 0xa0) { // valid start code
@@ -188,7 +188,7 @@ public:
 			break;
 		case STATE_LENGTH: /* (optional) length byte */
 			read_length=c;
-			read_data_long=(unsigned char *)realloc(read_data_long,read_length);
+			read_data_long=(uint8_t *)realloc(read_data_long,read_length);
 			read_data=read_data_long;
 			read_state=STATE_PAYLOAD;
 			break;
@@ -204,33 +204,33 @@ public:
 			{
 			read_state=STATE_START;
 			p.command=c>>4;
-			int checksum=0xf&(read_length+p.command+read_sumpay+(read_sumpay>>4));
-			int checkread=0xf&(c);
+			int16_t checksum=0xf&(read_length+p.command+read_sumpay+(read_sumpay>>4));
+			int16_t checkread=0xf&(c);
 			if (checkread==checksum) { /* checksum match--valid packet! */
 				p.valid=1;
 				p.length=read_length;
-				p.data=(const unsigned char *)read_data;
+				p.data=(const uint8_t *)read_data;
 			}
 			return +1; // let receiver know packet arrived (even if it's bad)
 			}
 			break;
-		default: /* only way to get here is memory corruption!  Reset. */ 
+		default: /* only way to get here is memory corruption!  Reset. */
 			read_state=0; break;
 		};
 		return -1; // no packet was received
 	}
 private:
 	// Private send buffers:
-	unsigned char write_data[max_short_length+2]; // short outgoing packets are assembled here
-	
+	uint8_t write_data[max_short_length+2]; // short outgoing packets are assembled here
+
 	// Private receiver state:
-	unsigned char read_state; // part of message we next expect
-	int read_length; // length of payload bytes we expect
-	int read_index; // location in payload to next receive
-	int read_sumpay; // sum of payload bytes so far
-	unsigned char read_data_short[max_short_length]; ///< Short packets go here
-	unsigned char *read_data_long; ///< malloc'd long packets, or NULL
-	unsigned char *read_data; ///< current target for read data
+	uint8_t read_state; // part of message we next expect
+	int16_t read_length; // length of payload bytes we expect
+	int16_t read_index; // location in payload to next receive
+	int16_t read_sumpay; // sum of payload bytes so far
+	uint8_t read_data_short[max_short_length]; ///< Short packets go here
+	uint8_t *read_data_long; ///< malloc'd long packets, or NULL
+	uint8_t *read_data; ///< current target for read data
 };
 
 

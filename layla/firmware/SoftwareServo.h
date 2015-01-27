@@ -16,10 +16,10 @@ class SoftwareServo
     static SoftwareServo* first;
   public:
     SoftwareServo();
-    uint8_t attach(int);     // attach to a pin, sets pinMode, returns 0 on failure, won't
+    uint8_t attach(int16_t);     // attach to a pin, sets pinMode, returns 0 on failure, won't
                              // position the servo until a subsequent write() happens
     void detach();
-    void write(int);         // specify the angle in degrees, 0 to 180
+    void write(int16_t);         // specify the angle in degrees, 0 to 180
     uint8_t read();
     uint8_t attached();
     void setMinimumPulse(uint16_t);  // pulse length for 0 degrees in microseconds, 540uS default

@@ -11,7 +11,7 @@
 
 void low_latency_ops();  // fast operations
 
-void sendMotor(int motorSide,int power); //sends power level of motor to sabortooth
+void sendMotor(int16_t motorSide,int16_t power); //sends power level of motor to sabortooth
 void send_servos(void) ;  //requests servos to be at angle however, (SoftwareServo::refresh()) set servor to that angle
 void send_motors(void);  //sets all motors power levels
 
@@ -19,18 +19,18 @@ void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p);  
 
 void read_sensors(void);  //get sensor values and store in robot.sensors (preportory for sending)
 void send_sensors(void); //sends the sensor values to PC
-void u_received();  //interupt function for 
+void u_received();  //interupt function for
 
 void send_leds(void) ;   //sets RGB led color
 void LEDdemo();  //auto changing led colors
 
-//#define LAYLA_UNO
+#define LAYLA_UNO
 
 
 #ifdef LAYLA_UNO
   #define PIN_LED_RED 11
   #define PIN_LED_GREEN 10
-  #define PIN_LED_BLUE 9  
+  #define PIN_LED_BLUE 9
   #define PIN_SABER_RX 9
   #define PIN_SABER_TX 8
   #define PIN_USOUND1_TRG 12
@@ -47,14 +47,14 @@ void LEDdemo();  //auto changing led colors
   HardwareSerial &PCport=Serial; // direct PC
   #define INTTERUPT_USOUND 0
   SoftwareSerial saberSerial(PIN_SABER_RX,PIN_SABER_TX); // RX (not used), TX
-  
+
   SoftwareServo servo1;  //servo objects for pins look at setup servo.attach
   SoftwareServo servo2;
   SoftwareServo servo3;
 #else
   #define PIN_LED_RED 11
   #define PIN_LED_GREEN 10
-  #define PIN_LED_BLUE 9  
+  #define PIN_LED_BLUE 9
   //#define PIN_SABER_RX 19
   //#define PIN_SABER_TX 18
   HardwareSerial &saberSerial=Serial1; // RX (not used), TX
@@ -78,36 +78,36 @@ void LEDdemo();  //auto changing led colors
 
 struct leds
 {
-  leds(int b, int r, int g): blue(b), red(r), green(g)
+  leds(int16_t b, int16_t r, int16_t g): blue(b), red(r), green(g)
   {
   }
-  int blue;
-  int red;
-  int green;
+  int16_t blue;
+  int16_t red;
+  int16_t green;
 };
 
 struct usound
 {
   usound(): pulse_width(0), state(0), start(0),wait(false),current(1)
   {}
-  unsigned long pulse_width;
-  int state; //0 low start trig, 1 high trig, 2 low wait for echo
-  unsigned long start;
-  int wait; //1 we are, 0 we are not waiting
-  int current; // current sensor 1-5
+  uint32_t pulse_width;
+  int16_t state; //0 low start trig, 1 high trig, 2 low wait for echo
+  uint32_t start;
+  int16_t wait; //1 we are, 0 we are not waiting
+  int16_t current; // current sensor 1-5
 };
 
-struct ramp 
+struct ramp
 {
-  ramp(leds a,unsigned long s): active(a), slowness(s), lastrun(0), brightness(0), up(true)
+  ramp(leds a,uint32_t s): active(a), slowness(s), lastrun(0), brightness(0), up(true)
   {
   }
   void run();
   bool up;
-  unsigned long lastrun;
+  uint32_t lastrun;
   leds active;
-  int brightness;
-  unsigned long slowness;
+  int16_t brightness;
+  uint32_t slowness;
 };
 
 
@@ -118,25 +118,25 @@ public:
   HardwareSerial &backend;
   A_packet_formatter<HardwareSerial> pkt; // packet formatter
   bool is_connected; // 1 if we're recently connected; 0 if no response
-  unsigned long last_read; // millis() the last time we got data back
-  unsigned long next_send; // millis() the next time we should send off data
+  uint32_t last_read; // millis() the last time we got data back
+  uint32_t next_send; // millis() the next time we should send off data
 
   CommunicationChannel(HardwareSerial &new_backend) :
-  backend(new_backend), pkt(backend) 
+  backend(new_backend), pkt(backend)
   {
     is_connected=0;
     last_read=0;
     next_send=0;
   }
 
-  bool read_packet(unsigned long milli, A_packet &p) {
+  bool read_packet(uint32_t milli, A_packet &p) {
     p.valid=0;
     if (backend.available()) {
-      while (-1==pkt.read_packet(p)) { 
+      while (-1==pkt.read_packet(p)) {
         low_latency_ops(); /* while reading packet */
       }
       if (p.valid) {
-        last_read=milli; 
+        last_read=milli;
         next_send=milli+500;
         is_connected=true; // got valid packet
         return true;
@@ -165,7 +165,7 @@ CommunicationChannel PC(PCport);
 // Robot's current state:
 robot_current robot;
 
-unsigned long next_micro_send=0;
+uint32_t next_micro_send=0;
 usound ultraSound;
 //--------------
 
@@ -178,17 +178,17 @@ void setup()
 {
   Serial.begin(9600); // Control connection to PC
   saberSerial.begin(9600); // sabertooth motor controller
- 
+
   //servo signal pins
   servo1.attach(PIN_SERVO1);
   servo2.attach(PIN_SERVO2);
   servo3.attach(PIN_SERVO3);
-  
+
   //set servos to known state in case of power cycle
   servo1.write(90);
   servo2.write(90);
   servo3.write(90);
-  
+
   //set led pin's up
   pinMode(ledpins.blue, OUTPUT);
   pinMode(ledpins.red, OUTPUT);
@@ -196,7 +196,7 @@ void setup()
   analogWrite(ledpins.blue,0); // turn them off
   analogWrite(ledpins.red,0);
   analogWrite(ledpins.green,0);
-  
+
   // Our ONE debug LED!
   pinMode(PIN_DEBUG,OUTPUT);
   digitalWrite(PIN_DEBUG,LOW);
@@ -220,15 +220,15 @@ void setup()
 
 void loop()
 {
-  static unsigned long test=0;
-  unsigned long micro=micros();
-  unsigned long milli=micro>>10; // approximately == milliseconds
+  static uint32_t test=0;
+  uint32_t micro=micros();
+  uint32_t milli=micro>>10; // approximately == milliseconds
 
   A_packet p;
   if (PC.read_packet(milli,p)) handle_packet(PC.pkt,p);
   if (!(PC.is_connected)) robot.power.stop(); // disconnected?
 
-  if (micro>=next_micro_send) 
+  if (micro>=next_micro_send)
   { // Send commands to motors
     send_motors();
    // send_servos();
@@ -254,15 +254,15 @@ void low_latency_ops() {
 
 // motor and servo stuff------------
 
-void sendMotor(int motorSide,int power) {
+void sendMotor(int16_t motorSide,int16_t power) {
   if (power<1) power=1;
   if (power>126) power=126;
   if (motorSide) power+=128;
-  saberSerial.write((unsigned char)power);
+  saberSerial.write((uint8_t)power);
 }
 // Sends servo values 0-180
 // command is quick and nonblocking
-void send_servos(void) 
+void send_servos(void)
 {
   servo1.write((robot.power.front*180)/127);  // front is 0-127 and servo range is 0-180
   servo2.write((robot.power.mine*180)/127);  // servo2
@@ -290,7 +290,7 @@ void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p)
     if (!p.get(robot.power)) { // error
       pkt.write_packet(0xE,0,0);
     }
-    else 
+    else
     { // got power request successfully: read and send sensors
       read_sensors();
       send_sensors();
@@ -306,7 +306,7 @@ void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p)
   }
   else if (p.command==0xC) // led command
   { // Led change
-	 if (!p.get(robot.led)) 
+	 if (!p.get(robot.led))
 	 { // error
             pkt.write_packet(0xE,0,0);
          }
@@ -324,14 +324,14 @@ void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p)
 
 // Read all robot sensors into robot.sensor
 void read_sensors(void) {
- 
+
   //dumby sensor values until we get non blocking sensor read going
-  static int trig_pin;
+  static int16_t trig_pin;
  switch (ultraSound.current)  //select pin
  {
    case 1:
      trig_pin = PIN_USOUND1_TRG;
-   break;  
+   break;
    case 2:
      trig_pin = PIN_USOUND2_TRG;
    break;
@@ -348,7 +348,7 @@ void read_sensors(void) {
    ;
    //  digitalWrite(PIN_DEBUG,HIGH); //this should not happen
  }
- 
+
  switch (ultraSound.state)
  {
    case 0:
@@ -366,8 +366,8 @@ void read_sensors(void) {
        ultraSound.wait=false;
      }
    }
-   break; 
-   
+   break;
+
    case 1:
    if(!ultraSound.wait)
    {
@@ -384,7 +384,7 @@ void read_sensors(void) {
      }
    }
    break;
-   
+
    case 2:
    if(!ultraSound.wait)
    {
@@ -404,7 +404,7 @@ void read_sensors(void) {
      }
    }
    break;
-   
+
    default:
    ;     //digitalWrite(PIN_DEBUG,HIGH);
  }
@@ -428,8 +428,8 @@ void send_sensors(void)
 //interupt function
 void u_received()
 {
-  int up_down=0;
-  static unsigned long start;
+  int16_t up_down=0;
+  static uint32_t start;
   up_down=digitalRead(PIN_USOUND_READ);
   if(up_down){
  // digitalWrite(PIN_DEBUG,HIGH);
@@ -440,19 +440,19 @@ void u_received()
    switch (ultraSound.current) //where we recored data
  {
    case 1:
-     robot.f_sensors.uSound1 =(micros()-start)/120; 
-   break;  
+     robot.f_sensors.uSound1 =(micros()-start)/120;
+   break;
    case 2:
-     robot.f_sensors.uSound2 =(micros()-start)/120; 
+     robot.f_sensors.uSound2 =(micros()-start)/120;
    break;
    case 3:
-     robot.f_sensors.uSound3 =(micros()-start)/120; 
+     robot.f_sensors.uSound3 =(micros()-start)/120;
    break;
    case 4:
-     robot.f_sensors.uSound4 =(micros()-start)/120; 
+     robot.f_sensors.uSound4 =(micros()-start)/120;
    break;
    case 5:
-     robot.f_sensors.uSound5 =(micros()-start)/120; 
+     robot.f_sensors.uSound5 =(micros()-start)/120;
    break;
    default:
    ;   //  digitalWrite(PIN_DEBUG,HIGH); //this should not happen
@@ -504,17 +504,17 @@ void send_leds(void) {
 void LEDdemo()
 {
 
-static int count=0;
-static int countspace=5000;
-static unsigned long lastcount=0;
+static int16_t count=0;
+static int16_t countspace=5000;
+static uint32_t lastcount=0;
   if(lastcount+countspace<millis())
   {
     lastcount=millis();
     count++;
-  
+
     if(count>7)
       count=0;
-    
+
     if(count==0)
     {
       colors.active.blue=1;
