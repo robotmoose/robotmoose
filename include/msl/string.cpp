@@ -35,6 +35,7 @@ std::string msl::replace_all(std::string str,const std::string& find,const std::
 	while(found!=std::string::npos)
 	{
 		str.replace(found,find.size(),replace);
+		found+=replace.size();
 		found=str.find(find,found-find.size()+replace.size());
 	}
 

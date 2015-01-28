@@ -6,3 +6,5 @@ jpeg_video_test/server
 jpeg_video_test/server.exe
 jpeg_video_test/client
 jpeg_video_test/client.exe
+code_editor_test/code_editor
+code_editor_test/code_editor.exe
