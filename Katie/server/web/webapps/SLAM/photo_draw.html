@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>R House SLAM</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <script src="javascript/jquery-2.0.3.js"></script>
+        <script src="raphael/raphael-min.js"></script>
+        <script src="angular/angular-1.2.9.js"></script>
+    </head>
+    <body>
+        <div style="width: 400px; height: 300px; background-size: 100% 100%; background-repeat: no-repeat;" id="canvas"></div>
+        <script>
+            var paper = Raphael(0, 0, 400, 300);
+
+            var drawing_rect = null;
+            var init_x;
+            var init_y;
+            var draw = false;
+
+            var final_w, final_h;
+
+            var allTags = [];
+
+            function newRect(x, y, w, h, textString) {
+                var rect = paper.rect(x, y, w, h, 5);
+                rect.attr("stroke", "#cc0000");
+                rect.attr("stroke-width", "2");
+                rect.attr("stroke-opacity", "0.8");
+                if (textString) {
+                    var new_text = paper.text(x + w / 2, y + h / 2, textString);
+                    new_text.attr("font-size", 24);
+                    new_text.attr("stroke", "#000");
+                    new_text.attr("fill", "#fff");
+                    allTags.push({tag: textString, rect: rect, text: new_text});
+                }
+                return rect;
+            }
+
+            $("svg").mousedown(function(m) {
+                if (drawing_rect !== null) {
+                    console.log("new rect");
+                    drawing_rect.remove();
+                }
+                init_x = m.pageX;
+                init_y = m.pageY;
+                drawing_rect = newRect(init_x, init_y, 0, 0, false);
+                draw = true;
+            });
+
+            $("svg").mousemove(function(m) {
+                if (draw) {
+                    var new_w = m.pageX - init_x;
+                    var new_h = m.pageY - init_y;
+                    if (new_w < 0 || new_h < 0) {
+                        return;
+                    }
+                    drawing_rect.attr("width", new_w);
+                    drawing_rect.attr("height", new_h);
+                }
+            });
+
+            $("svg").mouseup(function(m) {
+                draw = false;
+                drawing_rect.remove();
+                final_w = m.pageX - init_x;
+                final_h = m.pageY - init_y;
+                if (final_w < 0 || final_h < 0) {
+                    return;
+                }
+                var x = prompt("please enter a tag for this area");
+                x = x.trim();
+                if (!x) {
+                    alert("Tag content is not valid");
+                    return;
+                }
+                for (var i = 0; i < allTags.length; i++) {
+                    if (allTags[i].tag === x) {
+                        alert("Tag is duplicated");
+                        return;
+                    }
+                }
+
+                parent.putNewDrawingTag({photo: parent.getPhotoId(), tag: x, x: init_x, y: init_y, width: final_w, height: final_h});
+                newRect(init_x, init_y, final_w, final_h, x);
+            });
+
+            window.onbeforeunload = function() {
+                if (!final_w || !final_h) {
+                    alert("Area is not valid");
+                } else {
+                    alert("Area is set");
+                }
+            };
+
+            function removeTag(tag) {
+                for (var i = 0; i < allTags.length; i++) {
+                    if (allTags[i].tag === tag) {
+                        allTags[i].rect.remove();
+                        allTags[i].text.remove();
+                        allTags.splice(i, 1);
+                    }
+                }
+            }
+
+            $("#canvas").css("background-image", "url(" + parent.getPhotoUrl() + ")");
+
+            parent.loadAreas();
+        </script>
+    </body>
+</html>

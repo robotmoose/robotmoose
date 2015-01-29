@@ -1,0 +1,49 @@
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <h4 class="panel-title">Photos</h4>
+    </div>
+    <div class="panel-body">
+        <div ng-controller="PhotoListControl" id="PhotoListControl">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span class="dropdown">
+                    <a class="dropdown-toggle" style="text-decoration: none;" ng-click="startChooseTag()">
+                        {{currentTag}}
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="tag in allTags">
+                            <a ng-click="chooseTag(tag)">{{tag}}</a>
+                        </li>
+                    </ul>
+                </span>
+            </div>
+            <div class="row">
+                <div>
+                    <div ng-repeat="photo in photoList" class="col-xs-6 col-md-3">
+                        <a href="javascript:void(0);"
+                           ng-click="showPhoto(photo.id)" 
+                           class="thumbnail"
+                           tooltip-html-unsafe="{{photo.saveTime}}">
+                            <img ng-src="{{photo.filePath}}" style="width: 240px;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <pager total-items="totalItems" page="currentPage" items-per-page="itemsPerPage" max-size="maxSize"
+                       on-select-page="loadList(page)"
+                       previous-text="Previous" next-text="Next"></pager>
+                <pagination total-items="totalItems" page="currentPage" items-per-page="itemsPerPage" max-size="maxSize" 
+                            class="pagination-sm" boundary-links="true" rotate="false"
+                            first-text="First" last-text="Last"
+                            direction-links="false"
+                            on-select-page="loadList(page)"
+                            ></pagination>
+                <p>
+                    <button class="btn btn-sm btn-success" ng-click="goTargetPage()"
+                            style="margin-top: -5px;">Go to Page:</button>
+                    <input type="text" ng-model="targetPage" style="width: 50px; margin-top: 5px;"/>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

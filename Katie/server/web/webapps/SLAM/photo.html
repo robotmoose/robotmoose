@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>R House SLAM</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <script src="javascript/jquery-2.0.3.js"></script>
+        <script src="javascript/global_values.js"></script>
+        <script src="angular/angular-1.2.9.js"></script>
+        <script src="angular/controllers.js"></script>
+        <script src="ng-tags/ng-tags-input.min.js"></script>
+        <script>
+            angular.module("PhotoCenter", ["ngTagsInput"], function($locationProvider) {
+                $locationProvider.html5Mode(true);
+            });
+
+            function putNewDrawingTag(tag) {
+                angular.element(document.getElementById("PhotoInfoControl")).scope().addNewTag(tag);
+            }
+
+            function getPhotoId() {
+                return angular.element(document.getElementById("PhotoInfoControl")).scope().getPhotoId();
+            }
+
+            function getPhotoUrl() {
+                return angular.element(document.getElementById("PhotoInfoControl")).scope().getPhotoUrl();
+            }
+
+            function loadAreas() {
+                angular.element(document.getElementById("PhotoInfoControl")).scope().loadAreas();
+            }
+        </script>
+        <link rel="stylesheet" href="ng-tags/ng-tags-input.min.css" type="text/css">
+    </head>
+    <body style="background-color: #E6ece5;">
+        <div ng-app="PhotoCenter">
+            <div ng-controller="PhotoInfoControl" style="text-align: center;" id="PhotoInfoControl">
+                <h3>Photo: {{photo.name}}</h3>
+                <iframe src="photo_draw.html" scrolling="no" frameborder="0"
+                        style="width: 400px; height: 300px; margin-top: 30px;" id="photoIFrame"></iframe>
+                <tags-input ng-model="tags"
+                            min-length="1"
+                            max-length="100"
+                            on-tag-added="newTag($tag)"
+                            on-tag-removed="removeTag($tag)">
+                </tags-input>
+                <tags-input ng-model="tagsDraw"
+                            min-length="1"
+                            max-length="100"
+                            on-tag-added="cancelAddDrawingTag($tag)"
+                            on-tag-removed="removeDrawingTag($tag)"
+                            placeholder="Draw tags">
+                </tags-input>
+            </div>
+        </div>
+    </body>
+</html>

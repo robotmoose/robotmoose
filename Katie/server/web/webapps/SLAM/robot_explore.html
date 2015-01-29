@@ -1,0 +1,115 @@
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form name="myForm3" class="css-form" novalidate>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group"
+                         style="width: 100px;">
+                        <span class="input-group-addon">Check Width</span>
+                        <span class="input-group-addon">{{checkWidth}}&deg;</span>
+                    </div>
+                    <slider
+                        ng-model="checkWidth"
+                        floor="1"
+                        ceiling="90"
+                        translate="showDegree"
+                        style="margin-top: 20px;">
+                    </slider>
+                    <br/><br/>
+                    <div class="input-group"
+                         style="width: 100px;">
+                        <span class="input-group-addon">Check Speed</span>
+                        <span class="input-group-addon">{{checkSpeed}}mm</span>
+                    </div>
+                    <slider
+                        ng-model="checkSpeed"
+                        floor="50"
+                        ceiling="400"
+                        translate="showMM"
+                        style="margin-top: 20px;">
+                    </slider>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group"
+                         style="width: 100px;">
+                        <span class="input-group-addon">Randomness</span>
+                        <span class="input-group-addon">{{randomness}}%</span>
+                    </div>
+                    <slider
+                        ng-model="randomness"
+                        floor="0"
+                        ceiling="50"
+                        translate="showPercentage"
+                        style="margin-top: 20px;">
+                    </slider>
+                    <br/><br/>
+                </div>
+            </div>
+            <br/><hr/><br/>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <button class="btn btn-success"
+                                    ng-disabled="shooNotValid"
+                                    ng-click="shoo()"
+                                    style="width: 120px; height: 80px; font-size: 24px;">
+                                Shoo
+                            </button>
+                            <br/><br/>
+                            <div class="input-group"
+                                 style="width: 100px;">
+                                <span class="input-group-addon">Flight Distance</span>
+                                <span class="input-group-addon">{{flightDistance}}cm</span>
+                            </div>
+                            <slider
+                                ng-model="flightDistance"
+                                floor="1"
+                                ceiling="999"
+                                translate="showCM"
+                                style="margin-top: 20px; width: 100%;">
+                            </slider>
+                            <br/><br/>
+                            <div class="input-group"
+                                 style="width: 100px;">
+                                <span class="input-group-addon">Flight Speed</span>
+                                <span class="input-group-addon">{{flightSpeed}}mm</span>
+                            </div>
+                            <slider
+                                ng-model="flightSpeed"
+                                floor="150"
+                                ceiling="400"
+                                translate="showMM"
+                                style="margin-top: 20px; width: 100%;">
+                            </slider>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <button class="btn btn-success"
+                                    ng-disabled="greetNotValid"
+                                    ng-click="greet()"
+                                    style="width: 120px; height: 80px; font-size: 24px;">
+                                Greet
+                            </button>
+                            <br/><br/>
+                            <div class="input-group"
+                                 style="width: 100px;">
+                                <span class="input-group-addon">Check Repeats</span>
+                                <span class="input-group-addon">{{checkRepeat}}</span>
+                            </div>
+                            <slider
+                                ng-model="checkRepeat"
+                                floor="1"
+                                ceiling="10"
+                                style="margin-top: 20px; width: 100%;">
+                            </slider>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

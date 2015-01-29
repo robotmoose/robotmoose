@@ -1,0 +1,67 @@
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form name="myForm2" class="css-form" novalidate>
+            <div class="row">
+                <div class="col-md-6">
+
+                    <div class="input-group" 
+                         style="width: 250px;">
+                        <span class="input-group-addon">Distance</span>
+                        <input type="number" class="form-control" ng-model="driveDistance"
+                               required
+                               name="formDistance"/>
+                        <span class="input-group-addon">cm</span>
+                    </div>
+                    <br/>
+                    <div class="input-group"
+                         style="width: 250px;">
+                        <span class="input-group-addon">Velocity</span>
+                        <input type="number" class="form-control" ng-model="driveVelocity"
+                               required
+                               name="formVelocity"/>
+                        <span class="input-group-addon">mm/s</span>
+                    </div>
+                    <br/>
+                    <div class="input-group"
+                         style="width: 100px;">
+                        <span class="input-group-addon">Degree</span>
+                        <span class="input-group-addon">{{driveDegrees}}&deg;</span>
+                    </div>
+                    <slider
+                        ng-model="driveDegrees"
+                        floor="-180"
+                        ceiling="180"
+                        translate="showDegree"
+                        style="margin-top: 20px;">
+                    </slider>
+                    <br/><br/>
+                    <div class="input-group"
+                         style="width: 100px;">
+                        <span class="input-group-addon">Radius</span>
+                        <span class="input-group-addon">{{driveRadius}}mm</span>
+                    </div>
+                    <slider
+                        ng-model="driveRadius"
+                        floor="-999"
+                        ceiling="999"
+                        translate="showMM"
+                        style="margin-top: 20px;">
+                    </slider>
+                </div>
+                <div class="col-md-6">
+                    <button class="btn btn-info"
+                            ng-disabled="myForm2.$invalid || form2NotValid"
+                            ng-click="driveOneStep()"
+                            style="width: 100px; height: 100px; font-size: 36px;">
+                        Go
+                    </button>
+                    <button class="btn btn-info"
+                            ng-click="haltDrive()"
+                            style="width: 100px; height: 100px; font-size: 36px;">
+                        Halt
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

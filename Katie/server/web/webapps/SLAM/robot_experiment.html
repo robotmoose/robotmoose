@@ -1,0 +1,47 @@
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <h4 class="panel-title">Experiment Records</h4>
+    </div>
+    <div class="panel-body">
+        <div ng-controller="ExperimentListControl" id="ExperimentListControl">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Experiment ID</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="log in logList">
+                        <td>{{log.id}}</td>
+                        <td>{{log.startTime}}</td>
+                        <td>{{log.endTime}}</td>
+                        <td>
+                            <span>{{log.note}}</span>
+                            <br/>
+                            <!--                                                onclick="openNote('')"-->
+                            <a href="javascript:void(0);"
+                               ng-click="goOpenNote(log.id)">
+                                <img src="images/note.png" style="width: 32px; height: 32px;"/>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="getExpFile?experimentId={{log.id}}">
+                                <img src="images/down.png" style="width: 32px; height: 32px;"/>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="text-align: center;">
+                <pagination total-items="totalItems" page="currentPage" items-per-page="itemsPerPage" max-size="maxSize" 
+                            class="pagination-sm" boundary-links="true" rotate="false"
+                            previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"
+                            on-select-page="loadList(page)"></pagination>
+            </div>
+        </div>
+    </div>
+</div>

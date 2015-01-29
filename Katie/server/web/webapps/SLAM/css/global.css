@@ -1,0 +1,57 @@
+body, select, input, textarea {font-size: 13px; color: #454749; font-family: "Myriad Web Pro", myriad-pro, myriad-pro-1, myriad-pro-2, Verdana, sans-serif;}
+#wrapper{border-top: 6px solid #108d44; padding-top:9px;background:#D6E1D6}
+#wrapper2{border-top: 6px solid #108d44; padding-top:5px;background:#D6E1D6;}
+#navigation ul{ list-style:none; height:22px; margin-top:85px;}
+#navigation2 ul{ list-style:none; height:18px; margin-top:48px;}
+#navigation ul li a{font-size: 18px; color:#108d44; text-decoration: none;}
+#navigation ul li a:hover{color: #58b75a;}
+#navigation2 ul li a{font-size: 18px; color:#108d44; text-decoration: none;}
+#navigation2 ul li a:hover{color: #58b75a;}
+#content-wrapper{background:#E6ece5 }
+#content{padding-top:30px;}
+#logo p{text-indent:-9999px;}
+#logo{height:110px;padding-left:8px;padding-right:0px;background:#f6fcf5; margin-top:0px}
+#logo2{height:69px;padding-left:9px;padding-top:4px;background:#f6fcf5;}
+#bar{ background:#108d44; height:32px; padding-top:3px; ;padding-left:0px;}
+#bar2{ background:#108d44; height:32px; padding-top:6px; ;padding-left:0px;}
+#bar h2{font-size:17px; color: #ffffff; font-family: "Myriad Web Pro", myriad-pro, myriad-pro-1, myriad-pro-2, Verdana, sans-serif; padding-left:0px}
+#bar2 h2{font-size:17px; color: #ffffff; font-family: "Myriad Web Pro", myriad-pro, myriad-pro-1, myriad-pro-2, Verdana, sans-serif; padding-left:1px}
+#projects{padding-top:25px;}
+#projects p{font-size:10px}
+#news h4{padding-top: 0px; font-size: 15px; font-weight:bold} 
+#intro{padding-right:10px; height:80px;padding-bottom:0px;}
+#wrapper #content h3{margin-bottom: 10px; font-size:17px; font-weight:normal ; margin-top:0px; padding-bottom:10px; padding-left:0px; color:#108d44}
+#wrapper #content h4{margin-bottom: 5px; font-size:14px; font-weight:bold ; margin-top:0px}
+#wrapper #content h5{margin-bottom: 5px; font-size:13px; font-weight:bold ; margin-top:0px; margin-right:16px}
+
+#wrapper2 h3{margin-bottom: 10px; font-size:17px; font-weight:normal ; margin-top:10px; padding-bottom:10px; padding-left:0px; color:#108d44}
+#wrapper2 h4{margin-bottom: 5px; font-size:13px; font-weight:bold ; margin-top:5px; margin-right:10px}
+
+/****************************************
+ * IU Footer
+ ****************************************/
+
+#footer-wrapper {
+	background-color: #fff; 
+	height:50px;
+	padding-top:50px;
+	border-top:6px solid #108d44;
+}
+#footer #copyright #blockiu a {
+	background:#ffffff;
+}
+#footer #copyright #blockiu a img {
+	display: block;
+}
+#footer #copyright p {
+	color: #000;
+}
+#footer #copyright a {
+	color: #900;
+	text-decoration: underline;
+}
+
+#cp {
+	padding-top:5px;
+	font-size: 10px;
+}

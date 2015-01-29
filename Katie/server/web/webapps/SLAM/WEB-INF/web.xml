@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+    <listener>
+        <listener-class>iu.slam.utils.MyContextListener</listener-class>
+    </listener>
+    
+    <listener>
+        <listener-class>iu.slam.utils.MyHttpSessionListener</listener-class>
+    </listener>
+    
+    <filter>
+        <filter-name>struts2</filter-name>
+        <filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+    </filter>
+    
+    <filter-mapping>
+        <filter-name>struts2</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <session-config>
+        <session-timeout>
+            5
+        </session-timeout>
+    </session-config>
+ 
+    <welcome-file-list>
+        <welcome-file>home.html</welcome-file>
+    </welcome-file-list>
+    
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name></web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>katiePeople</role-name>
+        </auth-constraint>
+    </security-constraint>
+    
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name></web-resource-name>
+            <url-pattern>/driveKatie</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
+    
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name></web-resource-name>
+            <url-pattern>/datalog</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
+    
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name></web-resource-name>
+            <url-pattern>/infoControl</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
+    
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name></web-resource-name>
+            <url-pattern>/liveData</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
+    
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name></web-resource-name>
+            <url-pattern>/uploadPhoto</url-pattern>
+        </web-resource-collection>
+    </security-constraint>
+
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>Katie Realm</realm-name>
+    </login-config>
+
+    <security-role>
+        <role-name>katiePeople</role-name>
+    </security-role>
+    
+</web-app>

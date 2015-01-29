@@ -1,0 +1,29 @@
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <h4 class="panel-title">Data Graph</h4>
+    </div>
+    <div class="panel-body">
+        <div ng-controller="DataGraphControl" id="DataGraphControl">
+            <p class="input-group" style="width: 200px;">
+                <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="dt" 
+                       is-open="opened" min="'2012-01-01'" max="'2016-01-01'" 
+                       datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close"
+                       show-button-bar="false" show-weeks="false"
+                       ng-change="change()"/>
+                <span class="input-group-btn">
+                    <button class="btn btn-default" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                </span>
+            </p>
+
+            <p>
+            <div ng-model="mytime" ng-change="changed()" style="display:inline-block;">
+                <timepicker hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></timepicker>
+            </div>
+            </p>
+
+            <button ng-click="showGraph()" class="btn btn-default">Show Graph</button>
+        </div>
+
+        <div id="graph-container" style="margin: 0 auto"></div>
+    </div>
+</div>
