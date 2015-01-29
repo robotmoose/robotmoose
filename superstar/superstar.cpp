@@ -17,6 +17,7 @@
 #include "osl/sha2_auth.h" /* for authentication */
 #include "osl/sha2.cpp" /* for easier linking */
 
+const std::string ADDRESS="0.0.0.0:8081";
 
 /// Utility: integer to string
 std::string my_itos(int i) {
@@ -209,16 +210,12 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 */
 void *thread_code(void *) {
   struct mg_server *server= mg_create_server(NULL, http_handler);
-#ifdef LISTEN80 /* production server */
-  mg_set_option(server, "listening_port", "80");
-#else /* normal development case */
-  mg_set_option(server, "listening_port", "8080");
-#endif
+  mg_set_option(server, "listening_port", ADDRESS.c_str());
   mg_set_option(server, "document_root", "web"); // files served from here
 
   printf("OK, listening!  Visit http://localhost:%s to see the site!\n",
   	mg_get_option(server, "listening_port"));
-  
+ 
   while (1) {
   	mg_poll_server(server,1000);
   }
@@ -226,7 +223,8 @@ void *thread_code(void *) {
 }
 
 
-int main(void) {
+int main(void)
+{
   /* Start threads to be redundant servers.  This seems to do nothing. */
   for (int thread=0;thread<0;thread++)
   {
