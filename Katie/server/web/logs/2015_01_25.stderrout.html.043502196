@@ -1,0 +1,478 @@
+2015-01-24 19:29:41.413:INFO:oejs.Server:main: jetty-9.1.2.v20140210
+2015-01-24 19:29:41.433:INFO:oejdp.ScanningAppProvider:main: Deployment monitor [file:/home/arsh/ITEST/katie-explore/server/web/webapps/] at interval 1
+2015-01-24 19:29:42.980:INFO:oeja.AnnotationConfiguration:main: Scanned 1 container path jars, 30 WEB-INF/lib jars, 1 WEB-INF/classes dirs in 1284ms for context o.e.j.w.WebAppContext@3363ab6d{/SLAM,file:/home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/,STARTING}{/SLAM}
+Jan 24, 2015 7:29:43 PM iu.slam.utils.UtilLog logEnvironment
+INFO: <p style='color:#919191;'>{iu.slam.utils.MyContextListener}:: Servlet Context Path: /home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/</p>
+Jan 24, 2015 7:29:43 PM org.hibernate.annotations.common.Version <clinit>
+INFO: HCANN000001: Hibernate Commons Annotations {4.0.2.Final}
+Jan 24, 2015 7:29:43 PM org.hibernate.Version logVersion
+INFO: HHH000412: Hibernate Core {4.2.2.Final}
+Jan 24, 2015 7:29:43 PM org.hibernate.cfg.Environment <clinit>
+INFO: HHH000206: hibernate.properties not found
+Jan 24, 2015 7:29:43 PM org.hibernate.cfg.Environment buildBytecodeProvider
+INFO: HHH000021: Bytecode provider name : javassist
+Jan 24, 2015 7:29:43 PM org.hibernate.service.jdbc.connections.internal.ConnectionProviderInitiator instantiateExplicitConnectionProvider
+INFO: HHH000130: Instantiating explicit connection provider: org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider
+Jan 24, 2015 7:29:43 PM org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider configure
+INFO: HHH010002: C3P0 using driver: com.mysql.jdbc.Driver at URL: jdbc:mysql://127.0.0.1:3306/slam?autoReconnect=true
+Jan 24, 2015 7:29:43 PM org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider configure
+INFO: HHH000046: Connection properties: {user=root, password=****}
+Jan 24, 2015 7:29:43 PM org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider configure
+INFO: HHH000006: Autocommit mode: false
+Jan 24, 2015 7:29:43 PM com.mchange.v2.log.MLog <clinit>
+INFO: MLog clients using java 1.4+ standard logging.
+Jan 24, 2015 7:29:43 PM com.mchange.v2.c3p0.C3P0Registry banner
+INFO: Initializing c3p0-0.9.1 [built 16-January-2007 14:46:42; debug? true; trace: 10]
+Jan 24, 2015 7:29:44 PM com.mchange.v2.c3p0.impl.AbstractPoolBackedDataSource getPoolManager
+INFO: Initializing c3p0 pool... com.mchange.v2.c3p0.PoolBackedDataSource@3a195c7d [ connectionPoolDataSource -> com.mchange.v2.c3p0.WrapperConnectionPoolDataSource@f2be94a0 [ acquireIncrement -> 3, acquireRetryAttempts -> 30, acquireRetryDelay -> 1000, autoCommitOnClose -> false, automaticTestTable -> null, breakAfterAcquireFailure -> false, checkoutTimeout -> 0, connectionCustomizerClassName -> null, connectionTesterClassName -> com.mchange.v2.c3p0.impl.DefaultConnectionTester, debugUnreturnedConnectionStackTraces -> false, factoryClassLocation -> null, forceIgnoreUnresolvedTransactions -> false, identityToken -> z8kfsx978p67161qk07ul|3613ba6d, idleConnectionTestPeriod -> 600, initialPoolSize -> 3, maxAdministrativeTaskTime -> 0, maxConnectionAge -> 0, maxIdleTime -> 0, maxIdleTimeExcessConnections -> 0, maxPoolSize -> 15, maxStatements -> 0, maxStatementsPerConnection -> 0, minPoolSize -> 3, nestedDataSource -> com.mchange.v2.c3p0.DriverManagerDataSource@1263deb4 [ description -> null, driverClass -> null, factoryClassLocation -> null, identityToken -> z8kfsx978p67161qk07ul|488f7b56, jdbcUrl -> jdbc:mysql://127.0.0.1:3306/slam?autoReconnect=true, properties -> {user=******, password=******} ], preferredTestQuery -> null, propertyCycle -> 0, testConnectionOnCheckin -> true, testConnectionOnCheckout -> false, unreturnedConnectionTimeout -> 0, usesTraditionalReflectiveProxies -> false; userOverrides: {} ], dataSourceName -> null, factoryClassLocation -> null, identityToken -> z8kfsx978p67161qk07ul|17b1be96, numHelperThreads -> 3 ]
+Jan 24, 2015 7:32:13 PM com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask run
+WARNING: com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask@45e83537 -- Acquisition Attempt Failed!!! Clearing pending acquires. While trying to acquire a needed new resource, we failed to succeed more than the maximum number of allowed acquisition attempts (30). Last acquisition attempt exception: 
+com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException: Could not create connection to database server. Attempted reconnect 3 times. Giving up.
+	at sun.reflect.GeneratedConstructorAccessor11.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1015)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:989)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:975)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:920)
+	at com.mysql.jdbc.ConnectionImpl.connectWithRetries(ConnectionImpl.java:2385)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2306)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:834)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:47)
+	at sun.reflect.GeneratedConstructorAccessor10.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:416)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:317)
+	at com.mchange.v2.c3p0.DriverManagerDataSource.getConnection(DriverManagerDataSource.java:135)
+	at com.mchange.v2.c3p0.WrapperConnectionPoolDataSource.getPooledConnection(WrapperConnectionPoolDataSource.java:182)
+	at com.mchange.v2.c3p0.WrapperConnectionPoolDataSource.getPooledConnection(WrapperConnectionPoolDataSource.java:171)
+	at com.mchange.v2.c3p0.impl.C3P0PooledConnectionPool$1PooledConnectionResourcePoolManager.acquireResource(C3P0PooledConnectionPool.java:137)
+	at com.mchange.v2.resourcepool.BasicResourcePool.doAcquire(BasicResourcePool.java:1014)
+	at com.mchange.v2.resourcepool.BasicResourcePool.access$800(BasicResourcePool.java:32)
+	at com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask.run(BasicResourcePool.java:1810)
+	at com.mchange.v2.async.ThreadPoolAsynchronousRunner$PoolThread.run(ThreadPoolAsynchronousRunner.java:547)
+Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:1121)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:355)
+	at com.mysql.jdbc.ConnectionImpl.coreConnect(ConnectionImpl.java:2479)
+	at com.mysql.jdbc.ConnectionImpl.connectWithRetries(ConnectionImpl.java:2324)
+	... 17 more
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:339)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:200)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:182)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:579)
+	at java.net.Socket.connect(Socket.java:528)
+	at java.net.Socket.<init>(Socket.java:425)
+	at java.net.Socket.<init>(Socket.java:241)
+	at com.mysql.jdbc.StandardSocketFactory.connect(StandardSocketFactory.java:259)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:305)
+	... 19 more
+
+Jan 24, 2015 7:32:13 PM com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask run
+WARNING: com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask@108a6823 -- Acquisition Attempt Failed!!! Clearing pending acquires. While trying to acquire a needed new resource, we failed to succeed more than the maximum number of allowed acquisition attempts (30). Last acquisition attempt exception: 
+com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException: Could not create connection to database server. Attempted reconnect 3 times. Giving up.
+	at sun.reflect.GeneratedConstructorAccessor11.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1015)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:989)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:975)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:920)
+	at com.mysql.jdbc.ConnectionImpl.connectWithRetries(ConnectionImpl.java:2385)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2306)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:834)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:47)
+	at sun.reflect.GeneratedConstructorAccessor10.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:416)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:317)
+	at com.mchange.v2.c3p0.DriverManagerDataSource.getConnection(DriverManagerDataSource.java:135)
+	at com.mchange.v2.c3p0.WrapperConnectionPoolDataSource.getPooledConnection(WrapperConnectionPoolDataSource.java:182)
+	at com.mchange.v2.c3p0.WrapperConnectionPoolDataSource.getPooledConnection(WrapperConnectionPoolDataSource.java:171)
+	at com.mchange.v2.c3p0.impl.C3P0PooledConnectionPool$1PooledConnectionResourcePoolManager.acquireResource(C3P0PooledConnectionPool.java:137)
+	at com.mchange.v2.resourcepool.BasicResourcePool.doAcquire(BasicResourcePool.java:1014)
+	at com.mchange.v2.resourcepool.BasicResourcePool.access$800(BasicResourcePool.java:32)
+	at com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask.run(BasicResourcePool.java:1810)
+	at com.mchange.v2.async.ThreadPoolAsynchronousRunner$PoolThread.run(ThreadPoolAsynchronousRunner.java:547)
+Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:1121)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:355)
+	at com.mysql.jdbc.ConnectionImpl.coreConnect(ConnectionImpl.java:2479)
+	at com.mysql.jdbc.ConnectionImpl.connectWithRetries(ConnectionImpl.java:2324)
+	... 17 more
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:339)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:200)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:182)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:579)
+	at java.net.Socket.connect(Socket.java:528)
+	at java.net.Socket.<init>(Socket.java:425)
+	at java.net.Socket.<init>(Socket.java:241)
+	at com.mysql.jdbc.StandardSocketFactory.connect(StandardSocketFactory.java:259)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:305)
+	... 19 more
+
+Jan 24, 2015 7:32:13 PM com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask run
+WARNING: com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask@6ebada50 -- Acquisition Attempt Failed!!! Clearing pending acquires. While trying to acquire a needed new resource, we failed to succeed more than the maximum number of allowed acquisition attempts (30). Last acquisition attempt exception: 
+com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException: Could not create connection to database server. Attempted reconnect 3 times. Giving up.
+	at sun.reflect.GeneratedConstructorAccessor11.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1015)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:989)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:975)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:920)
+	at com.mysql.jdbc.ConnectionImpl.connectWithRetries(ConnectionImpl.java:2385)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2306)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:834)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:47)
+	at sun.reflect.GeneratedConstructorAccessor10.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:416)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:317)
+	at com.mchange.v2.c3p0.DriverManagerDataSource.getConnection(DriverManagerDataSource.java:135)
+	at com.mchange.v2.c3p0.WrapperConnectionPoolDataSource.getPooledConnection(WrapperConnectionPoolDataSource.java:182)
+	at com.mchange.v2.c3p0.WrapperConnectionPoolDataSource.getPooledConnection(WrapperConnectionPoolDataSource.java:171)
+	at com.mchange.v2.c3p0.impl.C3P0PooledConnectionPool$1PooledConnectionResourcePoolManager.acquireResource(C3P0PooledConnectionPool.java:137)
+	at com.mchange.v2.resourcepool.BasicResourcePool.doAcquire(BasicResourcePool.java:1014)
+	at com.mchange.v2.resourcepool.BasicResourcePool.access$800(BasicResourcePool.java:32)
+	at com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask.run(BasicResourcePool.java:1810)
+	at com.mchange.v2.async.ThreadPoolAsynchronousRunner$PoolThread.run(ThreadPoolAsynchronousRunner.java:547)
+Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at sun.reflect.GeneratedConstructorAccessor7.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:1121)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:355)
+	at com.mysql.jdbc.ConnectionImpl.coreConnect(ConnectionImpl.java:2479)
+	at com.mysql.jdbc.ConnectionImpl.connectWithRetries(ConnectionImpl.java:2324)
+	... 17 more
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:339)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:200)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:182)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:579)
+	at java.net.Socket.connect(Socket.java:528)
+	at java.net.Socket.<init>(Socket.java:425)
+	at java.net.Socket.<init>(Socket.java:241)
+	at com.mysql.jdbc.StandardSocketFactory.connect(StandardSocketFactory.java:259)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:305)
+	... 19 more
+
+Jan 24, 2015 7:32:13 PM org.hibernate.engine.jdbc.internal.JdbcServicesImpl configure
+WARN: HHH000342: Could not obtain connection to query metadata : Connections could not be acquired from the underlying database!
+Jan 24, 2015 7:32:13 PM org.hibernate.dialect.Dialect <init>
+INFO: HHH000400: Using dialect: org.hibernate.dialect.MySQLDialect
+Jan 24, 2015 7:32:13 PM org.hibernate.engine.jdbc.internal.LobCreatorBuilder useContextualLobCreation
+INFO: HHH000422: Disabling contextual LOB creation as connection was null
+Jan 24, 2015 7:32:13 PM org.hibernate.mapping.RootClass checkCompositeIdentifier
+WARN: HHH000038: Composite-id class does not override equals(): iu.slam.models.PhotoTags
+Jan 24, 2015 7:32:13 PM org.hibernate.mapping.RootClass checkCompositeIdentifier
+WARN: HHH000039: Composite-id class does not override hashCode(): iu.slam.models.PhotoTags
+Jan 24, 2015 7:32:13 PM org.hibernate.engine.transaction.internal.TransactionFactoryInitiator initiateService
+INFO: HHH000399: Using default transaction strategy (direct JDBC transactions)
+Jan 24, 2015 7:32:13 PM org.hibernate.hql.internal.ast.ASTQueryTranslatorFactory <init>
+INFO: HHH000397: Using ASTQueryTranslatorFactory
+Jan 24, 2015 7:32:13 PM iu.slam.utils.UtilLog logDatabase
+INFO: <p style='color:#8a00ce;'>{class iu.slam.database.DatabaseHandler}:: SessionFactory created</p>
+2015-01-24 19:32:13.804:WARN:oejuc.AbstractLifeCycle:main: FAILED o.e.j.w.WebAppContext@3363ab6d{/SLAM,file:/home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/,STARTING}{/SLAM}: java.lang.NoClassDefFoundError: iu/slam/websockets/TimerCheckDataIdle
+java.lang.NoClassDefFoundError: iu/slam/websockets/TimerCheckDataIdle
+	at iu.slam.utils.MyContextListener.contextInitialized(MyContextListener.java:31)
+	at org.eclipse.jetty.server.handler.ContextHandler.callContextInitialized(ContextHandler.java:801)
+	at org.eclipse.jetty.servlet.ServletContextHandler.callContextInitialized(ServletContextHandler.java:446)
+	at org.eclipse.jetty.server.handler.ContextHandler.startContext(ContextHandler.java:793)
+	at org.eclipse.jetty.servlet.ServletContextHandler.startContext(ServletContextHandler.java:296)
+	at org.eclipse.jetty.webapp.WebAppContext.startContext(WebAppContext.java:1347)
+	at org.eclipse.jetty.server.handler.ContextHandler.doStart(ContextHandler.java:745)
+	at org.eclipse.jetty.webapp.WebAppContext.doStart(WebAppContext.java:492)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.start(ContainerLifeCycle.java:117)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.addBean(ContainerLifeCycle.java:281)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.addBean(ContainerLifeCycle.java:213)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.updateBeans(ContainerLifeCycle.java:763)
+	at org.eclipse.jetty.server.handler.HandlerCollection.setHandlers(HandlerCollection.java:89)
+	at org.eclipse.jetty.server.handler.ContextHandlerCollection.setHandlers(ContextHandlerCollection.java:144)
+	at org.eclipse.jetty.server.handler.HandlerCollection.addHandler(HandlerCollection.java:155)
+	at org.eclipse.jetty.deploy.bindings.StandardDeployer.processBinding(StandardDeployer.java:41)
+	at org.eclipse.jetty.deploy.AppLifeCycle.runBindings(AppLifeCycle.java:186)
+	at org.eclipse.jetty.deploy.DeploymentManager.requestAppGoal(DeploymentManager.java:498)
+	at org.eclipse.jetty.deploy.DeploymentManager.addApp(DeploymentManager.java:146)
+	at org.eclipse.jetty.deploy.providers.ScanningAppProvider.fileAdded(ScanningAppProvider.java:180)
+	at org.eclipse.jetty.deploy.providers.ScanningAppProvider$1.fileAdded(ScanningAppProvider.java:64)
+	at org.eclipse.jetty.util.Scanner.reportAddition(Scanner.java:605)
+	at org.eclipse.jetty.util.Scanner.reportDifferences(Scanner.java:528)
+	at org.eclipse.jetty.util.Scanner.scan(Scanner.java:391)
+	at org.eclipse.jetty.util.Scanner.doStart(Scanner.java:313)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.deploy.providers.ScanningAppProvider.doStart(ScanningAppProvider.java:150)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.deploy.DeploymentManager.startAppProvider(DeploymentManager.java:560)
+	at org.eclipse.jetty.deploy.DeploymentManager.doStart(DeploymentManager.java:235)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.start(ContainerLifeCycle.java:117)
+	at org.eclipse.jetty.server.Server.start(Server.java:355)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.doStart(ContainerLifeCycle.java:99)
+	at org.eclipse.jetty.server.handler.AbstractHandler.doStart(AbstractHandler.java:60)
+	at org.eclipse.jetty.server.Server.doStart(Server.java:324)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.xml.XmlConfiguration$1.run(XmlConfiguration.java:1250)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.jetty.xml.XmlConfiguration.main(XmlConfiguration.java:1174)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.eclipse.jetty.start.Main.invokeMain(Main.java:297)
+	at org.eclipse.jetty.start.Main.start(Main.java:724)
+	at org.eclipse.jetty.start.Main.main(Main.java:103)
+Caused by: 
+java.lang.ClassNotFoundException: iu.slam.websockets.TimerCheckDataIdle
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:366)
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:355)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:354)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:425)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:358)
+	at org.eclipse.jetty.webapp.WebAppClassLoader.loadClass(WebAppClassLoader.java:436)
+	at org.eclipse.jetty.webapp.WebAppClassLoader.loadClass(WebAppClassLoader.java:389)
+	at iu.slam.utils.MyContextListener.contextInitialized(MyContextListener.java:31)
+	at org.eclipse.jetty.server.handler.ContextHandler.callContextInitialized(ContextHandler.java:801)
+	at org.eclipse.jetty.servlet.ServletContextHandler.callContextInitialized(ServletContextHandler.java:446)
+	at org.eclipse.jetty.server.handler.ContextHandler.startContext(ContextHandler.java:793)
+	at org.eclipse.jetty.servlet.ServletContextHandler.startContext(ServletContextHandler.java:296)
+	at org.eclipse.jetty.webapp.WebAppContext.startContext(WebAppContext.java:1347)
+	at org.eclipse.jetty.server.handler.ContextHandler.doStart(ContextHandler.java:745)
+	at org.eclipse.jetty.webapp.WebAppContext.doStart(WebAppContext.java:492)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.start(ContainerLifeCycle.java:117)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.addBean(ContainerLifeCycle.java:281)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.addBean(ContainerLifeCycle.java:213)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.updateBeans(ContainerLifeCycle.java:763)
+	at org.eclipse.jetty.server.handler.HandlerCollection.setHandlers(HandlerCollection.java:89)
+	at org.eclipse.jetty.server.handler.ContextHandlerCollection.setHandlers(ContextHandlerCollection.java:144)
+	at org.eclipse.jetty.server.handler.HandlerCollection.addHandler(HandlerCollection.java:155)
+	at org.eclipse.jetty.deploy.bindings.StandardDeployer.processBinding(StandardDeployer.java:41)
+	at org.eclipse.jetty.deploy.AppLifeCycle.runBindings(AppLifeCycle.java:186)
+	at org.eclipse.jetty.deploy.DeploymentManager.requestAppGoal(DeploymentManager.java:498)
+	at org.eclipse.jetty.deploy.DeploymentManager.addApp(DeploymentManager.java:146)
+	at org.eclipse.jetty.deploy.providers.ScanningAppProvider.fileAdded(ScanningAppProvider.java:180)
+	at org.eclipse.jetty.deploy.providers.ScanningAppProvider$1.fileAdded(ScanningAppProvider.java:64)
+	at org.eclipse.jetty.util.Scanner.reportAddition(Scanner.java:605)
+	at org.eclipse.jetty.util.Scanner.reportDifferences(Scanner.java:528)
+	at org.eclipse.jetty.util.Scanner.scan(Scanner.java:391)
+	at org.eclipse.jetty.util.Scanner.doStart(Scanner.java:313)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.deploy.providers.ScanningAppProvider.doStart(ScanningAppProvider.java:150)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.deploy.DeploymentManager.startAppProvider(DeploymentManager.java:560)
+	at org.eclipse.jetty.deploy.DeploymentManager.doStart(DeploymentManager.java:235)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.start(ContainerLifeCycle.java:117)
+	at org.eclipse.jetty.server.Server.start(Server.java:355)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.doStart(ContainerLifeCycle.java:99)
+	at org.eclipse.jetty.server.handler.AbstractHandler.doStart(AbstractHandler.java:60)
+	at org.eclipse.jetty.server.Server.doStart(Server.java:324)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.xml.XmlConfiguration$1.run(XmlConfiguration.java:1250)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.jetty.xml.XmlConfiguration.main(XmlConfiguration.java:1174)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.eclipse.jetty.start.Main.invokeMain(Main.java:297)
+	at org.eclipse.jetty.start.Main.start(Main.java:724)
+	at org.eclipse.jetty.start.Main.main(Main.java:103)
+2015-01-24 19:32:13.808:WARN:oejd.DeploymentManager:main: Unable to reach node goal: started
+java.lang.NoClassDefFoundError: iu/slam/websockets/TimerCheckDataIdle
+	at iu.slam.utils.MyContextListener.contextInitialized(MyContextListener.java:31)
+	at org.eclipse.jetty.server.handler.ContextHandler.callContextInitialized(ContextHandler.java:801)
+	at org.eclipse.jetty.servlet.ServletContextHandler.callContextInitialized(ServletContextHandler.java:446)
+	at org.eclipse.jetty.server.handler.ContextHandler.startContext(ContextHandler.java:793)
+	at org.eclipse.jetty.servlet.ServletContextHandler.startContext(ServletContextHandler.java:296)
+	at org.eclipse.jetty.webapp.WebAppContext.startContext(WebAppContext.java:1347)
+	at org.eclipse.jetty.server.handler.ContextHandler.doStart(ContextHandler.java:745)
+	at org.eclipse.jetty.webapp.WebAppContext.doStart(WebAppContext.java:492)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.start(ContainerLifeCycle.java:117)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.addBean(ContainerLifeCycle.java:281)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.addBean(ContainerLifeCycle.java:213)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.updateBeans(ContainerLifeCycle.java:763)
+	at org.eclipse.jetty.server.handler.HandlerCollection.setHandlers(HandlerCollection.java:89)
+	at org.eclipse.jetty.server.handler.ContextHandlerCollection.setHandlers(ContextHandlerCollection.java:144)
+	at org.eclipse.jetty.server.handler.HandlerCollection.addHandler(HandlerCollection.java:155)
+	at org.eclipse.jetty.deploy.bindings.StandardDeployer.processBinding(StandardDeployer.java:41)
+	at org.eclipse.jetty.deploy.AppLifeCycle.runBindings(AppLifeCycle.java:186)
+	at org.eclipse.jetty.deploy.DeploymentManager.requestAppGoal(DeploymentManager.java:498)
+	at org.eclipse.jetty.deploy.DeploymentManager.addApp(DeploymentManager.java:146)
+	at org.eclipse.jetty.deploy.providers.ScanningAppProvider.fileAdded(ScanningAppProvider.java:180)
+	at org.eclipse.jetty.deploy.providers.ScanningAppProvider$1.fileAdded(ScanningAppProvider.java:64)
+	at org.eclipse.jetty.util.Scanner.reportAddition(Scanner.java:605)
+	at org.eclipse.jetty.util.Scanner.reportDifferences(Scanner.java:528)
+	at org.eclipse.jetty.util.Scanner.scan(Scanner.java:391)
+	at org.eclipse.jetty.util.Scanner.doStart(Scanner.java:313)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.deploy.providers.ScanningAppProvider.doStart(ScanningAppProvider.java:150)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.deploy.DeploymentManager.startAppProvider(DeploymentManager.java:560)
+	at org.eclipse.jetty.deploy.DeploymentManager.doStart(DeploymentManager.java:235)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.start(ContainerLifeCycle.java:117)
+	at org.eclipse.jetty.server.Server.start(Server.java:355)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.doStart(ContainerLifeCycle.java:99)
+	at org.eclipse.jetty.server.handler.AbstractHandler.doStart(AbstractHandler.java:60)
+	at org.eclipse.jetty.server.Server.doStart(Server.java:324)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.xml.XmlConfiguration$1.run(XmlConfiguration.java:1250)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.jetty.xml.XmlConfiguration.main(XmlConfiguration.java:1174)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.eclipse.jetty.start.Main.invokeMain(Main.java:297)
+	at org.eclipse.jetty.start.Main.start(Main.java:724)
+	at org.eclipse.jetty.start.Main.main(Main.java:103)
+Caused by: 
+java.lang.ClassNotFoundException: iu.slam.websockets.TimerCheckDataIdle
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:366)
+	at java.net.URLClassLoader$1.run(URLClassLoader.java:355)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:354)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:425)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:358)
+	at org.eclipse.jetty.webapp.WebAppClassLoader.loadClass(WebAppClassLoader.java:436)
+	at org.eclipse.jetty.webapp.WebAppClassLoader.loadClass(WebAppClassLoader.java:389)
+	at iu.slam.utils.MyContextListener.contextInitialized(MyContextListener.java:31)
+	at org.eclipse.jetty.server.handler.ContextHandler.callContextInitialized(ContextHandler.java:801)
+	at org.eclipse.jetty.servlet.ServletContextHandler.callContextInitialized(ServletContextHandler.java:446)
+	at org.eclipse.jetty.server.handler.ContextHandler.startContext(ContextHandler.java:793)
+	at org.eclipse.jetty.servlet.ServletContextHandler.startContext(ServletContextHandler.java:296)
+	at org.eclipse.jetty.webapp.WebAppContext.startContext(WebAppContext.java:1347)
+	at org.eclipse.jetty.server.handler.ContextHandler.doStart(ContextHandler.java:745)
+	at org.eclipse.jetty.webapp.WebAppContext.doStart(WebAppContext.java:492)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.start(ContainerLifeCycle.java:117)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.addBean(ContainerLifeCycle.java:281)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.addBean(ContainerLifeCycle.java:213)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.updateBeans(ContainerLifeCycle.java:763)
+	at org.eclipse.jetty.server.handler.HandlerCollection.setHandlers(HandlerCollection.java:89)
+	at org.eclipse.jetty.server.handler.ContextHandlerCollection.setHandlers(ContextHandlerCollection.java:144)
+	at org.eclipse.jetty.server.handler.HandlerCollection.addHandler(HandlerCollection.java:155)
+	at org.eclipse.jetty.deploy.bindings.StandardDeployer.processBinding(StandardDeployer.java:41)
+	at org.eclipse.jetty.deploy.AppLifeCycle.runBindings(AppLifeCycle.java:186)
+	at org.eclipse.jetty.deploy.DeploymentManager.requestAppGoal(DeploymentManager.java:498)
+	at org.eclipse.jetty.deploy.DeploymentManager.addApp(DeploymentManager.java:146)
+	at org.eclipse.jetty.deploy.providers.ScanningAppProvider.fileAdded(ScanningAppProvider.java:180)
+	at org.eclipse.jetty.deploy.providers.ScanningAppProvider$1.fileAdded(ScanningAppProvider.java:64)
+	at org.eclipse.jetty.util.Scanner.reportAddition(Scanner.java:605)
+	at org.eclipse.jetty.util.Scanner.reportDifferences(Scanner.java:528)
+	at org.eclipse.jetty.util.Scanner.scan(Scanner.java:391)
+	at org.eclipse.jetty.util.Scanner.doStart(Scanner.java:313)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.deploy.providers.ScanningAppProvider.doStart(ScanningAppProvider.java:150)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.deploy.DeploymentManager.startAppProvider(DeploymentManager.java:560)
+	at org.eclipse.jetty.deploy.DeploymentManager.doStart(DeploymentManager.java:235)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.start(ContainerLifeCycle.java:117)
+	at org.eclipse.jetty.server.Server.start(Server.java:355)
+	at org.eclipse.jetty.util.component.ContainerLifeCycle.doStart(ContainerLifeCycle.java:99)
+	at org.eclipse.jetty.server.handler.AbstractHandler.doStart(AbstractHandler.java:60)
+	at org.eclipse.jetty.server.Server.doStart(Server.java:324)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:69)
+	at org.eclipse.jetty.xml.XmlConfiguration$1.run(XmlConfiguration.java:1250)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.jetty.xml.XmlConfiguration.main(XmlConfiguration.java:1174)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.eclipse.jetty.start.Main.invokeMain(Main.java:297)
+	at org.eclipse.jetty.start.Main.start(Main.java:724)
+	at org.eclipse.jetty.start.Main.main(Main.java:103)
+2015-01-24 19:32:13.821:INFO:oejs.ServerConnector:main: Started ServerConnector@6b501f3e{HTTP/1.1}{0.0.0.0:8080}
+2015-01-24 19:32:13.822:WARN:oejuc.FileNoticeLifeCycleListener:main: 
+java.io.FileNotFoundException: /home/arsh/ITEST/katie-explore/server/web/jetty.state (No such file or directory)
+	at java.io.FileOutputStream.open(Native Method)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:221)
+	at java.io.FileOutputStream.<init>(FileOutputStream.java:142)
+	at java.io.FileWriter.<init>(FileWriter.java:78)
+	at org.eclipse.jetty.util.component.FileNoticeLifeCycleListener.writeState(FileNoticeLifeCycleListener.java:45)
+	at org.eclipse.jetty.util.component.FileNoticeLifeCycleListener.lifeCycleStarted(FileNoticeLifeCycleListener.java:62)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.setStarted(AbstractLifeCycle.java:179)
+	at org.eclipse.jetty.util.component.AbstractLifeCycle.start(AbstractLifeCycle.java:70)
+	at org.eclipse.jetty.xml.XmlConfiguration$1.run(XmlConfiguration.java:1250)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at org.eclipse.jetty.xml.XmlConfiguration.main(XmlConfiguration.java:1174)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:606)
+	at org.eclipse.jetty.start.Main.invokeMain(Main.java:297)
+	at org.eclipse.jetty.start.Main.start(Main.java:724)
+	at org.eclipse.jetty.start.Main.main(Main.java:103)
+2015-01-24 19:32:30.050:INFO:oeja.AnnotationConfiguration:Scanner-0: Scanned 1 container path jars, 30 WEB-INF/lib jars, 1 WEB-INF/classes dirs in 2039ms for context o.e.j.w.WebAppContext@3eb25fe5{/SLAM,file:/home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/,STARTING}{/SLAM}
+Jan 24, 2015 7:32:30 PM iu.slam.utils.UtilLog logEnvironment
+INFO: <p style='color:#919191;'>{iu.slam.utils.MyContextListener}:: Servlet Context Path: /home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/</p>
+Jan 24, 2015 7:32:30 PM org.hibernate.annotations.common.Version <clinit>
+INFO: HCANN000001: Hibernate Commons Annotations {4.0.2.Final}
+Jan 24, 2015 7:32:30 PM org.hibernate.Version logVersion
+INFO: HHH000412: Hibernate Core {4.2.2.Final}
+Jan 24, 2015 7:32:30 PM org.hibernate.cfg.Environment <clinit>
+INFO: HHH000206: hibernate.properties not found
+Jan 24, 2015 7:32:30 PM org.hibernate.cfg.Environment buildBytecodeProvider
+INFO: HHH000021: Bytecode provider name : javassist
+Jan 24, 2015 7:32:30 PM org.hibernate.service.jdbc.connections.internal.ConnectionProviderInitiator instantiateExplicitConnectionProvider
+INFO: HHH000130: Instantiating explicit connection provider: org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider
+Jan 24, 2015 7:32:30 PM org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider configure
+INFO: HHH010002: C3P0 using driver: com.mysql.jdbc.Driver at URL: jdbc:mysql://127.0.0.1:3306/slam?autoReconnect=true
+Jan 24, 2015 7:32:30 PM org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider configure
+INFO: HHH000046: Connection properties: {user=root, password=****}
+Jan 24, 2015 7:32:30 PM org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider configure
+INFO: HHH000006: Autocommit mode: false
+Jan 24, 2015 7:32:30 PM com.mchange.v2.log.MLog <clinit>
+INFO: MLog clients using java 1.4+ standard logging.
+Jan 24, 2015 7:32:30 PM com.mchange.v2.c3p0.C3P0Registry banner
+INFO: Initializing c3p0-0.9.1 [built 16-January-2007 14:46:42; debug? true; trace: 10]
+Jan 24, 2015 7:32:30 PM com.mchange.v2.c3p0.management.ActiveManagementCoordinator attemptManageC3P0Registry
+WARNING: A C3P0Registry mbean is already registered. This probably means that an application using c3p0 was undeployed, but not all PooledDataSources were closed prior to undeployment. This may lead to resource leaks over time. Please take care to close all PooledDataSources.
+Jan 24, 2015 7:32:30 PM com.mchange.v2.c3p0.impl.AbstractPoolBackedDataSource getPoolManager
+INFO: Initializing c3p0 pool... com.mchange.v2.c3p0.PoolBackedDataSource@41e62445 [ connectionPoolDataSource -> com.mchange.v2.c3p0.WrapperConnectionPoolDataSource@ef76e34b [ acquireIncrement -> 3, acquireRetryAttempts -> 30, acquireRetryDelay -> 1000, autoCommitOnClose -> false, automaticTestTable -> null, breakAfterAcquireFailure -> false, checkoutTimeout -> 0, connectionCustomizerClassName -> null, connectionTesterClassName -> com.mchange.v2.c3p0.impl.DefaultConnectionTester, debugUnreturnedConnectionStackTraces -> false, factoryClassLocation -> null, forceIgnoreUnresolvedTransactions -> false, identityToken -> z8kfsx978p9rm3qd7j6k|a523fc4, idleConnectionTestPeriod -> 600, initialPoolSize -> 3, maxAdministrativeTaskTime -> 0, maxConnectionAge -> 0, maxIdleTime -> 0, maxIdleTimeExcessConnections -> 0, maxPoolSize -> 15, maxStatements -> 0, maxStatementsPerConnection -> 0, minPoolSize -> 3, nestedDataSource -> com.mchange.v2.c3p0.DriverManagerDataSource@ee216da3 [ description -> null, driverClass -> null, factoryClassLocation -> null, identityToken -> z8kfsx978p9rm3qd7j6k|29a190ff, jdbcUrl -> jdbc:mysql://127.0.0.1:3306/slam?autoReconnect=true, properties -> {user=******, password=******} ], preferredTestQuery -> null, propertyCycle -> 0, testConnectionOnCheckin -> true, testConnectionOnCheckout -> false, unreturnedConnectionTimeout -> 0, usesTraditionalReflectiveProxies -> false; userOverrides: {} ], dataSourceName -> null, factoryClassLocation -> null, identityToken -> z8kfsx978p9rm3qd7j6k|3aa852f0, numHelperThreads -> 3 ]
+2015-01-24 19:34:35.357:INFO:oejs.ServerConnector:Thread-1: Stopped ServerConnector@6b501f3e{HTTP/1.1}{0.0.0.0:8080}
+2015-01-24 19:35:00.703:INFO:oejsh.ContextHandler:Scanner-0: Started o.e.j.w.WebAppContext@3eb25fe5{/SLAM,file:/home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/,AVAILABLE}{/SLAM}
+2015-01-24 19:35:00.718:INFO:oejsh.ContextHandler:Thread-1: Stopped o.e.j.w.WebAppContext@3eb25fe5{/SLAM,file:/home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/,UNAVAILABLE}{/SLAM}

@@ -1,0 +1,2 @@
+2015-01-26 15:15:50.403:INFO:oejs.ServerConnector:Thread-1: Stopped ServerConnector@8e2a65c{HTTP/1.1}{0.0.0.0:8080}
+2015-01-26 15:15:50.422:INFO:oejsh.ContextHandler:Thread-1: Stopped o.e.j.w.WebAppContext@12fa85c8{/SLAM,file:/home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/,UNAVAILABLE}{/SLAM}

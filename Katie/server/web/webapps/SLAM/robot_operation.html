@@ -1,0 +1,73 @@
+<div class="panel panel-default">
+    <div class="panel-body">
+        <button class="btn btn-danger" ng-click="resetKaite()">Reset</button>
+        <br/>
+        <br/>
+        <button type="button" class="btn btn-default"
+                ng-model="stateE"
+                btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0"
+                ng-click="modelE()">
+            Collecting Model-E data
+        </button>
+        <button type="button" class="btn btn-default"
+                ng-model="stateT"
+                btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0"
+                ng-click="modelT()">
+            Collecting Model-T data
+        </button>
+        <br/>
+        <br/>
+        <button class="btn btn-default"
+                ng-model="stateQuickTurn"
+                btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0"
+                ng-click="quickTurn()">
+            Quick Turn (@a)
+        </button>
+        <button class="btn btn-default"
+                ng-model="stateExplore"
+                btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0"
+                ng-click="doExplore()">
+            Explore (@u)
+        </button>
+        <button class="btn btn-default"
+                ng-model="stateRoomba"
+                btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0"
+                ng-click="doRoomba()">
+            Roomba (@j)
+        </button>
+        <br/>
+        <br/>
+
+        <form name="myForm" class="css-form" novalidate>
+            <button class="btn btn-default"
+                    ng-disabled="myForm.$invalid || formNotValid"
+                    ng-click="autoTakePhoto()"
+                    ng-model="stateAutoTake"
+                    btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0">
+                Taking a photo for: every {{interval}} seconds
+                at {{rotation}}&deg; rotation
+            </button>
+
+            <span ng-hide="takeIsOn" style="margin-left: 40px;">
+                <span class="dropdown">
+                    <a class="dropdown-toggle" style="text-decoration: none;">
+                        Camera Rotation
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="r in rotationDegrees">
+                            <a ng-click="r.click(r.value)">{{r.value}}</a>
+                        </li>
+                    </ul>
+                </span>
+                <span style="margin-right: 10px;">,</span>
+                <input type="number" class="form-control" ng-model="interval" placeholder="Seconds"
+                       required
+                       name="formInterval"
+                       style="width: 100px; display:inline-block;"/>
+            </span>
+        </form>
+        <br/>
+        <br/>
+        <button class="btn btn-info" ng-click="fullTurn()">Full Turn (@h)</button>
+    </div>
+</div>

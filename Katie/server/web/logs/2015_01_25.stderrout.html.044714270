@@ -1,0 +1,275 @@
+2015-01-24 19:40:12.038:INFO:oejs.Server:main: jetty-9.1.2.v20140210
+2015-01-24 19:40:12.057:INFO:oejdp.ScanningAppProvider:main: Deployment monitor [file:/home/arsh/ITEST/katie-explore/server/web/webapps/] at interval 1
+2015-01-24 19:40:13.646:INFO:oeja.AnnotationConfiguration:main: Scanned 1 container path jars, 30 WEB-INF/lib jars, 1 WEB-INF/classes dirs in 1306ms for context o.e.j.w.WebAppContext@12fa85c8{/SLAM,file:/home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/,STARTING}{/SLAM}
+Jan 24, 2015 7:40:14 PM iu.slam.utils.UtilLog logEnvironment
+INFO: <p style='color:#919191;'>{iu.slam.utils.MyContextListener}:: Servlet Context Path: /home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/</p>
+Jan 24, 2015 7:40:14 PM org.hibernate.annotations.common.Version <clinit>
+INFO: HCANN000001: Hibernate Commons Annotations {4.0.2.Final}
+Jan 24, 2015 7:40:14 PM org.hibernate.Version logVersion
+INFO: HHH000412: Hibernate Core {4.2.2.Final}
+Jan 24, 2015 7:40:14 PM org.hibernate.cfg.Environment <clinit>
+INFO: HHH000206: hibernate.properties not found
+Jan 24, 2015 7:40:14 PM org.hibernate.cfg.Environment buildBytecodeProvider
+INFO: HHH000021: Bytecode provider name : javassist
+Jan 24, 2015 7:40:14 PM org.hibernate.service.jdbc.connections.internal.ConnectionProviderInitiator instantiateExplicitConnectionProvider
+INFO: HHH000130: Instantiating explicit connection provider: org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider
+Jan 24, 2015 7:40:14 PM org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider configure
+INFO: HHH010002: C3P0 using driver: com.mysql.jdbc.Driver at URL: jdbc:mysql://127.0.0.1:3306/slam?autoReconnect=true
+Jan 24, 2015 7:40:14 PM org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider configure
+INFO: HHH000046: Connection properties: {user=root, password=****}
+Jan 24, 2015 7:40:14 PM org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider configure
+INFO: HHH000006: Autocommit mode: false
+Jan 24, 2015 7:40:14 PM com.mchange.v2.log.MLog <clinit>
+INFO: MLog clients using java 1.4+ standard logging.
+Jan 24, 2015 7:40:14 PM com.mchange.v2.c3p0.C3P0Registry banner
+INFO: Initializing c3p0-0.9.1 [built 16-January-2007 14:46:42; debug? true; trace: 10]
+Jan 24, 2015 7:40:14 PM com.mchange.v2.c3p0.impl.AbstractPoolBackedDataSource getPoolManager
+INFO: Initializing c3p0 pool... com.mchange.v2.c3p0.PoolBackedDataSource@b270da3a [ connectionPoolDataSource -> com.mchange.v2.c3p0.WrapperConnectionPoolDataSource@f36392f [ acquireIncrement -> 3, acquireRetryAttempts -> 30, acquireRetryDelay -> 1000, autoCommitOnClose -> false, automaticTestTable -> null, breakAfterAcquireFailure -> false, checkoutTimeout -> 0, connectionCustomizerClassName -> null, connectionTesterClassName -> com.mchange.v2.c3p0.impl.DefaultConnectionTester, debugUnreturnedConnectionStackTraces -> false, factoryClassLocation -> null, forceIgnoreUnresolvedTransactions -> false, identityToken -> z8kfsx978pjprty2evqu|18f6cd28, idleConnectionTestPeriod -> 600, initialPoolSize -> 3, maxAdministrativeTaskTime -> 0, maxConnectionAge -> 0, maxIdleTime -> 0, maxIdleTimeExcessConnections -> 0, maxPoolSize -> 15, maxStatements -> 0, maxStatementsPerConnection -> 0, minPoolSize -> 3, nestedDataSource -> com.mchange.v2.c3p0.DriverManagerDataSource@e26dfda1 [ description -> null, driverClass -> null, factoryClassLocation -> null, identityToken -> z8kfsx978pjprty2evqu|5c464132, jdbcUrl -> jdbc:mysql://127.0.0.1:3306/slam?autoReconnect=true, properties -> {user=******, password=******} ], preferredTestQuery -> null, propertyCycle -> 0, testConnectionOnCheckin -> true, testConnectionOnCheckout -> false, unreturnedConnectionTimeout -> 0, usesTraditionalReflectiveProxies -> false; userOverrides: {} ], dataSourceName -> null, factoryClassLocation -> null, identityToken -> z8kfsx978pjprty2evqu|23ce6f88, numHelperThreads -> 3 ]
+Jan 24, 2015 7:42:44 PM com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask run
+WARNING: com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask@1ffcd3ae -- Acquisition Attempt Failed!!! Clearing pending acquires. While trying to acquire a needed new resource, we failed to succeed more than the maximum number of allowed acquisition attempts (30). Last acquisition attempt exception: 
+com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException: Could not create connection to database server. Attempted reconnect 3 times. Giving up.
+	at sun.reflect.GeneratedConstructorAccessor13.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1015)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:989)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:975)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:920)
+	at com.mysql.jdbc.ConnectionImpl.connectWithRetries(ConnectionImpl.java:2385)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2306)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:834)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:47)
+	at sun.reflect.GeneratedConstructorAccessor11.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:416)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:317)
+	at com.mchange.v2.c3p0.DriverManagerDataSource.getConnection(DriverManagerDataSource.java:135)
+	at com.mchange.v2.c3p0.WrapperConnectionPoolDataSource.getPooledConnection(WrapperConnectionPoolDataSource.java:182)
+	at com.mchange.v2.c3p0.WrapperConnectionPoolDataSource.getPooledConnection(WrapperConnectionPoolDataSource.java:171)
+	at com.mchange.v2.c3p0.impl.C3P0PooledConnectionPool$1PooledConnectionResourcePoolManager.acquireResource(C3P0PooledConnectionPool.java:137)
+	at com.mchange.v2.resourcepool.BasicResourcePool.doAcquire(BasicResourcePool.java:1014)
+	at com.mchange.v2.resourcepool.BasicResourcePool.access$800(BasicResourcePool.java:32)
+	at com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask.run(BasicResourcePool.java:1810)
+	at com.mchange.v2.async.ThreadPoolAsynchronousRunner$PoolThread.run(ThreadPoolAsynchronousRunner.java:547)
+Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at sun.reflect.GeneratedConstructorAccessor4.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:1121)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:355)
+	at com.mysql.jdbc.ConnectionImpl.coreConnect(ConnectionImpl.java:2479)
+	at com.mysql.jdbc.ConnectionImpl.connectWithRetries(ConnectionImpl.java:2324)
+	... 17 more
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:339)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:200)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:182)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:579)
+	at java.net.Socket.connect(Socket.java:528)
+	at java.net.Socket.<init>(Socket.java:425)
+	at java.net.Socket.<init>(Socket.java:241)
+	at com.mysql.jdbc.StandardSocketFactory.connect(StandardSocketFactory.java:259)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:305)
+	... 19 more
+
+Jan 24, 2015 7:42:44 PM com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask run
+WARNING: com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask@1ffcd3ae -- Acquisition Attempt Failed!!! Clearing pending acquires. While trying to acquire a needed new resource, we failed to succeed more than the maximum number of allowed acquisition attempts (30). Last acquisition attempt exception: 
+com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException: Could not create connection to database server. Attempted reconnect 3 times. Giving up.
+	at sun.reflect.GeneratedConstructorAccessor13.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1015)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:989)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:975)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:920)
+	at com.mysql.jdbc.ConnectionImpl.connectWithRetries(ConnectionImpl.java:2385)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2306)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:834)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:47)
+	at sun.reflect.GeneratedConstructorAccessor11.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:416)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:317)
+	at com.mchange.v2.c3p0.DriverManagerDataSource.getConnection(DriverManagerDataSource.java:135)
+	at com.mchange.v2.c3p0.WrapperConnectionPoolDataSource.getPooledConnection(WrapperConnectionPoolDataSource.java:182)
+	at com.mchange.v2.c3p0.WrapperConnectionPoolDataSource.getPooledConnection(WrapperConnectionPoolDataSource.java:171)
+	at com.mchange.v2.c3p0.impl.C3P0PooledConnectionPool$1PooledConnectionResourcePoolManager.acquireResource(C3P0PooledConnectionPool.java:137)
+	at com.mchange.v2.resourcepool.BasicResourcePool.doAcquire(BasicResourcePool.java:1014)
+	at com.mchange.v2.resourcepool.BasicResourcePool.access$800(BasicResourcePool.java:32)
+	at com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask.run(BasicResourcePool.java:1810)
+	at com.mchange.v2.async.ThreadPoolAsynchronousRunner$PoolThread.run(ThreadPoolAsynchronousRunner.java:547)
+Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at sun.reflect.GeneratedConstructorAccessor4.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:1121)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:355)
+	at com.mysql.jdbc.ConnectionImpl.coreConnect(ConnectionImpl.java:2479)
+	at com.mysql.jdbc.ConnectionImpl.connectWithRetries(ConnectionImpl.java:2324)
+	... 17 more
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:339)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:200)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:182)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:579)
+	at java.net.Socket.connect(Socket.java:528)
+	at java.net.Socket.<init>(Socket.java:425)
+	at java.net.Socket.<init>(Socket.java:241)
+	at com.mysql.jdbc.StandardSocketFactory.connect(StandardSocketFactory.java:259)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:305)
+	... 19 more
+
+Jan 24, 2015 7:42:44 PM com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask run
+WARNING: com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask@41ecfc8c -- Acquisition Attempt Failed!!! Clearing pending acquires. While trying to acquire a needed new resource, we failed to succeed more than the maximum number of allowed acquisition attempts (30). Last acquisition attempt exception: 
+com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException: Could not create connection to database server. Attempted reconnect 3 times. Giving up.
+	at sun.reflect.GeneratedConstructorAccessor13.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1015)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:989)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:975)
+	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:920)
+	at com.mysql.jdbc.ConnectionImpl.connectWithRetries(ConnectionImpl.java:2385)
+	at com.mysql.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:2306)
+	at com.mysql.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:834)
+	at com.mysql.jdbc.JDBC4Connection.<init>(JDBC4Connection.java:47)
+	at sun.reflect.GeneratedConstructorAccessor11.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:416)
+	at com.mysql.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:317)
+	at com.mchange.v2.c3p0.DriverManagerDataSource.getConnection(DriverManagerDataSource.java:135)
+	at com.mchange.v2.c3p0.WrapperConnectionPoolDataSource.getPooledConnection(WrapperConnectionPoolDataSource.java:182)
+	at com.mchange.v2.c3p0.WrapperConnectionPoolDataSource.getPooledConnection(WrapperConnectionPoolDataSource.java:171)
+	at com.mchange.v2.c3p0.impl.C3P0PooledConnectionPool$1PooledConnectionResourcePoolManager.acquireResource(C3P0PooledConnectionPool.java:137)
+	at com.mchange.v2.resourcepool.BasicResourcePool.doAcquire(BasicResourcePool.java:1014)
+	at com.mchange.v2.resourcepool.BasicResourcePool.access$800(BasicResourcePool.java:32)
+	at com.mchange.v2.resourcepool.BasicResourcePool$AcquireTask.run(BasicResourcePool.java:1810)
+	at com.mchange.v2.async.ThreadPoolAsynchronousRunner$PoolThread.run(ThreadPoolAsynchronousRunner.java:547)
+Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+	at sun.reflect.GeneratedConstructorAccessor4.newInstance(Unknown Source)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+	at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:1121)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:355)
+	at com.mysql.jdbc.ConnectionImpl.coreConnect(ConnectionImpl.java:2479)
+	at com.mysql.jdbc.ConnectionImpl.connectWithRetries(ConnectionImpl.java:2324)
+	... 17 more
+Caused by: java.net.ConnectException: Connection refused
+	at java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:339)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:200)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:182)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:579)
+	at java.net.Socket.connect(Socket.java:528)
+	at java.net.Socket.<init>(Socket.java:425)
+	at java.net.Socket.<init>(Socket.java:241)
+	at com.mysql.jdbc.StandardSocketFactory.connect(StandardSocketFactory.java:259)
+	at com.mysql.jdbc.MysqlIO.<init>(MysqlIO.java:305)
+	... 19 more
+
+Jan 24, 2015 7:42:44 PM org.hibernate.engine.jdbc.internal.JdbcServicesImpl configure
+WARN: HHH000342: Could not obtain connection to query metadata : Connections could not be acquired from the underlying database!
+Jan 24, 2015 7:42:44 PM org.hibernate.dialect.Dialect <init>
+INFO: HHH000400: Using dialect: org.hibernate.dialect.MySQLDialect
+Jan 24, 2015 7:42:44 PM org.hibernate.engine.jdbc.internal.LobCreatorBuilder useContextualLobCreation
+INFO: HHH000422: Disabling contextual LOB creation as connection was null
+Jan 24, 2015 7:42:44 PM org.hibernate.mapping.RootClass checkCompositeIdentifier
+WARN: HHH000038: Composite-id class does not override equals(): iu.slam.models.PhotoTags
+Jan 24, 2015 7:42:44 PM org.hibernate.mapping.RootClass checkCompositeIdentifier
+WARN: HHH000039: Composite-id class does not override hashCode(): iu.slam.models.PhotoTags
+Jan 24, 2015 7:42:44 PM org.hibernate.engine.transaction.internal.TransactionFactoryInitiator initiateService
+INFO: HHH000399: Using default transaction strategy (direct JDBC transactions)
+Jan 24, 2015 7:42:44 PM org.hibernate.hql.internal.ast.ASTQueryTranslatorFactory <init>
+INFO: HHH000397: Using ASTQueryTranslatorFactory
+Jan 24, 2015 7:42:44 PM iu.slam.utils.UtilLog logDatabase
+INFO: <p style='color:#8a00ce;'>{class iu.slam.database.DatabaseHandler}:: SessionFactory created</p>
+Jan 24, 2015 7:42:44 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.TimerCheckDataIdle}:: TimerCheckDataIdle started</p>
+Jan 24, 2015 7:42:44 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.TimerForceHeartBeat}:: TimerForceHeartBeat started</p>
+Jan 24, 2015 7:42:44 PM iu.slam.utils.UtilLog logEnvironment
+INFO: <p style='color:#919191;'>{iu.slam.utils.MyContextListener}:: contextInitialized</p>
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Parsing configuration file [struts-default.xml]
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Parsing configuration file [struts-plugin.xml]
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Parsing configuration file [struts.xml]
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.ObjectFactory)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.FileManagerFactory)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.conversion.impl.XWorkConverter)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.TextProvider)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.LocaleProvider)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.ActionProxyFactory)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.conversion.ObjectTypeDeterminer)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (org.apache.struts2.dispatcher.mapper.ActionMapper)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (jakarta) for (org.apache.struts2.dispatcher.multipart.MultiPartRequest)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (org.apache.struts2.views.freemarker.FreemarkerManager)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (org.apache.struts2.components.UrlRenderer)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.validator.ActionValidatorManager)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.util.ValueStackFactory)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.util.reflection.ReflectionProvider)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.util.reflection.ReflectionContextFactory)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.util.PatternMatcher)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (org.apache.struts2.dispatcher.StaticContentLoader)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.UnknownHandlerManager)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (org.apache.struts2.views.util.UrlHelper)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.conversion.impl.CollectionConverter)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.conversion.impl.ArrayConverter)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.conversion.impl.DateConverter)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.conversion.impl.NumberConverter)
+Jan 24, 2015 7:42:44 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.conversion.impl.StringConverter)
+2015-01-24 19:42:44.946:INFO:oejsh.ContextHandler:main: Started o.e.j.w.WebAppContext@12fa85c8{/SLAM,file:/home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/,AVAILABLE}{/SLAM}
+2015-01-24 19:42:44.954:INFO:oejs.ServerConnector:main: Started ServerConnector@46904576{HTTP/1.1}{0.0.0.0:8080}
+2015-01-24 19:47:12.660:INFO:oejs.ServerConnector:Thread-1: Stopped ServerConnector@46904576{HTTP/1.1}{0.0.0.0:8080}
+2015-01-24 19:47:12.679:INFO:oejsh.ContextHandler:Thread-1: Stopped o.e.j.w.WebAppContext@12fa85c8{/SLAM,file:/home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/,UNAVAILABLE}{/SLAM}

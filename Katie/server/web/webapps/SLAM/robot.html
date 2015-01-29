@@ -1,0 +1,220 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="css/screen.css" type="text/css" media="screen, projection">
+        <link rel="stylesheet" href="css/print.css" type="text/css" media="print">
+        <link rel="stylesheet" href="css/global.css" type="text/css">
+        <script src="javascript/jquery-2.0.3.js"></script>
+        <script src="javascript/global_values.js"></script>
+        <script src="angular/angular-1.2.9.js"></script>
+        <script>
+            var myAppModule = angular.module("RobotCenter", ["ui.bootstrap", "vr.directives.slider", "timer"]);
+        </script>
+        <script src="angular/controllers.js"></script>
+
+        <script src="javascript/robot.html/websocket_drive_katie.js"></script>
+        <script src="javascript/robot.html/websocket_info_control.js"></script>
+        <script src="javascript/robot.html/js.js"></script>
+
+        <link rel="stylesheet" href="bootstrap3/css/bootstrap.css" type="text/css">
+        <script src="bootstrap3/js/bootstrap.js"></script>
+        <script src="angular/ui-bootstrap-tpls-0.10.0.js"></script>
+
+        <script src="switch_button/iphone-style-checkboxes.js"></script>
+        <link rel="stylesheet" href="switch_button/style.css" type="text/css"/>
+
+        <script src="bootbox/bootbox.js"></script>
+        <script src="http://code.highcharts.com/highcharts.js"></script>
+
+        <script src="angular/angular-touch.min.js"></script>
+        <script src="ng-slider/angular-slider.min.js"></script>
+        <link rel="stylesheet" href="ng-slider/css.css" type="text/css">
+
+        <script src="ng-timer/angular-timer.min.js"></script>
+        <title>R House Katie Explorer</title>
+        <style>
+            #my_tab a {
+                text-decoration: none;
+            }
+
+            .bootbox-input{
+                resize: none;
+                width: 80%;
+            }
+
+            .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+            a {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                cursor: pointer;
+            }
+
+            .css-form input.ng-invalid.ng-dirty {
+                background-color: #ff6666;
+            }          
+        </style>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="header" class="container">
+                <div id="logo" class="span-3" style="border:3px solid #108d44">
+                    <a href="home.html"><<!-- img src="images/rhouse-logo5.gif"
+                                             alt="Living Laboratory for Research in Human Robot Systems" width="95" height="100"
+                                             style="padding-left:0px;padding-top:5px"/> --></a>
+                </div>
+                <div id="navigation" class="span-12">
+                    <ul class="span-12">
+                        <li class="span-2"><a href="home.html">Home</a></li>
+                        <!-- <li class="span-2"><a href="live.html">Live</a></li> -->
+                        <li class="span-2"><a href="robot.html">Robots</a></li>
+                        <!-- <li class="span-2"><a href="video.html">Video</a></li> -->
+                    </ul>
+                </div>
+                <div id="iub" class="span-6 last right">
+
+                </div>
+            </div>
+
+            <div id="bar">
+                <div class="container">
+                    <div class="span-18"><h2 class="container">Katie Explorer Family Control Center</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-wrapper">
+                <div id="content" class="container">
+                    <div id="main">
+                        <div ng-app="RobotCenter">
+
+                            <h3 id="show_exp_name"></h3>
+                            <input id="input_exp_name" type="text" style="width: 300px;"/>
+                            <h3 id="show_exp_id"></h3>
+                            <h3><span id="total_dialogs"></span> robots are sending data now...</h3>
+                            <input type="checkbox" name="onoffswitch" id="button_check">
+                            <script>
+            var button_switch = $("#button_check").iphoneStyle({
+                checkedLabel: "Started",
+                uncheckedLabel: "Stopped",
+                onChange: switchRecording
+            });</script>
+                            <div style="margin-bottom: 30px;"></div>
+
+
+
+                            <div style="text-align: center;">
+                                <button class="btn btn-primary"
+                                        onclick="window.open('robot_info.html', '', 'width=640,height=480');">
+                                    Show Online Robots
+                                </button>
+                            </div>
+
+                            <hr/>
+
+                            <div ng-controller="RobotInfoControl" id="RobotInfoControl" style="text-align: center;">
+                                <span>Choose a Robot:</span>
+                                <select ng-model="robot" ng-change="showRobot(robot);" ng-options="r.name for r in robots"
+                                        style="width: 130px; font-size: 24px;"></select>
+                            </div>
+
+                            <br/>
+
+                            <div class="panel panel-primary" ng-controller="RobotControl" id="RobotControl">
+                                <div class="panel-heading">
+                                    <h2 class="panel-title">Robot Control Panel</h2>
+                                    <div style="text-align: right; font-size: 10px;" ng-show="showExecutionTimer">
+                                        {{commandExecution}} 
+                                        <span>
+                                            <span>
+                                                <timer autostart="false" start-time="commandExecutionTime">
+                                                    <span ng-show="days > 0"> {{days}} days</span>
+                                                    <span ng-show="hours > 0"> {{hours}} hours</span>
+                                                    <span ng-show="minutes > 0"> {{minutes}} minutes</span>
+                                                    <span> {{seconds}} seconds</span>
+                                                </timer>
+                                            </span>
+                                            ago
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                    <!-- <div ng-include="'robot_operation.html'"></div>
+                                    <br/> -->
+                                    <br/>
+                                    <div ng-include="'robot_drive.html'"></div>
+                                    <br/>
+                                    <br/>
+                                    <!--<div ng-include="'robot_old_drive.html'"></div>-->
+                                    <br/>
+                                    <!-- <br/>
+                                    <div ng-include="'robot_explore.html'"></div> -->
+	<!-- 
+                                </div>
+								
+                                <div class="panel-footer">
+                                    <div style="text-align: left;">Robot Perception:
+                                        <span ng-show="showPerceptionTimer">{{perception}}
+                                            <span>
+                                                <span>
+                                                    <timer autostart="false" start-time="perceptionTime">
+                                                        <span ng-show="days > 0"> {{days}} days</span>
+                                                        <span ng-show="hours > 0"> {{hours}} hours</span>
+                                                        <span ng-show="minutes > 0"> {{minutes}} minutes</span>
+                                                        <span> {{seconds}} seconds</span>
+                                                    </timer>
+                                                </span>
+                                                ago
+                                            </span>
+                                        </span>
+                                    </div>
+                                   <!--  <div style="text-align: right;">Robot Status: <span>{{online}}</span></div> -->
+                                </div> -->
+                            </div>
+                            <br/>
+
+                            <div ng-include="'robot_photo_list.html'"></div>
+                            <br/>
+
+                            <div ng-include="'robot_operation.html'"></div>
+                            <br/>
+<!-- 
+                            <div ng-include="'robot_data.html'"></div>
+                            <br/> -->
+
+                            <div ng-include="'robot_experiment.html'"></div>
+							
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- BEGIN INDIANA UNIVERSITY FOOTER -->
+
+        <div id="footer-wrapper">
+            <div id="footer" class="container">
+                <div id="copyright" class="span-1 prepend-6" style="margin-right: 40px;">
+                    <p class="small"><a href="http://www.iu.edu/" title="Indiana University" id="blockiu">
+                            <img src="images/blockiu_white.gif" alt="Block IU" width="22" height="28" /></a>
+                </div>
+                <div id="cp" class="span-12">
+                    <a href="http://www.iu.edu/comments/copyright.shtml">Copyright</a> &copy; 2008 The Trustees of 
+                    <a href="http://www.indiana.edu/">Indiana University</a> &#124; 
+                    <a href="http://www.indiana.edu/comments/complaint.shtml">Copyright Complaints</a>
+                </div>
+            </div>
+        </div>
+        <script>
+            //call after page loaded
+            window.onload = function() {
+                setupDriveKatie();
+                setupInfoControl();
+            };</script>
+    </body>
+</html>

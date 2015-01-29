@@ -1,0 +1,8 @@
+<!DOCTYPE struts PUBLIC
+"-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+"http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+    <constant name="struts.action.excludePattern" value="/datalog, /, /liveData, /infoControl, /driveKatie"/>
+    <constant name="struts.multipart.maxSize" value="10485760" />
+</struts>

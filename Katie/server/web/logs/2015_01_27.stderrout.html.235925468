@@ -1,0 +1,105 @@
+2015-01-27 14:55:56.674:INFO:oejs.Server:main: jetty-9.1.2.v20140210
+2015-01-27 14:55:56.693:INFO:oejdp.ScanningAppProvider:main: Deployment monitor [file:/home/arsh/ITEST/katie-explore/server/web/webapps/] at interval 1
+2015-01-27 14:55:58.274:INFO:oeja.AnnotationConfiguration:main: Scanned 1 container path jars, 31 WEB-INF/lib jars, 1 WEB-INF/classes dirs in 1300ms for context o.e.j.w.WebAppContext@77d65595{/SLAM,file:/home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/,STARTING}{/SLAM}
+Jan 27, 2015 2:55:58 PM iu.slam.utils.UtilLog logEnvironment
+INFO: <p style='color:#919191;'>{iu.slam.utils.MyContextListener}:: Servlet Context Path: /home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/</p>
+Jan 27, 2015 2:55:59 PM org.hibernate.annotations.common.Version <clinit>
+INFO: HCANN000001: Hibernate Commons Annotations {4.0.2.Final}
+Jan 27, 2015 2:55:59 PM org.hibernate.Version logVersion
+INFO: HHH000412: Hibernate Core {4.2.2.Final}
+Jan 27, 2015 2:55:59 PM org.hibernate.cfg.Environment <clinit>
+INFO: HHH000206: hibernate.properties not found
+Jan 27, 2015 2:55:59 PM org.hibernate.cfg.Environment buildBytecodeProvider
+INFO: HHH000021: Bytecode provider name : javassist
+Jan 27, 2015 2:55:59 PM org.hibernate.service.jdbc.connections.internal.ConnectionProviderInitiator instantiateExplicitConnectionProvider
+INFO: HHH000130: Instantiating explicit connection provider: org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider
+Jan 27, 2015 2:55:59 PM org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider configure
+INFO: HHH010002: C3P0 using driver: com.mysql.jdbc.Driver at URL: jdbc:mysql://127.0.0.1:3306/slam?autoReconnect=true
+Jan 27, 2015 2:55:59 PM org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider configure
+INFO: HHH000046: Connection properties: {user=root, password=****}
+Jan 27, 2015 2:55:59 PM org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider configure
+INFO: HHH000006: Autocommit mode: false
+Jan 27, 2015 2:55:59 PM com.mchange.v2.log.MLog <clinit>
+INFO: MLog clients using java 1.4+ standard logging.
+Jan 27, 2015 2:55:59 PM com.mchange.v2.c3p0.C3P0Registry banner
+INFO: Initializing c3p0-0.9.1 [built 16-January-2007 14:46:42; debug? true; trace: 10]
+Jan 27, 2015 2:55:59 PM com.mchange.v2.c3p0.impl.AbstractPoolBackedDataSource getPoolManager
+INFO: Initializing c3p0 pool... com.mchange.v2.c3p0.PoolBackedDataSource@b8ca1f39 [ connectionPoolDataSource -> com.mchange.v2.c3p0.WrapperConnectionPoolDataSource@3dca1e74 [ acquireIncrement -> 3, acquireRetryAttempts -> 30, acquireRetryDelay -> 1000, autoCommitOnClose -> false, automaticTestTable -> null, breakAfterAcquireFailure -> false, checkoutTimeout -> 0, connectionCustomizerClassName -> null, connectionTesterClassName -> com.mchange.v2.c3p0.impl.DefaultConnectionTester, debugUnreturnedConnectionStackTraces -> false, factoryClassLocation -> null, forceIgnoreUnresolvedTransactions -> false, identityToken -> z8kfsx97cpppro1x7wvoe|2f0fba16, idleConnectionTestPeriod -> 600, initialPoolSize -> 3, maxAdministrativeTaskTime -> 0, maxConnectionAge -> 0, maxIdleTime -> 0, maxIdleTimeExcessConnections -> 0, maxPoolSize -> 15, maxStatements -> 0, maxStatementsPerConnection -> 0, minPoolSize -> 3, nestedDataSource -> com.mchange.v2.c3p0.DriverManagerDataSource@495cb376 [ description -> null, driverClass -> null, factoryClassLocation -> null, identityToken -> z8kfsx97cpppro1x7wvoe|7dcd10fe, jdbcUrl -> jdbc:mysql://127.0.0.1:3306/slam?autoReconnect=true, properties -> {user=******, password=******} ], preferredTestQuery -> null, propertyCycle -> 0, testConnectionOnCheckin -> true, testConnectionOnCheckout -> false, unreturnedConnectionTimeout -> 0, usesTraditionalReflectiveProxies -> false; userOverrides: {} ], dataSourceName -> null, factoryClassLocation -> null, identityToken -> z8kfsx97cpppro1x7wvoe|1dca8c4a, numHelperThreads -> 3 ]
+Jan 27, 2015 2:55:59 PM org.hibernate.dialect.Dialect <init>
+INFO: HHH000400: Using dialect: org.hibernate.dialect.MySQLDialect
+Jan 27, 2015 2:55:59 PM org.hibernate.engine.jdbc.internal.LobCreatorBuilder useContextualLobCreation
+INFO: HHH000424: Disabling contextual LOB creation as createClob() method threw error : java.lang.reflect.InvocationTargetException
+Jan 27, 2015 2:55:59 PM org.hibernate.mapping.RootClass checkCompositeIdentifier
+WARN: HHH000038: Composite-id class does not override equals(): iu.slam.models.PhotoTags
+Jan 27, 2015 2:55:59 PM org.hibernate.mapping.RootClass checkCompositeIdentifier
+WARN: HHH000039: Composite-id class does not override hashCode(): iu.slam.models.PhotoTags
+Jan 27, 2015 2:55:59 PM org.hibernate.engine.transaction.internal.TransactionFactoryInitiator initiateService
+INFO: HHH000399: Using default transaction strategy (direct JDBC transactions)
+Jan 27, 2015 2:55:59 PM org.hibernate.hql.internal.ast.ASTQueryTranslatorFactory <init>
+INFO: HHH000397: Using ASTQueryTranslatorFactory
+Jan 27, 2015 2:55:59 PM iu.slam.utils.UtilLog logDatabase
+INFO: <p style='color:#8a00ce;'>{class iu.slam.database.DatabaseHandler}:: SessionFactory created</p>
+Jan 27, 2015 2:55:59 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.TimerCheckDataIdle}:: TimerCheckDataIdle started</p>
+Jan 27, 2015 2:55:59 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.TimerForceHeartBeat}:: TimerForceHeartBeat started</p>
+Jan 27, 2015 2:55:59 PM iu.slam.utils.UtilLog logEnvironment
+INFO: <p style='color:#919191;'>{iu.slam.utils.MyContextListener}:: contextInitialized</p>
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Parsing configuration file [struts-default.xml]
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Parsing configuration file [struts-plugin.xml]
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Parsing configuration file [struts.xml]
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.ObjectFactory)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.FileManagerFactory)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.conversion.impl.XWorkConverter)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.TextProvider)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.LocaleProvider)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.ActionProxyFactory)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.conversion.ObjectTypeDeterminer)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (org.apache.struts2.dispatcher.mapper.ActionMapper)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (jakarta) for (org.apache.struts2.dispatcher.multipart.MultiPartRequest)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (org.apache.struts2.views.freemarker.FreemarkerManager)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (org.apache.struts2.components.UrlRenderer)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.validator.ActionValidatorManager)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.util.ValueStackFactory)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.util.reflection.ReflectionProvider)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.util.reflection.ReflectionContextFactory)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.util.PatternMatcher)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (org.apache.struts2.dispatcher.StaticContentLoader)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.UnknownHandlerManager)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (org.apache.struts2.views.util.UrlHelper)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.conversion.impl.CollectionConverter)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.conversion.impl.ArrayConverter)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.conversion.impl.DateConverter)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.conversion.impl.NumberConverter)
+Jan 27, 2015 2:56:00 PM com.opensymphony.xwork2.util.logging.commons.CommonsLogger info
+INFO: Choosing bean (struts) for (com.opensymphony.xwork2.conversion.impl.StringConverter)
+2015-01-27 14:56:00.476:INFO:oejsh.ContextHandler:main: Started o.e.j.w.WebAppContext@77d65595{/SLAM,file:/home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/,AVAILABLE}{/SLAM}
+2015-01-27 14:56:00.485:INFO:oejs.ServerConnector:main: Started ServerConnector@47f128ad{HTTP/1.1}{0.0.0.0:8080}
+2015-01-27 14:59:23.800:INFO:oejs.ServerConnector:Thread-1: Stopped ServerConnector@47f128ad{HTTP/1.1}{0.0.0.0:8080}
+2015-01-27 14:59:23.818:INFO:oejsh.ContextHandler:Thread-1: Stopped o.e.j.w.WebAppContext@77d65595{/SLAM,file:/home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/,UNAVAILABLE}{/SLAM}

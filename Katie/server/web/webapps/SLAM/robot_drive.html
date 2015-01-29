@@ -1,0 +1,212 @@
+<div class="panel panel-default">
+    <div class="panel-body" ng-controller="OnePhotoListControl" id="OnePhotoListControl">
+        <div class="row" style="margin-top: 50px; margin-bottom: 50px;">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-12">
+                        <span>{{imageTitle}}</span>
+                        <br/>
+                        <span>Taken</span>
+                        <span ng-show="showTimer">
+                            <span style="color: #0097cf;" ng-show="showTimer">
+                                <timer autostart="false" start-time="startTime">
+                                    <span ng-show="days > 0">{{days}} days,</span>
+                                    <span ng-show="hours > 0">{{hours}} hours, </span>
+                                    <span ng-show="minutes > 0">{{minutes}} minutes,</span>
+                                    <span>{{seconds}} seconds</span>
+                                </timer>
+                            </span>
+                            ago
+                        </span>
+                        <br/>
+                        <span>at {{photo.saveTime}}</span>
+                        <a href="javascript:void(0);"
+                           ng-click="showPhoto(photo.id)"
+                           class="thumbnail">
+                            <img ng-src="{{photo.filePath}}" style="width: 400px;">
+                        </a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <button class="btn btn-info" style="width: 100%; height: 60px;"
+                                ng-click="showLatest()">Latest Photo</button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-info" style="width: 100%; height: 60px;"
+                                ng-click="takeOnePhoto()">Take Photo</button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-info" style="width: 100%; height: 60px;"
+                                ng-click="showPrevious()">Previous Photo</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div style="width: 100%; margin-top: 20px;">
+                            <slider
+                                ng-model="cameraTilt"
+                                floor="90"
+                                ceiling="180"
+                                translate="showDegree"
+                                style="width: 60%; float: left;">
+                            </slider>
+                            <button class="btn btn-info" ng-click="tiltCamera()"
+                                    style="width: 30%; float: right; white-space: normal;">Tilt
+                                Camera
+                                to {{cameraTilt}}&deg;</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <span class="dropdown">
+                            <a class="dropdown-toggle" style="text-decoration: none;">
+                                Camera Rotation: {{rotation}}&deg;
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li ng-repeat="r in rotationDegrees">
+                                    <a ng-click="r.click(r.value)">{{r.value}}</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row" style="margin-bottom: 40px; padding-left: 20%; padding-top:20px;">
+                    <div class="input-group"
+                         style="width: 250px;">
+                        <span class="input-group-addon">Velocity</span>
+                        <input type="number" class="form-control"/>
+                        <span class="input-group-addon">mm/s</span>
+                    </div>
+                </div>
+                <script type="text/ng-template" id="modal_content">
+                    <div class="modal-header">
+                    <h3 class="modal-title" style="text-align: center;">{{title}}</h3>
+                    </div>
+                    <div class="modal-body">
+
+                    <div class="input-group"
+                    style="width: 250px;">
+                    <span class="input-group-addon">Velocity</span>
+                    <input type="number" class="form-control" id="modal_drive_velocity" value="200"/>
+                    <span class="input-group-addon">mm/s</span>
+                    </div>
+                    <br/>
+
+                    <div class="input-group" ng-hide="hideModalDistance" 
+                    style="width: 250px;">
+                    <span class="input-group-addon">Distance</span>
+                    <input type="number" class="form-control" id="modal_drive_distance" value="0"/>
+                    <span class="input-group-addon">cm</span>
+                    </div>
+                    <br/>
+
+                    <div class="input-group" ng-hide="hideModalRadius"
+                    style="width: 250px;">
+                    <span class="input-group-addon">Radius</span>
+                    <input type="number" class="form-control" id="modal_drive_radius" value="0"/>
+                    <span class="input-group-addon">cm</span>
+                    </div>
+                    <br/>     
+
+                    <div class="input-group" ng-hide="hideModalDegree"
+                    style="width: 250px;">
+                    <span class="input-group-addon">Degree</span>
+                    <input type="number" class="form-control" id="modal_drive_degree" value="0"/>
+                    <span class="input-group-addon">&deg;</span>
+                    </div>
+
+                    </div>
+                    <div class="modal-footer">
+                    <button class="btn btn-primary" ng-click="ok()">Go</button>
+                    <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+                    </div>
+                </script>
+                <div class="row" style="margin-bottom: 20px; height: 80px;">
+                    <div class="col-md-4" style="text-align: center;">
+                        <button class="btn btn-info" ng-click="openModal('Left Forward', 'lf')"
+                                style="width: 100px; height: 80px; position: absolute; left: 25px; top: 0px;">Left<br/>Forward
+                        </button>
+                    </div>
+                    <div class="col-md-4" style="text-align: center;">
+                        <button class="btn btn-info" ng-click="openModal('Forward', 'f')"
+                                style="width: 100px; height: 80px; position: absolute; left: 0px; top: -30px;">Forward
+                        </button>
+                    </div>
+                    <div class="col-md-4" style="text-align: center;">
+                        <button class="btn btn-info" ng-click="openModal('Right Forward', 'rf')"
+                                style="width: 100px; height: 80px; position: absolute; left: -25px; top: 0px;">
+                            Right<br/>Forward
+                        </button>
+                    </div>
+                </div>
+                <div class="row" style="margin-bottom: 20px; height: 80px;">
+                    <div class="col-md-4" style="text-align: center;">
+                        <button class="btn btn-info" ng-click="openModal('Rotate Left', 'rl')"
+                                style="width: 100px; height: 80px; position: absolute; left: 0px; top: 0px;">Rotate<br/>Left
+                        </button>
+                    </div>
+                    <div class="col-md-4" style="text-align: center;">
+                        <img src="images/irobot.png"
+                             style="width: 120px; height: 120px; position: absolute; left: -10px; top: -20px;"/>
+                    </div>
+                    <div class="col-md-4" style="text-align: center;">
+                        <button class="btn btn-info" ng-click="openModal('Rotate Left', 'rr')"
+                                style="width: 100px; height: 80px; position: absolute; left: 0px; top: 0px;">Rotate<br/>Right
+                        </button>
+                    </div>
+                </div>
+                <div class="row" style="margin-bottom: 30px; height: 80px;">
+                    <div class="col-md-4" style="text-align: center;">
+                        <button class="btn btn-info" ng-click="openModal('Back Left', 'bl')"
+                                style="width: 100px; height: 80px; position: absolute; left: 25px; top: 0px;">Back<br/>Left
+                        </button>
+                    </div>
+                    <div class="col-md-4" style="text-align: center;">
+                        <button class="btn btn-info" ng-click="openModal('Reverse', 'b')"
+                                style="width: 100px; height: 80px; position: absolute; left: 0px; top: 30px;">Reverse
+                        </button>
+                    </div>
+                    <div class="col-md-4" style="text-align: center;">
+                        <button class="btn btn-info" ng-click="openModal('Back Right', 'br')"
+                                style="width: 100px; height: 80px; position: absolute; left: -25px; top: 0px;">Back<br/>Right
+                        </button>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 40px; margin-bottom: 10px;">
+                    <div class="col-md-12">
+                        <span>Current Heading:</span>
+
+                        <div class="well">{{currentHeadingString}}</div>
+                    </div>
+                </div>
+                <div class="row" style="margin-bottom: 10px;">
+                    <div class="col-md-6">
+                        <button class="btn btn-danger" style="width: 100%; height: 60px;"
+                                ng-click="haltDrive()">Stop</button>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="btn btn-info" style="width: 100%; height: 60px;"
+                                ng-click="beep()">Beep (@b)</button>
+                    </div>
+                </div>
+                <div class="row" style="margin-bottom: 10px;">
+                    <div class="col-md-12">
+                        <button class="btn btn-info" style="width: 100%; height: 60px;"
+                                ng-click="scan()">Scan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <span>Rear Distance:</span>
+
+                <div class="well">{{rearDistanceString}}</div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="css/screen.css" type="text/css" media="screen, projection">
+        <link rel="stylesheet" href="css/print.css" type="text/css" media="print">
+        <link rel="stylesheet" href="css/global.css" type="text/css">
+        <script src="javascript/jquery-2.0.3.js"></script>
+        <script src="javascript/global_values.js"></script>
+        <script src="javascript/processing-1.4.1.js"></script>
+        <script src="javascript/live.html/my_websocket_client.js"></script>
+        <script src="javascript/my_processing.js"></script>
+        <title>R House SLAM</title>
+
+        <link rel="stylesheet" href="bootstrap3/css/bootstrap.css" type="text/css">
+        <script src="bootstrap3/js/bootstrap.js"></script>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="header" class="container">
+                <div id="logo" class="span-3" style="border:3px solid #108d44">
+                    <a href="home.html"><img src="images/rhouse-logo5.gif"
+                                             alt="Living Laboratory for Research in Human Robot Systems" width="95" height="100"
+                                             style="padding-left:0px;padding-top:5px"/></a>
+                </div>
+                <div id="navigation" class="span-12">
+                    <ul class="span-12">
+                        <li class="span-2"><a href="home.html">Home</a></li>
+                        <li class="span-2"><a href="live.html">Live</a></li>
+                        <li class="span-2"><a href="robot.html">Robots</a></li>
+                        <li class="span-2"><a href="video.html">Video</a></li>
+                    </ul>
+                </div>
+                <div id="iub" class="span-6 last right">
+
+                </div>
+            </div>
+
+            <div id="bar">
+                <div class="container">
+                    <div class="span-18"><h2 class="container">SLAM Control Center (under construction)</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div id="content-wrapper">
+                <div id="content" class="container">
+                    <div id="main" class="span-18">
+                        <div id="out"></div>
+                        <canvas data-processing-sources="processing_js/processing_js.pde" id="processing1"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- BEGIN INDIANA UNIVERSITY FOOTER -->
+
+        <div id="footer-wrapper">
+            <div id="footer" class="container">
+                <div id="copyright" class="span-1 prepend-6" style="margin-right: 40px;">
+                    <p class="small"><a href="http://www.iu.edu/" title="Indiana University" id="blockiu">
+                            <img src="images/blockiu_white.gif" alt="Block IU" width="22" height="28" /></a>
+                </div>
+                <div id="cp" class="span-12">
+                    <a href="http://www.iu.edu/comments/copyright.shtml">Copyright</a> &copy; 2008 The Trustees of 
+                    <a href="http://www.indiana.edu/">Indiana University</a> &#124; 
+                    <a href="http://www.indiana.edu/comments/complaint.shtml">Copyright Complaints</a>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,250 @@
+Jan 27, 2015 3:14:17 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 3:14:17 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client joined: websocket-1</p>
+Jan 27, 2015 3:14:17 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Total: 1</p>
+Jan 27, 2015 3:14:18 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client joined: websocket-2</p>
+Jan 27, 2015 3:14:18 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Total: 1</p>
+Jan 27, 2015 3:14:18 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.check"}</p>
+Jan 27, 2015 3:19:04 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.start","content":"UAF test 1"}</p>
+Jan 27, 2015 3:19:04 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Recording started</p>
+Jan 27, 2015 3:19:04 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Current experimentId: 1422404344250</p>
+Jan 27, 2015 3:19:04 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Current experimentName: UAF test 1</p>
+Jan 27, 2015 3:19:21 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 3:19:21 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Client joined: websocket-3</p>
+Jan 27, 2015 3:19:21 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Got protocol message: {"content":[0,"127.0.1.1"],"topic":"topic.new"}</p>
+Jan 27, 2015 3:20:47 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client closed: websocket-2, due to CloseReason[1001]</p>
+Jan 27, 2015 3:20:47 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client closed: websocket-1, due to CloseReason[1001]</p>
+Jan 27, 2015 3:20:48 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 3:20:48 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client joined: websocket-4</p>
+Jan 27, 2015 3:20:48 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Total: 1</p>
+Jan 27, 2015 3:20:48 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client joined: websocket-5</p>
+Jan 27, 2015 3:20:48 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Total: 1</p>
+Jan 27, 2015 3:20:48 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.check"}</p>
+Jan 27, 2015 3:21:16 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client closed: websocket-4, due to CloseReason[1001]</p>
+Jan 27, 2015 3:21:16 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client closed: websocket-5, due to CloseReason[1001]</p>
+Jan 27, 2015 3:21:17 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 3:21:17 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client joined: websocket-6</p>
+Jan 27, 2015 3:21:17 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Total: 1</p>
+Jan 27, 2015 3:21:17 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client joined: websocket-7</p>
+Jan 27, 2015 3:21:17 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Total: 1</p>
+Jan 27, 2015 3:21:18 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.check"}</p>
+Jan 27, 2015 3:21:43 PM org.hibernate.engine.jdbc.spi.SqlExceptionHelper logExceptions
+WARN: SQL Error: 1146, SQLState: 42S02
+Jan 27, 2015 3:21:43 PM org.hibernate.engine.jdbc.spi.SqlExceptionHelper logExceptions
+ERROR: Table 'slam.photo' doesn't exist
+Jan 27, 2015 3:21:43 PM iu.slam.utils.UtilLog logWarn
+INFO: <p style='color:#ff00ff;'>{iu.slam.actions.photo.ActionShowPhoto}:: org.hibernate.exception.SQLGrammarException: could not extract ResultSet</p>
+Jan 27, 2015 3:22:25 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client closed: websocket-7, due to CloseReason[1001]</p>
+Jan 27, 2015 3:22:25 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client closed: websocket-6, due to CloseReason[1001]</p>
+Jan 27, 2015 3:23:15 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 3:23:15 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client joined: websocket-8</p>
+Jan 27, 2015 3:23:15 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Total: 1</p>
+Jan 27, 2015 3:23:15 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client joined: websocket-9</p>
+Jan 27, 2015 3:23:15 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Total: 1</p>
+Jan 27, 2015 3:23:15 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.check"}</p>
+Jan 27, 2015 3:23:18 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.end"}</p>
+Jan 27, 2015 3:23:18 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Total dialogs: 0</p>
+Jan 27, 2015 3:23:18 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Recording ended</p>
+Jan 27, 2015 3:23:27 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.start","content":"UAF test"}</p>
+Jan 27, 2015 3:23:27 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Total dialogs: 0</p>
+Jan 27, 2015 3:23:27 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Recording started</p>
+Jan 27, 2015 3:23:27 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Current experimentId: 1422404607913</p>
+Jan 27, 2015 3:23:27 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Current experimentName: UAF test</p>
+Jan 27, 2015 3:25:33 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Client closed: websocket-3, due to CloseReason[1006,Read EOF]</p>
+Jan 27, 2015 3:28:24 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 3:28:24 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Client joined: websocket-10</p>
+Jan 27, 2015 3:28:24 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Got protocol message: {"content":[0,"127.0.1.1"],"topic":"topic.new"}</p>
+Jan 27, 2015 3:28:34 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client closed: websocket-8, due to CloseReason[1001]</p>
+Jan 27, 2015 3:28:34 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client closed: websocket-9, due to CloseReason[1001]</p>
+Jan 27, 2015 3:28:36 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 3:28:36 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client joined: websocket-11</p>
+Jan 27, 2015 3:28:36 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Total: 1</p>
+Jan 27, 2015 3:28:36 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client joined: websocket-12</p>
+Jan 27, 2015 3:28:36 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Total: 1</p>
+Jan 27, 2015 3:28:36 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.check"}</p>
+Jan 27, 2015 3:28:40 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.end"}</p>
+Jan 27, 2015 3:28:40 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Total dialogs: 0</p>
+Jan 27, 2015 3:28:40 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Recording ended</p>
+Jan 27, 2015 3:28:44 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.start","content":"test"}</p>
+Jan 27, 2015 3:28:44 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Total dialogs: 0</p>
+Jan 27, 2015 3:28:44 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Recording started</p>
+Jan 27, 2015 3:28:44 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Current experimentId: 1422404924397</p>
+Jan 27, 2015 3:28:44 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Current experimentName: test</p>
+Jan 27, 2015 3:30:30 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 3:30:30 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client joined: websocket-13</p>
+Jan 27, 2015 3:30:30 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Total: 2</p>
+Jan 27, 2015 3:30:30 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client joined: websocket-14</p>
+Jan 27, 2015 3:30:30 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Total: 2</p>
+Jan 27, 2015 3:30:31 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.check"}</p>
+Jan 27, 2015 3:30:41 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client closed: websocket-12, due to CloseReason[1005]</p>
+Jan 27, 2015 3:30:41 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client closed: websocket-11, due to CloseReason[1005]</p>
+Jan 27, 2015 3:32:21 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.end"}</p>
+Jan 27, 2015 3:32:21 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Total dialogs: 0</p>
+Jan 27, 2015 3:32:21 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Recording ended</p>
+Jan 27, 2015 3:32:25 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.start","content":"TEst"}</p>
+Jan 27, 2015 3:32:25 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Total dialogs: 0</p>
+Jan 27, 2015 3:32:25 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Recording started</p>
+Jan 27, 2015 3:32:25 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Current experimentId: 1422405145897</p>
+Jan 27, 2015 3:32:25 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{class iu.slam.websockets.EndpointDataLog}:: Current experimentName: TEst</p>
+Jan 27, 2015 3:33:20 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Client closed: websocket-10, due to CloseReason[1006,Read EOF]</p>
+Jan 27, 2015 3:34:39 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 3:34:39 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Client joined: websocket-15</p>
+Jan 27, 2015 3:34:39 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Got protocol message: {"content":[1,"127.0.1.1"],"topic":"topic.new"}</p>
+Jan 27, 2015 3:48:03 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Client closed: websocket-15, due to CloseReason[1006,Read EOF]</p>
+Jan 27, 2015 3:49:40 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 3:49:40 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Client joined: websocket-16</p>
+Jan 27, 2015 3:49:40 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Got protocol message: {"content":[0,"127.0.1.1"],"topic":"topic.new"}</p>
+Jan 27, 2015 3:50:15 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Client closed: websocket-16, due to CloseReason[1006,Read EOF]</p>
+Jan 27, 2015 3:50:16 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 3:50:16 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Client joined: websocket-17</p>
+Jan 27, 2015 3:50:16 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Got protocol message: {"content":[0,"127.0.1.1"],"topic":"topic.new"}</p>
+Jan 27, 2015 3:50:24 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client closed: websocket-14, due to CloseReason[1001]</p>
+Jan 27, 2015 3:50:24 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client closed: websocket-13, due to CloseReason[1001]</p>
+Jan 27, 2015 3:50:25 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 3:50:25 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client joined: websocket-18</p>
+Jan 27, 2015 3:50:25 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Total: 1</p>
+Jan 27, 2015 3:50:25 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client joined: websocket-19</p>
+Jan 27, 2015 3:50:25 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Total: 1</p>
+Jan 27, 2015 3:50:25 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.check"}</p>
+Jan 27, 2015 3:54:31 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Client closed: websocket-17, due to CloseReason[1006,Read EOF]</p>
+Jan 27, 2015 3:59:15 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 3:59:15 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Client joined: websocket-20</p>
+Jan 27, 2015 3:59:15 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDataLog}:: Got protocol message: {"content":[0,"127.0.1.1"],"topic":"topic.new"}</p>
+Jan 27, 2015 4:25:16 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client closed: websocket-19, due to CloseReason[1001]</p>
+Jan 27, 2015 4:25:16 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client closed: websocket-18, due to CloseReason[1001]</p>
+Jan 27, 2015 4:25:17 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 4:25:17 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client joined: websocket-21</p>
+Jan 27, 2015 4:25:17 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Total: 1</p>
+Jan 27, 2015 4:25:17 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client joined: websocket-22</p>
+Jan 27, 2015 4:25:17 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Total: 1</p>
+Jan 27, 2015 4:25:17 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.check"}</p>
+Jan 27, 2015 4:26:02 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client closed: websocket-21, due to CloseReason[1001]</p>
+Jan 27, 2015 4:26:02 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client closed: websocket-22, due to CloseReason[1001]</p>
+Jan 27, 2015 4:26:04 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: MaxIdleTimeout: 600000</p>
+Jan 27, 2015 4:26:04 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Client joined: websocket-23</p>
+Jan 27, 2015 4:26:04 PM iu.slam.utils.UtilLog logNetwork
+INFO: <p style='color:#00d5ff;'>{iu.slam.websockets.EndpointDrive}:: Total: 1</p>
+Jan 27, 2015 4:26:04 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Client joined: websocket-24</p>
+Jan 27, 2015 4:26:04 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: Total: 1</p>
+Jan 27, 2015 4:26:04 PM iu.slam.utils.UtilLog logInfo
+INFO: <p style='color:#73e600;'>{iu.slam.websockets.EndpointInfoControl}:: onMessage: {"topic":"topic.datalog","command":"command.datalog.check"}</p>
+2015-01-27 16:31:24.395:INFO:oejs.ServerConnector:Thread-1: Stopped ServerConnector@5288e65f{HTTP/1.1}{0.0.0.0:8080}
+2015-01-27 16:31:24.440:INFO:oejsh.ContextHandler:Thread-1: Stopped o.e.j.w.WebAppContext@5d4e9726{/SLAM,file:/home/arsh/ITEST/katie-explore/server/web/webapps/SLAM/,UNAVAILABLE}{/SLAM}
