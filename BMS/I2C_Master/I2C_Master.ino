@@ -26,16 +26,55 @@ void setup()
 
 void readI2C()
 {
+   /*
   if (x==0)
   {
-    Wire.requestFrom(2, 6);    // request 6 bytes from slave device #2
+     Wire.requestFrom(2, 6);    // request 6 bytes from slave device #2
+   int i=0;
+   char c0[6];
+   String string;
+   while(Wire.available())    // slave may send less than requested    
+   {
+     c0[i] = Wire.read(); // receive a byte as character
+     // Serial.print(Cell[i]);   // print the character
+     i++;
+   }
+   Cell0=atof(c0);
+   
+   Wire.requestFrom(2, 6);    // request 6 bytes from slave device #2
+   i=0;
+   char c1[6];
+   while(Wire.available())    // slave may send less than requested    
+   {
+     c1[i] = Wire.read(); // receive a byte as character
+     // Serial.print(Cell[i]);   // print the character
+     i++;
+   }
+   Cell1=atof(c1);
+   
+   Wire.requestFrom(2, 6);    // request 6 bytes from slave device #2
+   i=0;
+   char c2[6];
+   while(Wire.available())    // slave may send less than requested    
+   {
+     c1[i] = Wire.read(); // receive a byte as character
+     // Serial.print(Cell[i]);   // print the character
+     i++;
+   }
+   Cell2=atof(c1);
+  }
+*/
+
+if (x==0)
+  {
+    Wire.requestFrom(2, 7);    // request 6 bytes from slave device #2
     int i=0;
-    char c[6];
+    char c[7];
     String string;
     while(Wire.available())    // slave may send less than requested
     {
         c[i] = Wire.read(); // receive a byte as character
-        // Serial.print(Cell[i]);   // print the character
+        Serial.print(c[i]);   // print the character
         i++;
     }
     Cell0=atof(c);
@@ -43,14 +82,14 @@ void readI2C()
   
   else if (x==1)
   {
-    Wire.requestFrom(2, 6);    // request 6 bytes from slave device #2
+    Wire.requestFrom(2, 7);    // request 6 bytes from slave device #2
     int i=0;
-    char c[6];
+    char c[7];
     String string;
     while(Wire.available())    // slave may send less than requested
     {
         c[i] = Wire.read(); // receive a byte as character
-        // Serial.print(Cell[i]);   // print the character
+        Serial.print(c[i]);   // print the character
         i++;
     }
     Cell1=atof(c);
@@ -58,20 +97,20 @@ void readI2C()
   
   else if (x==2)
   {
-    Wire.requestFrom(2, 6);    // request 6 bytes from slave device #2
+    Wire.requestFrom(2, 7);    // request 6 bytes from slave device #2
     int i=0;
-    char c[6];
+    char c[7];
     String string;
     while(Wire.available())    // slave may send less than requested
     {
         c[i] = Wire.read(); // receive a byte as character
-        // Serial.print(Cell[i]);   // print the character
+        Serial.print(c[i]);   // print the character
         i++;
     }
     Cell2=atof(c);
   }
 }
- 
+
 void sendI2C()
 {
   //Serial.println(x);

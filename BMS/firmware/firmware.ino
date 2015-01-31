@@ -90,11 +90,12 @@ void setup()
   SPI.begin();          // Start SPI 
   Serial.begin(9600);   // Open serial port
 //---------------------------------------------------------------------------------------------------------------------
+
 // I2C configs
  Wire.begin(2);                // join i2c bus with address #2
  Wire.onRequest(requestEvent); // register event
  Wire.onReceive(receiveEvent);
-  
+
 //---------------------------------------------------------------------------------------------------------------------
 
 }
@@ -320,34 +321,35 @@ void requestEvent()
      //If value received is 0 
   if (x == 0) 
   {
-    char Cell[5];
+    char Cell0[5];
     //cellVoltage[0]=2.567482309;  // Artificially set to test I2C
-    Wire.write(dtostrf(cellVoltage[0],7,5,Cell));
-    int testflag=0;
+    Wire.write(dtostrf(cellVoltage[0],7,5,Cell0));
+    int testflag0=0;
     //Serial.println(testflag);
     //Serial.println(Cell);
   }
-  //If value received is 1 
-  else if (x == 1) 
+  
+  if (x==1)
   {
-    char Cell[5];
+    char Cell1[5];
     //cellVoltage[1]=-3.3473632; // Artificially set to test I2C
-    Wire.write(dtostrf(cellVoltage[1],7,5,Cell));
-    int testflag=1;
+    Wire.write(dtostrf(cellVoltage[1],7,5,Cell1));
+    int testflag1=1;
     //Serial.println(testflag);
     //Serial.println(Cell);
   }
-  else if (x == 2) 
+  
+  if (x==2)
   {
-    char Cell[5];
+    char Cell2[5];
     //cellVoltage[2]=1.48236372; // Artificially set to test I2C
-    Wire.write(dtostrf(cellVoltage[2],7,5,Cell));
-    int testflag=2;
+    Wire.write(dtostrf(cellVoltage[2],7,5,Cell2));
+    int testflag2=2;
     //Serial.println(testflag);
     //Serial.println(Cell);
+    
   }
 }
-
 
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
@@ -368,19 +370,19 @@ void loop()
     Serial.print("Cell ");
     Serial.print(i);
     Serial.print(": ");
-    Serial.print(cellVoltage[i], 4);
+    Serial.print(cellVoltage[i], 3);
     Serial.println(" V");
   }
   Serial.print("Average Cell Voltage: ");
-  Serial.print(AvgCellVolts,4);
+  Serial.print(AvgCellVolts,3);
   Serial.println(" V");
   
   Serial.print("Total Cell Voltages: ");
-  Serial.print(cellVoltTotal,4);
+  Serial.print(cellVoltTotal,3);
   Serial.println(" V");
   
   Serial.print("Charge flag: ");
-  Serial.println(chargeflag);
+  Serial.println(chargeflag,3);
   Serial.println("-------------------------------------");
   delay(1200);
 }
