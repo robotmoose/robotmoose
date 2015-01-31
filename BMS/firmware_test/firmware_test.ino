@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include <Wire.h>
 #include <stdlib.h>
+#include "battery.h"
 
 // LTC6803 parameters
 
@@ -317,7 +318,7 @@ void receiveEvent(int command)
 
 void requestEvent()
 {
-  Wire.write((uint8_t*)&cellVoltage[x],4);
+  send_battery(make_battery(cellVoltage));
 }
 
 
