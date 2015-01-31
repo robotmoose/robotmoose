@@ -18,12 +18,21 @@ inline void send_battery(const battery_t& bat)
   Wire.write((uint8_t*)&bat,BATTERY_T_SIZE);
 }
 
+inline battery_t receive_battery(const uint8_t* data)
+{
+  battery_t bat;
+
+  for(int ii=0;ii<BATTERY_T_SIZE;++ii)
+    ((uint8_t*)&bat)[ii]=data[ii];
+
+  return bat;
+}
+
 inline battery_t make_battery(float cells[3])
 {
-  //Create Battery Struct
   battery_t bat;
   bat.voltage=cells[0]+cells[1]+cells[2];
-  bat.percentage=(uint8_t)(bat.voltage/12.4*100.0);
+  bat.percentage=(uint8_t)(bat.voltage/12.4*100.0);  //FIX THIS!!! This is 0% at 0v...this number is wrong!!!
   bat.cell[0]=cells[0];
   bat.cell[1]=cells[1];
   bat.cell[2]=cells[2];
