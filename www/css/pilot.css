@@ -1,22 +1,26 @@
 /*Stylesheet for the pilot.html user interface*/
 
-h1{
+h1
+{
 	font-family: Segoe UI, Arial, sans-serif;
 }
 
-body{
+body
+{
 	background-color:#222222;
 	color:#ffccff;
 }
 
 /*Styles for arrow controls*/
-#pilot_arrows{
+#pilot_arrows
+{
 	background-color:#808080;
 	position:relative;
 	width:400px;
 	height:400px;
 }
-#pilot_arrows_img{
+#pilot_arrows_img
+{
 	position:absolute;
 	left:0px;
 	top:0px;
@@ -24,7 +28,8 @@ body{
 	height:100%;
 	pointer-events:none;
 }
-#glow{
+#glow
+{
 	position:absolute;
 	left:0px;
 	top:0px;
