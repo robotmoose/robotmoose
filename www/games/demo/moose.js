@@ -22,9 +22,9 @@ var moose_t=function(x,y)
 	{
 		if(simulation)
 		{
+			//Check for Under Collision
 			var collision=false;
 			var new_y=this.y+this.y_velocity;
-
 			for(var ii=0;ii<level.blocks.length;++ii)
 			{
 				if(this.x+this.bb.width/2.0>=level.blocks[ii].x-level.blocks[ii].spr.width/2.0&&
@@ -38,13 +38,17 @@ var moose_t=function(x,y)
 					break;
 				}
 			}
-
 			if(!collision)
 			{
 				this.y=new_y;
 				this.y_velocity+=9.8*dt;
 			}
+			if(this.y_velocity>100)
+				this.y_velocity=100;
+			if(this.y_velocity<-100)
+				this.y_velocity=-100;
 
+			//Move Left/Right
 			var moved=false;
 			if(simulation.keys_down[kb_right]&&!simulation.keys_down[kb_left])
 			{
@@ -56,13 +60,6 @@ var moose_t=function(x,y)
 				moved=true;
 				this.direction=-1;
 			}
-
-			if(simulation.keys_pressed[kb_up]&&!this.jump)
-			{
-				this.jump=true;
-				this.y_velocity-=5;
-			}
-
 			if(moved)
 			{
 				var collision=false;
@@ -84,6 +81,12 @@ var moose_t=function(x,y)
 					this.x=new_x;
 			}
 
+			//Jump
+			if(simulation.keys_pressed[kb_up]&&!this.jump)
+			{
+				this.jump=true;
+				this.y_velocity-=5;
+			}
 			if(this.jump)
 			{
 				this.spr=this.spr_jump;

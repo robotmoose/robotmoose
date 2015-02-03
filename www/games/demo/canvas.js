@@ -60,18 +60,25 @@ var canvas_t=function(canvas_obj,setup_func,loop_func,draw_func)
 
 	this.loop=function(obj)
 	{
-		if(myself.user_loop&&myself.old_time&&myself.loop&&myself.draw)
+		if(myself.canvas.hasFocus())
 		{
-			var new_time=new Date();
-			myself.user_loop((new_time-myself.old_time)/1000.0);
-			myself.old_time=new_time;
-			myself.draw();
-		}
+			if(myself.user_loop&&myself.old_time&&myself.loop&&myself.draw)
+			{
+				var new_time=new Date();
+				myself.user_loop(Math.min((new_time-myself.old_time)/1000.0,0.1));
+				myself.old_time=new_time;
+				myself.draw();
+			}
 
-		for(var ii=0;ii<255;++ii)
+			for(var ii=0;ii<255;++ii)
+			{
+				myself.keys_pressed[ii]=false;
+				myself.keys_released[ii]=false;
+			}
+		}
+		else
 		{
-			myself.keys_pressed[ii]=false;
-			myself.keys_released[ii]=false;
+			myself.old_time=new Date();
 		}
 
 		window.requestAnimationFrame(function(){myself.loop();});
@@ -79,6 +86,6 @@ var canvas_t=function(canvas_obj,setup_func,loop_func,draw_func)
 
 	this.user_setup();
 	this.loop(this);
-	window.addEventListener("keydown",this.keydown,true);
-	window.addEventListener("keyup",this.keyup,true);
+	this.canvas.addEventListener("keydown",this.keydown,true);
+	this.canvas.addEventListener("keyup",this.keyup,true);
 };
