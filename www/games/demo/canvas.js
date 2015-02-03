@@ -60,25 +60,18 @@ var canvas_t=function(canvas_obj,setup_func,loop_func,draw_func)
 
 	this.loop=function(obj)
 	{
-		if(myself.canvas.hasFocus())
+		if(myself.user_loop&&myself.old_time&&myself.loop&&myself.draw)
 		{
-			if(myself.user_loop&&myself.old_time&&myself.loop&&myself.draw)
-			{
-				var new_time=new Date();
-				myself.user_loop(Math.min((new_time-myself.old_time)/1000.0,0.1));
-				myself.old_time=new_time;
-				myself.draw();
-			}
-
-			for(var ii=0;ii<255;++ii)
-			{
-				myself.keys_pressed[ii]=false;
-				myself.keys_released[ii]=false;
-			}
+			var new_time=new Date();
+			myself.user_loop(Math.min((new_time-myself.old_time)/1000.0,0.1));
+			myself.old_time=new_time;
+			myself.draw();
 		}
-		else
+
+		for(var ii=0;ii<255;++ii)
 		{
-			myself.old_time=new Date();
+			myself.keys_pressed[ii]=false;
+			myself.keys_released[ii]=false;
 		}
 
 		window.requestAnimationFrame(function(){myself.loop();});
