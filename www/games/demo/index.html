@@ -10,10 +10,22 @@
 		<script src="http://robotmoose.com/games/demo/moose.js"></script>
 		<script src="http://robotmoose.com/games/demo/sprite.js"></script>
 		<script>
+			var run=true;
 			var simulation;
+
+			function toggle()
+			{
+				run=!run;
+
+				if(run)
+					document.getElementById("runner").innerHTML="Pause";
+				else
+					document.getElementById("runner").innerHTML="Play";
+			}
 
 			function init()
 			{
+				toggle();
 				simulation=new canvas_t(document.getElementById("canvas"),setup,loop,draw);
 
 				if(!simulation)
@@ -33,11 +45,20 @@
 
 			function loop(dt)
 			{
-				moose.loop(simulation,dt,level);
+				if(run)
+					moose.loop(simulation,dt,level);
 			}
 
 			function draw()
 			{
+				if(simulation&&!run)
+				{
+					simulation.ctx.font="48px serif";
+					simulation.ctx.textAlign="center";
+					simulation.ctx.fillText("PAUSED",simulation.canvas.width/2.0,
+						simulation.canvas.height/2.0+24);
+				}
+
 				moose.draw(simulation);
 				level.draw(simulation);
 			}
@@ -50,7 +71,12 @@
 			<div class="page-header">
 				<h1>Demo</h1>
 			</div>
-			<center><canvas id="canvas" width="320px" height="240px" style="border:1px solid #000000;"></canvas></center>
+			<center>
+				<canvas id="canvas" width="320px" height="240px" style="border:1px solid #000000;"></canvas>
+				<br/>
+				<button id="runner" onclick="toggle();" class="btn btn-lg btn-primary"></button>
+			</center>
+
 		</div>
 	</body>
 </html>
