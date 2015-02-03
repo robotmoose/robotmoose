@@ -1,127 +1,127 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - Pilot</title>
+	</head>
 
-<!-- Our Javascript functions -->
-<script type="text/javascript" src="js/pilot.js"></script>
+	<body role="document" onload="run();">
+		<!--#include virtual="/navbar.html"-->
 
-<!--Jquery files for interface additions -->
-<script src="jquery/external/jquery/jquery.js"></script>
-<script src="jquery/jquery-ui.js"></script>
-<link href="jquery/jquery-ui.css" rel="stylesheet">
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>Pilot</h1>
+			</div>
 
-<script src="js/sha2_auth.js"></script> <!-- auth support -->
-
-
-<script type="text/javascript" src="jscolor/jscolor.js"></script> <!-- Jscolor library for color picker -->
-
-<script type="text/javascript">
-//Make Tabs collapsible 
-$(function(){
-	$( "#tabs").tabs({collapsible: true});
-});
-
-</script>
-<head><title>Pilot for ITEST: Being There</title>
-
-</head>
-
-<body onLoad="run();" style="background-color:#222222;color:#ffccff;">
-<center>
-<h1>ITEST: Being There Pilot Interface</h1>
-</center>
-
-<table>
-<tr>
-<td><div id="pilot_arrows" style="background-color:#808080;position:relative;width:400px;height:400px;" onmousedown="pilot_mouse(event,0)" ondblclick="pilot_mouse(event,2)" ondragstart="pilot_mouse(event,0)" onmouseout="pilot_mouse(event,1)"  onmouseup="pilot_mouse(event,1)" onmousemove="pilot_mouse(event,2)">
-<img src="img/arrows_hard.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;">
-<img id="glow" src="img/arrows_glow.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;">
-</div></td>
-<td style="width:100%;height:100%"><div id="video_area" style="width:100%;height:100%"><iframe id="video_frame" style="width:100%;height:400px" src=""></iframe></div></td>
-<tr>
-</table>
-
-<div id="tabs"> 
-	<ul>
-		<li><a href="#tabs-1">Setup</a></li>
-		<li><a href="#tabs-2">Interaction</a></li>
-		<li><a href="#tabs-3">Sensors</a></li>
-		<li><a href="#tabs-4">Robot Health</a></li> 
-	</ul>
-	
-	<div id="tabs-1">
-		<p>
-		Robot Name: <input type="text" id="robot_name" rows="1" cols="30" onChange="run();" value="layla/uaf">
-		<input value="Video - Gruveo" type="button" onClick="runCmd('video','r'+((new Date()).getTime())); openGruveoVideo()"><br>
-
-		RTC video name: <input type="text" id="robot_videoname" rows="1" cols="30" onChange="updateRTCVideo()" value="layla/uaf">
-		<input value="Video - RTC" type="button" onClick="updateRTCVideo()"><br>
-
-		Drive Power: <input type="text" id="robot_power" rows="1" cols="30" onChange="run()" value="15"><br>
-
-		Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""><br>
-		</p>
-	</div>
-
-	<div id="tabs-2">
-		<p>
-		Show text:
-		<input type="text" id="robot_showtext" rows="1" cols="30" onChange="runCmd('say',this.value)" value="Hi! ">
-		<br>
-
-		Play sounds:
-		<input value="Beep 1" type="button" onClick="runCmd('play','music/whistle1.mp3')">
-		<input value="Beep 2" type="button" onClick="runCmd('play','music/whistle2.mp3')">
-		<input value="Stop" type="button" onClick="runCmd('play','')"><br>
-
-		<!--   -->
-
-		<div id="button_area" style="font-style:italic">
 			<table>
-
-			<tr>
-
-			<td>Toggle LED<input id="LEDtoggle" value="LED On" type="checkbox" onClick="LEDtoggle()"></td>
-			<td>LED Demo <input  id="LEDdemo" value="LED Demo" type="checkbox" onClick="LEDdemo()" disabled></td> 
-			<td><input class="color{pickerOnfocus:true}" id="color_picker" onchange = "updateRGB()"></td>
-			</tr>
-			<tr>
-			<td></td> <!-- 2 empty cells for Alignment -->
-			<td></td>
- 
-			<td colspan="3">R <input id="LED_red" size="5">  G <input id="LED_green" size="5">  B <input id="LED_blue" size="5">
-			</tr>
-
+				<tr>
+					<td>
+						<div id="pilot_arrows" style="background-color:#808080;position:relative;width:400px;height:400px;" onmousedown="pilot_mouse(event,0)" ondblclick="pilot_mouse(event,2)" ondragstart="pilot_mouse(event,0)" onmouseout="pilot_mouse(event,1)"  onmouseup="pilot_mouse(event,1)" onmousemove="pilot_mouse(event,2)">
+							<img src="img/arrows_hard.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;"/>
+							<img id="glow" src="img/arrows_glow.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;"/>
+						</div>
+					</td>
+					<td style="width:100%;height:100%">
+						<div id="video_area" style="width:100%;height:100%">
+							<iframe id="video_frame" style="width:100%;height:400px" src=""></iframe>
+						</div>
+					</td>
+				</tr>
 			</table>
 
+			<div role="tabpanel">
+				<ul class="nav nav-tabs" role="tablist">
+					<li role="presentation" class="setup"><a href="#setup" aria-controls="setup" role="tab" data-toggle="tab">Setup</a></li>
+					<li role="presentation"><a href="#interaction" aria-controls="interaction" role="tab" data-toggle="tab">Interaction</a></li>
+					<li role="presentation"><a href="#sensors" aria-controls="sensors" role="tab" data-toggle="tab">Sensors</a></li>
+					<li role="presentation"><a href="#robot_health" aria-controls="robot_health" role="tab" data-toggle="tab">Robot Health</a></li>
+				</ul>
+
+				<div class="tab-content">
+					<div role="tabpanel" class="tab-pane active" id="setup">
+						Robot Name:<input type="text" id="robot_name" rows="1" cols="30" onChange="run();" value="layla/uaf"/>
+						<input value="Video - Gruveo" type="button" onClick="runCmd('video','r'+((new Date()).getTime())); openGruveoVideo()"/><br/>
+
+						RTC video name: <input type="text" id="robot_videoname" rows="1" cols="30" onChange="updateRTCVideo()" value="layla/uaf"/>
+						<input value="Video - RTC" type="button" onClick="updateRTCVideo()"/><br/>
+
+						Drive Power: <input type="text" id="robot_power" rows="1" cols="30" onChange="run()" value="15"/><br/>
+
+						Pilot Auth: <input type="text" id="robot_auth" rows="1" cols="30" onChange="run()" value=""/><br/>
+					</div>
+					<div role="tabpanel" class="tab-pane" id="interaction">
+						Show text: <input type="text" id="robot_showtext" rows="1" cols="30" onChange="runCmd('say',this.value)" value="Hi! "/><br/>
+
+						Play sounds:
+							<input value="Beep 1" type="button" onClick="runCmd('play','music/whistle1.mp3')"/>
+							<input value="Beep 2" type="button" onClick="runCmd('play','music/whistle2.mp3')"/>
+							<input value="Stop" type="button" onClick="runCmd('play','')"/><br/>
+
+						<div id="button_area" style="font-style:italic">
+							<table>
+								<tr>
+									<td>
+										Toggle LED<input id="LEDtoggle" value="LED On" type="checkbox" onClick="LEDtoggle()"/>
+									</td>
+									<td>
+										LED Demo <input  id="LEDdemo" value="LED Demo" type="checkbox" onClick="LEDdemo()" disabled/>
+									</td>
+									<td>
+										<input class="color{pickerOnfocus:true}" id="color_picker" onchange = "updateRGB()"/>
+									</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td></td>
+									<td colspan="3">R <input id="LED_red" size="5"/>  G <input id="LED_green" size="5"/>  B <input id="LED_blue" size="5"/>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div role="tabpanel" class="tab-pane" id="sensors">
+						<table>
+							<CAPTION> Current Sensor Values</CAPTION>
+							<tr>
+								<td colspan="5">
+									Ultrasonic Sensors
+									<input id="USonic1" size ="3" disabled/>
+									<input id="USonic2" size ="3" disabled/>
+									<input id="USonic3" size ="3" disabled/>
+									<input id="USonic4" size ="3" disabled/>
+									<input id="USonic5" size ="3" disabled/>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div role="tabpanel" class="tab-pane" id="robot_health">
+						<table>
+							<tr>
+								<td>
+									<p id="p_outputNet"> Network Status</p>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<p id="p_outputPilot">Pilot Status</p>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+
+				<div id="status_area" style="font-style:italic;">
+					<p id="p_errorout" style="color:red;">ERROR: JavaScript not enabled.</p>
+				</div>
+			</div>
 		</div>
-		</p>
-	</div> <!-- Close Interaction Tab -->
-	<div id="tabs-3">
-		<table>
-		 <CAPTION> Current Sensor Values</CAPTION> 
-		 <!-- Display Utrasonic Sensor Values -->
-		<td colspan="5">Ultrasonic Sensors <input id="USonic1" size ="3" disabled> <input id="USonic2" size ="3" disabled> <input id="USonic3" size ="3" disabled> <input id="USonic4" size ="3" disabled> <input id="USonic5" size ="3" disabled> </td>
-		</tr>
-		</table>
-				
-	</div> <!-- Close Sensors Tab -->
-	
-	<div id="tabs-4">
-		<table>
-		<tr>
-		<p id="p_outputNet"> Network Status</p>
-		</tr>
-		<tr>
-		<P id="p_outputPilot">Pilot Status</p>
-		</tr>
-		</table>
-	</div> <!-- Close Robot health Tab -->	
-</div>
-<script> $( "#tabs" ).tabs(); </script> <!--Has to be placed after tabs-->
 
+		<!--Color Picker Source-->
+		<script type="text/javascript" src="http://www.robotmoose.com/js/jscolor/jscolor.js"></script>
 
+		<!--Pilot Source-->
+		<script type="text/javascript" src="http://www.robotmoose.com/js/pilot.js"></script>
 
-<div id="status_area" style="font-style:italic;">
-<P id="p_errorout" style="color:red;">ERROR: JavaScript not enabled.</p>
-</div>
-</body></html>
+		<!--Auth Source-->
+		<script src="http://www.robotmoose.com/js/auth/sha2_auth.js"></script>
+	</body>
+</html>
