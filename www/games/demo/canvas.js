@@ -33,20 +33,6 @@ var canvas_t=function(canvas_obj,setup_func,loop_func,draw_func)
 
 	var myself=this;
 
-	this.keydown=function(evt)
-	{
-		if(!myself.keys_down[evt.keyCode])
-			myself.keys_pressed[evt.keyCode]=true;
-
-		myself.keys_down[evt.keyCode]=true;
-	};
-
-	this.keyup=function(evt)
-	{
-		myself.keys_released[evt.keyCode]=true;
-		myself.keys_down[evt.keyCode]=false;
-	};
-
 	this.draw=function()
 	{
 		if(myself.canvas&&myself.ctx&&myself.user_draw)
@@ -79,6 +65,4 @@ var canvas_t=function(canvas_obj,setup_func,loop_func,draw_func)
 
 	this.user_setup();
 	this.loop(this);
-	this.canvas.addEventListener("keydown",this.keydown,true);
-	this.canvas.addEventListener("keyup",this.keyup,true);
 };

@@ -10,6 +10,31 @@
 		<script src="http://robotmoose.com/games/demo/moose.js"></script>
 		<script src="http://robotmoose.com/games/demo/sprite.js"></script>
 		<script>
+
+			function keydown(evt)
+			{
+				if(simulation)
+				{
+					if(!simulation.keys_down[evt.keyCode])
+						simulation.keys_pressed[evt.keyCode]=true;
+
+					simulation.keys_down[evt.keyCode]=true;
+				}
+			};
+
+			function keyup(evt)
+			{
+				if(simulation)
+				{
+					simulation.keys_released[evt.keyCode]=true;
+					simulation.keys_down[evt.keyCode]=false;
+				}
+			};
+
+			window.addEventListener("keydown",keydown,true);
+			window.addEventListener("keyup",keyup,true);
+
+
 			var run=true;
 			var simulation;
 
