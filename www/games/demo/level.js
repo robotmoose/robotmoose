@@ -1,15 +1,17 @@
 (function(){var imported=document.createElement("script");imported.src="http://robotmoose.com/games/demo/block.js";document.head.appendChild(imported);})();
 
-var level_t=function(places)
+function level_t(places)
 {
-	this.blocks=new Array();
+	var myself=this;
+
+	myself.blocks=new Array();
 
 	for(var ii=0;ii<places.length;++ii)
-		this.blocks[ii]=new block_t(places[ii].x,places[ii].y);
+		myself.blocks[ii]=new block_t(places[ii].x,places[ii].y);
 
-	this.draw=function(simulation)
+	myself.draw=function(simulation)
 	{
-		for(var ii=0;ii<this.blocks.length;++ii)
-			this.blocks[ii].draw(simulation);
+		for(var ii=0;ii<myself.blocks.length;++ii)
+			myself.blocks[ii].draw(simulation);
 	};
 };

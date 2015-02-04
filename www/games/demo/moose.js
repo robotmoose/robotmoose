@@ -1,76 +1,77 @@
 (function(){var imported=document.createElement("script");imported.src="http://robotmoose.com/games/demo/sprite.js";document.head.appendChild(imported);})();
 (function(){var imported=document.createElement("script");imported.src="http://robotmoose.com/games/demo/level.js";document.head.appendChild(imported);})();
 
-var moose_t=function(x,y)
+function moose_t(x,y)
 {
-	this.x=x;
-	this.y=y;
-	this.spr_right=new sprite_t("http://robotmoose.com/games/demo/moose_right.png",4);
-	this.spr_left=new sprite_t("http://robotmoose.com/games/demo/moose_left.png",4);
-	this.spr_jump=new sprite_t("http://robotmoose.com/games/demo/moose_jump.png",2);
-	this.spr=this.spr_right;
-	this.speed=100;
-	this.animation_speed=20;
-	this.jump=false;
-	this.direction=1;
-	this.bb={width:0,height:0};
-	this.v_speed=0;
+	var myself=this;
 
-	this.y_velocity=0;
+	myself.x=x;
+	myself.y=y;
+	myself.spr_right=new sprite_t("http://robotmoose.com/games/demo/moose_right.png",4);
+	myself.spr_left=new sprite_t("http://robotmoose.com/games/demo/moose_left.png",4);
+	myself.spr_jump=new sprite_t("http://robotmoose.com/games/demo/moose_jump.png",2);
+	myself.spr=myself.spr_right;
+	myself.speed=100;
+	myself.animation_speed=20;
+	myself.jump=false;
+	myself.direction=1;
+	myself.bb={width:0,height:0};
+	myself.v_speed=0;
+	myself.y_velocity=0;
 
-	this.loop=function(simulation,dt,level)
+	myself.loop=function(simulation,dt,level)
 	{
 		if(simulation)
 		{
 			//Check for Under Collision
 			var collision=false;
-			var new_y=this.y+this.y_velocity;
+			var new_y=myself.y+myself.y_velocity;
 			for(var ii=0;ii<level.blocks.length;++ii)
 			{
-				if(this.x+this.bb.width/2.0>=level.blocks[ii].x-level.blocks[ii].spr.width/2.0&&
-					this.x-this.bb.width/2.0<=level.blocks[ii].x+level.blocks[ii].spr.width/2.0&&
-					new_y+this.bb.height/2.0>=level.blocks[ii].y-level.blocks[ii].spr.height/2.0&&
-					new_y-this.bb.height/2.0<=level.blocks[ii].y+level.blocks[ii].spr.height/2.0)
+				if(myself.x+myself.bb.width/2.0>=level.blocks[ii].x-level.blocks[ii].spr.width/2.0&&
+					myself.x-myself.bb.width/2.0<=level.blocks[ii].x+level.blocks[ii].spr.width/2.0&&
+					new_y+myself.bb.height/2.0>=level.blocks[ii].y-level.blocks[ii].spr.height/2.0&&
+					new_y-myself.bb.height/2.0<=level.blocks[ii].y+level.blocks[ii].spr.height/2.0)
 				{
 					collision=true;
-					this.y_velocity=0;
-					this.jump=false;
+					myself.y_velocity=0;
+					myself.jump=false;
 					break;
 				}
 			}
 			if(!collision)
 			{
-				this.y=new_y;
-				this.y_velocity+=9.8*dt;
+				myself.y=new_y;
+				myself.y_velocity+=9.8*dt;
 			}
-			if(this.y_velocity>100)
-				this.y_velocity=100;
-			if(this.y_velocity<-100)
-				this.y_velocity=-100;
+			if(myself.y_velocity>100)
+				myself.y_velocity=100;
+			if(myself.y_velocity<-100)
+				myself.y_velocity=-100;
 
 			//Move Left/Right
 			var moved=false;
 			if(simulation.keys_down[kb_right]&&!simulation.keys_down[kb_left])
 			{
 				moved=true;
-				this.direction=1;
+				myself.direction=1;
 			}
 			if(!simulation.keys_down[kb_right]&&simulation.keys_down[kb_left])
 			{
 				moved=true;
-				this.direction=-1;
+				myself.direction=-1;
 			}
 			if(moved)
 			{
 				var collision=false;
-				var new_x=this.x+this.speed*dt*this.direction;
+				var new_x=myself.x+myself.speed*dt*myself.direction;
 
 				for(var ii=0;ii<level.blocks.length;++ii)
 				{
-					if(new_x+this.bb.width/2.0>=level.blocks[ii].x-level.blocks[ii].spr.width/2.0&&
-						new_x-this.bb.width/2.0<=level.blocks[ii].x+level.blocks[ii].spr.width/2.0&&
-						this.y+this.bb.height/2.0>=level.blocks[ii].y-level.blocks[ii].spr.height/2.0&&
-						this.y-this.bb.height/2.0<=level.blocks[ii].y+level.blocks[ii].spr.height/2.0)
+					if(new_x+myself.bb.width/2.0>=level.blocks[ii].x-level.blocks[ii].spr.width/2.0&&
+						new_x-myself.bb.width/2.0<=level.blocks[ii].x+level.blocks[ii].spr.width/2.0&&
+						myself.y+myself.bb.height/2.0>=level.blocks[ii].y-level.blocks[ii].spr.height/2.0&&
+						myself.y-myself.bb.height/2.0<=level.blocks[ii].y+level.blocks[ii].spr.height/2.0)
 					{
 						collision=true;
 						break;
@@ -78,49 +79,49 @@ var moose_t=function(x,y)
 				}
 
 				if(!collision)
-					this.x=new_x;
+					myself.x=new_x;
 			}
 
 			//Jump
-			if(simulation.keys_pressed[kb_up]&&!this.jump)
+			if(simulation.keys_pressed[kb_up]&&!myself.jump)
 			{
-				this.jump=true;
-				this.y_velocity-=5;
+				myself.jump=true;
+				myself.y_velocity=-5;
 			}
-			if(this.jump)
+			if(myself.jump)
 			{
-				this.spr=this.spr_jump;
+				myself.spr=myself.spr_jump;
 
-				if(this.direction==1)
-					this.spr.frame=0;
+				if(myself.direction==1)
+					myself.spr.frame=0;
 				else
-					this.spr.frame=1;
+					myself.spr.frame=1;
 			}
 			else
 			{
-				if(this.direction==1)
-					this.spr=this.spr_right;
+				if(myself.direction==1)
+					myself.spr=myself.spr_right;
 				else
-					this.spr=this.spr_left;
+					myself.spr=myself.spr_left;
 
 				if(moved)
-					this.spr.frame+=this.animation_speed*dt;
+					myself.spr.frame+=myself.animation_speed*dt;
 				else
-					this.spr.frame=0;
+					myself.spr.frame=0;
 			}
 		}
 	};
 
-	this.draw=function(simulation)
+	myself.draw=function(simulation)
 	{
 		if(simulation)
 		{
-			this.bb.width=22;
-			this.bb.height=Math.max(this.spr_right.height,this.spr_left.height,this.spr_jump.height);
+			myself.bb.width=22;
+			myself.bb.height=Math.max(myself.spr_right.height,myself.spr_left.height,myself.spr_jump.height);
 
 			simulation.ctx.save();
-			simulation.ctx.translate(this.x,this.y);
-			this.spr.draw(simulation);
+			simulation.ctx.translate(myself.x,myself.y);
+			myself.spr.draw(simulation);
 			simulation.ctx.restore();
 		}
 	};

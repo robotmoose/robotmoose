@@ -1,37 +1,39 @@
-var sprite_t=function(source,frames)
+function sprite_t(source,frames)
 {
-	this.image=new Image();
-	this.image.src=source;
-	this.frame=0;
-	this.frame_count=frames;
-	this.x_scale=1;
-	this.y_scale=1;
-	this.width=this.image.width/this.frame_count;
-	this.height=this.image.height;
+	var myself=this;
 
-	this.draw=function(simulation)
+	myself.image=new Image();
+	myself.image.src=source;
+	myself.frame=0;
+	myself.frame_count=frames;
+	myself.x_scale=1;
+	myself.y_scale=1;
+	myself.width=myself.image.width/myself.frame_count;
+	myself.height=myself.image.height;
+
+	myself.draw=function(simulation)
 	{
-		if(this.frame>=this.frame_count)
-			this.frame=0;
+		if(myself.frame>=myself.frame_count)
+			myself.frame=0;
 
-		this.width=this.image.width/this.frame_count;
-		this.height=this.image.height;
+		myself.width=myself.image.width/myself.frame_count;
+		myself.height=myself.image.height;
 
 		if(simulation)
 		{
 			simulation.ctx.save();
-			simulation.ctx.translate(-(this.width/2.0*this.x_scale),-(this.height/2.0*this.y_scale));
-			simulation.ctx.scale(this.x_scale,this.y_scale);
+			simulation.ctx.translate(-(myself.width/2.0*myself.x_scale),-(myself.height/2.0*myself.y_scale));
+			simulation.ctx.scale(myself.x_scale,myself.y_scale);
 
-			simulation.ctx.drawImage(this.image,
-				Math.floor(this.frame)*this.width,
+			simulation.ctx.drawImage(myself.image,
+				Math.floor(myself.frame)*myself.width,
 				0,
-				this.width,
-				this.height,
+				myself.width,
+				myself.height,
 				0,
 				0,
-				this.width,
-				this.height);
+				myself.width,
+				myself.height);
 
 			simulation.ctx.restore();
 		}
