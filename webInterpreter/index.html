@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/Product">
+  <head>
+    <title>RobotMoose - Coding Workshop</title>
+    <script>
+      // Redirect old hash url to new.
+      (function () {
+        var loc = window.location,
+            parts = loc.hash.split(':'),
+            session_path = parts[0].slice(1),
+            page = parts[1];
+        if (page || session_path) {
+          var loc = loc.protocol + '//' +  loc.host  + '/';
+          if (session_path) loc += session_path + '/';
+          if (page) loc += page;
+          window.location.href = loc;
+        }
+      })();
+    </script>
+
+    <!-- Icons -->
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/vnd.microsoft.icon" />
+  
+    <!-- Scripts -->
+    <link type="text/css" rel="stylesheet" href="/css/style.css?{{CACHE_BUSTER}}" />
+    <link type="text/css" rel="stylesheet" href="/css/print.css?{{CACHE_BUSTER}}" media="print" />
+    <link type="text/css" rel="stylesheet" href="/css/ansi.css?{{CACHE_BUSTER}}" />
+
+    <!-- Application -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <!--BAKED
+        <script src="/jsrepl/jsrepl.js?{{CACHE_BUSTER}}" id="jsrepl-script"></script>
+        <script src="/repl.it.js?{{CACHE_BUSTER}}"></script>
+    UNBAKED-->
+        <!-- jsREPL -->
+        <script src="/jsrepl/repl.js?{{CACHE_BUSTER}}" id="jsrepl-script"></script>
+        <script src="/jsrepl/languages.js?{{CACHE_BUSTER}}"></script>
+        <!-- repl.it -->
+        <script src="/lib/jqconsole-2.10.0.min.js"></script>
+        <script src="/lib/bootstrap-tooltip.js"></script>
+        <script src="/lib/page.js"></script>
+        <script src="/src/base.js?{{CACHE_BUSTER}}"></script>
+        <script src="/src/browser-check.js?{{CACHE_BUSTER}}"></script>
+        <script src="/src/dom.js?{{CACHE_BUSTER}}"></script>
+        <script src="/src/repl.js?{{CACHE_BUSTER}}"></script>
+        <script src="/src/pager.js?{{CACHE_BUSTER}}"></script>
+        <script src="/src/router.js?{{CACHE_BUSTER}}"></script>
+        <script src="/src/session.js?{{CACHE_BUSTER}}"></script>
+        <script src="/src/languages.js?{{CACHE_BUSTER}}"></script>
+        <script src="/src/analytics.js?{{CACHE_BUSTER}}"></script>
+
+    <!--/UNBAKED-->
+    <script src="/lib/ace/ace.js"></script>
+    <!-- Session -->
+    <script>try{ {{SESSION_PLACEHOLDER}} } catch(e) {}</script>
+  </head>
+
+  <body>
+    <div id="main">
+      <div id="resize-left"></div>
+
+      <!-- Main wokspace area with editor and console. -->
+      <div id="content-workspace" class="page">
+        <div id="editor">
+          <div id="editor-run" class="button"></div>
+          <div id="editor-widget"></div>
+          <div id="unhide-left"></div>
+        </div>
+        <div id="resize-center"></div>
+        <div id="console">
+          <div id="replay-button" class="button">Run Session</div>
+          <div id="progress"><div id="progress-fill"></div></div>
+          <div id="unhide-right"></div>
+        </div>
+      </div>
+    <div id="footer">
+      <div id="links">
+        <a href="https://github.com/replit" id="link-source-code" target="_blank">source code</a>
+      </div>
+    </div>
+  </body>
+</html>
