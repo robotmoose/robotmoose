@@ -1,3 +1,5 @@
+#include "cppcheck.hpp"
+
 #include <cstdlib>
 #include <iostream>
 #include <json.h>
@@ -41,7 +43,7 @@ bool client_func(const mg_connection& connection,enum mg_event event)
 
 	if(method=="POST"&&request=="/code")
 	{
-		std::string code="#include <Arduino.h>\n"+std::string(connection.content,connection.content_len);
+		std::string code=std::string(connection.content,connection.content_len);
 		json::Object response;
 		code_check(code,response);
 		send_json(connection,response);
@@ -85,22 +87,21 @@ void send_json(const mg_connection& connection,const json::Object& obj)
 
 void code_check(const std::string& code,json::Object& response)
 {
-	json::Array errors;
+	json::Array json_errors;
+	std::vector<myerror_t> errors;
 
+	if(cppcheck_anonymous(code,errors,100000))
 	{
-		json::Object error;
-		error["line"]=1;
-		error["text"]="Nope!";
-		errors.push_back(error);
+		for(auto error:errors)
+		{
+			json::Object json_error;
+			json_error["line"]=(int)error.line;
+			json_error["column"]=(int)error.column;
+			json_error["text"]=error.text;
+			json_errors.push_back(json_error);
+		}
 	}
 
-	{
-		json::Object error;
-		error["line"]=7;
-		error["text"]="Nope again!";
-		errors.push_back(error);
-	}
-
-	response["errors"]=errors;
+	response["errors"]=json_errors;
 }
 
