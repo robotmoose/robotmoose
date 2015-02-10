@@ -7,11 +7,11 @@
 void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p);  //reads serial packets, and sometimes read/sends sensors
 
 #define PIN_DEBUG 13
-HardwareSerial &robotserial=Serial1; // RX (not used), TX
+HardwareSerial &robotserial=Serial3; // RX (not used), TX
 HardwareSerial &PCport=Serial; // direct PC
 
 //robot constants
-#define BOOT_TIME 4000
+#define BOOT_TIME 5000
 #define CMD_START               0x80
 #define CMD_MODE_SAFE           0x83
 #define CMD_MODE_FULL           0x84
@@ -84,17 +84,14 @@ void setup()
   pinMode(PIN_DEBUG,OUTPUT);
   digitalWrite(PIN_DEBUG,LOW);
   create2.start();
+  delay (1000);
 }
-
 
 void loop()
 {
-  A_packet p;
+ A_packet p;
   if (PC.read_packet(millis(),p)) handle_packet(PC.pkt,p);
-  if (!(PC.is_connected)) robot.power.stop(); // disconnected?
-  create2.motors(robot.power.left*500/64,robot.power.right*500/64); //stop
-  
-
+ if (!(PC.is_connected)) robot.power.stop(); // disconnected?
 }
 
 
@@ -105,8 +102,10 @@ void loop()
 
  void irobot::start()
  {
-   delay(BOOT_TIME);
+   //delay(BOOT_TIME);
    robotserial.begin(115200); //defualt
+   robotserial.write(0x7);
+   delay(BOOT_TIME);
    robotserial.write(CMD_START);
    robotserial.write(CMD_MODE_FULL);
    //set other start stuff ie led what not
@@ -129,6 +128,11 @@ void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p)
     }
     else //packet is good
     { 
+        int left = (robot.power.left-64)*500./63.;
+
+  int right = (robot.power.right-64)*500./63.;
+  create2.motors(right,left); 
+
       static bool blink=0;
       digitalWrite(PIN_DEBUG,!blink); // good input received: blink!
       blink=!blink;
