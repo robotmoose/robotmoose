@@ -21,6 +21,7 @@ HardwareSerial &PCport=Serial; // direct PC
 
 class irobot
 {
+  public:
    void start(void);
    void motors(int right,int left);
 };
@@ -71,7 +72,7 @@ CommunicationChannel PC(PCport);
  
 // Robot's current state:
 robot_current robot;
-
+irobot create2;
 
 
 
@@ -82,7 +83,7 @@ void setup()
     // Our ONE debug LED!
   pinMode(PIN_DEBUG,OUTPUT);
   digitalWrite(PIN_DEBUG,LOW);
-  //irobot.start();
+  create2.start();
 }
 
 
@@ -91,7 +92,7 @@ void loop()
   A_packet p;
   if (PC.read_packet(millis(),p)) handle_packet(PC.pkt,p);
   if (!(PC.is_connected)) robot.power.stop(); // disconnected?
-  irobot.motors(robot.power.left,robot.power.right); //stop
+  create2.motors(robot.power.left*500/64,robot.power.right*500/64); //stop
   
 
 }
@@ -144,6 +145,8 @@ void handle_packet(A_packet_formatter<HardwareSerial> &pkt,const A_packet &p)
          }
 	else // packet is good
 	{
+      digitalWrite(PIN_DEBUG,robot.led.ledon); // DEBUG
+
 	}
   }
 }
