@@ -1,4 +1,4 @@
-#include "arduino.hpp"
+#include <arduino.hpp>
 #include "littlestar.hpp"
 
 arduino_t arduino("/dev/ttyUSB0",57600);

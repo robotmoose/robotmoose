@@ -4,8 +4,8 @@
 #include <iostream>
 #include <thread>
 
-arduino_t::arduino_t(const std::string& serial,const size_t baud):
-	serial_m(serial),baud_m(baud),arduino_m(serial_m,baud_m)
+arduino_t::arduino_t(const std::string& serial,const size_t baud,const bool show_debug):
+	serial_m(serial),baud_m(baud),arduino_m(serial_m,baud_m),show_debug_m(show_debug)
 {}
 
 arduino_t::~arduino_t()
@@ -74,6 +74,11 @@ void arduino_t::set_baud(const size_t baud,const bool restart)
 	}
 }
 
+void arduino_t::show_debug(const bool show)
+{
+	show_debug_m=show;
+}
+
 void arduino_t::arduino_thread_func_m()
 {
 	while(true)
@@ -82,14 +87,18 @@ void arduino_t::arduino_thread_func_m()
 
 		if(arduino_m.good())
 		{
-			std::cout<<"Arduino found on "<<arduino_m.name()<<"@"<<arduino_m.baud()<<"."<<std::endl;
+			if(show_debug_m)
+				std::cout<<"Arduino found on "<<arduino_m.name()<<"@"<<arduino_m.baud()<<"."<<std::endl;
 
 			while(arduino_m.good())
 				std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
 
 		arduino_m.close();
-		std::cout<<"Arduino not found on "<<arduino_m.name()<<"@"<<arduino_m.baud()<<"."<<std::endl;
+
+		if(show_debug_m)
+			std::cout<<"Arduino not found on "<<arduino_m.name()<<"@"<<arduino_m.baud()<<"."<<std::endl;
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
 }

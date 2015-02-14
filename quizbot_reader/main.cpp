@@ -1,84 +1,59 @@
-//Made in 5 minutes...could be cleaned up a bit...
-#include <algorithm>
-#include <cctype>
-#include <fstream>
+#include <arduino.hpp>
 #include <iostream>
+#include <msl/time.hpp>
+#include "reader.hpp"
+#include <stdexcept>
 #include <string>
-#include <vector>
+#include <ctime>
 
-struct question_t
+arduino_t arduino("/dev/ttyUSB0",57600,false);
+
+void send_answer(const bool answer)
 {
-	std::string text;
-	std::string correct_answer;
-	std::vector<std::string> wrong_answers;
-};
-
-//Windows CRs...
-std::string strip_whitespace(std::string str)
-{
-	while(str.size()>0&&isspace(str[str.size()-1])!=0)
-		str.pop_back();
-
-	return str;
+	if(arduino.good())
+	{
+		if(answer)
+			arduino.write("y");
+		else
+			arduino.write("n");
+	}
+	else
+	{
+		std::cout<<"Arduino not found on "<<arduino.get_serial()<<"@"<<arduino.get_baud()<<"."<<std::endl;
+	}
 }
 
-int main()
+int main(int argc,char* argv[])
 {
-	std::string filename="questions.ini";
-	std::ifstream istr(filename);
-
-	if(!istr)
+	try
 	{
-		std::cout<<"Could not open \""<<filename<<"\"."<<std::endl;
-		return 0;
-	}
+		if(argc>1)
+			arduino.set_serial(argv[1]);
+		if(argc>2)
+			arduino.set_baud(std::stoi(argv[2]));
 
-	std::string line;
-	std::vector<question_t> questions;
-	question_t question;
+		srand(time(nullptr));
 
-	while(std::getline(istr,line))
-	{
-		line=strip_whitespace(line);
+		arduino.start();
 
-		if(line.size()!=0)
+		for(auto question:read_questions("questions.ini"))
 		{
-			if(line.find("?")!=std::string::npos)
+			while(true)
 			{
-				if(question.correct_answer.size()!=0&&question.wrong_answers.size()!=0)
-					questions.push_back(question);
+				auto answer=ask_question(question);
+				send_answer(answer);
 
-				question.correct_answer="";
-				question.wrong_answers.clear();
-				question.text=line;
-			}
-			else
-			{
-				if(question.correct_answer.size()==0)
-					question.correct_answer=line;
-				else
-					question.wrong_answers.push_back(line);
+				if(answer)
+					break;
 			}
 		}
+
+		std::cout<<"All done!"<<std::endl;
 	}
-
-	if(question.correct_answer.size()!=0&&question.wrong_answers.size()!=0)
-		questions.push_back(question);
-
-	//This just spits out all the questions...in order from the file...randomize output and call it good?
-	for(size_t qq=0;qq<questions.size();++qq)
+	catch(std::exception& e)
 	{
-		//Print Out Question
-		std::cout<<qq+1<<")  "<<questions[qq].text<<std::endl;
-
-		//Print Out Correct Answer
-		std::cout<<"\ta)  "<<questions[qq].correct_answer<<std::endl;
-
-		//Print Out Wrong Answers
-		for(size_t ww=0;ww<std::min(questions[qq].wrong_answers.size(),(size_t)25);++ww)
-			std::cout<<"\t"<<(char)('b'+ww)<<")  "<<questions[qq].wrong_answers[ww]<<std::endl;
-
-		std::cout<<std::endl;
+		std::cout<<e.what()<<std::endl;
+		return 1;
 	}
 
 	return 0;
