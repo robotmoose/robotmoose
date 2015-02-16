@@ -45,6 +45,30 @@ class roomba_t
 			CHECKSUM
 		};
 
+		struct sensor_t
+		{
+			uint8_t bumper_drop;
+			uint8_t charge_state;
+			uint16_t batt_voltage;
+			int8_t batt_temp;
+			uint16_t batt_charge;
+			uint16_t batt_capacity;
+			uint16_t encoder_l;
+			uint16_t encoder_r;
+			uint16_t cliff_l;
+			uint16_t cliff_fl;
+			uint16_t cliff_fr;
+			uint16_t cliff_r;
+			uint8_t mode;
+			uint8_t light_field;
+			uint16_t light_l;
+			uint16_t light_fl;
+			uint16_t light_cl;
+			uint16_t light_cr;
+			uint16_t light_fr;
+			uint16_t light_r;
+		};
+
 		roomba_t(const roomba_serial_t& serial);
 
 		void start();
@@ -82,29 +106,9 @@ class roomba_t
 		uint8_t* serial_buffer_m;
 		uint8_t serial_pointer_m;
 		parser_state_t serial_state_m;
+		sensor_t sensor_packet_m;
 
-		void parse_sensor_packet();
-
-		uint8_t bumper_drop_m;
-		uint8_t charge_state_m;
-		uint16_t batt_voltage_m;
-		int8_t batt_temp_m;
-		uint16_t batt_charge_m;
-		uint16_t batt_capacity_m;
-		uint16_t encoder_l_m;
-		uint16_t encoder_r_m;
-		uint16_t cliff_l_m;
-		uint16_t cliff_fl_m;
-		uint16_t cliff_fr_m;
-		uint16_t cliff_r_m;
-		uint8_t mode_m;
-		uint8_t light_field_m;
-		uint16_t light_l_m;
-		uint16_t light_fl_m;
-		uint16_t light_cl_m;
-		uint16_t light_cr_m;
-		uint16_t light_fr_m;
-		uint16_t light_r_m;
+		bool parse_sensor_packet_m();
 };
 
 #endif
