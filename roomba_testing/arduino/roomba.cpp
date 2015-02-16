@@ -43,7 +43,7 @@
 
 #define ROOMBA_PACKET_HEADER                 19
 
-#ifdef __AVR
+#if(defined(__AVR))
 
 	void (*roomba_delay)(unsigned long)=delay;
 
@@ -67,11 +67,11 @@
 
 #else
 
+	#include <iostream>
+
 	void (*roomba_delay)(const std::int64_t)=msl::delay_ms;
 
 #endif
-
-//#include <iostream>
 
 static bool checksum(const uint8_t header,const uint8_t size,const void* data,const uint8_t cs)
 {
@@ -136,8 +136,8 @@ void roomba_t::update()
 		{
 			if(checksum(ROOMBA_PACKET_HEADER,serial_size_m,serial_buffer_m,data))
 			{
-				//Need to make a struct to hold this data, then just write it in...
-				//std::cout<<"GOT A PACKET!"<<std::endl;
+				parse_sensor_packet();
+				dump_sensors();
 			}
 
 			serial_size_m=0;
@@ -294,4 +294,168 @@ void roomba_t::set_receive_sensors(const bool on)
 	}
 
 	roomba_delay(ROOMBA_SYNC_TIME);
+}
+
+#if(defined(__AVR))
+
+void roomba_t::dump_sensors() const
+{
+}
+
+#else
+
+void roomba_t::dump_sensors() const
+{
+	std::cout<<"bd\t"<<(int)bumper_drop_m<<std::endl;
+	std::cout<<"cs\t"<<(int)charge_state_m<<std::endl;
+	std::cout<<"bv\t"<<(int)batt_voltage_m<<std::endl;
+	std::cout<<"bt\t"<<(int)batt_temp_m<<std::endl;
+	std::cout<<"bch\t"<<(int)batt_charge_m<<std::endl;
+	std::cout<<"bca\t"<<(int)batt_capacity_m<<std::endl;
+	std::cout<<"enl\t"<<(int)encoder_l_m<<std::endl;
+	std::cout<<"enr\t"<<(int)encoder_r_m<<std::endl;
+	std::cout<<"cl\t"<<(int)cliff_l_m<<std::endl;
+	std::cout<<"cfl\t"<<(int)cliff_fl_m<<std::endl;
+	std::cout<<"cfr\t"<<(int)cliff_fr_m<<std::endl;
+	std::cout<<"cr\t"<<(int)cliff_r_m<<std::endl;
+	std::cout<<"m\t"<<(int)mode_m<<std::endl;
+	std::cout<<"ls\t"<<(int)light_field_m<<std::endl;
+	std::cout<<"ll\t"<<(int)light_l_m<<std::endl;
+	std::cout<<"lfl\t"<<(int)light_fl_m<<std::endl;
+	std::cout<<"lcl\t"<<(int)light_cl_m<<std::endl;
+	std::cout<<"lcr\t"<<(int)light_cr_m<<std::endl;
+	std::cout<<"lfr\t"<<(int)light_fr_m<<std::endl;
+	std::cout<<"lr\t"<<(int)light_r_m<<std::endl;
+	std::cout<<std::endl;
+}
+
+#endif
+
+void roomba_t::parse_sensor_packet()
+{
+	size_t index=0;
+
+	while(index<serial_size_m)
+	{
+		if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_BUMPER_DROP)
+		{
+			++index;
+			bumper_drop_m=*(uint8_t*)(serial_buffer_m+index);
+			index+=sizeof(uint8_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_CHARGE_STATE)
+		{
+			++index;
+			charge_state_m=*(uint8_t*)(serial_buffer_m+index);
+			index+=sizeof(uint8_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_BATT_VOLTAGE)
+		{
+			++index;
+			batt_voltage_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_BATT_TEMP)
+		{
+			++index;
+			batt_temp_m=*(int8_t*)(serial_buffer_m+index);
+			index+=sizeof(int8_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_BATT_CHARGE)
+		{
+			++index;
+			batt_charge_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_BATT_CAPACITY)
+		{
+			++index;
+			batt_capacity_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_ENCODER_L)
+		{
+			++index;
+			encoder_l_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_ENCODER_R)
+		{
+			++index;
+			encoder_r_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_CLIFF_L)
+		{
+			++index;
+			cliff_l_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_CLIFF_FL)
+		{
+			++index;
+			cliff_fl_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_CLIFF_FR)
+		{
+			++index;
+			cliff_fr_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_CLIFF_R)
+		{
+			++index;
+			cliff_r_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_MODE)
+		{
+			++index;
+			mode_m=*(uint8_t*)(serial_buffer_m+index);
+			index+=sizeof(uint8_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_LIGHT_FIELD)
+		{
+			++index;
+			light_field_m=*(uint8_t*)(serial_buffer_m+index);
+			index+=sizeof(uint8_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_LIGHT_L)
+		{
+			++index;
+			light_l_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_LIGHT_FL)
+		{
+			++index;
+			light_fl_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_LIGHT_CL)
+		{
+			++index;
+			light_cl_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_LIGHT_CR)
+		{
+			++index;
+			light_cr_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_LIGHT_FR)
+		{
+			++index;
+			light_fr_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_LIGHT_R)
+		{
+			++index;
+			light_r_m=*(uint16_t*)(serial_buffer_m+index);
+			index+=sizeof(uint16_t);
+		}
+	}
 }

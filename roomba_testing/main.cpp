@@ -30,7 +30,7 @@ int main()
 
 			//Setup
 			roomba.start();
-			roomba.set_mode(roomba_t::FULL);
+			roomba.set_mode(roomba_t::SAFE);
 
 
 			//Set Some LEDs
@@ -40,8 +40,6 @@ int main()
 			roomba.set_led_debris(false);
 			roomba.set_led_clean(0,0);
 			roomba.set_7_segment(" -_-");
-			roomba.set_receive_sensors(true);
-			roomba.set_receive_sensors(true);
 			roomba.set_receive_sensors(true);
 
 			while(arduino.good())
