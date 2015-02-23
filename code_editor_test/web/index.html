@@ -20,12 +20,11 @@
 
 		<!--Syntax Highlighting CSS-->
 		<style>
-		.lint-error{background:#ffaaaa;color:#a00000;padding:1px}
+		.lint-error{background:#ff8888;color:#a00000;padding:1px}
 		.lint-error-icon{background:#ff0000;color:#ffffff;border-radius:50%;margin-right:7px;}
 		</style>
 
-		<!--JQuery Source-->
-		<script src="js/jquery/jquery-1.8.3.min.js"></script>
+		<script src="js/xmlhttp.js"></script>
 
 		<script type="text/javascript">
 			var code_editor;
@@ -39,48 +38,41 @@
 				code_editor.setValue("void setup()\n{\n\t//This happens once\n}\n\nvoid loop()\n{\n\t//This keeps happening\n}");
 			}
 
-			function compile()
+			function on_reply(response)
 			{
-				var xmlhttp=new XMLHttpRequest();
-				var data=code_editor.getValue();
-				xmlhttp.open("POST","code",true);
-
-				xmlhttp.setRequestHeader("Content-Type","application/octet-stream");
-
-				xmlhttp.onreadystatechange=function()
+				try
 				{
-					if(xmlhttp.readyState==4&&xmlhttp.status==200)
+					var json=JSON.parse(response);
+
+					if(json)
 					{
-						try
+						for(var ii=0;ii<widgets.length;++ii)
+							code_editor.removeLineWidget(widgets[ii]);
+						widgets.length=0;
+
+						for(var ii=0;ii<json.errors.length;++ii)
 						{
-							var json=JSON.parse(xmlhttp.responseText);
+							var line=json.errors[ii].line;
+							var msg=document.createElement("div");
+							var icon=msg.appendChild(document.createElement("span"));
+							icon.innerHTML="!!";
+							icon.className="lint-error-icon";
+							msg.appendChild(document.createTextNode(json.errors[ii].text));
+							msg.className="lint-error";
 
-							if(json)
-							{
-								for(var ii=0;ii<widgets.length;++ii)
-									code_editor.removeLineWidget(widgets[ii]);
-								widgets.length=0;
-
-								for(var ii=0;ii<json.errors.length;++ii)
-								{
-									var line=json.errors[ii].line;
-									var msg=document.createElement("div");
-									var icon=msg.appendChild(document.createElement("span"));
-									icon.innerHTML="!!";
-									icon.className="lint-error-icon";
-									msg.appendChild(document.createTextNode(json.errors[ii].text));
-									msg.className="lint-error";
-
-									widgets.push(code_editor.addLineWidget(line-1,msg,{coverGutter:false,noHScroll:true}));
-								}
-							}
+							widgets.push(code_editor.addLineWidget(line-1,msg,{coverGutter:false,noHScroll:true}));
 						}
-						catch(e)
-						{}
 					}
 				}
+				catch(e)
+				{
+					alert(e);
+				}
+			}
 
-				xmlhttp.send(data);
+			function compile()
+			{
+				send_request("POST","code","",on_reply,code_editor.getValue(),"application/octet-stream");
 			}
 		</script>
 	</head>

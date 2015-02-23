@@ -43,6 +43,7 @@ bool client_func(const mg_connection& connection,enum mg_event event)
 
 	if(method=="POST"&&request=="/code")
 	{
+		std::cout<<"Code Request!"<<std::endl;
 		std::string code=std::string(connection.content,connection.content_len);
 		json::Object response;
 		code_check(code,response);
