@@ -3,81 +3,27 @@
 
 <html>
 	<head>
-		<!--CodeMirror Source-->
 		<script src="js/codemirror/codemirror.js"></script>
-		<script src="js/codemirror/clike_arduino_nxt.js"></script>
-		<link rel="stylesheet" href="js/codemirror/codemirror.css">
-		<style>.CodeMirror{border:1px solid #000000;}</style>
-
-		<!--CodeMirror Matching Brackets Source-->
-		<script src="js/codemirror/addon/edit/matchbrackets.js"></script>
-
-		<!--CodeMirror Search Source-->
-		<script src="js/codemirror/addon/dialog/dialog.js"></script>
-		<link rel="stylesheet" href="js/codemirror/addon/dialog/dialog.css">
-		<script src="js/codemirror/addon/search/search.js"></script>
-		<script src="js/codemirror/addon/search/searchcursor.js"></script>
-
-		<!--Syntax Highlighting CSS-->
-		<style>
-		.lint-error{background:#ff8888;color:#a00000;padding:1px}
-		.lint-error-icon{background:#ff0000;color:#ffffff;border-radius:50%;margin-right:7px;}
-		</style>
-
-		<script src="js/xmlhttp.js"></script>
+		<script src="js/code_editor.js"></script>
 
 		<script type="text/javascript">
-			var code_editor;
-			var widgets=[];
+			var editor=new code_editor_t();
 
 			function initialize()
 			{
-				code_editor=CodeMirror.fromTextArea(document.getElementById("code"),
-					{indentUnit:4,indentWithTabs:true,lineNumbers:true,matchBrackets:true,mode:"text/x-arduino"});
-				code_editor.setSize(480,463);
-				code_editor.setValue("void setup()\n{\n\t//This happens once\n}\n\nvoid loop()\n{\n\t//This keeps happening\n}");
-			}
-
-			function on_reply(response)
-			{
-				try
-				{
-					var json=JSON.parse(response);
-
-					if(json)
-					{
-						for(var ii=0;ii<widgets.length;++ii)
-							code_editor.removeLineWidget(widgets[ii]);
-						widgets.length=0;
-
-						for(var ii=0;ii<json.errors.length;++ii)
-						{
-							var line=json.errors[ii].line;
-							var msg=document.createElement("div");
-							var icon=msg.appendChild(document.createElement("span"));
-							icon.innerHTML="!!";
-							icon.className="lint-error-icon";
-							msg.appendChild(document.createTextNode(json.errors[ii].text));
-							msg.className="lint-error";
-
-							widgets.push(code_editor.addLineWidget(line-1,msg,{coverGutter:false,noHScroll:true}));
-						}
-					}
-				}
-				catch(e)
-				{
-					alert(e);
-				}
+				editor.create(document.getElementById("code"));
+				editor.set_value("void setup()\n{\n\t//This happens once\n}\n\nvoid loop()\n{\n\t//This keeps happening\n}");
+				editor.set_size(480,463);
 			}
 
 			function compile()
 			{
-				send_request("POST","code","",on_reply,code_editor.getValue(),"application/octet-stream");
+				editor.compile();
 			}
 		</script>
 	</head>
 	<body onload="initialize();">
-		<textarea id="code"></textarea>
+		<div id="code"></div>
 		<br/>
 		<input type="button" value="Compile" onclick="compile();"/>
 	</body>
