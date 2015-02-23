@@ -59,7 +59,6 @@ function editor_t()
 				window.clearTimeout(myself.timeout);
 
 			myself.timeout=setTimeout(myself.compile,myself.compile_time);
-			myself.set_status("Compiling...");
 		}
 	};
 
@@ -143,8 +142,11 @@ function editor_t()
 	myself.compile=function()
 	{
 		if(myself.editor&&myself.compilable)
+		{
+			myself.set_status("Compiling...");
 			send_request("POST","code","",myself.compile_response,myself.error_response,
 				myself.get_value(),"application/octet-stream");
+		}
 	};
 
 	myself.compile_response=function(response)

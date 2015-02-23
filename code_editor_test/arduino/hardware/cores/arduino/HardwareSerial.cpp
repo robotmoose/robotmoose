@@ -17,11 +17,10 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
+  
   Modified 23 November 2006 by David A. Mellis
   Modified 28 September 2010 by Mark Sproul
   Modified 14 August 2012 by Alarus
-  Modified 09 July 2014 by Mike Moss
 */
 
 #include <stdlib.h>
@@ -31,7 +30,7 @@
 #include "Arduino.h"
 #include "wiring_private.h"
 
-// this next line disables the entire HardwareSerial.cpp,
+// this next line disables the entire HardwareSerial.cpp, 
 // this is so I can support Attiny series and any other chip without a uart
 #if defined(UBRRH) || defined(UBRR0H) || defined(UBRR1H) || defined(UBRR2H) || defined(UBRR3H)
 
@@ -57,9 +56,9 @@
 // to which to write the next incoming character and tail is the index of the
 // location from which to read.
 #if (RAMEND < 1000)
-  #define SERIAL_BUFFER_SIZE 64
+  #define SERIAL_BUFFER_SIZE 16
 #else
-  #define SERIAL_BUFFER_SIZE 512
+  #define SERIAL_BUFFER_SIZE 64
 #endif
 
 struct ring_buffer
@@ -92,7 +91,7 @@ struct ring_buffer
 
 inline void store_char(unsigned char c, ring_buffer *buffer)
 {
-  unsigned int i = (unsigned int)(buffer->head + 1) % SERIAL_BUFFER_SIZE;
+  int i = (unsigned int)(buffer->head + 1) % SERIAL_BUFFER_SIZE;
 
   // if we should be storing the received character into the location
   // just before the tail (meaning that the head would advance to the
@@ -233,7 +232,7 @@ ISR(USART_UDRE_vect)
     // There is more data in the output buffer. Send the next byte
     unsigned char c = tx_buffer.buffer[tx_buffer.tail];
     tx_buffer.tail = (tx_buffer.tail + 1) % SERIAL_BUFFER_SIZE;
-
+	
   #if defined(UDR0)
     UDR0 = c;
   #elif defined(UDR)
@@ -257,7 +256,7 @@ ISR(USART1_UDRE_vect)
     // There is more data in the output buffer. Send the next byte
     unsigned char c = tx_buffer1.buffer[tx_buffer1.tail];
     tx_buffer1.tail = (tx_buffer1.tail + 1) % SERIAL_BUFFER_SIZE;
-
+	
     UDR1 = c;
   }
 }
@@ -274,7 +273,7 @@ ISR(USART2_UDRE_vect)
     // There is more data in the output buffer. Send the next byte
     unsigned char c = tx_buffer2.buffer[tx_buffer2.tail];
     tx_buffer2.tail = (tx_buffer2.tail + 1) % SERIAL_BUFFER_SIZE;
-
+	
     UDR2 = c;
   }
 }
@@ -291,7 +290,7 @@ ISR(USART3_UDRE_vect)
     // There is more data in the output buffer. Send the next byte
     unsigned char c = tx_buffer3.buffer[tx_buffer3.tail];
     tx_buffer3.tail = (tx_buffer3.tail + 1) % SERIAL_BUFFER_SIZE;
-
+	
     UDR3 = c;
   }
 }
@@ -338,7 +337,7 @@ void HardwareSerial::begin(unsigned long baud)
 #endif
 
 try_again:
-
+  
   if (use_u2x) {
     *_ucsra = 1 << _u2x;
     baud_setting = (F_CPU / 4 / baud - 1) / 2;
@@ -346,7 +345,7 @@ try_again:
     *_ucsra = 0;
     baud_setting = (F_CPU / 8 / baud - 1) / 2;
   }
-
+  
   if ((baud_setting > 4095) && use_u2x)
   {
     use_u2x = false;
@@ -381,7 +380,7 @@ void HardwareSerial::begin(unsigned long baud, byte config)
 #endif
 
 try_again:
-
+  
   if (use_u2x) {
     *_ucsra = 1 << _u2x;
     baud_setting = (F_CPU / 4 / baud - 1) / 2;
@@ -389,7 +388,7 @@ try_again:
     *_ucsra = 0;
     baud_setting = (F_CPU / 8 / baud - 1) / 2;
   }
-
+  
   if ((baud_setting > 4095) && use_u2x)
   {
     use_u2x = false;
@@ -405,7 +404,7 @@ try_again:
   config |= 0x80; // select UCSRC register (shared with UBRRH)
 #endif
   *_ucsrc = config;
-
+  
   sbi(*_ucsrb, _rxen);
   sbi(*_ucsrb, _txen);
   sbi(*_ucsrb, _rxcie);
@@ -420,9 +419,9 @@ void HardwareSerial::end()
 
   cbi(*_ucsrb, _rxen);
   cbi(*_ucsrb, _txen);
-  cbi(*_ucsrb, _rxcie);
+  cbi(*_ucsrb, _rxcie);  
   cbi(*_ucsrb, _udrie);
-
+  
   // clear any received data
   _rx_buffer->head = _rx_buffer->tail;
 }
@@ -462,22 +461,22 @@ void HardwareSerial::flush()
 
 size_t HardwareSerial::write(uint8_t c)
 {
-  unsigned int i = (_tx_buffer->head + 1) % SERIAL_BUFFER_SIZE;
-
-  // If the output buffer is full, there's nothing for it other than to
+  int i = (_tx_buffer->head + 1) % SERIAL_BUFFER_SIZE;
+	
+  // If the output buffer is full, there's nothing for it other than to 
   // wait for the interrupt handler to empty it a bit
   // ???: return 0 here instead?
   while (i == _tx_buffer->tail)
     ;
-
+	
   _tx_buffer->buffer[_tx_buffer->head] = c;
   _tx_buffer->head = i;
-
+	
   sbi(*_ucsrb, _udrie);
   // clear the TXC bit -- "can be cleared by writing a one to its bit location"
   transmitting = true;
   sbi(*_ucsra, TXC0);
-
+  
   return 1;
 }
 
