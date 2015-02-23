@@ -55,8 +55,14 @@ function editor_t()
 	{
 		if(myself.editor&&myself.compilable)
 		{
+			myself.clear_errors();
+			myself.set_status("");
+
 			if(myself.timeout)
+			{
 				window.clearTimeout(myself.timeout);
+				myself.timeout=null;
+			}
 
 			myself.timeout=setTimeout(myself.compile,myself.compile_time);
 		}
@@ -72,7 +78,10 @@ function editor_t()
 		myself.compilable=false;
 
 		if(myself.timeout)
+		{
 			window.clearTimeout(myself.timeout);
+			myself.timeout=null;
+		}
 	};
 
 	myself.set_status=function(text)
@@ -153,10 +162,7 @@ function editor_t()
 	{
 		if(myself.editor)
 		{
-			if(myself.timeout)
-				window.clearTimeout(myself.timeout);
-
-				myself.set_status("");
+			myself.set_status("");
 
 			try
 			{
@@ -173,7 +179,7 @@ function editor_t()
 			catch(e)
 			{
 				console.log(e);
-				set_status("Server error...");
+				myself.set_status("Server error...");
 			}
 		}
 	};
