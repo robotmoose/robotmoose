@@ -154,7 +154,7 @@ static bool parse_errors(const std::string& file_name,const std::string& error_d
 	errors=temp_errors;
 	return true;
 }
-#include <iostream>
+
 bool cppcheck(const size_t identifier,const std::string& file_data,std::vector<myerror_t>& errors)
 {
 	std::string identifier_str=std::to_string(identifier);
@@ -184,7 +184,6 @@ bool cppcheck(const size_t identifier,const std::string& file_data,std::vector<m
 		if(!ret)
 			return false;
 
-		std::cout<<error_data<<std::endl;
 		return parse_errors(file_name,error_data,errors);
 	}
 
