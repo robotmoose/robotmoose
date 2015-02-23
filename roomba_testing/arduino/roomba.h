@@ -95,6 +95,8 @@ class roomba_t
 
 		void set_receive_sensors(const bool on);
 
+		sensor_t get_sensors() const;
+
 		void dump_sensors() const;
 
 	private:

@@ -19,19 +19,18 @@ int main()
 
 	while(true)
 	{
-		msl::serial_t arduino(serial_port,serial_baud);
-		arduino.open();
+		msl::serial_t serial(serial_port,serial_baud);
+		serial.open();
 
-		if(arduino.good())
+		if(serial.good())
 		{
-			roomba_t roomba(arduino);
+			roomba_t roomba(serial);
 
 			std::cout<<":)"<<std::endl;
 
 			//Setup
 			roomba.start();
-			roomba.set_mode(roomba_t::SAFE);
-
+			roomba.set_mode(roomba_t::FULL);
 
 			//Set Some LEDs
 			roomba.set_led_check(false);
@@ -39,22 +38,37 @@ int main()
 			roomba.set_led_spot(false);
 			roomba.set_led_debris(false);
 			roomba.set_led_clean(0,0);
-			roomba.set_7_segment(" -_-");
 			roomba.set_receive_sensors(true);
+			roomba.drive(0,0);
+			roomba.set_7_segment("----");
 
-			while(arduino.good())
+			while(serial.good())
 			{
 				roomba.update();
-				//roomba.play_song(2);
-				/*//Fade Big LED
-				for(int ii=0;ii<256;++ii)
+
+				auto sensors=roomba.get_sensors();
+
+				if((int)sensors.mode==3)
 				{
-					roomba.set_led_clean(0,ii);
-					roomba.led_update();
-					msl::delay_ms(2);
-				}*/
+					//roomba.set_led_clean(255,255);
+					roomba.set_7_segment("F   ");
+				}
+				else if((int)sensors.mode==2)
+				{
+					//roomba.set_led_clean(128,255);
+					roomba.set_7_segment("S   ");
+				}
+				else
+				{
+					//roomba.set_led_clean(0,255);
+					roomba.set_7_segment("OFF");
+				}
+
+				roomba.led_update();
 				msl::delay_ms(1);
 			}
+
+			serial.close();
 		}
 
 		std::cout<<":("<<std::endl;

@@ -136,8 +136,13 @@ void roomba_t::update()
 		{
 			if(checksum(ROOMBA_PACKET_HEADER,serial_size_m,serial_buffer_m,data))
 			{
+				std::cout<<"good packet"<<std::endl;
 				parse_sensor_packet_m();
 				dump_sensors();
+			}
+			else
+			{
+				std::cout<<"bad packet"<<std::endl;
 			}
 
 			serial_size_m=0;
@@ -216,7 +221,6 @@ void roomba_t::led_update()
 	serial_m->write(&leds_m,1);
 	serial_m->write(&led_clean_color_m,1);
 	serial_m->write(&led_clean_brightness_m,1);
-	roomba_delay(ROOMBA_SYNC_TIME);
 }
 
 void roomba_t::set_7_segment(const uint8_t digits[4])
@@ -226,7 +230,6 @@ void roomba_t::set_7_segment(const uint8_t digits[4])
 
 	for(int ii=0;ii<4;++ii)
 		serial_m->write(digits,4);
-	roomba_delay(ROOMBA_SYNC_TIME);
 }
 
 void roomba_t::set_7_segment(const char* text)
@@ -242,7 +245,6 @@ void roomba_t::set_7_segment(const char* text)
 	}
 
 	set_7_segment(digits);
-	roomba_delay(ROOMBA_SYNC_TIME);
 }
 
 void roomba_t::play_song(const uint8_t number)
@@ -250,7 +252,6 @@ void roomba_t::play_song(const uint8_t number)
 	uint8_t id=ROOMBA_ID_PLAY_SONG;
 	serial_m->write(&id,1);
 	serial_m->write(&number,1);
-	roomba_delay(ROOMBA_SYNC_TIME);
 }
 
 void roomba_t::set_receive_sensors(const bool on)
@@ -294,6 +295,11 @@ void roomba_t::set_receive_sensors(const bool on)
 	}
 
 	roomba_delay(ROOMBA_SYNC_TIME);
+}
+
+roomba_t::sensor_t roomba_t::get_sensors() const
+{
+	return sensor_packet_m;
 }
 
 void roomba_t::dump_sensors() const
