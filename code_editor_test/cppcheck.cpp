@@ -78,6 +78,15 @@ static bool parse_errors(const std::string& file_name,const std::string& error_d
 
 	for(size_t ii=0;ii<lines.size();++ii)
 	{
+		auto undefined_start=lines[ii].find("undefined reference to");
+
+		if(undefined_start!=std::string::npos)
+		{
+			auto str=lines[ii].substr(undefined_start,lines[ii].size()-undefined_start);
+			temp_errors.push_back({-1,0,str});
+			continue;
+		}
+
 		auto file_name_end=lines[ii].find(file_name+":");
 
 		if(file_name_end==std::string::npos)
@@ -97,7 +106,7 @@ static bool parse_errors(const std::string& file_name,const std::string& error_d
 			continue;
 
 		for(auto error:temp_errors)
-			if(error.line==(size_t)line_number)
+			if(error.line==(ssize_t)line_number)
 				continue;
 
 		std::vector<std::string> error_texts={": error: ",": warning: ",": "};
@@ -126,7 +135,18 @@ static bool parse_errors(const std::string& file_name,const std::string& error_d
 		error_index+=error_text.size();
 
 		lines[ii]=lines[ii].substr(error_index,lines[ii].size()-error_index);
-		temp_errors.push_back({(size_t)line_number,0,lines[ii]});
+		temp_errors.push_back({(ssize_t)line_number,0,lines[ii]});
+	}
+
+	for(size_t ii=1;ii<temp_errors.size();++ii)
+	{
+		if(temp_errors[ii-1].line==temp_errors[ii].line&&
+			temp_errors[ii-1].column==temp_errors[ii].column&&
+			temp_errors[ii-1].text==temp_errors[ii].text)
+		{
+			temp_errors.erase(temp_errors.begin()+ii);
+			--ii;
+		}
 	}
 
 	errors=temp_errors;
@@ -151,7 +171,10 @@ bool cppcheck(const size_t identifier,const std::string& file_data,std::vector<m
 		std::string error_data;
 		std::string remove_data;
 
-		auto command1="cd \""+identifier_str+"\"&&g++ -Wall -g \""+file_name+"\" 2>&1|grep \""+file_name+":\"";
+		std::string compile_command="avr-g++ -I../arduino/hardware/variants/standard -mmcu=atmega328p -DF_CPU=16000000UL -Iarduino/hardware/cores -I../arduino/hardware/cores/arduino ../arduino/hardware/cores/arduino/*.cpp ../arduino/hardware/cores/arduino/*.c -o test.elf -Wno-sign-compare -Wno-unused-variable -Wall -lm -O3 -Wl,--gc-sections -ffunction-sections -fdata-sections -DUSB_VID=null -DUSB_PID=null -DARDUINO=103 -Wno-strict-aliasing";
+		std::string link_command="avr-objcopy -R .eeprom -O ihex test.elf test.hex";
+
+		auto command1="cd \""+identifier_str+"\"&&"+compile_command+" \""+file_name+"\" 2>&1 && "+link_command+" 2>&1|grep \""+file_name+":\"";
 		auto command2="rm -rf \""+identifier_str+"\"";
 
 		auto ret=exec(command1,error_data)&&exec(command2,remove_data);
@@ -165,10 +188,31 @@ bool cppcheck(const size_t identifier,const std::string& file_data,std::vector<m
 	return false;
 }
 
+bool cppcheck_arduino(const size_t identifier,const std::string& file_data,std::vector<myerror_t>& errors)
+{
+	if(cppcheck(identifier,"#include<Arduino.h>\n"+file_data,errors))
+	{
+		for(auto& error:errors)
+			--error.line;
+
+		return true;
+	}
+
+	return false;
+}
+
 bool cppcheck_anonymous(const std::string& file_data,std::vector<myerror_t>& errors,const size_t tries)
 {
 	for(size_t ii=0;ii<tries;++ii)
 		if(cppcheck(rand(),file_data,errors))
+			return true;
+	return false;
+}
+
+bool cppcheck_arduino_anonymous(const std::string& file_data,std::vector<myerror_t>& errors,const size_t tries)
+{
+	for(size_t ii=0;ii<tries;++ii)
+		if(cppcheck_arduino(rand(),file_data,errors))
 			return true;
 	return false;
 }

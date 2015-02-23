@@ -43,7 +43,6 @@ bool client_func(const mg_connection& connection,enum mg_event event)
 
 	if(method=="POST"&&request=="/code")
 	{
-		std::cout<<"Code Request!"<<std::endl;
 		std::string code=std::string(connection.content,connection.content_len);
 		json::Object response;
 		code_check(code,response);
@@ -91,7 +90,7 @@ void code_check(const std::string& code,json::Object& response)
 	json::Array json_errors;
 	std::vector<myerror_t> errors;
 
-	if(cppcheck_anonymous(code,errors,100000))
+	if(cppcheck_arduino_anonymous(code,errors,100000))
 	{
 		for(auto error:errors)
 		{

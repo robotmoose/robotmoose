@@ -13,10 +13,13 @@ function editor_t()
 {
 	var myself=this;
 	myself.div=null;
+	myself.statusarea=null;
 	myself.textarea=null;
 	myself.widgets=[];
 	myself.editor=null;
+	myself.compilable=false;
 	myself.timeout=null;
+	myself.compile_time=300;
 
 	myself.create=function(div)
 	{
@@ -26,13 +29,18 @@ function editor_t()
 			myself.div.innerHTML="";
 
 			myself.textarea=document.createElement("textarea");
-			myself.textarea.value="";
+			myself.set_status("");
 			myself.div.appendChild(myself.textarea);
+
+			myself.statusarea=document.createElement("div");
+			myself.statusarea.innerHTML=" ";
+			myself.div.appendChild(myself.statusarea);
 
 			myself.editor=CodeMirror.fromTextArea(myself.textarea,
 				{indentUnit:4,indentWithTabs:true,lineNumbers:true,matchBrackets:true,mode:"text/x-arduino"});
 
 			myself.editor.on("change",myself.interval_reset);
+			myself.compilable=true;
 
 			if(myself.editor)
 				return true;
@@ -45,12 +53,13 @@ function editor_t()
 
 	myself.interval_reset=function()
 	{
-		if(myself.editor)
+		if(myself.editor&&myself.compilable)
 		{
 			if(myself.timeout)
 				window.clearTimeout(myself.timeout);
 
-			myself.timeout=setTimeout(myself.compile,1000);
+			myself.timeout=setTimeout(myself.compile,myself.compile_time);
+			myself.set_status("Compiling...");
 		}
 	};
 
@@ -58,11 +67,24 @@ function editor_t()
 	{
 		myself.clear_errors();
 		myself.div=null;
+		myself.statusarea=null;
 		myself.textarea=null;
 		myself.editor=null;
+		myself.compilable=false;
 
 		if(myself.timeout)
 			window.clearTimeout(myself.timeout);
+	};
+
+	myself.set_status=function(text)
+	{
+		if(myself.statusarea)
+		{
+			if(text.length==0)
+				myself.statusarea.innerHTML="&nbsp;";
+			else
+				myself.statusarea.innerHTML=text;
+		}
 	};
 
 	myself.set_value=function(value)
@@ -108,14 +130,21 @@ function editor_t()
 			icon.className="lint-error-icon";
 			msg.appendChild(document.createTextNode(text));
 			msg.className="lint-error";
-			myself.widgets.push(myself.editor.addLineWidget(line-1,msg,{coverGutter:false,noHScroll:true}));
+
+			var line_number=line-1;
+
+			if(line_number<0)
+				line_number=myself.editor.lineCount()-1;
+
+			myself.widgets.push(myself.editor.addLineWidget(line_number,msg,{coverGutter:false,noHScroll:true}));
 		}
 	};
 
 	myself.compile=function()
 	{
-		if(myself.editor)
-			send_request("POST","code","",myself.compile_response,myself.get_value(),"application/octet-stream");
+		if(myself.editor&&myself.compilable)
+			send_request("POST","code","",myself.compile_response,myself.error_response,
+				myself.get_value(),"application/octet-stream");
 	};
 
 	myself.compile_response=function(response)
@@ -124,6 +153,8 @@ function editor_t()
 		{
 			if(myself.timeout)
 				window.clearTimeout(myself.timeout);
+
+				myself.set_status("");
 
 			try
 			{
@@ -140,7 +171,14 @@ function editor_t()
 			catch(e)
 			{
 				console.log(e);
+				set_status("Server error...");
 			}
 		}
+	};
+
+	myself.error_response=function(error_code)
+	{
+		if(myself.editor)
+			myself.set_status("Server error ("+error_code+")");
 	};
 }

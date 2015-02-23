@@ -1,25 +1,42 @@
-function send_request(method,request,uri,on_reply,data,content_type)
+function send_request(method,request,uri,on_reply,on_error,data,content_type)
 {
-	if(method&&request)
+	try
 	{
-		var xmlhttp=new XMLHttpRequest();
-
-		xmlhttp.onreadystatechange=function()
+		if(method&&request)
 		{
-			if(xmlhttp.readyState==4&&xmlhttp.status==200&&on_reply)
-				on_reply(xmlhttp.responseText);
-		};
+			var xmlhttp=new XMLHttpRequest();
 
-		var request_text=encodeURIComponent(request);
+			xmlhttp.onreadystatechange=function()
+			{
+				if(xmlhttp.readyState==4)
+				{
+					if(xmlhttp.status==200)
+					{
+						if(on_reply)
+							on_reply(xmlhttp.responseText);
+					}
+					else if(on_error)
+					{
+						on_error(xmlhttp.status);
+					}
+				}
+			};
 
-		if(uri)
-			request_text+=uri;
+			var request_text=encodeURIComponent(request);
 
-		xmlhttp.open(method,request_text,true);
+			if(uri)
+				request_text+=uri;
 
-		if(content_type)
-			xmlhttp.setRequestHeader("Content-Type",content_type);
+			xmlhttp.open(method,request_text,true);
 
-		xmlhttp.send(data);
+			if(content_type)
+				xmlhttp.setRequestHeader("Content-Type",content_type);
+
+			xmlhttp.send(data);
+		}
+	}
+	catch(e)
+	{
+		on_error(e);
 	}
 }
