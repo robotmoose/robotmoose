@@ -19,7 +19,7 @@ function editor_t()
 	myself.editor=null;
 	myself.compilable=false;
 	myself.timeout=null;
-	myself.compile_time=300;
+	myself.compile_time=1000;
 
 	myself.create=function(div)
 	{

@@ -12,7 +12,7 @@ void send_string(const mg_connection& connection,const std::string& str);
 void send_json(const mg_connection& connection,const json::Object& obj);
 void code_check(const std::string& code,json::Object& response);
 
-msl::webserver_t server(client_func,"0.0.0.0:8080","web");
+msl::webserver_t server(client_func,"0.0.0.0:8082","web");
 
 int main()
 {
