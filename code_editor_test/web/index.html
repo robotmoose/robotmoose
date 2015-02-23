@@ -4,10 +4,10 @@
 <html>
 	<head>
 		<script src="js/codemirror/codemirror.js"></script>
-		<script src="js/code_editor.js"></script>
+		<script src="js/editor.js"></script>
 
 		<script type="text/javascript">
-			var editor=new code_editor_t();
+			var editor=new editor_t();
 
 			function initialize()
 			{
@@ -24,7 +24,5 @@
 	</head>
 	<body onload="initialize();">
 		<div id="code"></div>
-		<br/>
-		<input type="button" value="Compile" onclick="compile();"/>
 	</body>
 </html>
