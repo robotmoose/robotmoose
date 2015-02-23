@@ -4,6 +4,8 @@
 #include <fstream>
 #include <sstream>
 
+//Requires linux system with avr-g++ and avr-objcopy in bin search path.
+
 #if(defined(_WIN32)&&!defined(__CYGWIN__))
 
 	static FILE* popen(const char* command,const char* type)

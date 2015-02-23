@@ -1,6 +1,8 @@
 #ifndef CPP_CHECK_HPP_C11
 #define CPP_CHECK_HPP_C11
 
+//Requires linux system with avr-g++ and avr-objcopy in bin search path.
+
 #include <string>
 #include <vector>
 

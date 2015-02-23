@@ -1,5 +1,6 @@
-#include "cppcheck.hpp"
+//Requires linux system with avr-g++ and avr-objcopy in bin search path.
 
+#include "cppcheck.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <json.h>
