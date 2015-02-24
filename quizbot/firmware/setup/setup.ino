@@ -6,18 +6,18 @@ int body_amount=20;
 
 Servo neck;
 int neck_forward=30;
-int neck_amount=10;
+int neck_amount=20;
 
 void setup()
 {
-  body.attach(9);
-  neck.attach(10);
+  body.attach(10);
+  neck.attach(9);
 }
 
 void loop()
 {
   face_forward();
-  // nod_yes();
+  nod_yes();
 }
 
 void face_forward()
