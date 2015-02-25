@@ -1,68 +1,59 @@
 #include <Servo.h>
 
-Servo tilt;
-int tilt_pin=4;
-int tilt_forward=38;
-int tilt_amount=10;
+Servo body;
+int body_forward=90;
+int body_amount=20;
 
-Servo pan;
-int pan_pin=10;
-int pan_forward=90;
-int pan_amount=30;
+Servo neck;
+int neck_forward=30;
+int neck_amount=20;
 
 void setup()
 {
   Serial.begin(57600);
-  tilt.attach(tilt_pin);
-  pan.attach(pan_pin);
-  face_forward();
-  delay(500);
+  Serial.write("Robot starting up!");
+  body.attach(10);
+  neck.attach(9);
 }
 
 void loop()
 {
-  char temp;
-
-  while(Serial.available()>0&&Serial.readBytes(&temp,1)==1)
+  int key=Serial.read();
+  
+  if(key=='y')
   {
-    if(temp=='n')
-    {
-      nod_no();
-    }
-    else if(temp=='y')
-    {
-      nod_yes();
-    }
-
+    nod_yes();
+    // add more motions here!
+  }
+  else if(key=='n')
+  {
+    shake_no();
+    // add more motions here!
+  }
+  else
+  {
     face_forward();
-    delay(500);
   }
 }
 
 void face_forward()
 {
-  tilt.write(tilt_forward);
-  pan.write(pan_forward);
+  body.write(body_forward+0);
+  neck.write(neck_forward+0);
+  delay(500);
 }
 
 void nod_yes()
 {
-  for(int times=0;times<3;++times)
-  {
-    tilt.write(tilt_forward-tilt_amount);
-    delay(300);
-    tilt.write(tilt_forward+tilt_amount);
-    delay(300);
-  }
+  body.write(body_forward+0);
+  neck.write(neck_forward+neck_amount);
+  delay(500);
 }
 
-void nod_no()
+void shake_no()
 {
-  for(int times=0;times<3;++times)
-  {
-    pan.write(pan_forward-pan_amount);
-    delay(300);
-    pan.write(pan_forward+pan_amount);
-    delay(300);
-  }
+  body.write(body_forward+body_amount);
+  neck.write(neck_forward+0);
+  delay(500);
 }
+
