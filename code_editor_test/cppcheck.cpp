@@ -161,7 +161,7 @@ bool cppcheck(const size_t identifier,const std::string& file_data,std::vector<m
 	std::string file_name=identifier_str+".cpp";
 	std::string temp;
 
-	if(!exec("chroot mkdir -p "+identifier_str,temp))
+	if(!exec("mkdir -p "+identifier_str,temp))
 		return false;
 
 	std::ofstream ostr(identifier_str+"/"+file_name);
@@ -173,8 +173,8 @@ bool cppcheck(const size_t identifier,const std::string& file_data,std::vector<m
 		std::string error_data;
 		std::string remove_data;
 
-		std::string compile_command="chroot /jail/ /jail/usr/bin/avr-g++ -I../arduino/hardware/variants/standard -mmcu=atmega328p -DF_CPU=16000000UL -Iarduino/hardware/cores -I../arduino/hardware/cores/arduino ../arduino/hardware/cores/arduino/*.cpp ../arduino/hardware/cores/arduino/*.c -o test.elf -Wno-sign-compare -Wno-unused-variable -Wall -lm -Wl,--gc-sections -DUSB_VID=null -DUSB_PID=null -DARDUINO=103 -Wno-strict-aliasing";
-		std::string link_command="chroot /jail/ /jail/usr/bin/avr-objcopy -R .eeprom -O ihex test.elf test.hex";
+		std::string compile_command="avr-g++ -I../arduino/hardware/variants/standard -mmcu=atmega328p -DF_CPU=16000000UL -Iarduino/hardware/cores -I../arduino/hardware/cores/arduino ../arduino/hardware/cores/arduino/*.cpp ../arduino/hardware/cores/arduino/*.c -o test.elf -Wno-sign-compare -Wno-unused-variable -Wall -lm -Wl,--gc-sections -DUSB_VID=null -DUSB_PID=null -DARDUINO=103 -Wno-strict-aliasing";
+		std::string link_command="avr-objcopy -R .eeprom -O ihex test.elf test.hex";
 
 		auto command1="cd \""+identifier_str+"\"&&"+compile_command+" \""+file_name+"\" 2>&1 && "+link_command+" 2>&1|grep \""+file_name+":\"";
 		auto command2="rm -rf \""+identifier_str+"\"";
