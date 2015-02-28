@@ -7,14 +7,8 @@ function load_js(js)
 
 function load_dependencies()
 {
-	load_js("js/three/three.min.js");
-
-	setTimeout(
-		function()
-		{
-			load_js("js/three/loaders/OBJLoader.js");
-			load_js("js/three/loaders/STLLoader.js");
-		},100);
+	load_js("js/three/loaders/OBJLoader.js");
+	load_js("js/three/loaders/STLLoader.js");
 };
 
 (function(){load_dependencies()})();
