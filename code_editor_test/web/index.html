@@ -3,21 +3,33 @@
 
 <html>
 	<head>
-		<script src="js/codemirror/codemirror.js"></script>
+		<script src="js/arduino_emulator.js"></script>
 		<script src="js/editor.js"></script>
 
 		<script type="text/javascript">
+			var upload_button;
 			var editor=new editor_t();
+			var emulator=new arduino_emulator_t();
 
 			function initialize()
 			{
+				var upload_button=document.getElementById("upload");
 				editor.create(document.getElementById("code"));
-				editor.set_value("void setup()\n{\n\t//This happens once\n}\n\nvoid loop()\n{\n\t//This keeps happening\n}");
+				editor.set_value("void setup()\n{\n\t//This happens once\n\tSerial.println(\"test\");\n}\n\nvoid loop()\n{\n\t//This keeps happening\n}");
 				editor.set_size(480,463);
+				editor.on_change=function(){upload_button.disabled=true};
+				editor.on_compiled=function(){upload_button.disabled=false};
+			}
+
+			function upload()
+			{
+				emulator.compile(editor.get_value());
 			}
 		</script>
 	</head>
 	<body onload="initialize();">
 		<div id="code"></div>
+		<br/>
+		<input type="button" id="upload" value="Upload" onclick="upload();"/>
 	</body>
 </html>

@@ -6,7 +6,7 @@ LIBS=-lpthread
 cppcheck_src=cppcheck.cpp
 json_src=$(INC)/json.cpp
 mongoose_src=$(INC)/mongoose/mongoose.c
-msl_src=$(INC)/msl/time.cpp $(INC)/msl/webserver.cpp
+msl_src=$(INC)/msl/string.cpp $(INC)/msl/time.cpp $(INC)/msl/webserver.cpp
 
 all: code_editor
 

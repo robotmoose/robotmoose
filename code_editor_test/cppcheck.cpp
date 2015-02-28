@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <fstream>
 #include <sstream>
+#include <msl/string.hpp>
 
 //Requires linux system with avr-g++ and avr-objcopy in bin search path.
 
@@ -150,6 +151,9 @@ static bool parse_errors(const std::string& file_name,const std::string& error_d
 			--ii;
 		}
 	}
+
+	for(auto& error:temp_errors)
+		error.text=msl::replace_all(error.text,"\"","\\\"");
 
 	errors=temp_errors;
 	return true;

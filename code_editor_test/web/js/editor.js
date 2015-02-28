@@ -1,13 +1,46 @@
-(function(){var imported=document.createElement("script");imported.src="js/xmlhttp.js";document.head.appendChild(imported);})();
-(function(){var imported=document.createElement("script");imported.src="js/codemirror/clike_arduino_nxt.js";document.head.appendChild(imported);})();
-(function(){var imported=document.createElement("script");imported.src="js/codemirror/addon/edit/matchbrackets.js";document.head.appendChild(imported);})();
-(function(){var imported=document.createElement("script");imported.src="js/codemirror/addon/dialog/dialog.js";document.head.appendChild(imported);})();
-(function(){var imported=document.createElement("script");imported.src="js/codemirror/addon/search/search.js";document.head.appendChild(imported);})();
-(function(){var imported=document.createElement("script");imported.src="js/codemirror/addon/search/searchcursor.js";document.head.appendChild(imported);})();
-(function(){var imported=document.createElement("link");imported.rel="stylesheet";imported.href="js/codemirror/codemirror.css";document.head.appendChild(imported);})();
-(function(){var imported=document.createElement("link");imported.rel="stylesheet";imported.href="js/codemirror/addon/dialog/dialog.css";document.head.appendChild(imported);})();
-(function(){var imported=document.createElement("style");imported.appendChild(document.createTextNode(".CodeMirror{border:1px solid #000000;}"));document.head.appendChild(imported);})();
-(function(){var imported=document.createElement("style");imported.appendChild(document.createTextNode(".lint-error{background:#ff8888;color:#a00000;padding:1px}\r\n.lint-error-icon{background:#ff0000;color:#ffffff;border-radius:50%;margin-right:7px;}"));document.head.appendChild(imported);})();
+function load_js(js)
+{
+	var scr=document.createElement("script");
+	scr.src=js;
+	document.head.appendChild(scr);
+};
+
+function load_link(link)
+{
+	var ln=document.createElement("link");
+	ln.rel="stylesheet";
+	ln.href=link;
+	document.head.appendChild(ln);
+};
+
+function load_style(style)
+{
+	var sty=document.createElement("style");
+	sty.appendChild(document.createTextNode(style));
+	document.head.appendChild(sty);
+};
+
+function load_dependencies()
+{
+	load_js("js/codemirror/codemirror.js");
+
+	setTimeout(
+		function()
+		{
+			load_js("js/xmlhttp.js");
+			load_js("js/codemirror/clike_arduino_nxt.js");
+			load_js("js/codemirror/addon/edit/matchbrackets.js");
+			load_js("js/codemirror/addon/dialog/dialog.js");
+			load_js("js/codemirror/addon/search/search.js");
+			load_js("js/codemirror/addon/search/searchcursor.js");
+			load_link("js/codemirror/codemirror.css");
+			load_link("js/codemirror/addon/dialog/dialog.css");
+			load_style(".CodeMirror{border:1px solid #000000;}");
+			load_style(".lint-error{background:#ff8888;color:#a00000;padding:1px}\r\n.lint-error-icon{background:#ff0000;color:#ffffff;border-radius:50%;margin-right:7px;}");
+		},100);
+};
+
+(function(){load_dependencies()})();
 
 function editor_t()
 {
@@ -20,6 +53,9 @@ function editor_t()
 	myself.compilable=false;
 	myself.timeout=null;
 	myself.compile_time=1000;
+
+	myself.on_change=null;
+	myself.on_compiled=null;
 
 	myself.create=function(div)
 	{
@@ -65,6 +101,9 @@ function editor_t()
 			}
 
 			myself.timeout=setTimeout(myself.compile,myself.compile_time);
+
+			if(myself.on_change)
+				myself.on_change();
 		}
 	};
 
@@ -174,6 +213,9 @@ function editor_t()
 
 					for(var ii=0;ii<json.errors.length;++ii)
 						myself.add_error(json.errors[ii].line,json.errors[ii].text);
+
+					if(myself.on_compiled&&json.errors.length==0)
+						myself.on_compiled();
 				}
 			}
 			catch(e)
