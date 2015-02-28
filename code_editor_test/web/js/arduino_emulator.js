@@ -12,6 +12,21 @@ function load_dependencies()
 
 (function(){load_dependencies()})();
 
+function arduino_servo_t(pin_count)
+{
+	var myself=this;
+	myself.pin_count=pin_count;
+	myself.pin=-1;
+	myself.pos=0;
+
+	myself.attach=function(pin){myself.pin=pin;};
+	myself.write=function(pos){myself.pos=Math.max(0,Math.min(180,pos));};
+	myself.writeMicroseconds=function(us){myself.pos=Math.max(0,Math.min(180,myself.map(us,544,2400,0,180)));};
+	myself.read=function(){return myself.pos;};
+	myself.attached=function(){return (myself.pin>=0&&myself.pin<myself.pin_count);};
+	myself.detach=function(){console.log(myself);myself.pin=-1;};
+};
+
 function arduino_emulator_t()
 {
 	var myself=this;
@@ -51,12 +66,19 @@ function arduino_emulator_t()
 		{
 			try
 			{
+				code=code.replace(/\#include/ig,"//#include");
 				code=code.replace(/\#\s+include/ig,"//#include");
+				code=code.replace(/\#if/ig,"//#if");
 				code=code.replace(/\#\s+if/ig,"//#if");
+				code=code.replace(/\#ifdef/ig,"//#ifdef");
 				code=code.replace(/\#\s+ifdef/ig,"//#ifdef");
+				code=code.replace(/\#ifndef/ig,"//#ifndef");
 				code=code.replace(/\#\s+ifndef/ig,"//#ifndef");
+				code=code.replace(/\#else/ig,"//#else");
 				code=code.replace(/\#\s+else/ig,"//#else");
+				code=code.replace(/\#endif/ig,"//#endif");
 				code=code.replace(/\#\s+endif/ig,"//#endif");
+				code=code.replace(/\Servo\s(.*)[;]/ig,"var $1=new arduino_servo_t("+myself.pin_count+");");
 
 				this.OUTPUT=0;
 				this.INPUT=1;

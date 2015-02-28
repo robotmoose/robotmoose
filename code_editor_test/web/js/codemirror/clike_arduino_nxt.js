@@ -310,6 +310,7 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
                     "Stream millis micros delayMicroseconds write receive byte String string word " +
                     "lowByte highByte bitRead bitWrite bitSet bitClear bit print println delay " +
                     "boolean digitalWrite digitalRead analogWrite loop setup analogRead pinMode " +
+                    "Servo attach write writeMicroseconds read attached detach " +
                     "asm dynamic_cast namespace reinterpret_cast try bool explicit new " +
                     "static_cast typeid catch operator template typename class friend private " +
                     "this using const_cast inline public throw virtual delete mutable protected " +
