@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+
+<html>
+	<head>
+		<script src="js/3d.js"></script>
+		<script type="text/javascript">
+			var renderer;
+			var cube;
+			var light;
+			var mario;
+
+			function initialize()
+			{
+				renderer=new renderer_t();
+				renderer.create(document.getElementById("container"));
+				renderer.set_size(640,480);
+
+				var size=32;
+				cube=renderer.create_cube();
+				cube.scale.set(size,size,size);
+				cube.position.set(-30,40,-30);
+				cube.set_color(0xff0000);
+
+				mario=renderer.load_obj("models/mario.obj",renderer.load_texture("models/mario.png"));
+				mario.position.set(0,0,-200);
+				mario.rotation.set(3*Math.PI/2,0,Math.PI);
+				var scale=30;
+				mario.scale.set(scale,scale,scale);
+
+				light=new renderer.create_light();
+				light.position.set(0,0,50);
+			}
+		</script>
+	</head>
+	<body onload="initialize();">
+		<table border="1px">
+			<tr>
+				<td>
+					<div id="container"></div>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>
