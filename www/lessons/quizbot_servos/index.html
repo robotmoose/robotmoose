@@ -29,7 +29,7 @@
 				run_button=document.getElementById("run");
 				stop_button=document.getElementById("stop");
 				editor.create(document.getElementById("code"));
-				editor.set_value("//Head servo is on pin 8\n//Neck servo is on pin 9\n\n//Need this to use servos\n#include <Servo.h>\n\nvoid setup()\n{\n\t//Things written in here happen once\n}\n\nvoid loop()\n{\n\t//Things written in here keep happening\n}");
+				editor.set_value("//Need this to use servos\n#include <Servo.h>\n\n//Head tilt servo is on pin 9\n//Neck twist servo is on pin 10\n\n\nvoid setup()\n{\n\t//Things written in here happen once\n\n}\n\nvoid loop()\n{\n\t//Things written in here keep happening\n\n}");
 				editor.set_size(480,460);
 				editor.on_change=function(){stop();run_button.disabled=true;};
 				editor.on_compiled=function(){stop();};
@@ -76,8 +76,8 @@
 
 				if(emulator.running())
 				{
-					if(emulator.pin_directions[8]==3)
-						document.getElementById("nod").value=emulator.map(emulator.pin_servos[8],0,255,0,180);
+					if(emulator.pin_directions[10]==3)
+						document.getElementById("nod").value=emulator.map(emulator.pin_servos[10],0,255,0,180);
 
 					if(emulator.pin_directions[9]==3)
 						document.getElementById("twist").value=emulator.map(emulator.pin_servos[9],0,255,0,180);
