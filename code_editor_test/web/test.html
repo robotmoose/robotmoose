@@ -17,7 +17,7 @@
 				renderer.create(document.getElementById("container"));
 				renderer.set_size(640,480);
 
-				grid=renderer.create_grid();
+				grid=renderer.create_grid(64,64,64);
 
 				light=new renderer.create_light();
 				light.position.set(0,600,200);

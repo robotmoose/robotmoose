@@ -82,6 +82,7 @@ function light_t(scene)
 	};
 };
 
+//need to fix parents in this class...they do not cleanup themselves...
 function model_t(scene)
 {
 	var myself=this;
@@ -269,22 +270,12 @@ function renderer_t()
 		return new light_t(myself.scene);
 	};
 
-	myself.create_grid=function()
+	myself.create_grid=function(size,width,height)
 	{
-		var planeW = 50;
-		var planeH = 50;
-		var numW = 50; // how many wide (50*50 = 2500 pixels wide)
-		var numH = 50; // how many tall (50*50 = 2500 pixels tall)
-		var plane = new THREE.Mesh(
-		new THREE.PlaneGeometry( planeW*numW, planeH*numH, planeW, planeH ),
-		new THREE.MeshBasicMaterial( {
-		color: 0x000000,
-		wireframe: true
-		} )
-		);
-
+		var geometry=new THREE.PlaneGeometry(size*width,size*height,size,size);
+		var material=new THREE.MeshBasicMaterial({color:0x000000,wireframe:true});
+		var plane=new THREE.Mesh(geometry,material);
 		plane.rotation.set(Math.PI/2,0,0);
-
 		myself.scene.add(plane);
 		return plane;
 	};
