@@ -30,7 +30,7 @@
 				stop_button=document.getElementById("stop");
 				editor.create(document.getElementById("code"));
 				editor.set_value("//Need this to use servos\n#include <Servo.h>\n\n//Head tilt servo is on pin 9\n//Neck twist servo is on pin 10\n\n\nvoid setup()\n{\n\t//Things written in here happen once\n\t\n}\n\nvoid loop()\n{\n\t//Things written in here keep happening\n\t\n}");
-				//editor.set_size(480,460);
+				editor.set_size(480,460); // FIXME: scaling?
 				editor.on_change=function(){stop();run_button.disabled=true;};
 				editor.on_compiled=function(){stop();};
 
@@ -51,7 +51,7 @@
 				var size=400;
 				var intensity=0.8;
 				lights[0]=new renderer.create_light(intensity);
-				lights[0].position.set(0,-size,0);
+				lights[0].position.set(0,+size,-size);
 			/*
 				lights[1]=new renderer.create_light(intensity);
 				lights[1].position.set(0,-size,0);
