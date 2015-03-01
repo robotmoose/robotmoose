@@ -32,35 +32,35 @@ function quizbot_t(renderer)
 	myself.models[0][2]=0;
 	myself.models[0][3]=0;
 	myself.models[0][4]=null;
-	myself.models[0][5]=0xff0000;
+	myself.models[0][5]=0xcc0000;
 
 	myself.models[1][0]="models/base_servo.obj";
 	myself.models[1][1]=0;
 	myself.models[1][2]=0;
 	myself.models[1][3]=0;
 	myself.models[1][4]=null;
-	myself.models[1][5]=0x00ff00;
+	myself.models[1][5]=0x00cc00;
 
 	myself.models[2][0]="models/middle.obj";
 	myself.models[2][1]=0.38;
 	myself.models[2][2]=37;
 	myself.models[2][3]=-12.38;
 	myself.models[2][4]=null;
-	myself.models[2][5]=0xff0000;
+	myself.models[2][5]=0xcc0000;
 
 	myself.models[3][0]="models/middle_servo.obj";
 	myself.models[3][1]=0.38;
 	myself.models[3][2]=37;
 	myself.models[3][3]=-12.38;
 	myself.models[3][4]=null;
-	myself.models[3][5]=0x00ff00;
+	myself.models[3][5]=0x00cc00;
 
 	myself.models[4][0]="models/head.obj";
 	myself.models[4][1]=-0.17;
 	myself.models[4][2]=68.5;
 	myself.models[4][3]=-12.5;
 	myself.models[4][4]=null;
-	myself.models[4][5]=0xff0000;
+	myself.models[4][5]=0xcc0000;
 
 	for(var ii=0;ii<5;++ii)
 	{
@@ -112,7 +112,7 @@ function quizbot_t(renderer)
 			myself.models[4][4].rotation.set(rad_nod,myself.models[4][4].rotation.y,
 				myself.models[4][4].rotation.z);
 
-			var rad_twist=(myself.twist-90)*Math.PI/180;
+			var rad_twist=-(myself.twist-90)*Math.PI/180;
 			myself.models[2][4].rotation.set(myself.models[2][4].rotation.x,
 				myself.models[2][4].rotation.y,rad_twist);
 			myself.models[3][4].rotation.set(myself.models[3][4].rotation.x,
