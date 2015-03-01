@@ -29,7 +29,21 @@
 				run_button=document.getElementById("run");
 				stop_button=document.getElementById("stop");
 				editor.create(document.getElementById("code"));
-				editor.set_value("//Need this to use servos\n#include <Servo.h>\n\n//Head tilt servo is on pin 9\n//Neck twist servo is on pin 10\n\n\nvoid setup()\n{\n\t//Things written in here happen once\n\t\n}\n\nvoid loop()\n{\n\t//Things written in here keep happening\n\t\n}");
+				editor.set_value(
+"//Need this to use servos\n#include <Servo.h>\n\n"+
+"//Body twist servo is on pin 10\n//Neck tilt servo is on pin 9\n"+
+"Servo body;\nServo neck;\n"+
+"\n\nvoid setup()\n{\n\t//Things written in here happen once\n"+
+"\tbody.attach(10);\n"+
+"\tneck.attach(9);\n"+
+"}\n\n"+
+"void loop()\n"+
+"{\n\t//Things written in here keep happening\n"+
+"\tbody.write(80);\n"+
+"\tneck.write(50);\n"+
+"\tdelay(500);\n"+
+"}"
+);
 				editor.set_size(480,460); // FIXME: scaling?
 				editor.on_change=function(){stop();run_button.disabled=true;};
 				editor.on_compiled=function(){stop();};
@@ -48,7 +62,7 @@
 
 				grid=renderer.create_grid(64,8,8);
 
-				var size=400;
+				var size=1000;
 				var intensity=0.8;
 				lights[0]=new renderer.create_light(intensity,
 					new THREE.Vector3(-size/2,+size,+size/2));
@@ -67,10 +81,10 @@
 				if(emulator.running())
 				{
 					if(emulator.pin_directions[10]==3)
-						document.getElementById("nod").value=emulator.map(emulator.pin_servos[10],0,255,0,180);
+						document.getElementById("twist").value=emulator.map(emulator.pin_servos[10],0,255,0,180);
 
 					if(emulator.pin_directions[9]==3)
-						document.getElementById("twist").value=emulator.map(emulator.pin_servos[9],0,255,0,180);
+						document.getElementById("nod").value=emulator.map(emulator.pin_servos[9],0,255,0,180);
 				}
 
 				nod_update();
@@ -93,12 +107,16 @@
 
 			function nod_update()
 			{
-				quizbot.set_nod_target(parseInt(document.getElementById("nod").value));
+				var V=parseInt(document.getElementById("nod").value);
+				quizbot.set_nod_target(V);
+				document.getElementById("show_nod").innerHTML=""+V;
 			}
 
 			function twist_update()
 			{
-				quizbot.set_twist_target(parseInt(document.getElementById("twist").value));
+				var V=parseInt(document.getElementById("twist").value);
+				quizbot.set_twist_target(V);
+				document.getElementById("show_twist").innerHTML=""+V;
 			}
 		</script>
 	</head>
@@ -125,8 +143,10 @@
 					<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
 				</td>
 				<td style="vertical-align:top;">
-					Head:<input type="range"id="nod" min="0" max="180" value="40" oninput="nod_update();"/><br/>
-					Neck:<input type="range" id="twist" min="0" max="180" value="90" oninput="twist_update();"/>
+					Body: <span id="show_twist"></span>
+						<input type="range" id="twist" min="0" max="180" value="90" oninput="twist_update();"/>
+					Neck: <span id="show_nod"></span>
+						<input type="range"id="nod" min="0" max="180" value="40" oninput="nod_update();"/><br/>
 				</td>
 			</tr>
 		</table>
