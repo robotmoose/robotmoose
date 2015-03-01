@@ -21,20 +21,47 @@ function arduino_servo_t(controller)
 
 	myself.attach=function(pin)
 	{
-		myself.pin=pin;
-		myself.controller.pin_directions[myself.pin]=0;
+		var json_original={"value":pin,"counter":myself.controller.commands.length};
+		var json=JSON.parse(JSON.stringify(json_original));
+
+		myself.controller.commands[myself.controller.commands.length]=function()
+		{
+			myself.pin=json.value;
+			myself.controller.pin_directions[myself.pin]=0;
+
+			if(json.counter+1<myself.controller.commands.length)
+				myself.controller.commands[json.counter+1]();
+		};
 	};
 
 	myself.write=function(pos)
 	{
-		myself.pos=Math.max(0,Math.min(180,pos));
-		myself.controller.pin_servos[myself.pin]=myself.controller.map(myself.pos,0,180,0,255);
+		var json_original={"value":pos,"counter":myself.controller.commands.length};
+		var json=JSON.parse(JSON.stringify(json_original));
+
+		myself.controller.commands[myself.controller.commands.length]=function()
+		{
+			myself.pos=Math.max(0,Math.min(180,json.value));
+			myself.controller.pin_servos[myself.pin]=myself.controller.map(myself.pos,0,180,0,255);
+
+			if(json.counter+1<myself.controller.commands.length)
+				myself.controller.commands[json.counter+1]();
+		};
 	};
 
 	myself.writeMicroseconds=function(us)
 	{
-		myself.pos=Math.max(0,Math.min(180,myself.map(us,544,2400,0,180)));
-		myself.controller.pin_servos[myself.pin]=myself.controller.map(myself.pos,0,180,0,255);
+		var json_original={"value":us,"counter":myself.controller.commands.length};
+		var json=JSON.parse(JSON.stringify(json_original));
+
+		myself.controller.commands[myself.controller.commands.length]=function()
+		{
+			myself.pos=Math.max(0,Math.min(180,myself.map(json.value,544,2400,0,180)));
+			myself.controller.pin_servos[myself.pin]=myself.controller.map(myself.pos,0,180,0,255);
+
+			if(json.counter+1<myself.controller.commands.length)
+				myself.controller.commands[json.counter+1]();
+		};
 	};
 
 	myself.read=function()
@@ -49,15 +76,25 @@ function arduino_servo_t(controller)
 
 	myself.detach=function()
 	{
-		myself.controller.pin_directions[myself.pin]=1;
-		myself.controller.pin_servos[myself.pin]=0;
-		myself.pin=-1;
+		var json_original={"counter":myself.controller.commands.length};
+		var json=JSON.parse(JSON.stringify(json_original));
+
+		myself.controller.commands[myself.controller.commands.length]=function()
+		{
+			myself.controller.pin_directions[myself.pin]=1;
+			myself.controller.pin_servos[myself.pin]=0;
+			myself.pin=-1;
+
+			if(json.counter+1<myself.controller.commands.length)
+				myself.controller.commands[json.counter+1]();
+		};
 	};
 };
 
 function arduino_emulator_t()
 {
 	var myself=this;
+	myself.commands=new Array();
 	myself.json={};
 	myself.pin_count=19;
 	myself.pin_directions=new Array();
@@ -84,10 +121,55 @@ function arduino_emulator_t()
 		end:function(){},
 		flush:function(){},
 		peek:function(){return 0;},
-		print:function(text){console.log(text);},
-		println:function(text){console.log(text+"\n");},
+
+		print:function(text)
+		{
+			var json_original={"value":text,"counter":myself.commands.length};
+			var json=JSON.parse(JSON.stringify(json_original));
+
+			myself.commands[myself.commands.length]=function()
+			{
+				console.log(json.value);
+
+				if(myself.pin_directions[pin]==0)
+				{
+					myself.pin_pwms[pin]=0;
+
+					if(value>=0&&value<=255)
+						myself.pin_pwms[pin]=value;
+				}
+			};
+		},
+
+		println:function(text)
+		{
+			var json_original={"value":text,"counter":myself.commands.length};
+			var json=JSON.parse(JSON.stringify(json_original));
+
+			myself.commands[myself.commands.length]=function()
+			{
+				console.log(json.value);
+
+				if(json.counter+1<myself.commands.length)
+					myself.commands[json.counter+1]();
+			};
+		},
+
 		read:function(){return 0},
-		write:function(text){console.log(text);}
+
+		write:function(text)
+		{
+			var json_original={"value":text,"counter":myself.commands.length};
+			var json=JSON.parse(JSON.stringify(json_original));
+
+			myself.commands[myself.commands.length]=function()
+			{
+				console.log(json.value);
+
+				if(json.counter+1<myself.commands.length)
+					myself.commands[json.counter+1]();
+			};
+		}
 	};
 
 	myself.compile=function(code)
@@ -128,6 +210,8 @@ function arduino_emulator_t()
 
 				eval(Processing.compile(code).sourceCode)(myself.json);
 
+				myself.json.delay=myself.delay;
+
 				myself.json.sqrt=Math.sqrt;
 				myself.json.min=Math.min;
 				myself.json.max=Math.max;
@@ -135,14 +219,33 @@ function arduino_emulator_t()
 				myself.json.pow=Math.pow;
 				myself.json.constrain=constrain;
 				myself.json.map=map;
+
+				myself.commands.length=0;
+				myself.json.setup();
+
+				myself.commands[myself.commands.length]=function()
+				{
+					myself.commands.length=0;
+					myself.json.loop();
+
+					if(myself.commands.length>0)
+						myself.commands[0]();
+
+					myself.commands[myself.commands.length]=function()
+					{
+						if(myself.commands.length>0)
+							myself.commands[0]();
+					};
+				};
+
+				if(myself.commands.length>0)
+					myself.commands[0]();
 			}
 			catch(e)
 			{
 				console.log(e);
 			}
 		})();
-
-		myself.json.setup();
 	};
 
 	myself.constrain=function(consNum,lowNum,highNum)
@@ -165,13 +268,31 @@ function arduino_emulator_t()
 
 	myself.pinMode=function(pin,direction)
 	{
-		myself.pin_directions[pin]=direction;
+		var json_original={"counter":myself.commands.length};
+		var json=JSON.parse(JSON.stringify(json_original));
+
+		myself.commands[myself.commands.length]=function()
+		{
+			myself.pin_directions[pin]=direction;
+
+			if(json.counter+1<myself.commands.length)
+				myself.commands[json.counter+1]();
+		};
 	};
 
 	myself.digitalWrite=function(pin,value)
 	{
-		if(myself.pin_directions[pin]==0)
-			myself.pin_outputs[pin]=(value!=false&&value!=null);
+		var json_original={"value":value,"counter":myself.commands.length};
+		var json=JSON.parse(JSON.stringify(json_original));
+
+		myself.commands[myself.commands.length]=function()
+		{
+			if(myself.pin_directions[pin]==0)
+				myself.pin_outputs[pin]=(value!=false&&value!=null);
+
+			if(json.counter+1<myself.commands.length)
+				myself.commands[json.counter+1]();
+		};
 	};
 
 	myself.digitalRead=function(pin)
@@ -187,13 +308,22 @@ function arduino_emulator_t()
 
 	myself.analogWrite=function(pin,value)
 	{
-		if(myself.pin_directions[pin]==0)
-		{
-			myself.pin_pwms[pin]=0;
+		var json_original={"value":value,"counter":myself.commands.length};
+		var json=JSON.parse(JSON.stringify(json_original));
 
-			if(value>=0&&value<=255)
-				myself.pin_pwms[pin]=value;
-		}
+		myself.commands[myself.commands.length]=function()
+		{
+			if(myself.pin_directions[pin]==0)
+				myself.pin_outputs[pin]=(value!=false&&value!=null);
+
+			if(myself.pin_directions[pin]==0)
+			{
+				myself.pin_pwms[pin]=0;
+
+				if(value>=0&&value<=255)
+					myself.pin_pwms[pin]=value;
+			}
+		};
 	};
 
 	myself.analogRead=function(pin)
@@ -202,5 +332,29 @@ function arduino_emulator_t()
 			return myself.pin_analogs[pin];
 
 		return 0;
+	};
+
+	myself.delay=function(time)
+	{
+		var json_original={"time":time,"counter":myself.commands.length};
+		var json=JSON.parse(JSON.stringify(json_original));
+
+		myself.commands[myself.commands.length]=function()
+		{
+			setTimeout(function(){
+				if(json.counter+1<myself.commands.length)
+					myself.commands[json.counter+1]();
+				},json.time);
+		};
+	}
+
+	myself.stop=function()
+	{
+		myself.commands.length=0;
+	};
+
+	myself.running=function()
+	{
+		return (myself.commands.length>0);
 	};
 };
