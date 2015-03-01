@@ -20,20 +20,26 @@
 				var grid=renderer.create_grid();
 
 				var models=new Array();
-				models[0]="models/base.obj";
-				models[1]="models/base_servo.obj";
-				models[2]="models/head.obj";
-				models[3]="models/middle.obj";
-				models[4]="models/middle_servo.obj";
+
+				for(var ii=0;ii<5;++ii)
+					models[ii]=new Array();
+
+				models[0][0]="models/base.obj";
+				models[1][0]="models/base_servo.obj";
+				models[2][0]="models/head.obj";
+				models[3][0]="models/middle.obj";
+				models[4][0]="models/middle_servo.obj";
 
 				for(var ii=0;ii<5;++ii)
 				{
-					var test=renderer.load_obj(models[ii]);
-					test.rotation.set(3*Math.PI/2,0,Math.PI/2);
-					test.position.set(-38,0,-100);
+					models[ii][1]=renderer.load_obj(models[ii]);
+					models[ii][1].rotation.set(3*Math.PI/2,0,0);
+					models[ii][1].position.set(0,0,-100);
 					var scale=1;
-					test.scale.set(scale,scale,scale);
+					models[ii][1].scale.set(scale,scale,scale);
 				}
+
+				models[2][1].rotation.set(3*Math.PI/2+10,0,0);
 
 				light=new renderer.create_light();
 				light.position.set(0,600,200);
