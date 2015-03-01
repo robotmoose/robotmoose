@@ -79,26 +79,22 @@ function quizbot_t(renderer)
 
 	myself.set_nod=function(value)
 	{
-		if(value)
-			myself.nod=value;
+		myself.nod=value;
 	};
 
 	myself.set_nod_target=function(value)
 	{
-		if(value)
-			myself.nod_target=value;
+		myself.nod_target=value;
 	};
 
 	myself.set_twist=function(value)
 	{
-		if(value)
-			myself.twist=value;
+		myself.twist=value;
 	};
 
 	myself.set_twist_target=function(value)
 	{
-		if(value)
-			myself.twist_target=value;
+		myself.twist_target=value;
 	};
 
 	myself.set_position=function(x,y,z)
@@ -122,27 +118,27 @@ function quizbot_t(renderer)
 			myself.models[3][4].rotation.set(myself.models[3][4].rotation.x,
 				myself.models[3][4].rotation.y,rad_twist);
 
-			var speed=100;
+			var speed=200;
 
 			if(Math.floor(myself.nod)<myself.nod_target)
 				myself.nod+=speed*dt;
-
-			myself.nod=Math.min(180,Math.max(0,myself.nod));
-
 			if(Math.floor(myself.nod)>myself.nod_target)
 				myself.nod-=speed*dt;
 
-			myself.nod=Math.min(180,Math.max(0,myself.nod));
+			if(myself.nod<0)
+				myself.nod=0;
+			if(myself.nod>180)
+				myself.nod=180;
 
 			if(Math.floor(myself.twist)<myself.twist_target)
 				myself.twist+=speed*dt;
-
-			myself.twist=Math.min(180,Math.max(0,myself.twist));
-
 			if(Math.floor(myself.twist)>myself.twist_target)
 				myself.twist-=speed*dt;
 
-			myself.twist=Math.min(180,Math.max(0,myself.twist));
+			if(myself.twist<0)
+				myself.twist=0;
+			if(myself.twist>180)
+				myself.twist=180;
 		}
 	};
 };
