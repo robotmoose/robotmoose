@@ -45,14 +45,23 @@ function cube_t(scene)
 	};
 };
 
-function light_t(scene,intensity)
+function light_t(scene,intensity,position)
 {
 	var myself=this;
 	myself.scene=scene;
 
 	myself.light=new THREE.SpotLight(0xffffff,intensity);
 	myself.light.position.set(0,0,0);
+	myself.light.castShadow=true;
+	
+	var size=1000; // hack!
+	myself.light.shadowCameraNear=size/2;
+	myself.light.shadowCameraFar=size*3;
+	myself.light.shadowCameraFov=60; 
+	myself.light.shadowCameraVisible=true; // debug 
+	
 	myself.position=myself.light.position;
+	if (position) myself.position.copy(position);
 	myself.scene.add(myself.light);
 
 	myself.set_color=function(color)
@@ -263,9 +272,9 @@ function renderer_t(div,setup_func,loop_func)
 		return new cube_t(myself.scene);
 	};
 
-	myself.create_light=function(intensity)
+	myself.create_light=function(intensity,position)
 	{
-		return new light_t(myself.scene,intensity);
+		return new light_t(myself.scene,intensity,position);
 	};
 
 	myself.create_grid=function(size,width,height)

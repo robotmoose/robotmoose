@@ -50,12 +50,8 @@
 
 				var size=400;
 				var intensity=0.8;
-				lights[0]=new renderer.create_light(intensity);
-				lights[0].position.set(-size/2,+size,+size/2);
-				lights[0].light.castShadow=true;
-				lights[0].light.shadowCameraNear=size/2;
-				lights[0].light.shadowCameraFar=size*3;
-				lights[0].light.shadowCameraFov=60; // degree field of view for shadow map
+				lights[0]=new renderer.create_light(intensity,
+					new THREE.Vector3D(-size/2,+size,+size/2));
 				
 			/*
 				lights[1]=new renderer.create_light(intensity);
