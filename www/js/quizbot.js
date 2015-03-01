@@ -70,6 +70,8 @@ function quizbot_t(renderer)
 		var scale=1;
 		myself.models[ii][4].scale.set(scale,scale,scale);
 		myself.models[ii][4].set_color(myself.models[ii][5]);
+		myself.models[ii][4].castShadow=true;
+		myself.models[ii][4].receiveShadow=true;
 	}
 
 	myself.models[4][4].set_parent(myself.models[2][4]);
@@ -118,7 +120,7 @@ function quizbot_t(renderer)
 			myself.models[3][4].rotation.set(myself.models[3][4].rotation.x,
 				myself.models[3][4].rotation.y,rad_twist);
 
-			var speed=200;
+			var speed=200; // degrees/second slew rate
 
 			if(Math.floor(myself.nod)<myself.nod_target)
 				myself.nod+=speed*dt;
