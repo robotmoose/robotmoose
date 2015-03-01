@@ -9,6 +9,8 @@ function load_dependencies()
 {
 	load_js("js/three/loaders/OBJLoader.js");
 	load_js("js/three/loaders/STLLoader.js");
+	load_js("js/three/loaders/STLLoader.js");
+	load_js("js/three/controls/OrbitControls.js");
 };
 
 (function(){load_dependencies()})();
@@ -94,8 +96,8 @@ function model_t(scene)
 	{
 		if(myself.loaded&&myself.mesh)
 		{
-			//myself.mesh.castShadow=on;
-			//myself.mesh.receiveShadow=on;
+			myself.mesh.castShadow=on;
+			myself.mesh.receiveShadow=on;
 		}
 		else
 		{
@@ -134,6 +136,7 @@ function renderer_t()
 	myself.viewport=null;
 	myself.scene=null;
 	myself.camera=null;
+	myself.controls=null;
 
 	myself.create=function(div)
 	{
@@ -156,7 +159,12 @@ function renderer_t()
 		myself.scene.matrixAutoUpdate=true;
 
 		myself.camera=new THREE.PerspectiveCamera(45,myself.width/myself.height,1,20000);
-		myself.camera.position.y=32;
+
+		myself.controls=new THREE.OrbitControls(myself.camera);
+		myself.controls.movementSpeed=100;
+		myself.controls.lookSpeed=0.2;
+		myself.controls.center.set(0,64,0);
+		myself.controls.object.position.set(0,100,250);
 
 		myself.loop();
 	};
@@ -167,6 +175,7 @@ function renderer_t()
 		myself.viewport=null;
 		myself.scene=null;
 		myself.camera=null;
+		myself.controls=null;
 	};
 
 	myself.set_size=function(width,height)
@@ -185,6 +194,7 @@ function renderer_t()
 	myself.loop=function()
 	{
 		myself.dt=myself.clock.getDelta();
+		myself.controls.update(myself.dt);
 		requestAnimationFrame(myself.loop);
 		myself.viewport.render(myself.scene,myself.camera);
 	};
@@ -240,5 +250,25 @@ function renderer_t()
 	myself.create_light=function()
 	{
 		return new light_t(myself.scene);
+	};
+
+	myself.create_grid=function()
+	{
+		var planeW = 50;
+		var planeH = 50;
+		var numW = 50; // how many wide (50*50 = 2500 pixels wide)
+		var numH = 50; // how many tall (50*50 = 2500 pixels tall)
+		var plane = new THREE.Mesh(
+		new THREE.PlaneGeometry( planeW*numW, planeH*numH, planeW, planeH ),
+		new THREE.MeshBasicMaterial( {
+		color: 0x000000,
+		wireframe: true
+		} )
+		);
+
+		plane.rotation.set(Math.PI/2,0,0);
+
+		myself.scene.add(plane);
+		return plane;
 	};
 }

@@ -12,19 +12,43 @@ function load_dependencies()
 
 (function(){load_dependencies()})();
 
-function arduino_servo_t(pin_count)
+function arduino_servo_t(controller)
 {
 	var myself=this;
-	myself.pin_count=pin_count;
+	myself.controller=controller;
 	myself.pin=-1;
 	myself.pos=0;
 
-	myself.attach=function(pin){myself.pin=pin;};
-	myself.write=function(pos){myself.pos=Math.max(0,Math.min(180,pos));};
-	myself.writeMicroseconds=function(us){myself.pos=Math.max(0,Math.min(180,myself.map(us,544,2400,0,180)));};
-	myself.read=function(){return myself.pos;};
-	myself.attached=function(){return (myself.pin>=0&&myself.pin<myself.pin_count);};
-	myself.detach=function(){console.log(myself);myself.pin=-1;};
+	myself.attach=function(pin)
+	{
+		myself.pin=pin;
+	};
+
+	myself.write=function(pos)
+	{
+		myself.pos=Math.max(0,Math.min(180,pos));
+	};
+
+	myself.writeMicroseconds=function(us)
+	{
+		myself.pos=Math.max(0,Math.min(180,myself.map(us,544,2400,0,180)));
+	};
+
+	myself.read=function()
+	{
+		return myself.pos;
+	};
+
+	myself.attached=function()
+	{
+		return (myself.pin>=0&&myself.pin<myself.controller.pin_count);
+	};
+
+	myself.detach=function()
+	{
+		console.log(myself.pin);
+		myself.pin=-1;
+	};
 };
 
 function arduino_emulator_t()
@@ -66,6 +90,7 @@ function arduino_emulator_t()
 		{
 			try
 			{
+				myself.json.controller=myself;
 				code=code.replace(/\#include/ig,"//#include");
 				code=code.replace(/\#\s+include/ig,"//#include");
 				code=code.replace(/\#if/ig,"//#if");
@@ -78,7 +103,7 @@ function arduino_emulator_t()
 				code=code.replace(/\#\s+else/ig,"//#else");
 				code=code.replace(/\#endif/ig,"//#endif");
 				code=code.replace(/\#\s+endif/ig,"//#endif");
-				code=code.replace(/\Servo\s(.*)[;]/ig,"var $1=new arduino_servo_t("+myself.pin_count+");");
+				code=code.replace(/\Servo\s(.*)[;]/ig,"var $1=new arduino_servo_t(get_controller());");
 
 				this.OUTPUT=0;
 				this.INPUT=1;
@@ -93,6 +118,7 @@ function arduino_emulator_t()
 				this.digitalRead=myself.digitalRead;
 				this.analogWrite=myself.analogWrite;
 				this.analogRead=myself.analogRead;
+				this.get_controller=function(){return myself;};
 
 				eval(Processing.compile(code).sourceCode)(myself.json);
 

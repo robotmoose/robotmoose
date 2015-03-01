@@ -17,20 +17,26 @@
 				renderer.create(document.getElementById("container"));
 				renderer.set_size(640,480);
 
-				var size=32;
-				cube=renderer.create_cube();
-				cube.scale.set(size,size,size);
-				cube.position.set(-30,40,-30);
-				cube.set_color(0xff0000);
+				var grid=renderer.create_grid();
 
-				mario=renderer.load_obj("models/mario.obj",renderer.load_texture("models/mario.png"));
-				mario.position.set(0,0,-200);
-				mario.rotation.set(3*Math.PI/2,0,Math.PI);
-				var scale=30;
-				mario.scale.set(scale,scale,scale);
+				var models=new Array();
+				models[0]="models/base.obj";
+				models[1]="models/base_servo.obj";
+				models[2]="models/head.obj";
+				models[3]="models/middle.obj";
+				models[4]="models/middle_servo.obj";
+
+				for(var ii=0;ii<5;++ii)
+				{
+					var test=renderer.load_obj(models[ii]);
+					test.rotation.set(3*Math.PI/2,0,Math.PI/2);
+					test.position.set(-38,0,-100);
+					var scale=1;
+					test.scale.set(scale,scale,scale);
+				}
 
 				light=new renderer.create_light();
-				light.position.set(0,0,50);
+				light.position.set(0,600,200);
 			}
 		</script>
 	</head>
