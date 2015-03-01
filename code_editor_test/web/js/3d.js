@@ -97,7 +97,8 @@ function model_t(scene)
 	{
 		if(myself.loaded&&myself.mesh)
 		{
-			myself.mesh.traverse(function(child){if(child instanceof THREE.Mesh)child.material.color.setHex(color);});
+			myself.mesh.traverse(function(child){if(child instanceof THREE.Mesh)
+				child.material.color.setHex(color);});
 		}
 		else
 		{
