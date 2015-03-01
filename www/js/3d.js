@@ -51,17 +51,20 @@ function light_t(scene,intensity,position)
 	myself.scene=scene;
 
 	myself.light=new THREE.SpotLight(0xffffff,intensity);
-	myself.light.position.set(0,0,0);
+	myself.light.position.copy(position);
+	myself.light.target.position.set(0,0,0);
 	myself.light.castShadow=true;
 	
 	var size=1000; // hack!
+	myself.light.shadowMapHeight=512;
+	myself.light.shadowMapWidth=512;
 	myself.light.shadowCameraNear=size/2;
 	myself.light.shadowCameraFar=size*3;
 	myself.light.shadowCameraFov=60; 
 	myself.light.shadowCameraVisible=true; // debug 
 	
 	myself.position=myself.light.position;
-	if (position) myself.position.copy(position);
+//	if (position) myself.position.copy(position);
 	myself.scene.add(myself.light);
 
 	myself.set_color=function(color)
@@ -166,8 +169,9 @@ function renderer_t(div,setup_func,loop_func)
 
 			myself.clock=new THREE.Clock();
 
-			myself.viewport=new THREE.WebGLRenderer();
+			myself.viewport=new THREE.WebGLRenderer({antialias:true});
 			myself.viewport.setSize(myself.width,myself.height);
+			myself.viewport.setClearColor(new THREE.Color(0xaaccff));
 			myself.div.appendChild(myself.viewport.domElement);
 
 			myself.scene=new THREE.Scene();
