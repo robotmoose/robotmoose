@@ -174,7 +174,7 @@ function renderer_t()
 		myself.div=div;
 		myself.div.innerHTML="";
 
-		window.addEventListener("resize",myself.set_size,false);
+		window.addEventListener("resize",myself.resize,false);
 
 		myself.clock=new THREE.Clock();
 
@@ -217,6 +217,11 @@ function renderer_t()
 		if(height)
 			myself.height=height;
 
+		myself.resize();
+	};
+
+	myself.resize=function()
+	{
 		myself.camera.aspect=myself.width/myself.height;
 		myself.camera.updateProjectionMatrix();
 		myself.viewport.setSize(myself.width,myself.height);
