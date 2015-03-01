@@ -22,16 +22,19 @@ function arduino_servo_t(controller)
 	myself.attach=function(pin)
 	{
 		myself.pin=pin;
+		myself.controller.pin_directions[myself.pin]=0;
 	};
 
 	myself.write=function(pos)
 	{
 		myself.pos=Math.max(0,Math.min(180,pos));
+		myself.controller.pin_servos[myself.pin]=myself.controller.map(myself.pos,0,180,0,255);
 	};
 
 	myself.writeMicroseconds=function(us)
 	{
 		myself.pos=Math.max(0,Math.min(180,myself.map(us,544,2400,0,180)));
+		myself.controller.pin_servos[myself.pin]=myself.controller.map(myself.pos,0,180,0,255);
 	};
 
 	myself.read=function()
@@ -46,7 +49,8 @@ function arduino_servo_t(controller)
 
 	myself.detach=function()
 	{
-		console.log(myself.pin);
+		myself.controller.pin_directions[myself.pin]=1;
+		myself.controller.pin_servos[myself.pin]=0;
 		myself.pin=-1;
 	};
 };
@@ -61,6 +65,7 @@ function arduino_emulator_t()
 	myself.pin_inputs=new Array();
 	myself.pin_pwms=new Array();
 	myself.pin_analogs=new Array();
+	myself.pin_servos=new Array();
 
 	for(var ii=0;ii<myself.pin_count;++ii)
 	{
@@ -69,6 +74,7 @@ function arduino_emulator_t()
 		myself.pin_inputs[ii]=false;
 		myself.pin_pwms[ii]=0;
 		myself.pin_analogs[ii]=0;
+		myself.pin_servos[ii]=0;
 	}
 
 	myself.Serial=

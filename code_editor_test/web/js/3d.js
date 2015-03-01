@@ -155,12 +155,18 @@ function model_t(scene)
 	};
 };
 
-function renderer_t()
+function renderer_t(div,setup_func,loop_func)
 {
 	var myself=this;
-	myself.div=null;
+
+	myself.div=div;
+	myself.div.innerHTML="";
+
 	myself.width=320;
 	myself.height=240;
+
+	myself.user_setup=setup_func;
+	myself.user_loop=loop_func;
 
 	myself.clock=0;
 	myself.dt=0;
@@ -169,35 +175,40 @@ function renderer_t()
 	myself.camera=null;
 	myself.controls=null;
 
-	myself.create=function(div)
+	myself.setup=function()
 	{
-		myself.div=div;
-		myself.div.innerHTML="";
+		if(myself.div&&myself.user_setup&&myself.user_loop)
+		{
+			window.addEventListener("resize",myself.resize,false);
 
-		window.addEventListener("resize",myself.resize,false);
+			myself.clock=new THREE.Clock();
 
-		myself.clock=new THREE.Clock();
+			myself.viewport=new THREE.WebGLRenderer();
+			myself.viewport.setSize(myself.width,myself.height);
+			myself.viewport.shadowMapEnabled=true;
+			myself.viewport.shadowMapSoft=true;
+			myself.viewport.shadowMapWidth=2048;
+			myself.viewport.shadowMapHeight=2048;
+			myself.div.appendChild(myself.viewport.domElement);
 
-		myself.viewport=new THREE.WebGLRenderer();
-		myself.viewport.setSize(myself.width,myself.height);
-		myself.viewport.shadowMapEnabled=true;
-		myself.viewport.shadowMapSoft=true;
-		myself.viewport.shadowMapWidth=2048;
-		myself.viewport.shadowMapHeight=2048;
-		myself.div.appendChild(myself.viewport.domElement);
+			myself.scene=new THREE.Scene();
+			myself.scene.matrixAutoUpdate=true;
 
-		myself.scene=new THREE.Scene();
-		myself.scene.matrixAutoUpdate=true;
+			myself.camera=new THREE.PerspectiveCamera(45,myself.width/myself.height,1,20000);
 
-		myself.camera=new THREE.PerspectiveCamera(45,myself.width/myself.height,1,20000);
+			myself.controls=new THREE.OrbitControls(myself.camera,myself.div);
+			myself.controls.movementSpeed=100;
+			myself.controls.lookSpeed=0.2;
+			myself.controls.center.set(0,64,0);
+			myself.controls.object.position.set(0,100,250);
 
-		myself.controls=new THREE.OrbitControls(myself.camera,myself.div);
-		myself.controls.movementSpeed=100;
-		myself.controls.lookSpeed=0.2;
-		myself.controls.center.set(0,64,0);
-		myself.controls.object.position.set(0,100,250);
+			myself.user_setup();
+			myself.loop();
 
-		myself.loop();
+			return true;
+		}
+
+		return false;
 	};
 
 	myself.destroy=function()
@@ -230,6 +241,7 @@ function renderer_t()
 	myself.loop=function()
 	{
 		myself.dt=myself.clock.getDelta();
+		myself.user_loop(myself.dt);
 		myself.controls.update(myself.dt);
 		requestAnimationFrame(myself.loop);
 		myself.viewport.render(myself.scene,myself.camera);

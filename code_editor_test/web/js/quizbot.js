@@ -15,6 +15,13 @@ function load_dependencies()
 function quizbot_t(renderer)
 {
 	var myself=this;
+
+	myself.nod=40;
+	myself.nod_target=40;
+
+	myself.twist=90;
+	myself.twist_target=90;
+
 	myself.models=new Array();
 
 	for(var ii=0;ii<5;++ii)
@@ -72,18 +79,22 @@ function quizbot_t(renderer)
 
 	myself.set_nod=function(value)
 	{
-		var rad_value=-(value-40)*Math.PI/180;
-		myself.models[4][4].rotation.set(rad_value,myself.models[4][4].rotation.y,
-			myself.models[4][4].rotation.z);
+		myself.nod=value;
+	};
+
+	myself.set_nod_target=function(value)
+	{
+		myself.nod_target=value;
 	};
 
 	myself.set_twist=function(value)
 	{
-		var rad_value=(value-90)*Math.PI/180;
-		myself.models[2][4].rotation.set(myself.models[2][4].rotation.x,
-			myself.models[2][4].rotation.y,rad_value);
-		myself.models[3][4].rotation.set(myself.models[3][4].rotation.x,
-			myself.models[3][4].rotation.y,rad_value);
+		myself.twist=value;
+	};
+
+	myself.set_twist_target=function(value)
+	{
+		myself.twist_target=value;
 	};
 
 	myself.set_position=function(x,y,z)
@@ -91,5 +102,30 @@ function quizbot_t(renderer)
 		for(var ii=0;ii<4;++ii)
 			myself.models[ii][4].position.set(x+myself.models[ii][1],
 				y+myself.models[ii][2],z+myself.models[ii][3]);
+	};
+
+	myself.loop=function(dt)
+	{
+		var rad_nod=-(myself.nod-40)*Math.PI/180;
+		myself.models[4][4].rotation.set(rad_nod,myself.models[4][4].rotation.y,
+			myself.models[4][4].rotation.z);
+
+		var rad_twist=(myself.twist-90)*Math.PI/180;
+		myself.models[2][4].rotation.set(myself.models[2][4].rotation.x,
+			myself.models[2][4].rotation.y,rad_twist);
+		myself.models[3][4].rotation.set(myself.models[3][4].rotation.x,
+			myself.models[3][4].rotation.y,rad_twist);
+
+		var speed=100;
+
+		if(myself.nod<myself.nod_target)
+			myself.nod+=speed*dt;
+		if(myself.nod>myself.nod_target)
+			myself.nod-=speed*dt;
+
+		if(myself.twist<myself.twist_target)
+			myself.twist+=speed*dt;
+		if(myself.twist>myself.twist_target)
+			myself.twist-=speed*dt;
 	};
 };

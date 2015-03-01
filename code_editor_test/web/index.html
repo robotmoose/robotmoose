@@ -17,7 +17,7 @@
 			var editor=new editor_t();
 			var emulator=new arduino_emulator_t();
 
-			var renderer=new renderer_t();
+			var renderer;
 			var grid;
 			var light;
 			var quizbot;
@@ -26,12 +26,21 @@
 			{
 				var upload_button=document.getElementById("upload");
 				editor.create(document.getElementById("code"));
-				editor.set_value("#include <Servo.h>\nServo a;\n\nvoid setup()\n{\n\t//This happens once\n\tSerial.println(a.attached());\n\tSerial.println(a.read());\n\ta.attach(4);\n\ta.write(180);\n\tSerial.println(a.attached());\n\tSerial.println(a.read());\n}\n\nvoid loop()\n{\n\t//This keeps happening\n}");
+				editor.set_value("#include <Servo.h>\nServo nod;\nServo twist;\n\nvoid setup()\n{\n\t//This happens once\n\tnod.attach(8);\n\tnod.write(40);\n\ttwist.attach(9);\n\ttwist.write(90);\n}\n\nvoid loop()\n{\n\t//This keeps happening\n}");
 				editor.set_size(480,464);
 				editor.on_change=function(){upload_button.disabled=true};
 				editor.on_compiled=function(){upload_button.disabled=false};
 
-				renderer.create(document.getElementById("container"));
+				renderer=new renderer_t(document.getElementById("container"),setup,loop);
+
+				if(!renderer)
+					alert("Is WebGL enabled?");
+				else
+					renderer.setup();
+			}
+
+			function setup()
+			{
 				renderer.set_size(480,460);
 				grid=renderer.create_grid(64,64,64);
 				light=new renderer.create_light();
@@ -40,19 +49,28 @@
 				quizbot.set_position(0,0,0);
 			}
 
+			function loop(dt)
+			{
+				quizbot.loop(dt);
+			}
+
 			function upload()
 			{
 				emulator.compile(editor.get_value());
+				document.getElementById("nod").value=emulator.map(emulator.pin_servos[8],0,255,0,180);
+				nod_update();
+				document.getElementById("twist").value=emulator.map(emulator.pin_servos[9],0,255,0,180);
+				twist_update();
 			}
 
 			function nod_update()
 			{
-				quizbot.set_nod(document.getElementById("nod").value);
+				quizbot.set_nod_target(document.getElementById("nod").value);
 			}
 
 			function twist_update()
 			{
-				quizbot.set_twist(document.getElementById("twist").value);
+				quizbot.set_twist_target(document.getElementById("twist").value);
 			}
 		</script>
 	</head>
