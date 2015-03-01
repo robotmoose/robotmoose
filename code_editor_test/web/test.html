@@ -7,9 +7,9 @@
 		<script src="js/3d.js"></script>
 		<script type="text/javascript">
 			var renderer;
-			var cube;
+			var grid;
 			var light;
-			var mario;
+			var models=new Array();
 
 			function initialize()
 			{
@@ -17,9 +17,10 @@
 				renderer.create(document.getElementById("container"));
 				renderer.set_size(640,480);
 
-				var grid=renderer.create_grid();
+				grid=renderer.create_grid();
 
-				var models=new Array();
+				light=new renderer.create_light();
+				light.position.set(0,600,200);
 
 				for(var ii=0;ii<5;++ii)
 					models[ii]=new Array();
@@ -57,9 +58,20 @@
 					var scale=1;
 					models[ii][4].scale.set(scale,scale,scale);
 				}
+			}
 
-				light=new renderer.create_light();
-				light.position.set(0,600,200);
+			function nod_update()
+			{
+				var value=document.getElementById("nod").value-40;
+				models[2][4].rotation.set(3*Math.PI/2-value*Math.PI/180,models[2][4].rotation.y,models[2][4].rotation.z);
+			}
+
+			function twist_update()
+			{
+				var value=document.getElementById("twist").value-90;
+				models[2][4].rotation.set(models[2][4].rotation.x,models[2][4].rotation.y,value*Math.PI/180);
+				models[3][4].rotation.set(models[3][4].rotation.x,models[3][4].rotation.y,value*Math.PI/180);
+				models[4][4].rotation.set(models[4][4].rotation.x,models[4][4].rotation.y,value*Math.PI/180);
 			}
 		</script>
 	</head>
@@ -68,6 +80,12 @@
 			<tr>
 				<td>
 					<div id="container"></div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Nod:<input type="range"id="nod" min="0" max="180" value="40" oninput="nod_update();"/><br/>
+					Twist:<input type="range" id="twist" min="0" max="180" value="90" oninput="twist_update();"/>
 				</td>
 			</tr>
 		</table>

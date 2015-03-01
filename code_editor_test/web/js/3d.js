@@ -160,7 +160,7 @@ function renderer_t()
 
 		myself.camera=new THREE.PerspectiveCamera(45,myself.width/myself.height,1,20000);
 
-		myself.controls=new THREE.OrbitControls(myself.camera);
+		myself.controls=new THREE.OrbitControls(myself.camera,myself.div);
 		myself.controls.movementSpeed=100;
 		myself.controls.lookSpeed=0.2;
 		myself.controls.center.set(0,64,0);
