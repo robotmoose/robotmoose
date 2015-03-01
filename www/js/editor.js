@@ -22,14 +22,14 @@ function load_style(style)
 
 function load_dependencies()
 {
-	load_js("js/xmlhttp.js");
-	load_js("js/codemirror/clike_arduino_nxt.js");
-	load_js("js/codemirror/addon/edit/matchbrackets.js");
-	load_js("js/codemirror/addon/dialog/dialog.js");
-	load_js("js/codemirror/addon/search/search.js");
-	load_js("js/codemirror/addon/search/searchcursor.js");
-	load_link("js/codemirror/codemirror.css");
-	load_link("js/codemirror/addon/dialog/dialog.css");
+	load_js("http://robotmoose.com/js/xmlhttp.js");
+	load_js("http://robotmoose.com/js/codemirror/clike_arduino_nxt.js");
+	load_js("http://robotmoose.com/js/codemirror/addon/edit/matchbrackets.js");
+	load_js("http://robotmoose.com/js/codemirror/addon/dialog/dialog.js");
+	load_js("http://robotmoose.com/js/codemirror/addon/search/search.js");
+	load_js("http://robotmoose.com/js/codemirror/addon/search/searchcursor.js");
+	load_link("http://robotmoose.com/js/codemirror/codemirror.css");
+	load_link("http://robotmoose.com/js/codemirror/addon/dialog/dialog.css");
 	load_style(".CodeMirror{border:1px solid #000000;}");
 	load_style(".lint-error{background:#ff8888;color:#a00000;padding:1px}\r\n.lint-error-icon{background:#ff0000;color:#ffffff;border-radius:50%;margin-right:7px;}");
 };
@@ -186,7 +186,7 @@ function editor_t()
 		if(myself.editor&&myself.compilable)
 		{
 			myself.set_status("Compiling...");
-			send_request("POST","editor/code","",myself.compile_response,myself.error_response,
+			send_request("POST","/editor/","code","",myself.compile_response,myself.error_response,
 				myself.get_value(),"application/octet-stream");
 		}
 	};

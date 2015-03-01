@@ -7,10 +7,10 @@ function load_js(js)
 
 function load_dependencies()
 {
-	load_js("js/three/loaders/OBJLoader.js");
-	load_js("js/three/loaders/STLLoader.js");
-	load_js("js/three/loaders/STLLoader.js");
-	load_js("js/three/controls/OrbitControls.js");
+	load_js("http://robotmoose.com/js/three/loaders/OBJLoader.js");
+	load_js("http://robotmoose.com/js/three/loaders/STLLoader.js");
+	load_js("http://robotmoose.com/js/three/loaders/STLLoader.js");
+	load_js("http://robotmoose.com/js/three/controls/OrbitControls.js");
 };
 
 (function(){load_dependencies()})();

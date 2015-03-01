@@ -7,7 +7,7 @@ function load_js(js)
 
 function load_dependencies()
 {
-	load_js("js/processing/processing-1.4.1.min.js");
+	load_js("http://robotmoose.com/js/processing/processing-1.4.1.min.js");
 };
 
 (function(){load_dependencies()})();

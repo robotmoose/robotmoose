@@ -1,4 +1,4 @@
-function send_request(method,request,uri,on_reply,on_error,data,content_type)
+function send_request(method,path,request,uri,on_reply,on_error,data,content_type)
 {
 	try
 	{
@@ -27,7 +27,7 @@ function send_request(method,request,uri,on_reply,on_error,data,content_type)
 			if(uri)
 				request_text+=uri;
 
-			xmlhttp.open(method,request_text,true);
+			xmlhttp.open(method,path+"/"+request_text,true);
 
 			if(content_type)
 				xmlhttp.setRequestHeader("Content-Type",content_type);
