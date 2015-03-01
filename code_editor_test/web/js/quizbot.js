@@ -79,22 +79,26 @@ function quizbot_t(renderer)
 
 	myself.set_nod=function(value)
 	{
-		myself.nod=value;
+		if(value)
+			myself.nod=value;
 	};
 
 	myself.set_nod_target=function(value)
 	{
-		myself.nod_target=value;
+		if(value)
+			myself.nod_target=value;
 	};
 
 	myself.set_twist=function(value)
 	{
-		myself.twist=value;
+		if(value)
+			myself.twist=value;
 	};
 
 	myself.set_twist_target=function(value)
 	{
-		myself.twist_target=value;
+		if(value)
+			myself.twist_target=value;
 	};
 
 	myself.set_position=function(x,y,z)
@@ -106,26 +110,39 @@ function quizbot_t(renderer)
 
 	myself.loop=function(dt)
 	{
-		var rad_nod=-(myself.nod-40)*Math.PI/180;
-		myself.models[4][4].rotation.set(rad_nod,myself.models[4][4].rotation.y,
-			myself.models[4][4].rotation.z);
+		if(dt)
+		{
+			var rad_nod=-(myself.nod-40)*Math.PI/180;
+			myself.models[4][4].rotation.set(rad_nod,myself.models[4][4].rotation.y,
+				myself.models[4][4].rotation.z);
 
-		var rad_twist=(myself.twist-90)*Math.PI/180;
-		myself.models[2][4].rotation.set(myself.models[2][4].rotation.x,
-			myself.models[2][4].rotation.y,rad_twist);
-		myself.models[3][4].rotation.set(myself.models[3][4].rotation.x,
-			myself.models[3][4].rotation.y,rad_twist);
+			var rad_twist=(myself.twist-90)*Math.PI/180;
+			myself.models[2][4].rotation.set(myself.models[2][4].rotation.x,
+				myself.models[2][4].rotation.y,rad_twist);
+			myself.models[3][4].rotation.set(myself.models[3][4].rotation.x,
+				myself.models[3][4].rotation.y,rad_twist);
 
-		var speed=100;
+			var speed=100;
 
-		if(myself.nod<myself.nod_target)
-			myself.nod+=speed*dt;
-		if(myself.nod>myself.nod_target)
-			myself.nod-=speed*dt;
+			if(myself.nod<myself.nod_target)
+				myself.nod+=speed*dt;
 
-		if(myself.twist<myself.twist_target)
-			myself.twist+=speed*dt;
-		if(myself.twist>myself.twist_target)
-			myself.twist-=speed*dt;
+			myself.nod=Math.min(180,Math.max(0,myself.nod));
+
+			if(myself.nod>myself.nod_target)
+				myself.nod-=speed*dt;
+
+			myself.nod=Math.min(180,Math.max(0,myself.nod));
+
+			if(myself.twist<myself.twist_target)
+				myself.twist+=speed*dt;
+
+			myself.twist=Math.min(180,Math.max(0,myself.twist));
+
+			if(myself.twist>myself.twist_target)
+				myself.twist-=speed*dt;
+
+			myself.twist=Math.min(180,Math.max(0,myself.twist));
+			}
 	};
 };
