@@ -93,6 +93,18 @@ function model_t(scene)
 	myself.rotation=new THREE.Vector3(0,0,0);
 	myself.scale=new THREE.Vector3(1,1,1);
 
+	myself.set_color=function(color)
+	{
+		if(myself.loaded&&myself.mesh)
+		{
+			myself.mesh.traverse(function(child){if(child instanceof THREE.Mesh)child.material.color.setHex(color);});
+		}
+		else
+		{
+			setTimeout(function(){myself.set_color(color);},10);
+		}
+	};
+
 	myself.set_shadow=function(on)
 	{
 		if(myself.loaded&&myself.mesh)
