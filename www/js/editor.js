@@ -186,7 +186,7 @@ function editor_t()
 		if(myself.editor&&myself.compilable)
 		{
 			myself.set_status("Compiling...");
-			send_request("POST","code","",myself.compile_response,myself.error_response,
+			send_request("POST","editor/code","",myself.compile_response,myself.error_response,
 				myself.get_value(),"application/octet-stream");
 		}
 	};
