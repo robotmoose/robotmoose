@@ -27,7 +27,7 @@ function arduino_servo_t(controller)
 		myself.controller.commands[myself.controller.commands.length]=function()
 		{
 			myself.pin=json.value;
-			myself.controller.pin_directions[myself.pin]=0;
+			myself.controller.pin_directions[myself.pin]=3;
 
 			if(json.counter+1<myself.controller.commands.length)
 				myself.controller.commands[json.counter+1]();

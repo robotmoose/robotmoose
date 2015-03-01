@@ -29,8 +29,8 @@
 				run_button=document.getElementById("run");
 				stop_button=document.getElementById("stop");
 				editor.create(document.getElementById("code"));
-				editor.set_value("#include <Servo.h>\nServo nod;\nServo twist;\n\nvoid setup()\n{\n\t//This happens once\n\tnod.attach(8);\n\tnod.write(40);\n\ttwist.attach(9);\n\ttwist.write(90);\n}\n\nvoid loop()\n{\n\t//This keeps happening\n\ttwist.write(0);\n\tdelay(1000);\n\ttwist.write(180);\n\tdelay(1000);\n}");
-				editor.set_size(480,464);
+				editor.set_value("//Head servo is on pin 8\n//Neck servo is on pin 9\n\n//Need this to use servos\n#include <Servo.h>\n\nvoid setup()\n{\n\t//Things written in here happen once\n}\n\nvoid loop()\n{\n\t//Things written in here keep happening\n}");
+				editor.set_size(480,460);
 				editor.on_change=function(){stop();run_button.disabled=true;};
 				editor.on_compiled=function(){stop();};
 
@@ -44,7 +44,7 @@
 
 			function setup()
 			{
-				renderer.set_size(480,460);
+				renderer.set_size(480,453);
 
 				grid=renderer.create_grid(64,8,8);
 
@@ -63,9 +63,6 @@
 				lights[5]=new renderer.create_light(intensity);
 				lights[5].position.set(0,150,-size);
 
-				var test=new THREE.HemisphereLight( 0x0000ff, 0x00ff00,1);
-				renderer.scene.add(test);
-
 				quizbot=new quizbot_t(renderer);
 				quizbot.set_nod(parseInt(document.getElementById("nod").value));
 				quizbot.set_twist(parseInt(document.getElementById("twist").value));
@@ -79,8 +76,11 @@
 
 				if(emulator.running())
 				{
-					document.getElementById("nod").value=emulator.map(emulator.pin_servos[8],0,255,0,180);
-					document.getElementById("twist").value=emulator.map(emulator.pin_servos[9],0,255,0,180);
+					if(emulator.pin_directions[8]==3)
+						document.getElementById("nod").value=emulator.map(emulator.pin_servos[8],0,255,0,180);
+
+					if(emulator.pin_directions[9]==3)
+						document.getElementById("twist").value=emulator.map(emulator.pin_servos[9],0,255,0,180);
 				}
 
 				nod_update();
@@ -119,25 +119,28 @@
 			<div class="page-header">
 				<h1>Quizbot Servos</h1>
 			</div>
-
-		<table>
+		<center>
+		<table data-toggle="table">
 			<tr>
-				<td>
+				<td style="vertical-align:top;">
 					<div id="code"></div>
-					<br/>
-					<input type="button" id="run" value="Run" onclick="run();" disabled/>
-					<input type="button" id="stop" value="Stop" onclick="stop();" disabled/>
 				</td>
-				<td>
-					<div id="container" style="margin-top:15px;border:1px solid #000000;"></div>
-					<br/>
+				<td style="vertical-align:top;">
+					<div id="container" style="border:1px solid #000000;"></div>
+				</td>
+			</tr>
+			<tr>
+				<td style="vertical-align:top;">
+					<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();" disabled/>
+					<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
+				</td>
+				<td style="vertical-align:top;">
 					Nod:<input type="range"id="nod" min="0" max="180" value="40" oninput="nod_update();"/><br/>
 					Twist:<input type="range" id="twist" min="0" max="180" value="90" oninput="twist_update();"/>
 				</td>
 			</tr>
 		</table>
-
-			<button type="submit" class="btn btn-lg btn-primary" >Download</button>
+		</center>
 		</div>
 	</body>
 </html>
