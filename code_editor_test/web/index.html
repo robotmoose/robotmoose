@@ -8,30 +8,69 @@
 		<script src="js/codemirror/codemirror.js"></script>
 		<script src="js/editor.js"></script>
 
+		<script src="js/three/three.min.js"></script>
+		<script src="js/3d.js"></script>
+		<script src="js/quizbot.js"></script>
+
 		<script type="text/javascript">
 			var upload_button;
 			var editor=new editor_t();
 			var emulator=new arduino_emulator_t();
+
+			var renderer=new renderer_t();
+			var grid;
+			var light;
+			var quizbot;
 
 			function initialize()
 			{
 				var upload_button=document.getElementById("upload");
 				editor.create(document.getElementById("code"));
 				editor.set_value("#include <Servo.h>\nServo a;\n\nvoid setup()\n{\n\t//This happens once\n\tSerial.println(a.attached());\n\tSerial.println(a.read());\n\ta.attach(4);\n\ta.write(180);\n\tSerial.println(a.attached());\n\tSerial.println(a.read());\n}\n\nvoid loop()\n{\n\t//This keeps happening\n}");
-				editor.set_size(480,463);
+				editor.set_size(480,464);
 				editor.on_change=function(){upload_button.disabled=true};
 				editor.on_compiled=function(){upload_button.disabled=false};
+
+				renderer.create(document.getElementById("container"));
+				renderer.set_size(480,460);
+				grid=renderer.create_grid(64,64,64);
+				light=new renderer.create_light();
+				light.position.set(0,600,200);
+				quizbot=new quizbot_t(renderer);
+				quizbot.set_position(0,0,0);
 			}
 
 			function upload()
 			{
 				emulator.compile(editor.get_value());
 			}
+
+			function nod_update()
+			{
+				quizbot.set_nod(document.getElementById("nod").value);
+			}
+
+			function twist_update()
+			{
+				quizbot.set_twist(document.getElementById("twist").value);
+			}
 		</script>
 	</head>
 	<body onload="initialize();">
-		<div id="code"></div>
-		<br/>
-		<input type="button" id="upload" value="Upload" onclick="upload();" disabled/>
+		<table>
+			<tr>
+				<td>
+					<div id="code"></div>
+					<br/>
+					<input type="button" id="upload" value="Upload" onclick="upload();" disabled/>
+				</td>
+				<td>
+					<div id="container" style="margin-top:15px;border:1px solid #000000;"></div>
+					<br/>
+					Nod:<input type="range"id="nod" min="0" max="180" value="40" oninput="nod_update();"/><br/>
+					Twist:<input type="range" id="twist" min="0" max="180" value="90" oninput="twist_update();"/>
+				</td>
+			</tr>
+		</table>
 	</body>
 </html>
