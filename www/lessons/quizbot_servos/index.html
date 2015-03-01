@@ -52,6 +52,11 @@
 				var intensity=0.8;
 				lights[0]=new renderer.create_light(intensity);
 				lights[0].position.set(-size/2,+size,+size/2);
+				lights[0].castShadow=true;
+				lights[0].shadowCameraNear=size/2;
+				lights[0].shadowCameraFar=size*3;
+				lights[0].shadowCameraFov=60; // degree field of view for shadow map
+				
 			/*
 				lights[1]=new renderer.create_light(intensity);
 				lights[1].position.set(0,-size,0);
