@@ -35,43 +35,46 @@
 				models[1][2]=0;
 				models[1][3]=0;
 
-				models[2][0]="models/head.obj";
-				models[2][1]=-0.17;
-				models[2][2]=68.5;
-				models[2][3]=-12.5;
+				models[2][0]="models/middle.obj";
+				models[2][1]=0.38;
+				models[2][2]=37;
+				models[2][3]=-12.38;
 
-				models[3][0]="models/middle.obj";
+				models[3][0]="models/middle_servo.obj";
 				models[3][1]=0.38;
 				models[3][2]=37;
 				models[3][3]=-12.38;
 
-				models[4][0]="models/middle_servo.obj";
-				models[4][1]=0.38;
-				models[4][2]=37;
-				models[4][3]=-12.38;
+				models[4][0]="models/head.obj";
+				models[4][1]=-0.17;
+				models[4][2]=68.5;
+				models[4][3]=-12.5;
 
 				for(var ii=0;ii<5;++ii)
 				{
 					models[ii][4]=renderer.load_obj(models[ii][0]);
 					models[ii][4].rotation.set(3*Math.PI/2,0,0);
-					models[ii][4].position.set(0+models[ii][1],0+models[ii][2],-100+models[ii][3]);
+					models[ii][4].position.set(models[ii][1],models[ii][2],models[ii][3]);
 					var scale=1;
 					models[ii][4].scale.set(scale,scale,scale);
 				}
+
+				models[4][4].set_parent(models[2][4]);
+				models[4][4].rotation.set(0,0,0);
+				models[4][4].position.set(models[4][1]-models[2][1],models[4][3]-models[2][3],models[4][2]-models[2][2]);
 			}
 
 			function nod_update()
 			{
-				var value=document.getElementById("nod").value-40;
-				models[2][4].rotation.set(3*Math.PI/2-value*Math.PI/180,models[2][4].rotation.y,models[2][4].rotation.z);
+				var value=-(document.getElementById("nod").value-40)*Math.PI/180;
+				models[4][4].rotation.set(value,models[4][4].rotation.y,models[4][4].rotation.z);
 			}
 
 			function twist_update()
 			{
-				var value=document.getElementById("twist").value-90;
-				models[2][4].rotation.set(models[2][4].rotation.x,models[2][4].rotation.y,value*Math.PI/180);
-				models[3][4].rotation.set(models[3][4].rotation.x,models[3][4].rotation.y,value*Math.PI/180);
-				models[4][4].rotation.set(models[4][4].rotation.x,models[4][4].rotation.y,value*Math.PI/180);
+				var value=(document.getElementById("twist").value-90)*Math.PI/180;
+				models[2][4].rotation.set(models[2][4].rotation.x,models[2][4].rotation.y,value);
+				models[3][4].rotation.set(models[3][4].rotation.x,models[3][4].rotation.y,value);
 			}
 		</script>
 	</head>

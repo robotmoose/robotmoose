@@ -122,6 +122,23 @@ function model_t(scene)
 			setTimeout(myself.destroy,10);
 		}
 	};
+
+	myself.set_parent=function(parent)
+	{
+		if(parent)
+		{
+			if(myself.loaded)
+			{
+					parent.mesh.add(myself.mesh);
+					myself.scene.remove(myself.mesh);
+					myself.scene=parent;
+			}
+			else
+			{
+				setTimeout(function(){myself.set_parent(parent);},10);
+			}
+		}
+	};
 };
 
 function renderer_t()
