@@ -4,11 +4,10 @@
 #include <cstdlib>
 #include <iostream>
 #include <json.h>
-#include <thread>
 #include <msl/time.hpp>
 #include <msl/webserver.hpp>
 
-int client_func(const mg_connection& connection,enum mg_event event);
+bool client_func(const mg_connection& connection,enum mg_event event);
 void send_string(const mg_connection& connection,const std::string& str);
 void send_json(const mg_connection& connection,const json::Object& obj);
 void code_check(const std::string& code,json::Object& response);
@@ -32,18 +31,7 @@ int main()
 	return 0;
 }
 
-void real_client_func(const mg_connection& connection,enum mg_event event)
-{
-	std::string method=connection.request_method;
-	std::string request=connection.uri;
-
-	std::string code=std::string(connection.content,connection.content_len);
-	json::Object response;
-	code_check(code,response);
-	send_json(connection,response);
-}
-
-int client_func(const mg_connection& connection,enum mg_event event)
+bool client_func(const mg_connection& connection,enum mg_event event)
 {
 	if(event==MG_AUTH)
 		return true;
@@ -56,9 +44,11 @@ int client_func(const mg_connection& connection,enum mg_event event)
 
 	if(method=="POST"&&request=="/code")
 	{
-		std::thread test(real_client_func,connection,event);
-		test.detach();
-		return MG_MORE;
+		std::string code=std::string(connection.content,connection.content_len);
+		json::Object response;
+		code_check(code,response);
+		send_json(connection,response);
+		return true;
 	}
 
 	return false;

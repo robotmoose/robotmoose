@@ -25,8 +25,7 @@ namespace msl
 
 		private:
 			static int client_func_handler(mg_connection* connection,enum mg_event event);
-			void server_thread_func_m();
-			mg_server* server_m;
+			mg_server* server_m[10];
 			client_func_t client_func_m;
 			std::string address_m;
 			std::string webroot_m;

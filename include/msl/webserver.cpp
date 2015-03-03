@@ -3,9 +3,18 @@
 #include <chrono>
 #include <thread>
 
+static void server_thread_func_m(mg_server* server)
+{
+	while(mg_poll_server(server,10))
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+}
+
 msl::webserver_t::webserver_t(client_func_t client_func,const std::string& address,const std::string& webroot):
-	server_m(nullptr),client_func_m(client_func),address_m(address),webroot_m(webroot)
-{}
+	client_func_m(client_func),address_m(address),webroot_m(webroot)
+{
+	for(int ii=0;ii<10;++ii)
+		server_m[ii]=nullptr;
+}
 
 msl::webserver_t::~webserver_t()
 {
@@ -20,27 +29,34 @@ bool msl::webserver_t::good() const
 void msl::webserver_t::open()
 {
 	close();
-	auto server=mg_create_server(this,msl::webserver_t::client_func_handler);
-	mg_set_option(server,"listening_port",address_m.c_str());
-	mg_set_option(server,"document_root",webroot_m.c_str());
 
-	if(server!=nullptr&&mg_poll_server(server,10))
-		server_m=server;
-
-	if(good())
+	for(int ii=0;ii<10;++ii)
 	{
-		std::thread server_thread(&msl::webserver_t::server_thread_func_m,this);
-		server_thread.detach();
+		auto server=mg_create_server(this,msl::webserver_t::client_func_handler);
+		mg_set_option(server,"listening_port",address_m.c_str());
+		mg_set_option(server,"document_root",webroot_m.c_str());
+
+		if(server!=nullptr&&mg_poll_server(server,10))
+			server_m[ii]=server;
+
+		//if(good())
+		{
+			std::thread server_thread(server_thread_func_m,server);
+			server_thread.detach();
+		}
 	}
 }
 
 void msl::webserver_t::close()
 {
-	if(server_m!=nullptr)
+	/*if(server_m!=nullptr)
 	{
-		mg_destroy_server(&server_m);
-		server_m=nullptr;
-	}
+		for(int ii=0;ii<10;++ii)
+		{
+			mg_destroy_server(&server_m[ii]);
+			server_m[ii]=nullptr;
+		}
+	}*/
 }
 
 std::string msl::webserver_t::address() const
@@ -58,13 +74,5 @@ int msl::webserver_t::client_func_handler(mg_connection* connection,enum mg_even
 	if(connection!=nullptr)
 		return ((msl::webserver_t*)(connection->server_param))->client_func_m(*connection,event);
 
-	return MG_FALSE;
-}
-
-void msl::webserver_t::server_thread_func_m()
-{
-	while(mg_poll_server(server_m,10))
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
-
-	close();
+	return false;
 }
