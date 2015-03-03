@@ -152,5 +152,58 @@
 		</table>
 		</center>
 		</div>
+
+How does this work?
+<ul>
+<li>You can edit the code above, and press Run to have the simulated Arduino run it.
+<li>When we call body.write(80); the Arduino tells the body servo to rotate to angle 80 degrees.
+
+<ul>
+   <li><i>body</i> is an object, which we declared as type Servo at the top.
+   <li><i>write</i> is a member function to run with parameter 80.
+   <li>The semicolon ; ends a function call in many programming languages.
+   <li>This is C++ code (used to build operating systems), but JavaScript (used to build apps) looks very similar.
+</ul>
+
+<li>Body rotates the head left and right (bigger numbers), and is centered at 90.
+<li>Neck rotates the head down and up (bigger numbers), and is centered at 40.
+<li>The body and neck make a 2D cartesian coordinate system, like the
+latitude longitude grid on the Earth.
+<li>We need the delay so the servo has time to move where you tell it.  Smaller numbers give the servo less time to move.
+</ul>
+
+Challenges!
+<ul>
+<li>Stop the code and drag the sliders to put the head facing straight up.  What body and neck coordinates are these?  
+<li>Change the numbers passed into the servo write calls, and see where the head moves.
+<li>You can animate a series of motions by making more write calls in loop.  For example, this moves the neck servo up and down:
+<pre>
+void loop()
+{
+    body.write(80); // face forward
+    neck.write(50); // look up
+    delay(500);
+    body.write(80); // still forward
+    neck.write(20); // look down
+    delay(500);
+}
+</pre> 
+Try this! 
+
+<li>Move the head right, then left, then back to center. 
+
+<li>Move the head in a diagonal--bottom left, then top right, 
+then back to center. 
+
+<li>Move the head in a clockwise circle--right, up, left, down.
+
+<li>Tune a "good nod" for yes, and a "good shake" for no. 
+
+<li>Add a robot "twitch", where it jumps back and forth quickly, then looks forward for a while.
+
+</ul>
+
+Mike built this simulator last weekend!
+
 	</body>
 </html>
