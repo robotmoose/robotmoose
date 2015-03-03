@@ -56,7 +56,12 @@ std::string msl::webserver_t::webroot() const
 int msl::webserver_t::client_func_handler(mg_connection* connection,enum mg_event event)
 {
 	if(connection!=nullptr)
-		return ((msl::webserver_t*)(connection->server_param))->client_func_m(*connection,event);
+	{
+		std::thread thread(((msl::webserver_t*)(connection->server_param))->client_func_m,*connection,event);
+		thread.detach();
+		//return ((msl::webserver_t*)(connection->server_param))->client_func_m(*connection,event);
+		return true;
+	}
 
 	return false;
 }
