@@ -84,9 +84,9 @@
 
 				quizbot=new quizbot_t(renderer);
 				quizbot.set_nod(parseInt(document.getElementById("nod").value));
-				quizbot.set_twist(180-parseInt(document.getElementById("twist").value));
+				quizbot.set_twist(parseInt(document.getElementById("twist").value));
 				quizbot.set_nod_target(parseInt(document.getElementById("nod").value));
-				quizbot.set_twist_target(180-parseInt(document.getElementById("twist").value));
+				quizbot.set_twist_target(parseInt(document.getElementById("twist").value));
 			}
 
 			function loop(dt)
@@ -129,7 +129,7 @@
 
 			function twist_update()
 			{
-				var V=180-parseInt(document.getElementById("twist").value);
+				var V=parseInt(document.getElementById("twist").value);
 				quizbot.set_twist_target(V);
 				document.getElementById("show_twist").innerHTML=""+V;
 			}
