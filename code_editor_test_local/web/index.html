@@ -13,7 +13,7 @@
 		<script src="js/3d.js"></script>
 		<script src="js/quizbot.js"></script>
 
-				<script type="text/javascript">
+		<script type="text/javascript">
 			var run_button;
 			var stop_button;
 			var editor=new editor_t();
@@ -30,20 +30,20 @@
 				stop_button=document.getElementById("stop");
 				editor.create(document.getElementById("code"));
 				editor.set_value(
-"//Need this to use servos\n#include <Servo.h>\n\n"+
-"//Body twist servo is on pin 10\n//Neck tilt servo is on pin 9\n"+
-"Servo body;\nServo neck;\n"+
-"\n\nvoid setup()\n{\n\t//Things written in here happen once\n"+
-"\tbody.attach(10);\n"+
-"\tneck.attach(9);\n"+
-"}\n\n"+
-"void loop()\n"+
-"{\n\t//Things written in here keep happening\n"+
-"\tbody.write(80);\n"+
-"\tneck.write(50);\n"+
-"\tdelay(500);\n"+
-"}"
-);
+					"//Need this to use servos\n#include <Servo.h>\n\n"+
+					"//Body twist servo is on pin 10\n//Neck tilt servo is on pin 9\n"+
+					"Servo body;\nServo neck;\n"+
+					"\n\nvoid setup()\n{\n\t//Things written in here happen once\n"+
+					"\tbody.attach(10);\n"+
+					"\tneck.attach(9);\n"+
+					"}\n\n"+
+					"void loop()\n"+
+					"{\n\t//Things written in here keep happening\n"+
+					"\tbody.write(80);\n"+
+					"\tneck.write(50);\n"+
+					"\tdelay(500);\n"+
+					"}"
+					);
 				editor.set_size(480,460); // FIXME: scaling?
 				editor.on_change=function(){stop();run_button.disabled=true;};
 				editor.on_compiled=function(){stop();};
@@ -54,11 +54,26 @@
 					alert("Is WebGL enabled?");
 				else
 					renderer.setup();
+
+				var thing=CodeMirror.fromTextArea(document.getElementById("code_test"),
+					{indentUnit:4,indentWithTabs:true,lineNumbers:true,matchBrackets:true,mode:"text/x-arduino",readOnly:true});
+				thing.setValue(
+					"void loop()\n"+
+					"{\n"+
+					"\tbody.write(80); // face forward\n"+
+					"\tneck.write(50); // look up\n"+
+					"\tdelay(500);\n"+
+					"\tbody.write(80); // still forward\n"+
+					"\tneck.write(20); // look down\n"+
+					"\tdelay(500);\n"+
+					"}"
+				);
+				thing.setSize(400,125);
 			}
 
 			function setup()
 			{
-				renderer.set_size(480,453); // FIXME: scaling?
+				renderer.set_size(480,150); // FIXME: scaling?
 
 				grid=renderer.create_grid(64,8,8);
 
@@ -127,83 +142,74 @@
 			<div class="page-header">
 				<h1>Quizbot Servos</h1>
 			</div>
-		<center>
-		<table data-toggle="table">
-			<tr>
-				<td style="vertical-align:top;height:100%;">
-					<div id="code"></div>
-				</td>
-				<td style="vertical-align:top;">
-					<div id="container" style="border:1px solid #000000;"></div>
-				</td>
-			</tr>
-			<tr>
-				<td style="vertical-align:top;height:100%;">
-					<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();" disabled/>
-					<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
-				</td>
-				<td style="vertical-align:top;">
-					Body: <span id="show_twist"></span>
-						<input type="range" id="twist" min="0" max="180" value="90" oninput="twist_update();"/>
-					Neck: <span id="show_nod"></span>
-						<input type="range"id="nod" min="0" max="180" value="40" oninput="nod_update();"/><br/>
-				</td>
-			</tr>
-		</table>
-		</center>
+			<center>
+				<table data-toggle="table">
+					<tr>
+						<td style="vertical-align:top;height:100%;">
+							<div id="code"></div>
+						</td>
+						<td style="vertical-align:top;">
+							<div id="container" style="border:1px solid #000000;"></div>
+						</td>
+					</tr>
+					<tr>
+						<td style="vertical-align:top;height:100%;">
+							<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();" disabled/>
+							<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
+						</td>
+						<td style="vertical-align:top;">
+							Body: <span id="show_twist"></span>
+								<input type="range" id="twist" min="0" max="180" value="90" oninput="twist_update();"/>
+							Neck: <span id="show_nod"></span>
+								<input type="range"id="nod" min="0" max="180" value="40" oninput="nod_update();"/><br/>
+						</td>
+					</tr>
+				</table>
+			</center>
+
+			<div class="well">
+				How does this work?
+				<ul>
+					<li>You can edit the code above, and press Run to have the simulated Arduino run it.</li>
+					<li>When we call body.write(80); the Arduino tells the body servo to rotate to angle 80 degrees.</li>
+				</ul>
+
+				<ul>
+					<li><i>body</i> is an object, which we declared as type Servo at the top.</li>
+					<li><i>write</i> is a member function to run with parameter 80.</li>
+					<li>The semicolon ; ends a function call in many programming languages.</li>
+					<li>This is C++ code (used to build operating systems), but JavaScript (used to build apps) looks very similar.</li>
+				</ul>
+
+				<ul>
+					<li>Body rotates the head left and right (bigger numbers), and is centered at 90.</li>
+					<li>Neck rotates the head down and up (bigger numbers), and is centered at 40.</li>
+					<li>The body and neck make a 2D cartesian coordinate system, like the latitude longitude grid on the Earth.</li>
+					<li>We need the delay so the servo has time to move where you tell it.  Smaller numbers give the servo less time to move.</li>
+				</ul>
+			</div>
+
+			<div class="well">
+				Challenges!
+				<ul>
+					<li>Stop the code and drag the sliders to put the head facing straight up.  What body and neck coordinates are these?</li>
+					<li>Change the numbers passed into the servo write calls, and see where the head moves.</li>
+					<li>You can animate a series of motions by making more write calls in loop.  For example, this moves the neck servo up and down:</li>
+
+					<textarea id="code_test"></textarea>
+					Try this!
+
+					<li>Move the head right, then left, then back to center.</li>
+					<li>Move the head in a diagonal--bottom left, then top right, then back to center.</li>
+					<li>Move the head in a clockwise circle--right, up, left, down.</li>
+					<li>Tune a "good nod" for yes, and a "good shake" for no.</li>
+					<li>Add a robot "twitch", where it jumps back and forth quickly, then looks forward for a while.</li>
+				</ul>
+			</div>
+
+			<div class="well">
+				Mike built this simulator last weekend!
+			</div>
 		</div>
-
-How does this work?
-<ul>
-<li>You can edit the code above, and press Run to have the simulated Arduino run it.
-<li>When we call body.write(80); the Arduino tells the body servo to rotate to angle 80 degrees.
-
-<ul>
-   <li><i>body</i> is an object, which we declared as type Servo at the top.
-   <li><i>write</i> is a member function to run with parameter 80.
-   <li>The semicolon ; ends a function call in many programming languages.
-   <li>This is C++ code (used to build operating systems), but JavaScript (used to build apps) looks very similar.
-</ul>
-
-<li>Body rotates the head left and right (bigger numbers), and is centered at 90.
-<li>Neck rotates the head down and up (bigger numbers), and is centered at 40.
-<li>The body and neck make a 2D cartesian coordinate system, like the
-latitude longitude grid on the Earth.
-<li>We need the delay so the servo has time to move where you tell it.  Smaller numbers give the servo less time to move.
-</ul>
-
-Challenges!
-<ul>
-<li>Stop the code and drag the sliders to put the head facing straight up.  What body and neck coordinates are these?
-<li>Change the numbers passed into the servo write calls, and see where the head moves.
-<li>You can animate a series of motions by making more write calls in loop.  For example, this moves the neck servo up and down:
-<pre>
-void loop()
-{
-    body.write(80); // face forward
-    neck.write(50); // look up
-    delay(500);
-    body.write(80); // still forward
-    neck.write(20); // look down
-    delay(500);
-}
-</pre>
-Try this!
-
-<li>Move the head right, then left, then back to center.
-
-<li>Move the head in a diagonal--bottom left, then top right,
-then back to center.
-
-<li>Move the head in a clockwise circle--right, up, left, down.
-
-<li>Tune a "good nod" for yes, and a "good shake" for no.
-
-<li>Add a robot "twitch", where it jumps back and forth quickly, then looks forward for a while.
-
-</ul>
-
-Mike built this simulator last weekend!
-
 	</body>
 </html>
