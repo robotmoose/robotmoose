@@ -1,6 +1,6 @@
 INC=../include
 CXX=g++
-CFLAGS=-O -std=c++11 -Wall -I$(INC)
+CFLAGS=-O -std=c++11 -Wall -I$(INC) -DMONGOOSE_USE_IDLE_TIMEOUT_SECONDS=60
 LIBS=-lpthread
 
 cppcheck_src=cppcheck.cpp
