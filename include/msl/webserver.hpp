@@ -11,7 +11,7 @@ namespace msl
 	class webserver_t
 	{
 		public:
-			typedef std::function<bool(const mg_connection& connection,enum mg_event event)> client_func_t;
+			typedef std::function<int(const mg_connection& connection,enum mg_event event)> client_func_t;
 
 			webserver_t(client_func_t client_func,const std::string& address,const std::string& webroot="web");
 			webserver_t(const webserver_t& copy)=delete;
