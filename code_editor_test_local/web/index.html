@@ -55,7 +55,7 @@
 					"\tdelay(500);\n"+
 					"}"
 					);
-				editor.set_size(480,460); // FIXME: scaling?
+				editor.set_size(480,460);
 				editor.on_change=function(){stop();run_button.disabled=true;};
 				editor.on_compiled=function(){stop();};
 
@@ -84,7 +84,7 @@
 
 			function setup()
 			{
-				renderer.set_size(480,453); // FIXME: scaling?
+				renderer.set_size(480,453); // FIXME: there's a bottom border that is hard to get rid of...
 
 				grid=renderer.create_grid(64,8,8);
 
