@@ -69,9 +69,9 @@
 
 				quizbot=new quizbot_t(renderer);
 				quizbot.set_nod(parseInt(document.getElementById("nod").value));
-				quizbot.set_twist(parseInt(document.getElementById("twist").value));
+				quizbot.set_twist(180-parseInt(document.getElementById("twist").value));
 				quizbot.set_nod_target(parseInt(document.getElementById("nod").value));
-				quizbot.set_twist_target(parseInt(document.getElementById("twist").value));
+				quizbot.set_twist_target(180-parseInt(document.getElementById("twist").value));
 			}
 
 			function loop(dt)
@@ -114,7 +114,7 @@
 
 			function twist_update()
 			{
-				var V=parseInt(document.getElementById("twist").value);
+				var V=180-parseInt(document.getElementById("twist").value);
 				quizbot.set_twist_target(V);
 				document.getElementById("show_twist").innerHTML=""+V;
 			}
@@ -174,7 +174,7 @@ latitude longitude grid on the Earth.
 
 Challenges!
 <ul>
-<li>Stop the code and drag the sliders to put the head facing straight up.  What body and neck coordinates are these?  
+<li>Stop the code and drag the sliders to put the head facing straight up.  What body and neck coordinates are these?
 <li>Change the numbers passed into the servo write calls, and see where the head moves.
 <li>You can animate a series of motions by making more write calls in loop.  For example, this moves the neck servo up and down:
 <pre>
@@ -187,17 +187,17 @@ void loop()
     neck.write(20); // look down
     delay(500);
 }
-</pre> 
-Try this! 
+</pre>
+Try this!
 
-<li>Move the head right, then left, then back to center. 
+<li>Move the head right, then left, then back to center.
 
-<li>Move the head in a diagonal--bottom left, then top right, 
-then back to center. 
+<li>Move the head in a diagonal--bottom left, then top right,
+then back to center.
 
 <li>Move the head in a clockwise circle--right, up, left, down.
 
-<li>Tune a "good nod" for yes, and a "good shake" for no. 
+<li>Tune a "good nod" for yes, and a "good shake" for no.
 
 <li>Add a robot "twitch", where it jumps back and forth quickly, then looks forward for a while.
 

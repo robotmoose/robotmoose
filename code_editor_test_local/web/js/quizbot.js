@@ -116,7 +116,7 @@ function quizbot_t(renderer)
 			myself.models[4][4].rotation.set(rad_nod,myself.models[4][4].rotation.y,
 				myself.models[4][4].rotation.z);
 
-			var rad_twist=+(myself.twist-90)*Math.PI/180;
+			var rad_twist=-(myself.twist-90)*Math.PI/180;
 			myself.models[2][4].rotation.set(myself.models[2][4].rotation.x,
 				myself.models[2][4].rotation.y,rad_twist);
 			myself.models[3][4].rotation.set(myself.models[3][4].rotation.x,
