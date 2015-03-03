@@ -1,5 +1,6 @@
 #include "webserver.hpp"
 
+#include <unistd.h> /* for fork */
 #include <chrono>
 #include <thread>
 
@@ -23,13 +24,12 @@ msl::webserver_t::~webserver_t()
 
 bool msl::webserver_t::good() const
 {
-	return server_m!=nullptr;
+	return true;
 }
 
 void msl::webserver_t::open()
 {
-	close();
-
+#if 0 /* Thread version */
 	for(int ii=0;ii<10;++ii)
 	{
 		auto server=mg_create_server(this,msl::webserver_t::client_func_handler);
@@ -45,6 +45,13 @@ void msl::webserver_t::open()
 			server_thread.detach();
 		}
 	}
+#else /* Fork version */
+	auto server=mg_create_server(this,msl::webserver_t::client_func_handler);
+	mg_set_option(server,"listening_port",address_m.c_str());
+	mg_set_option(server,"document_root",webroot_m.c_str());
+	
+	for (int i=0;i<8;i++) if (fork()==0) server_thread_func_m(server);
+#endif
 }
 
 void msl::webserver_t::close()
