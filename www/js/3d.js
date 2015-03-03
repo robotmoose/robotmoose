@@ -1,3 +1,5 @@
+var url_path="http://robotmoose.com/";
+
 function load_js(js)
 {
 	var scr=document.createElement("script");
@@ -7,10 +9,10 @@ function load_js(js)
 
 function load_dependencies()
 {
-	load_js("http://robotmoose.com/js/three/loaders/OBJLoader.js");
-	load_js("http://robotmoose.com/js/three/loaders/STLLoader.js");
-	load_js("http://robotmoose.com/js/three/loaders/STLLoader.js");
-	load_js("http://robotmoose.com/js/three/controls/OrbitControls.js");
+	load_js(url_path+"js/three/loaders/OBJLoader.js");
+	load_js(url_path+"js/three/loaders/STLLoader.js");
+	load_js(url_path+"js/three/loaders/STLLoader.js");
+	load_js(url_path+"js/three/controls/OrbitControls.js");
 };
 
 (function(){load_dependencies()})();
@@ -54,15 +56,15 @@ function light_t(scene,intensity,position)
 	myself.light.position.copy(position);
 	myself.light.target.position.set(0,0,0);
 	myself.light.castShadow=true;
-	
+
 	var size=1000; // hack!
 	myself.light.shadowMapHeight=512;
 	myself.light.shadowMapWidth=512;
 	myself.light.shadowCameraNear=size/2;
 	myself.light.shadowCameraFar=size*3;
-	myself.light.shadowCameraFov=60; 
-	myself.light.shadowCameraVisible=true; // debug 
-	
+	myself.light.shadowCameraFov=60;
+	myself.light.shadowCameraVisible=true; // debug
+
 	myself.position=myself.light.position;
 //	if (position) myself.position.copy(position);
 	myself.scene.add(myself.light);
