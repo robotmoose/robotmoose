@@ -131,16 +131,16 @@ function model_t(scene)
 		{
 			if(myself.loaded&&myself.mesh)
 			{
-					try
-					{
-						parent.mesh.add(myself.mesh);
-						myself.scene.remove(myself.mesh);
-						myself.scene=parent;
-					}
-					catch(e)
-					{
-						setTimeout(function(){myself.set_parent(parent);},10);
-					}
+				try
+				{
+					parent.mesh.add(myself.mesh);
+					myself.scene.remove(myself.mesh);
+					myself.scene=parent;
+				}
+				catch(e)
+				{
+					setTimeout(function(){myself.set_parent(parent);},10);
+				}
 			}
 			else
 			{
