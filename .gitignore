@@ -8,6 +8,8 @@ jpeg_video_test/client
 jpeg_video_test/client.exe
 code_editor_test/code_editor
 code_editor_test/code_editor.exe
+code_editor_test_local/code_editor
+code_editor_test_local/code_editor.exe
 superstar/netbench
 superstar/netbench.exe
 superstar/superstar
