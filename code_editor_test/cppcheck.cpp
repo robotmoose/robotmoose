@@ -1,5 +1,7 @@
 #include "cppcheck.hpp"
 
+#include <iostream>
+#include <sys/stat.h> /* for mkdir */
 #include <cstdio>
 #include <fstream>
 #include <sstream>
@@ -159,16 +161,34 @@ static bool parse_errors(const std::string& file_name,const std::string& error_d
 	return true;
 }
 
-bool cppcheck(const size_t identifier,const std::string& file_data,std::vector<myerror_t>& errors)
+/* Make a valid directory to run this example code:
+     logs/code/<day>/<rand>/code.cpp
+*/
+std::string make_directory(void) 
 {
-	std::string identifier_str=std::to_string(identifier);
-	std::string file_name=identifier_str+".cpp";
-	std::string temp;
+	while (true) {
+		std::string logdir="logs";
+		unsigned long day=time(0)/(24*3600); // julian day since 1970
+		std::string daydir=logdir+"/"+std::to_string(day);
+		std::string dir=daydir+"/"+std::to_string(rand());
+		std::string temp;
+		std::cout<<"Trying to run code in "<<dir<<"\n";
+		if(0!=mkdir(dir.c_str(),0777))
+		{ // somebody using that ID already, or just missing parent?
+			exec("mkdir -p "+daydir,temp); // make parent
+			continue; 
+		}
+		return dir;
+	}
+}
 
-	if(!exec("mkdir -p "+identifier_str,temp))
-		return false;
 
-	std::ofstream ostr(identifier_str+"/"+file_name);
+bool cppcheck(const std::string& file_data,std::vector<myerror_t>& errors)
+{
+	std::string dir=make_directory();
+	std::string file_name="code.cpp";
+
+	std::ofstream ostr(dir+"/"+file_name);
 
 	if(ostr<<file_data)
 	{
@@ -177,13 +197,13 @@ bool cppcheck(const size_t identifier,const std::string& file_data,std::vector<m
 		std::string error_data;
 		std::string remove_data;
 
-		std::string compile_command="avr-g++ -I../arduino/hardware/variants/standard -mmcu=atmega328p -DF_CPU=16000000UL -Iarduino/hardware/cores -I../arduino/hardware/cores/arduino ../arduino/hardware/cores/arduino/*.cpp ../arduino/hardware/cores/arduino/*.c -o test.elf -Wno-sign-compare -Wno-unused-variable -Wall -lm -Wl,--gc-sections -DUSB_VID=null -DUSB_PID=null -DARDUINO=103 -Wno-strict-aliasing";
+		std::string compile_command="avr-g++ -I../../../arduino/hardware/variants/standard -mmcu=atmega328p -DF_CPU=16000000UL -I../../../arduino/hardware/cores -I../../../arduino/hardware/cores/arduino ../../../arduino/hardware/cores/arduino/*.cpp ../../../arduino/hardware/cores/arduino/*.c -o test.elf -Wno-sign-compare -Wno-unused-variable -Wall -lm -Wl,--gc-sections -DUSB_VID=null -DUSB_PID=null -DARDUINO=103 -Wno-strict-aliasing";
 		std::string link_command="avr-objcopy -R .eeprom -O ihex test.elf test.hex";
 
-		auto command1="cd \""+identifier_str+"\"&&"+compile_command+" \""+file_name+"\" 2>&1 && "+link_command+" 2>&1|grep \""+file_name+":\"";
-		auto command2="rm -rf \""+identifier_str+"\"";
+		auto command1="cd \""+dir+"\"&&"+compile_command+" \""+file_name+"\" 2>&1 && "+link_command+" 2>&1  | tee \""+file_name+".log\""; // |grep \""+file_name+":\"";
+		// auto command2="rm -rf \""+identifier_str+"\"";
 
-		auto ret=exec(command1,error_data)&&exec(command2,remove_data);
+		auto ret=exec(command1,error_data); // &&exec(command2,remove_data);
 
 		if(!ret)
 			return false;
@@ -194,9 +214,9 @@ bool cppcheck(const size_t identifier,const std::string& file_data,std::vector<m
 	return false;
 }
 
-bool cppcheck_arduino(const size_t identifier,const std::string& file_data,std::vector<myerror_t>& errors)
+bool cppcheck_arduino(const std::string& file_data,std::vector<myerror_t>& errors)
 {
-	if(cppcheck(identifier,"#include<Arduino.h>\n"+file_data,errors))
+	if(cppcheck("#include<Arduino.h>\n"+file_data,errors))
 	{
 		for(auto& error:errors)
 			--error.line;
@@ -209,16 +229,14 @@ bool cppcheck_arduino(const size_t identifier,const std::string& file_data,std::
 
 bool cppcheck_anonymous(const std::string& file_data,std::vector<myerror_t>& errors,const size_t tries)
 {
-	for(size_t ii=0;ii<tries;++ii)
-		if(cppcheck(rand(),file_data,errors))
-			return true;
+	if(cppcheck(file_data,errors))
+		return true;
 	return false;
 }
 
 bool cppcheck_arduino_anonymous(const std::string& file_data,std::vector<myerror_t>& errors,const size_t tries)
 {
-	for(size_t ii=0;ii<tries;++ii)
-		if(cppcheck_arduino(rand(),file_data,errors))
-			return true;
+	if(cppcheck_arduino(file_data,errors))
+		return true;
 	return false;
 }
