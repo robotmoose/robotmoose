@@ -188,6 +188,7 @@ function editor_t()
 	{
 		if(myself.editor&&myself.compilable)
 		{
+			myself.compilable=false;
 			myself.set_status("Compiling...");
 			send_request("POST",editor_path,"code","",myself.compile_response,myself.error_response,
 				myself.get_value(),"application/octet-stream");
@@ -220,12 +221,16 @@ function editor_t()
 				console.log(e);
 				myself.set_status("Server error...");
 			}
+			myself.compilable=true;
 		}
 	};
 
 	myself.error_response=function(error_code)
 	{
 		if(myself.editor)
+		{
 			myself.set_status("Server error ("+error_code+")");
+			myself.compilable=true;
+		}
 	};
 }
