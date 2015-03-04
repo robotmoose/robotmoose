@@ -1,6 +1,7 @@
 #include "webserver.hpp"
 
 #include <chrono>
+#include <stdexcept>
 #include <thread>
 
 int msl::client_thread_func_m(mg_connection* connection,mg_event event)
@@ -47,16 +48,7 @@ msl::webserver_t::webserver_t(client_func_t client_func,const std::string& addre
 
 msl::webserver_t::~webserver_t()
 {
-	close();
-}
-
-bool msl::webserver_t::good() const
-{
-	//for(size_t ii=0;ii<threads_m.size();++ii)
-	//	if(threads_m[ii]==nullptr||!mg_poll_server(threads_m[ii],10))
-	//		return false;
-
-	return (threads_m.size()==thread_count_m);
+	close_m();
 }
 
 void msl::webserver_t::open()
@@ -67,8 +59,8 @@ void msl::webserver_t::open()
 
 		if(threads_m[ii]==nullptr||!mg_poll_server(threads_m[ii],10))
 		{
-			close();
-			return;
+			close_m();
+			throw std::runtime_error("msl::webserver_t::open() - Could not open create server.");
 		}
 	}
 
@@ -76,8 +68,8 @@ void msl::webserver_t::open()
 	{
 		if(mg_set_option(threads_m[0],"listening_port",address_m.c_str())!=0)
 		{
-			close();
-			return;
+			close_m();
+			throw std::runtime_error("msl::webserver_t::open() - Could not open address \""+address_m+"\".");
 		}
 	}
 
@@ -88,21 +80,16 @@ void msl::webserver_t::open()
 	{
 		if(mg_set_option(threads_m[ii],"document_root",webroot_m.c_str())!=0)
 		{
-			close();
-			return;
+			close_m();
+			throw std::runtime_error("msl::webserver_t::open() - Could not access webroot \""+webroot_m+"\".");
 		}
+	}
 
+	for(size_t ii=0;ii<threads_m.size();++ii)
+	{
 		std::thread thread(server_thread_func_m,threads_m[ii]);
 		thread.detach();
 	}
-}
-
-void msl::webserver_t::close()
-{
-	for(size_t ii=0;ii<thread_count_m;++ii)
-		mg_destroy_server(&threads_m[ii]);
-
-	threads_m.clear();
 }
 
 std::string msl::webserver_t::address() const
@@ -118,4 +105,12 @@ std::string msl::webserver_t::webroot() const
 size_t msl::webserver_t::thread_count() const
 {
 	return thread_count_m;
+}
+
+void msl::webserver_t::close_m()
+{
+	for(size_t ii=0;ii<thread_count_m;++ii)
+		mg_destroy_server(&threads_m[ii]);
+
+	threads_m.clear();
 }

@@ -24,14 +24,14 @@ namespace msl
 			webserver_t(const webserver_t& copy)=delete;
 			~webserver_t();
 			webserver_t& operator=(const webserver_t& copy)=delete;
-			bool good() const;
 			void open();
-			void close();
 			std::string address() const;
 			std::string webroot() const;
 			size_t thread_count() const;
 
 		private:
+			void close_m();
+
 			client_func_t client_func_m;
 			std::vector<mg_server*> threads_m;
 			std::string address_m;

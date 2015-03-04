@@ -12,21 +12,21 @@ void send_string(const mg_connection& connection,const std::string& str);
 void send_json(const mg_connection& connection,const json::Object& obj);
 void code_check(const std::string& code,json::Object& response);
 
-msl::webserver_t server(client_func,"0.0.0.0:8082","web");
+msl::webserver_t server(client_func,"0.0.0.0:8082","web",8);
 
 int main()
 {
-	server.open();
+	try
+	{
+		server.open();
 
-	if(server.good())
-		std::cout<<":)"<<std::endl;
-	else
-		std::cout<<":("<<std::endl;
-
-	while(server.good())
-		msl::delay_ms(10);
-
-	server.close();
+		while(true)
+			msl::delay_ms(10);
+	}
+	catch(std::runtime_error& e)
+	{
+		std::cout<<e.what()<<std::endl;
+	}
 
 	return 0;
 }
