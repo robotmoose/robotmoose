@@ -1,8 +1,20 @@
 #include "webserver.hpp"
 
-#include <unistd.h> /* for fork */
 #include <chrono>
 #include <thread>
+
+int msl::client_thread_func_m(mg_connection* connection,mg_event event)
+{
+	if(connection!=nullptr)
+	{
+		if(((msl::webserver_t*)(connection->server_param))->client_func_m(*connection,event))
+			return MG_TRUE;
+		else
+			return MG_FALSE;
+	}
+
+	return MG_FALSE;
+}
 
 static void server_thread_func_m(mg_server* server)
 {
@@ -10,11 +22,27 @@ static void server_thread_func_m(mg_server* server)
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 }
 
-msl::webserver_t::webserver_t(client_func_t client_func,const std::string& address,const std::string& webroot):
-	client_func_m(client_func),address_m(address),webroot_m(webroot)
+void msl::client_reply(const mg_connection& client,const std::string& data,const std::string& mime)
 {
-	for(int ii=0;ii<10;++ii)
-		server_m[ii]=nullptr;
+	mg_printf
+	(
+		(mg_connection*)&client,
+		"HTTP/1.1 200 OK\r\n"
+		"Content-Type: %s\r\n"
+		"Content-Length: %ld\r\n"
+		"\r\n"
+		"%s",
+		mime.c_str(),
+		data.size(),data.c_str()
+	);
+}
+
+msl::webserver_t::webserver_t(client_func_t client_func,const std::string& address,
+	const std::string& webroot,const size_t thread_count):
+	client_func_m(client_func),address_m(address),webroot_m(webroot),thread_count_m(thread_count)
+{
+	if(thread_count_m<1)
+		thread_count_m=1;
 }
 
 msl::webserver_t::~webserver_t()
@@ -24,46 +52,57 @@ msl::webserver_t::~webserver_t()
 
 bool msl::webserver_t::good() const
 {
-	return true;
+	for(size_t ii=0;ii<threads_m.size();++ii)
+		if(threads_m[ii]==nullptr||!mg_poll_server(threads_m[ii],10))
+			return false;
+
+	return (threads_m.size()==thread_count_m);
 }
 
 void msl::webserver_t::open()
 {
-#if 0 /* Thread version */
-	for(int ii=0;ii<10;++ii)
+	for(size_t ii=0;ii<thread_count_m;++ii)
 	{
-		auto server=mg_create_server(this,msl::webserver_t::client_func_handler);
-		mg_set_option(server,"listening_port",address_m.c_str());
-		mg_set_option(server,"document_root",webroot_m.c_str());
+		threads_m.push_back(mg_create_server(this,msl::client_thread_func_m));
 
-		if(server!=nullptr&&mg_poll_server(server,10))
-			server_m[ii]=server;
-
-		//if(good())
+		if(threads_m[ii]==nullptr||!mg_poll_server(threads_m[ii],10))
 		{
-			std::thread server_thread(server_thread_func_m,server);
-			server_thread.detach();
+			close();
+			return;
 		}
 	}
-#else /* Fork version */
-	auto server=mg_create_server(this,msl::webserver_t::client_func_handler);
-	mg_set_option(server,"listening_port",address_m.c_str());
-	mg_set_option(server,"document_root",webroot_m.c_str());
-	
-	for (int i=0;i<8;i++) if (fork()==0) server_thread_func_m(server);
-#endif
+
+	if(threads_m.size()>0)
+	{
+		if(mg_set_option(threads_m[0],"listening_port",address_m.c_str())!=0)
+		{
+			close();
+			return;
+		}
+	}
+
+	for(size_t ii=1;ii<threads_m.size();++ii)
+		mg_copy_listeners(threads_m[0],threads_m[ii]);
+
+	for(size_t ii=0;ii<threads_m.size();++ii)
+	{
+		if(mg_set_option(threads_m[ii],"document_root",webroot_m.c_str())!=0)
+		{
+			close();
+			return;
+		}
+
+		std::thread thread(server_thread_func_m,threads_m[ii]);
+		thread.detach();
+	}
 }
 
 void msl::webserver_t::close()
 {
-	/*if(server_m!=nullptr)
-	{
-		for(int ii=0;ii<10;++ii)
-		{
-			mg_destroy_server(&server_m[ii]);
-			server_m[ii]=nullptr;
-		}
-	}*/
+	for(size_t ii=0;ii<thread_count_m;++ii)
+		mg_destroy_server(&threads_m[ii]);
+
+	threads_m.clear();
 }
 
 std::string msl::webserver_t::address() const
@@ -76,10 +115,7 @@ std::string msl::webserver_t::webroot() const
 	return webroot_m;
 }
 
-int msl::webserver_t::client_func_handler(mg_connection* connection,enum mg_event event)
+size_t msl::webserver_t::thread_count() const
 {
-	if(connection!=nullptr)
-		return ((msl::webserver_t*)(connection->server_param))->client_func_m(*connection,event);
-
-	return false;
+	return thread_count_m;
 }

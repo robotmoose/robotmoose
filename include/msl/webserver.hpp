@@ -3,17 +3,24 @@
 
 #include <functional>
 #include <string>
+#include <vector>
 
 #include "mongoose/mongoose.h"
 
 namespace msl
 {
+	int client_thread_func_m(mg_connection* connection,mg_event event);
+	void client_reply(const mg_connection& client,const std::string& data,const std::string& mime);
+
 	class webserver_t
 	{
-		public:
-			typedef std::function<int(const mg_connection& connection,enum mg_event event)> client_func_t;
+		friend int msl::client_thread_func_m(mg_connection* connection,mg_event event);
 
-			webserver_t(client_func_t client_func,const std::string& address,const std::string& webroot="web");
+		public:
+			typedef std::function<bool(const mg_connection& connection,mg_event event)> client_func_t;
+
+			webserver_t(client_func_t client_func,const std::string& address,
+				const std::string& webroot="web",const size_t thread_count=16);
 			webserver_t(const webserver_t& copy)=delete;
 			~webserver_t();
 			webserver_t& operator=(const webserver_t& copy)=delete;
@@ -22,13 +29,14 @@ namespace msl
 			void close();
 			std::string address() const;
 			std::string webroot() const;
+			size_t thread_count() const;
 
 		private:
-			static int client_func_handler(mg_connection* connection,enum mg_event event);
-			mg_server* server_m[10];
 			client_func_t client_func_m;
+			std::vector<mg_server*> threads_m;
 			std::string address_m;
 			std::string webroot_m;
+			size_t thread_count_m;
 	};
 }
 
