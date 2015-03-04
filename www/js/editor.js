@@ -49,7 +49,7 @@ function editor_t()
 	myself.editor=null;
 	myself.compilable=false;
 	myself.timeout=null;
-	myself.compile_time=1000;
+	myself.compile_time=3000; // automatically compile this many ms after last change
 
 	myself.on_change=null;
 	myself.on_compiled=null;
