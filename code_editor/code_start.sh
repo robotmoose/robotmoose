@@ -6,7 +6,7 @@ cd `dirname $0`
 (
 while [ true ]
 do
-	mkdir logs
+	mkdir -p logs
 	date >> logs/log
 	echo "Running code_start.sh by "`who am i` >> logs/log
 	chown no_priv:no_priv logs
