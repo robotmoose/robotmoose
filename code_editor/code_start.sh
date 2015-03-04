@@ -11,7 +11,7 @@ do
 	echo "Running code_start.sh by "`id` >> logs/log
 	chown no_priv:no_priv logs
 
-	su no_priv ./code_editor 2>&1 >> logs/log
+	su -c ./code_editor no_priv 2>&1 >> logs/log
 	echo "ERROR -- code_editor killed off somehow" >> logs/log
 	sleep 10
 done
