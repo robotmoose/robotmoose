@@ -52,9 +52,9 @@ msl::webserver_t::~webserver_t()
 
 bool msl::webserver_t::good() const
 {
-	for(size_t ii=0;ii<threads_m.size();++ii)
-		if(threads_m[ii]==nullptr||!mg_poll_server(threads_m[ii],10))
-			return false;
+	//for(size_t ii=0;ii<threads_m.size();++ii)
+	//	if(threads_m[ii]==nullptr||!mg_poll_server(threads_m[ii],10))
+	//		return false;
 
 	return (threads_m.size()==thread_count_m);
 }
