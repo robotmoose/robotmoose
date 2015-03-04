@@ -1,4 +1,4 @@
-var url_path="http://robotmoose.com/";
+var url_path="/"; // "http://robotmoose.com/";
 var editor_path="/editor/";
 
 function load_js(js)
