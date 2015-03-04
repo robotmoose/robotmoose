@@ -16,17 +16,18 @@ msl::webserver_t server(client_func,"0.0.0.0:8082","web",8);
 
 int main()
 {
-	try
-	{
-		server.open();
+	server.open();
 
-		while(true)
-			msl::delay_ms(10);
-	}
-	catch(std::runtime_error& e)
+	if(!server.good())
 	{
-		std::cout<<e.what()<<std::endl;
+		std::cout<<":("<<std::endl;
+		return 0;
 	}
+
+	std::cout<<":)"<<std::endl;
+
+	while(server.good())
+		msl::delay_ms(10);
 
 	return 0;
 }

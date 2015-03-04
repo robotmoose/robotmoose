@@ -1,5 +1,6 @@
 #include "webserver.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <stdexcept>
 #include <thread>
@@ -17,11 +18,25 @@ int msl::client_thread_func_m(mg_connection* connection,mg_event event)
 	return MG_FALSE;
 }
 
-static void server_thread_func_m(mg_server* server)
+void msl::server_thread_func_m(msl::webserver_t::server_thread_t* thread)
 {
-	while(mg_poll_server(server,10))
+	thread->mutex.lock();
+
+	while(mg_poll_server(thread->server,10))
+	{
+		if(thread->stop==true)
+			break;
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	}
+
+	mg_destroy_server(&thread->server);
+	thread->stop=true;
+	thread->mutex.unlock();
 }
+
+msl::webserver_t::server_thread_t::server_thread_t(mg_server* server_ptr):server(server_ptr),stop(false)
+{}
 
 void msl::client_reply(const mg_connection& client,const std::string& data,const std::string& mime)
 {
@@ -40,48 +55,46 @@ void msl::client_reply(const mg_connection& client,const std::string& data,const
 
 msl::webserver_t::webserver_t(client_func_t client_func,const std::string& address,
 	const std::string& webroot,const size_t thread_count):
-	client_func_m(client_func),address_m(address),webroot_m(webroot),thread_count_m(thread_count)
-{
-	if(thread_count_m<1)
-		thread_count_m=1;
-}
+	client_func_m(client_func),address_m(address),webroot_m(webroot),
+	thread_count_m(std::max((size_t)1,thread_count))
+{}
 
 msl::webserver_t::~webserver_t()
 {
-	close_m();
+	close();
 }
 
 void msl::webserver_t::open()
 {
 	for(size_t ii=0;ii<thread_count_m;++ii)
 	{
-		threads_m.push_back(mg_create_server(this,msl::client_thread_func_m));
+		threads_m.push_back(new server_thread_t(mg_create_server(this,msl::client_thread_func_m)));
 
-		if(threads_m[ii]==nullptr||!mg_poll_server(threads_m[ii],10))
+		if(threads_m[ii]->server==nullptr||!mg_poll_server(threads_m[ii]->server,10))
 		{
-			close_m();
-			throw std::runtime_error("msl::webserver_t::open() - Could not open create server.");
+			close();
+			return;
 		}
 	}
 
 	if(threads_m.size()>0)
 	{
-		if(mg_set_option(threads_m[0],"listening_port",address_m.c_str())!=0)
+		if(mg_set_option(threads_m[0]->server,"listening_port",address_m.c_str())!=0)
 		{
-			close_m();
-			throw std::runtime_error("msl::webserver_t::open() - Could not open address \""+address_m+"\".");
+			close();
+			return;
 		}
 	}
 
 	for(size_t ii=1;ii<threads_m.size();++ii)
-		mg_copy_listeners(threads_m[0],threads_m[ii]);
+		mg_copy_listeners(threads_m[0]->server,threads_m[ii]->server);
 
 	for(size_t ii=0;ii<threads_m.size();++ii)
 	{
-		if(mg_set_option(threads_m[ii],"document_root",webroot_m.c_str())!=0)
+		if(mg_set_option(threads_m[ii]->server,"document_root",webroot_m.c_str())!=0)
 		{
-			close_m();
-			throw std::runtime_error("msl::webserver_t::open() - Could not access webroot \""+webroot_m+"\".");
+			close();
+			return;
 		}
 	}
 
@@ -90,6 +103,27 @@ void msl::webserver_t::open()
 		std::thread thread(server_thread_func_m,threads_m[ii]);
 		thread.detach();
 	}
+}
+
+void msl::webserver_t::close()
+{
+	for(size_t ii=0;ii<thread_count_m;++ii)
+	{
+		if(!threads_m[ii]->stop)
+		{
+			threads_m[ii]->stop=true;
+			threads_m[ii]->mutex.lock();
+		}
+
+		delete threads_m[ii];
+	}
+
+	threads_m.clear();
+}
+
+bool msl::webserver_t::good() const
+{
+	return (threads_m.size()==thread_count_m);
 }
 
 std::string msl::webserver_t::address() const
@@ -105,12 +139,4 @@ std::string msl::webserver_t::webroot() const
 size_t msl::webserver_t::thread_count() const
 {
 	return thread_count_m;
-}
-
-void msl::webserver_t::close_m()
-{
-	for(size_t ii=0;ii<thread_count_m;++ii)
-		mg_destroy_server(&threads_m[ii]);
-
-	threads_m.clear();
 }
