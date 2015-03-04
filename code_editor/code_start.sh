@@ -8,7 +8,7 @@ while [ true ]
 do
 	mkdir logs
 	date >> logs/log
-	echo "Running code_start.sh by "`id` >> logs/log
+	echo "Running code_start.sh by "`who am i` >> logs/log
 	chown no_priv:no_priv logs
 
 	su -c ./code_editor no_priv 2>&1 >> logs/log
