@@ -14,6 +14,7 @@
 		<script src="http://robotmoose.com/js/quizbot.js"></script>
 
 		<script type="text/javascript">
+			var verify_button;
 			var run_button;
 			var stop_button;
 			var editor=new editor_t();
@@ -26,6 +27,7 @@
 
 			function initialize()
 			{
+				verify_button=document.getElementById("verify");
 				run_button=document.getElementById("run");
 				stop_button=document.getElementById("stop");
 				editor.create(document.getElementById("code"));
@@ -45,8 +47,8 @@
 					"}"
 					);
 				editor.set_size(480,460);
-				editor.on_change=function(){stop();run_button.disabled=true;};
-				editor.on_compiled=function(){stop();};
+				editor.on_change=function(){stop(); verify_button.value="Verify"; }
+				editor.on_compiled=function(){stop(); verify_button.value="Verified"; };
 
 				renderer=new renderer_t(document.getElementById("container"),setup,loop);
 
@@ -106,11 +108,19 @@
 				twist_update();
 			}
 
+
+			function verify()
+			{
+				editor.compile();
+			}
+
+
 			function run()
 			{
-				emulator.compile(editor.get_value());
-				run_button.disabled=true;
-				stop_button.disabled=false;
+				if (emulator.compile(editor.get_value())) {
+					run_button.disabled=true;
+					stop_button.disabled=false;
+				}
 			}
 
 			function stop()
@@ -154,7 +164,8 @@
 					</tr>
 					<tr>
 						<td style="vertical-align:top;height:100%;">
-							<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();" disabled/>
+							<input type="button" class="btn btn-sm btn-primary" id="verify" value="Verify" onclick="verify();"/>
+							<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();"  title="[alt-shift-r]" accesskey="r"  />
 							<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
 						</td>
 						<td style="vertical-align:top;">
