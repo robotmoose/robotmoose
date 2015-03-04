@@ -10,7 +10,7 @@ bool client_func(const mg_connection& connection,enum mg_event event);
 msl::webserver_t server(client_func,"0.0.0.0:8080","web");
 
 std::mutex cam_lock;
-std::map<std::string,std::string> cams={{"172.20.227.15:8081",""}};
+std::map<std::string,std::string> cams={{"172.20.230.221:8081",""}};
 
 int main()
 {
@@ -23,10 +23,13 @@ int main()
 
 	while(server.good())
 	{
-		auto jpg=get_jpg("172.20.227.15:8081","/cam.jpg");
-		cam_lock.lock();
-		cams["172.20.227.15:8081"]=jpg;
-		cam_lock.unlock();
+		for(auto& ii:cams)
+		{
+			auto jpg=get_jpg(ii.first,"/cam.jpg");
+			cam_lock.lock();
+			ii.second=jpg;
+			cam_lock.unlock();
+		}
 		msl::delay_ms(10);
 	}
 
