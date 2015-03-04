@@ -7,7 +7,7 @@
 
 bool client_func(const mg_connection& connection,enum mg_event event);
 
-msl::webserver_t server(client_func,"0.0.0.0:80","web");
+msl::webserver_t server(client_func,"0.0.0.0:8080","web");
 
 std::mutex cam_lock;
 std::map<std::string,std::string> cams={{"172.20.227.15:8081",""}};
