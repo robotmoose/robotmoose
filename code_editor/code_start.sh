@@ -16,4 +16,4 @@ do
 	sleep 10
 done
 ) &
-
+echo "Code running.  To see any errors, run   tail -f logs/log &"
