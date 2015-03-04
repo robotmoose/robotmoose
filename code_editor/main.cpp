@@ -42,7 +42,7 @@ bool client_func(const mg_connection& connection,enum mg_event event)
 	std::string request=connection.uri;
 	std::cout<<connection.remote_ip<<":"<<connection.remote_port<<"\t"<<request<<std::endl;
 
-	if(method=="POST"&&request=="/code")
+	if(method=="POST"&& (request=="/code" || request=="/editor/code"))
 	{
 		std::string code=std::string(connection.content,connection.content_len);
 		json::Object response;
