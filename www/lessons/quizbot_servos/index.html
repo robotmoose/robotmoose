@@ -117,10 +117,14 @@
 
 			function run()
 			{
-				if (emulator.compile(editor.get_value())) {
-					run_button.disabled=true;
-					stop_button.disabled=false;
-				}
+				var errs=emulator.compile(editor.get_value(),
+					function(compile_error) {
+						editor.set_status(compile_error);
+						stop();
+					}
+				);
+				run_button.disabled=true;
+				stop_button.disabled=false;
 			}
 
 			function stop()

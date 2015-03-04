@@ -173,8 +173,8 @@ function arduino_emulator_t()
 			};
 		}
 	};
-
-	myself.compile=function(code)
+	
+	myself.compile=function(code, error_handler)
 	{
 		(function()
 		{
@@ -211,7 +211,7 @@ function arduino_emulator_t()
 				this.get_controller=function(){return myself;};
 
 				eval(Processing.compile(code).sourceCode)(myself.json);
-
+				
 				myself.json.delay=myself.delay;
 
 				myself.json.sqrt=Math.sqrt;
@@ -239,13 +239,14 @@ function arduino_emulator_t()
 							myself.commands[0]();
 					};
 				};
-
+				
 				if(myself.commands.length>0)
 					myself.commands[0]();
 			}
 			catch(e)
 			{
-				console.log(e);
+				console.log("Arduino simulator error "+e);
+				error_handler("Invalid code: "+e);
 			}
 		})();
 	};
