@@ -1,5 +1,5 @@
-(function(){var imported=document.createElement("script");imported.src="http://robotmoose.com/games/demo/sprite.js";document.head.appendChild(imported);})();
-(function(){var imported=document.createElement("script");imported.src="http://robotmoose.com/games/demo/level.js";document.head.appendChild(imported);})();
+(function(){var imported=document.createElement("script");imported.src="/games/demo/sprite.js";document.head.appendChild(imported);})();
+(function(){var imported=document.createElement("script");imported.src="/games/demo/level.js";document.head.appendChild(imported);})();
 
 function moose_t(x,y)
 {
@@ -7,9 +7,9 @@ function moose_t(x,y)
 
 	myself.x=x;
 	myself.y=y;
-	myself.spr_right=new sprite_t("http://robotmoose.com/games/demo/moose_right.png",4);
-	myself.spr_left=new sprite_t("http://robotmoose.com/games/demo/moose_left.png",4);
-	myself.spr_jump=new sprite_t("http://robotmoose.com/games/demo/moose_jump.png",2);
+	myself.spr_right=new sprite_t("/games/demo/moose_right.png",4);
+	myself.spr_left=new sprite_t("/games/demo/moose_left.png",4);
+	myself.spr_jump=new sprite_t("/games/demo/moose_jump.png",2);
 	myself.spr=myself.spr_right;
 	myself.speed=100;
 	myself.animation_speed=20;
