@@ -47,7 +47,7 @@ namespace msl
 			virtual std::string address() const;
 			size_t buffer_size() const;
 
-		protected:
+		private:
 			socket_device_t device_m;
 	};
 

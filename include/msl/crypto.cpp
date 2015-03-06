@@ -21,7 +21,7 @@
 #define SHA256_BLOCK_SIZE				64
 #define SHA512_BLOCK_SIZE				128
 
-bool encrypt_rsa(const void* plain,const size_t size,const std::string& key,std::string& cipher)
+bool msl::encrypt_rsa(const void* plain,const size_t size,const std::string& key,std::string& cipher)
 {
 	bool success=true;
 	ERR_load_crypto_strings();
@@ -64,12 +64,12 @@ bool encrypt_rsa(const void* plain,const size_t size,const std::string& key,std:
 	return success;
 }
 
-bool encrypt_rsa(const std::string& plain,const std::string& key,std::string& cipher)
+bool msl::encrypt_rsa(const std::string& plain,const std::string& key,std::string& cipher)
 {
-	return encrypt_rsa(plain.c_str(),plain.size(),key,cipher);
+	return msl::encrypt_rsa(plain.c_str(),plain.size(),key,cipher);
 }
 
-bool encrypt_aes256(const void* plain,const size_t size,const std::string& key,const std::string& iv,std::string& cipher)
+bool msl::encrypt_aes256(const void* plain,const size_t size,const std::string& key,const std::string& iv,std::string& cipher)
 {
 	bool success=false;
 	ERR_load_crypto_strings();
@@ -98,12 +98,12 @@ bool encrypt_aes256(const void* plain,const size_t size,const std::string& key,c
 	return success;
 }
 
-bool encrypt_aes256(const std::string& plain,const std::string& key,const std::string& iv,std::string& cipher)
+bool msl::encrypt_aes256(const std::string& plain,const std::string& key,const std::string& iv,std::string& cipher)
 {
 	return encrypt_aes256(plain.c_str(),plain.size(),key,iv,cipher);
 }
 
-bool decrypt_rsa(const void* cipher,const size_t size,const std::string& key,std::string& plain)
+bool msl::decrypt_rsa(const void* cipher,const size_t size,const std::string& key,std::string& plain)
 {
 	bool success=true;
 	ERR_load_crypto_strings();
@@ -146,12 +146,12 @@ bool decrypt_rsa(const void* cipher,const size_t size,const std::string& key,std
 	return success;
 }
 
-bool decrypt_rsa(const std::string& cipher,const std::string& key,std::string& plain)
+bool msl::decrypt_rsa(const std::string& cipher,const std::string& key,std::string& plain)
 {
-	return decrypt_rsa(cipher.c_str(),cipher.size(),key,plain);
+	return msl::decrypt_rsa(cipher.c_str(),cipher.size(),key,plain);
 }
 
-bool decrypt_aes256(const void* cipher,const size_t size,const std::string& key,const std::string& iv,std::string& plain)
+bool msl::decrypt_aes256(const void* cipher,const size_t size,const std::string& key,const std::string& iv,std::string& plain)
 {
 	bool success=false;
 	ERR_load_crypto_strings();
@@ -180,12 +180,12 @@ bool decrypt_aes256(const void* cipher,const size_t size,const std::string& key,
 	return success;
 }
 
-bool decrypt_aes256(const std::string& cipher,const std::string& key,const std::string& iv,std::string& plain)
+bool msl::decrypt_aes256(const std::string& cipher,const std::string& key,const std::string& iv,std::string& plain)
 {
-	return decrypt_aes256(cipher.c_str(),cipher.size(),key,iv,plain);
+	return msl::decrypt_aes256(cipher.c_str(),cipher.size(),key,iv,plain);
 }
 
-bool hash_md5(const std::string& plain,std::string& hash)
+bool msl::hash_md5(const std::string& plain,std::string& hash)
 {
 	std::string temp_hash;
 	temp_hash.resize(MD5_DIGEST_LENGTH);
@@ -202,7 +202,7 @@ bool hash_md5(const std::string& plain,std::string& hash)
 	return false;
 }
 
-bool hash_sha256(const std::string& plain,std::string& hash)
+bool msl::hash_sha256(const std::string& plain,std::string& hash)
 {
 	std::string temp_hash;
 	temp_hash.resize(SHA256_DIGEST_LENGTH);
@@ -219,7 +219,7 @@ bool hash_sha256(const std::string& plain,std::string& hash)
 	return false;
 }
 
-bool hash_sha512(const std::string& plain,std::string& hash)
+bool msl::hash_sha512(const std::string& plain,std::string& hash)
 {
 	std::string temp_hash;
 	temp_hash.resize(SHA512_DIGEST_LENGTH);
@@ -236,11 +236,11 @@ bool hash_sha512(const std::string& plain,std::string& hash)
 	return false;
 }
 
-bool hmac_md5(std::string key,const std::string& plain,std::string& hash)
+bool msl::hmac_md5(std::string key,const std::string& plain,std::string& hash)
 {
 	if(key.size()>MD5_BLOCK_SIZE)
 	{
-		if(!hash_md5(key,key))
+		if(!msl::hash_md5(key,key))
 			return false;
 	}
 
@@ -255,18 +255,18 @@ bool hmac_md5(std::string key,const std::string& plain,std::string& hash)
 
 	std::string hash_temp="";
 
-	if(!hash_md5(i_key_pad+plain,hash_temp)||!hash_md5(o_key_pad+hash_temp,hash_temp))
+	if(!msl::hash_md5(i_key_pad+plain,hash_temp)||!msl::hash_md5(o_key_pad+hash_temp,hash_temp))
 		return false;
 
 	hash=hash_temp;
 	return true;
 }
 
-bool hmac_sha256(std::string key,const std::string& plain,std::string& hash)
+bool msl::hmac_sha256(std::string key,const std::string& plain,std::string& hash)
 {
 	if(key.size()>SHA256_BLOCK_SIZE)
 	{
-		if(!hash_sha256(key,key))
+		if(!msl::hash_sha256(key,key))
 			return false;
 	}
 
@@ -281,18 +281,18 @@ bool hmac_sha256(std::string key,const std::string& plain,std::string& hash)
 
 	std::string hash_temp="";
 
-	if(!hash_sha256(i_key_pad+plain,hash_temp)||!hash_sha256(o_key_pad+hash_temp,hash_temp))
+	if(!msl::hash_sha256(i_key_pad+plain,hash_temp)||!msl::hash_sha256(o_key_pad+hash_temp,hash_temp))
 		return false;
 
 	hash=hash_temp;
 	return true;
 }
 
-bool hmac_sha512(std::string key,const std::string& plain,std::string& hash)
+bool msl::hmac_sha512(std::string key,const std::string& plain,std::string& hash)
 {
 	if(key.size()>SHA512_BLOCK_SIZE)
 	{
-		if(!hash_sha512(key,key))
+		if(!msl::hash_sha512(key,key))
 			return false;
 	}
 
@@ -307,7 +307,7 @@ bool hmac_sha512(std::string key,const std::string& plain,std::string& hash)
 
 	std::string hash_temp="";
 
-	if(!hash_sha512(i_key_pad+plain,hash_temp)||!hash_sha512(o_key_pad+hash_temp,hash_temp))
+	if(!msl::hash_sha512(i_key_pad+plain,hash_temp)||!msl::hash_sha512(o_key_pad+hash_temp,hash_temp))
 		return false;
 
 	hash=hash_temp;

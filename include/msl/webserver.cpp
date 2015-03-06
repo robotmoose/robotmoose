@@ -20,8 +20,6 @@ int msl::client_thread_func_m(mg_connection* connection,mg_event event)
 
 void msl::server_thread_func_m(msl::webserver_t::server_thread_t* thread)
 {
-	thread->mutex.lock();
-
 	while(mg_poll_server(thread->server,10))
 	{
 		if(thread->stop==true)
@@ -100,6 +98,7 @@ void msl::webserver_t::open()
 
 	for(size_t ii=0;ii<threads_m.size();++ii)
 	{
+		threads_m[ii]->mutex.lock();
 		std::thread thread(server_thread_func_m,threads_m[ii]);
 		thread.detach();
 	}
@@ -107,12 +106,13 @@ void msl::webserver_t::open()
 
 void msl::webserver_t::close()
 {
-	for(size_t ii=0;ii<thread_count_m;++ii)
+	for(size_t ii=0;ii<threads_m.size();++ii)
 	{
 		if(!threads_m[ii]->stop)
 		{
 			threads_m[ii]->stop=true;
 			threads_m[ii]->mutex.lock();
+			threads_m[ii]->mutex.unlock();
 		}
 
 		delete threads_m[ii];
