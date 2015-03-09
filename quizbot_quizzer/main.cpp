@@ -23,37 +23,43 @@ void send_answer(const bool answer)
 	}
 }
 
+void run_quiz(void) {
+	srand(time(nullptr));
+
+	arduino.start();
+
+	for(auto question:read_questions("quiz.txt"))
+	{
+		while(true)
+		{
+			auto answer=ask_question(question);
+			send_answer(answer);
+
+			if(answer)
+				break;
+		}
+	}
+
+	std::cout<<"All done!\n\n\n"<<std::endl;
+}
+
 int main(int argc,char* argv[])
 {
-	try
-	{
-		if(argc>1)
-			arduino.set_serial(argv[1]);
-		if(argc>2)
-			arduino.set_baud(std::stoi(argv[2]));
-
-		srand(time(nullptr));
-
-		arduino.start();
-
-		for(auto question:read_questions("quiz.txt"))
+	while (true) {
+		try
 		{
-			while(true)
-			{
-				auto answer=ask_question(question);
-				send_answer(answer);
+			if(argc>1)
+				arduino.set_serial(argv[1]);
+			if(argc>2)
+				arduino.set_baud(std::stoi(argv[2]));
 
-				if(answer)
-					break;
-			}
+			run_quiz();
 		}
-
-		std::cout<<"All done!"<<std::endl;
-	}
-	catch(std::exception& e)
-	{
-		std::cout<<e.what()<<std::endl;
-		return 1;
+		catch(std::exception& e)
+		{
+			std::cout<<e.what()<<std::endl;
+			return 1;
+		}
 	}
 
 	return 0;
