@@ -83,7 +83,7 @@ bool ask_question(const question_t& question)
 				return false;
 			}
 
-			std::cout<<"\tCorrect!"<<std::endl;
+			std::cout<<"\tCorrect!\n"<<std::endl;
 			return true;
 		}
 	}
