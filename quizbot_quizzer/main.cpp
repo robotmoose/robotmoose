@@ -6,7 +6,7 @@
 #include <string>
 #include <ctime>
 
-arduino_t arduino("/dev/ttyUSB0",57600,false);
+arduino_t arduino("/dev/ttyACM0",57600,false);
 
 void send_answer(const bool answer)
 {
