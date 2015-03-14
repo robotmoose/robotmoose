@@ -1,0 +1,40 @@
+Here's how to build this OpenGL application:
+
+1.) On Windows with Visual Studio 2003
+	- Double-click on "make.vcproj"
+	- Run.  
+	- You'll be asked to save "make.sln", so save it.
+
+
+2.) On Windows with Code::Blocks 1.0
+	- Double-click on "make.cbp"
+
+
+3.) On Linux
+	- Download and install freeglut 2.4.0 from 
+		http://freeglut.sourceforge.net/index.php#download
+		tar xzvf freeglut-2.4.0.tar.gz
+		cd freeglut-2.4.0/
+		./configure 
+		make
+		sudo make install
+	- make
+	- ./main
+
+
+4.) On Mac OS X
+	- Open a terminal
+	- Download and install freeglut 2.4.0 from
+		http://freeglut.sourceforge.net/index.php#download
+	- Uncomment the "For MacOS X" SYSLIBS line in Makefile
+	- make
+	- ./main
+
+
+The freeglut 2.4.0 headers, and Windows libraries, are included here.
+If you'd like to use another version of GLUT, just remove
+	GL/glut.h GL/freeglut*
+from this directory.
+
+Please send any build errors, or project files for new platforms, to 
+  Orion Sky Lawlor, olawlor@acm.org
