@@ -1,8 +1,6 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
-#include "motor_controller.h"
-
 #if(defined(__AVR))
 	#include <Arduino.h>
 #else
