@@ -43,12 +43,15 @@ class battery_t
 		float* cells;
 };
 
-struct robot_t
+class robot_t
 {
-	drive_t drive;
-	rotation_t rotation;
-	position_t position;
-	battery_t battery;
+	public:
+		void loop();
+
+		drive_t drive;
+		rotation_t rotation;
+		position_t position;
+		battery_t battery;
 };
 
 #endif

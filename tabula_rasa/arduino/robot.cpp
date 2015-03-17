@@ -31,3 +31,7 @@ battery_t& battery_t::operator=(const battery_t& copy)
 
 	return *this;
 }
+
+void robot_t::loop()
+{
+}
