@@ -34,10 +34,3 @@ battery_t& battery_t::operator=(const battery_t& copy)
 
 	return *this;
 }
-
-robot_t::robot_t(motor_controller_t* controller):controller_m(controller)
-{}
-
-void robot_t::loop()
-{
-}
