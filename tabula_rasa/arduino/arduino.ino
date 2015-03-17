@@ -1,6 +1,7 @@
 #include "robot.h"
 
-robot_t robot;
+bts_controller_t bts(3,4);
+robot_t robot(&bts);
 
 void setup()
 {
