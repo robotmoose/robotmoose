@@ -5,7 +5,7 @@
 	#include <Arduino.h>
 #else
 	#include <cstdint>
-	#include <stdlib.h>
+	#include <cstdlib>
 #endif
 
 struct drive_t
@@ -34,7 +34,7 @@ struct position_t
 class battery_t
 {
 	public:
-		battery_t(const uint16_t cell_count);
+		battery_t(const uint16_t cell_count=0);
 		battery_t(const battery_t& copy);
 		~battery_t();
 		battery_t& operator=(const battery_t& copy);
