@@ -6,7 +6,7 @@ battery_t::battery_t(const uint16_t cell_count):cell_count(cell_count),
 
 battery_t::battery_t(const battery_t& copy)
 {
-	delete[] cells;
+	free(cells);
 	cell_count=copy.cell_count;
 
 	for(uint16_t ii=0;ii<cell_count;++ii)
@@ -15,14 +15,14 @@ battery_t::battery_t(const battery_t& copy)
 
 battery_t::~battery_t()
 {
-	delete[] cells;
+	free(cells);
 }
 
 battery_t& battery_t::operator=(const battery_t& copy)
 {
 	if(this!=&copy)
 	{
-		delete[] cells;
+		free(cells);
 		cell_count=copy.cell_count;
 
 		for(uint16_t ii=0;ii<cell_count;++ii)
