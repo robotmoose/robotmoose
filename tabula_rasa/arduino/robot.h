@@ -34,13 +34,15 @@ struct position_t
 class battery_t
 {
 	public:
-		battery_t(const uint16_t cell_count=0);
-		battery_t(const battery_t& copy);
+		battery_t(const uint16_t cell_count=3);
 		~battery_t();
-		battery_t& operator=(const battery_t& copy);
 
 		uint16_t cell_count;
 		float* cells;
+
+	private: // Don't copy these objects:
+		battery_t(const battery_t& copy);
+		battery_t& operator=(const battery_t& copy);
 };
 
 struct robot_t
