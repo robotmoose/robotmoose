@@ -6,13 +6,15 @@
 #ifndef __action__H
 #define __action__H
 
+#include <Arduino.h>
+
 /**
  One I/O device, which takes a loop() call repeatedly.
  You do want to inherit from this class to do your own stuff.
 */
 class action {
 public:
-  action() { next=0; }
+  action() { next=NULL; }
   virtual ~action() { /* does nothing */ }
   
   /// Do your functionality in loop here.
@@ -28,7 +30,7 @@ public:
 class action_list {
   action *head;
 public:
-  action_list() { head=0; }
+  action_list() { head=NULL; }
   ~action_list() { /* arguably, delete head and friends here */ }
   
   /// Add this device to our list
