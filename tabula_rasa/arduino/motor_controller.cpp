@@ -52,6 +52,10 @@ sabertooth_v1_controller_t::sabertooth_v1_controller_t(Stream& serial):
 void sabertooth_v1_controller_t::send_motor_m(const uint8_t address,const uint8_t motor,const int16_t value)
 {
 	uint8_t value_raw=64+(value>>2);
+
+	if(motor==7)
+		value_raw+=128;
+
 	serial_m->write(&value_raw,1);
 }
 

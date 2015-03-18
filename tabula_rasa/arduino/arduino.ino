@@ -33,7 +33,7 @@ public:
 		ctl.setup();
 	}
 	void loop() {
-		ctl.drive(250,250);
+		ctl.drive(0,0);
 	}
 };
 
