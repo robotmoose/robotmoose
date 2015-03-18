@@ -8,7 +8,7 @@ bts_controller_t test(left_pins,right_pins);
 void setup()
 {
   test.setup();
-  
+
   for(int ii=16;ii<=19;++ii)
   {
     pinMode(ii,OUTPUT);
