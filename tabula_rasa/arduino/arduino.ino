@@ -12,11 +12,18 @@ public:
 	bts_controller_t ctl;
 	motor_action() :ctl(left_pins,right_pins) 
 	{
-#else
+#else // sabertooth
+# if 0 // software serial
 	SoftwareSerial saberserial;
 	sabertooth_controller_t ctl;
 	motor_action() :saberserial(9,8), ctl(saberserial)
 	{
+# else
+#  define saberserial Serial1
+	sabertooth_controller_t ctl;
+	motor_action() :ctl(saberserial)
+	{
+# endif
 		saberserial.begin(9600);
 		delay(2000);
 		saberserial.write(0xAA); // "bauding character"
