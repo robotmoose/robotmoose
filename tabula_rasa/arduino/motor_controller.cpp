@@ -51,7 +51,7 @@ void sabertooth_controller_t::send_motor_m(const uint8_t address,const uint8_t m
 {
 	uint8_t value_raw=64+(value>>2);
 
-	uint8_t data[4]
+	uint8_t data[4]=
 	{
 		address,
 		motor,
