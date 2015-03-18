@@ -2,16 +2,12 @@
 #define MOTOR_CONTROLLER
 
 #include <Arduino.h>
-#include "robot.h" // Remove this once a main program is created
 
 class motor_controller_t
 {
 	public:
 		virtual void setup()=0;
 		virtual void drive(const int16_t left,const int16_t right)=0;
-
-	private:
-		robot_t robot;
 };
 
 class bts_controller_t:public motor_controller_t
