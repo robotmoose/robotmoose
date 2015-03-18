@@ -29,14 +29,30 @@ class bts_controller_t:public motor_controller_t
 class sabertooth_controller_t:public motor_controller_t
 {
 	public:
-		sabertooth_controller_t(Stream& serial,const uint32_t baud=9600);
+		sabertooth_controller_t(Stream& serial);
 		void setup();
 		void drive(const int16_t left,const int16_t right);
 
-	private:
+	protected:
 		Stream* serial_m;
-		uint32_t baud_m;
+		virtual void send_motor_m(const uint8_t address,const uint8_t motor,const int16_t value)=0;
+};
 
+class sabertooth_v1_controller_t:public sabertooth_controller_t
+{
+	public:
+		sabertooth_v1_controller_t(Stream& serial);
+
+	private:
+		void send_motor_m(const uint8_t address,const uint8_t motor,const int16_t value);
+};
+
+class sabertooth_v2_controller_t:public sabertooth_controller_t
+{
+	public:
+		sabertooth_v2_controller_t(Stream& serial);
+
+	private:
 		void send_motor_m(const uint8_t address,const uint8_t motor,const int16_t value);
 };
 

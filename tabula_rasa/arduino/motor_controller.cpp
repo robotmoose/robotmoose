@@ -32,14 +32,12 @@ void bts_controller_t::drive(const int16_t left,const int16_t right)
 	analogWrite(right_pwms_m[right>=0],abs(right));
 }
 
-sabertooth_controller_t::sabertooth_controller_t(Stream& serial,const uint32_t baud):
-	serial_m(&serial),baud_m(baud)
+sabertooth_controller_t::sabertooth_controller_t(Stream& serial):
+	serial_m(&serial)
 {}
 
 void sabertooth_controller_t::setup()
-{
-	// serial_m->begin(baud_m);
-}
+{}
 
 void sabertooth_controller_t::drive(const int16_t left,const int16_t right)
 {
@@ -47,7 +45,22 @@ void sabertooth_controller_t::drive(const int16_t left,const int16_t right)
 	send_motor_m(128,7,right);
 }
 
-void sabertooth_controller_t::send_motor_m(const uint8_t address,const uint8_t motor,const int16_t value)
+sabertooth_v1_controller_t::sabertooth_v1_controller_t(Stream& serial):
+	sabertooth_controller_t(serial)
+{}
+
+void sabertooth_v1_controller_t::send_motor_m(const uint8_t address,const uint8_t motor,const int16_t value)
+{
+	uint8_t value_raw=64+(value>>2);
+	serial_m->write(&value_raw,1);
+}
+
+sabertooth_v2_controller_t::sabertooth_v2_controller_t(Stream& serial):
+	sabertooth_controller_t(serial)
+{}
+
+//untested
+void sabertooth_v2_controller_t::send_motor_m(const uint8_t address,const uint8_t motor,const int16_t value)
 {
 	uint8_t value_raw=64+(value>>2);
 
