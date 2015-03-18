@@ -6,6 +6,8 @@
 #ifndef __action__H
 #define __action__H
 
+#include <Arduino.h>
+
 /**
  One I/O device, which takes a loop() call repeatedly.
  You do want to inherit from this class to do your own stuff.

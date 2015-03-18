@@ -22,38 +22,6 @@ void bts_controller_t::setup()
 
 void bts_controller_t::drive(const int16_t left,const int16_t right)
 {
-<<<<<<< HEAD
-	digitalWrite(left_pwm_pin_m,0);
-	digitalWrite(right_pwm_pin_m,0);
-	analogWrite(left_pwm_pin_m,left_pwm);
-	analogWrite(right_pwm_pin_m,right_pwm);
-}
-
-void sabertooth_controller_t::setup()
-{
-	/* Check serial_number and match it to the corresponding Serial port 
-      Probably handle 0 in the future
-	*/
-	if(serial_number = 1)
-		Serial1.begin(baud);
-	else if(serial_number = 2)
-		Serial2.begin(baud);
-	else if(serial_number = 3)
-		Serial3.begin(baud);
-}
-
-void sabertooth_controller_t::drive(const int16_t left,const int16_t right)
-{
-	robot.drive.left = left + 64;
-	robot.drive.right = right + 64;
-	
-	
-}
-
-	
-	
-	
-=======
 	for(int16_t ii=0;ii<2;++ii)
 	{
 		digitalWrite(left_pwms_m[ii],LOW);
@@ -63,4 +31,33 @@ void sabertooth_controller_t::drive(const int16_t left,const int16_t right)
 	analogWrite(left_pwms_m[left>=0],abs(left));
 	analogWrite(right_pwms_m[right>=0],abs(right));
 }
->>>>>>> 231b11edb9fb5b8932233e0560f4bc7e3558e428
+
+sabertooth_controller_t::sabertooth_controller_t(HardwareSerial& serial,const uint32_t baud):
+	serial_m(&serial),baud_m(baud)
+{}
+
+void sabertooth_controller_t::setup()
+{
+	serial_m->begin(baud_m);
+}
+
+void sabertooth_controller_t::drive(const int16_t left,const int16_t right)
+{
+	send_motor_m(128,6,left);
+	send_motor_m(128,7,right);
+}
+
+void sabertooth_controller_t::send_motor_m(const uint8_t address,const uint8_t motor,const int16_t value)
+{
+	uint8_t value_raw=64+(value>>2);
+
+	uint8_t data[4]
+	{
+		address,
+		motor,
+		value_raw,
+		(address+motor+value_raw)&127
+	};
+
+	serial_m->write(data,4);
+}

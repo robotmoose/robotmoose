@@ -2,16 +2,16 @@
 #define MOTOR_CONTROLLER
 
 #include <Arduino.h>
-#include "robot.h" // Remove this once a main program is created 
+#include "robot.h" // Remove this once a main program is created
 
 class motor_controller_t
 {
 	public:
 		virtual void setup()=0;
 		virtual void drive(const int16_t left,const int16_t right)=0;
-	
+
 	private:
-	robot_t robot; 
+		robot_t robot;
 };
 
 class bts_controller_t:public motor_controller_t
@@ -29,25 +29,27 @@ class bts_controller_t:public motor_controller_t
 class sabertooth_controller_t:public motor_controller_t
 {
 	public:
-		sabertooth_controller_t(const int16_t serial_number const int16_t baud);
+		sabertooth_controller_t(HardwareSerial& serial,const uint32_t baud=9600);
 		void setup();
-		void drive(const int16_t left, const int16_t right);
+		void drive(const int16_t left,const int16_t right);
 
 	private:
-		uint16_t serial_number;
-		uint16_t baud;
+		HardwareSerial* serial_m;
+		uint32_t baud_m;
+
+		void send_motor_m(const uint8_t address,const uint8_t motor,const int16_t value);
 };
 
-class create2_controller_t:public motor_controller_t
+/*class create2_controller_t:public motor_controller_t
 {
 	public:
-		create2_controller_t(const int16_t serial_number, const int16_t baud);
+		create2_controller_t(const int16_t serial_number,const int16_t baud);
 		void setup();
 		void drive(const int16_t left,const int16_t right);
 
 	private:
 		uint16_t serial_number;
 		uint16_t baud;
-};
+};*/
 
 #endif
