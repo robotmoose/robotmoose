@@ -42,14 +42,14 @@ action_list actions_1000s; // every 1000 seconds
 
 
 void action_setup() {
-  // Link a timer into each faster list, to run the slower list
-  actions_always.add(new timer_device<1>(actions_1ms));
-  actions_1ms.add(new timer_device<10>(actions_10ms));
-  actions_10ms.add(new timer_device<100>(actions_100ms));
-  actions_100ms.add(new timer_device<1000>(actions_1s));
-  actions_1s.add(new timer_device<10000>(actions_10s));
-  actions_10s.add(new timer_device<100000>(actions_100s));
-  actions_100s.add(new timer_device<1000000>(actions_1000s));
+  // Link a timer into each faster list, to run the next-slower list
+  actions_always.set(new timer_device<1>(actions_1ms));
+  actions_1ms.set(new timer_device<10>(actions_10ms));
+  actions_10ms.set(new timer_device<100>(actions_100ms));
+  actions_100ms.set(new timer_device<1000>(actions_1s));
+  actions_1s.set(new timer_device<10000>(actions_10s));
+  actions_10s.set(new timer_device<100000>(actions_100s));
+  actions_100s.set(new timer_device<1000000>(actions_1000s));
 }
 
 void action_loop() {

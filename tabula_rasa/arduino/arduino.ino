@@ -1,3 +1,4 @@
+#include "tabula_config.h"
 #include "action.h"
 #include "motor_controller.h"
 #include <SoftwareSerial.h>
@@ -13,7 +14,7 @@ public:
 	motor_action() :ctl(left_pins,right_pins) 
 	{
 #else // sabertooth
-# if 0 // software serial
+# if 1 // software serial
 	SoftwareSerial saberserial;
 	sabertooth_v1_controller_t ctl;
 	motor_action() :saberserial(9,8), ctl(saberserial)
@@ -39,14 +40,14 @@ public:
 
 class still_alive : public action {
 public:
-   void loop() { Serial.println("Still alive!\n"); }
+   void loop() { Serial.println("Still alive!"); }
 };
 
 void setup()
-{
-  Serial.begin(57600);
-  
+{ 
   action_setup();
+  tabula_setup();
+  
   actions_10ms.add(new motor_action());
   actions_1s.add(new still_alive());
 
