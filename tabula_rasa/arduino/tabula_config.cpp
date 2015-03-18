@@ -28,7 +28,7 @@ tabula_factory *tabula_factory_find(const String &device_name) {
 }
 
 
-
+// Configure one device
 bool tabula_configure() {
 	tabula_configure_source src(Serial);
 	String device=src.readString();
@@ -38,12 +38,12 @@ bool tabula_configure() {
 	if (factory) { 	// a normal user device
 		factory->create(src);
 		if (!src.failure) {
-			Serial.print("Added device ");
+			Serial.print(F("Added device "));
 			Serial.println(device);
 		}
 	}
 	else if (device=="version?") { 
-		Serial.println("2015-03-17 Anteater");
+		Serial.println(F("2015-03-18 Anteater"));
 	}
 	else if (device=="devices?") { 
 		tabula_factory_list();
@@ -54,10 +54,10 @@ bool tabula_configure() {
 		int stack_top; 
 		int bytes=(int) &stack_top - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
 		Serial.print(bytes);
-		Serial.println(" bytes free");
+		Serial.println(F(" bytes free"));
 	}
 	else if (device[0]=='?' || device[0]=='h') { // help/hello/howto
-		Serial.println("This interface lets you configure Arduino devices.  Registered devices:");
+		Serial.println(F("This interface lets you configure Arduino devices.  Registered devices:"));
 		tabula_factory_list();
 	}
 	else if (device=="print!") { // echo one string to screen
@@ -76,11 +76,11 @@ bool tabula_configure() {
 
 /* Report errors back over serial */
 	if (src.failure) {
-		Serial.print("ERROR: ");
+		Serial.print(F("ERROR: "));
 		Serial.print(src.failure);
-		Serial.print(" '");
+		Serial.print(F(" '"));
 		Serial.print(src.failedValue);
-		Serial.print("' while configuring ");
+		Serial.print(F("' while configuring "));
 		Serial.println(device);
 	}
 	
@@ -93,7 +93,7 @@ void tabula_setup() {
 	action_setup();
 	
 	Serial.begin(57600);
-	Serial.println("Please enter configuration strings: device pins...");
+	Serial.println(F("Please enter configuration strings: device pins..."));
 	
 	while (tabula_configure()) {}
 }
