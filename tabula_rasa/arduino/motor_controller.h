@@ -17,13 +17,13 @@ class motor_controller_t
 class bts_controller_t:public motor_controller_t
 {
 	public:
-		bts_controller_t(const uint16_t left_pwm_pin,const uint16_t right_pwm_pin);
+		bts_controller_t(uint16_t left_pwms[2],uint16_t right_pwms[2]);
 		void setup();
 		void drive(const int16_t left,const int16_t right);
 
 	private:
-		uint16_t left_pwm_pin_m;
-		uint16_t right_pwm_pin_m;
+		uint16_t left_pwms_m[2];
+		uint16_t right_pwms_m[2];
 };
 
 class sabertooth_controller_t:public motor_controller_t
@@ -32,7 +32,7 @@ class sabertooth_controller_t:public motor_controller_t
 		sabertooth_controller_t(const int16_t serial_number const int16_t baud);
 		void setup();
 		void drive(const int16_t left, const int16_t right);
-		
+
 	private:
 		uint16_t serial_number;
 		uint16_t baud;
@@ -44,7 +44,7 @@ class create2_controller_t:public motor_controller_t
 		create2_controller_t(const int16_t serial_number, const int16_t baud);
 		void setup();
 		void drive(const int16_t left,const int16_t right);
-	
+
 	private:
 		uint16_t serial_number;
 		uint16_t baud;

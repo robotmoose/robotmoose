@@ -1,13 +1,24 @@
 #include "motor_controller.h"
-#include "robot.h"
 
-bts_controller_t bts(3,4);
-robot_t robot;
+uint16_t right_pins[2]={3,5};
+uint16_t left_pins[2]={9,6};
+
+bts_controller_t test(left_pins,right_pins);
 
 void setup()
 {
+  test.setup();
+
+  for(int ii=16;ii<=19;++ii)
+  {
+    pinMode(ii,OUTPUT);
+    digitalWrite(ii,HIGH);
+  }
 }
 
 void loop()
 {
+  test.drive(0,0);
 }
+
+
