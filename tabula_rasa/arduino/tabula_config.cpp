@@ -9,28 +9,44 @@
 #include "motor_controller.h"
 // please add your header here!
 
+// First element of list:
+tabula_factory *tabula_factory::head=0;
+
+
+// Print all devices
+void tabula_factory_list() {
+	for (tabula_factory *cur=tabula_factory::head;cur!=NULL;cur=cur->next)
+		Serial.println(cur->device_name);
+}
+
+// Find the factory with this name
+tabula_factory *tabula_factory_find(const String &device_name) {
+	for (tabula_factory *cur=tabula_factory::head;cur!=NULL;cur=cur->next)
+		if (device_name == cur->device_name)
+			return cur;
+	return NULL;
+}
+
+
 
 bool tabula_configure() {
-	ConfigureSource src(Serial);
+	tabula_configure_source src(Serial);
 	String device=src.readString();
 
-/* Check for and configure every possible device here */
-
-// Motor controllers:
-	if (device=="bts_controller_t") {
-		 uint16_t left[2], right[2]; 
-		 left[0]=src.readPin();	left[1]=src.readPin();
-		 right[0]=src.readPin(); right[1]=src.readPin();
-		 actions_10ms.add(new bts_controller_t(left,right));
-	}
-	else if (device=="sabertooth_v1_controller_t") {
-		 Stream *saber=src.readSerial(9600);
-		 actions_10ms.add(new sabertooth_v1_controller_t(*saber));
-	}
+	tabula_factory *factory=tabula_factory_find(device);
 	
-// Special system objects: these have immediate effects
+	if (factory) { 	// a normal user device
+		factory->create(src);
+		if (!src.failure) {
+			Serial.print("Added device ");
+			Serial.println(device);
+		}
+	}
 	else if (device=="version?") { 
 		Serial.println("2015-03-17 Anteater");
+	}
+	else if (device=="devices?") { 
+		tabula_factory_list();
 	}
 	else if (device=="ram?") { // estimate free RAM remaining
 		// See http://playground.arduino.cc/code/AvailableMemory
@@ -40,8 +56,9 @@ bool tabula_configure() {
 		Serial.print(bytes);
 		Serial.println(" bytes free");
 	}
-	else if (device=="?" || device=="help") { // howto
-		Serial.println("This interface lets you configure Arduino devices.");
+	else if (device[0]=='?' || device[0]=='h') { // help/hello/howto
+		Serial.println("This interface lets you configure Arduino devices.  Registered devices:");
+		tabula_factory_list();
 	}
 	else if (device=="print!") { // echo one string to screen
 		Serial.println(src.readString());
@@ -50,18 +67,15 @@ bool tabula_configure() {
 		void (*reset_vector)() = 0; // fn ptr to address 0
 		reset_vector();
 	}
-	else if (device=="run!") {
+	else if (device=="loop!") {
 		return false; // we're done!
 	}
 	else {
 		src.failed("no such device",device);
 	}
 
-/* Report status of addition */
-	if (!src.failure) {
-		Serial.print("Added device ");
-		Serial.println(device);
-	} else {
+/* Report errors back over serial */
+	if (src.failure) {
 		Serial.print("ERROR: ");
 		Serial.print(src.failure);
 		Serial.print(" '");
@@ -74,8 +88,10 @@ bool tabula_configure() {
 }
 
 
-// Blocking function: configure the device until "run!" is reached.
+// Blocking function: configure the device until "loop!" is reached.
 void tabula_setup() {
+	action_setup();
+	
 	Serial.begin(57600);
 	Serial.println("Please enter configuration strings: device pins...");
 	

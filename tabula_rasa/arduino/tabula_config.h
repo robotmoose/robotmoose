@@ -6,18 +6,20 @@
 #ifndef __TABULA_CONFIG_H
 #define __TABULA_CONFIG_H
 
-#include <Arduino.h>
 #include <SoftwareSerial.h>
+#include <Arduino.h>
 #include "action.h"
 
 /**
- This class supplies configuration data such as strings,
- ints, etc.  Currently it reads these from a serial port in ASCII.
+ This class supplies configuration data such as strings, ints, etc
+ to create devices.
+ 
+ Currently it reads these from a serial port in ASCII.
 */
-class ConfigureSource {
+class tabula_configure_source {
 	Stream &s; // serial input stream
 public:
-	ConfigureSource(Stream &s_) :s(s_), failure(NULL)
+	tabula_configure_source(Stream &s_) :s(s_), failure(NULL)
 	{}
 
 	/**
@@ -139,6 +141,58 @@ public:
 	}
 
 };
+
+/** This factory is used by tabula_setup to create
+ instances of your device when requested.  
+ These classes are typically singletons,
+ and are automatically registered when created.
+
+Use REGISTER_TABULA_DEVICE to create your factory.
+*/
+class tabula_factory {
+public:
+	// The machine-readable string name of this device, like "bts_controller_t"
+	//   By convention, it's also the name of the class.
+	const char *device_name;
+	
+	tabula_factory(const char *device_name_)
+		:device_name(device_name_) 
+	{
+		register_factory(this);
+	}
+	virtual ~tabula_factory() {}
+	
+	/// Create your device based on these configuration parameters.
+	virtual void create(tabula_configure_source &src) =0;
+
+	/// Link this factory into our list
+	static void register_factory(tabula_factory *f) {
+		f->next=head;
+		head=f;
+	}
+
+	static tabula_factory *head;
+	tabula_factory *next;
+};
+
+/**
+  This macro is used to register your device with tabula_setup.
+  Use this pattern at file scope:
+
+REGISTER_TABULA_DEVICE(my_motor_controller,
+	// This code can use src, a tabula_configure_source
+	int outputPin=src.readPin();
+	actions_10ms.add(new my_motor_controller(outputPin));
+)
+*/
+#define REGISTER_TABULA_DEVICE(name, createCode) \
+	class name##_factory : public tabula_factory { \
+	public: \
+		name##_factory() :tabula_factory(#name) {} \
+		virtual void create(tabula_configure_source &src) { createCode ; } \
+	}; \
+	const static name##_factory name##_factory_singleton;
+
 
 extern void tabula_setup();
 

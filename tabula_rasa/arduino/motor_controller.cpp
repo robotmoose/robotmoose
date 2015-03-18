@@ -1,4 +1,5 @@
 #include "motor_controller.h"
+#include "tabula_config.h"
 
 bts_controller_t::bts_controller_t(uint16_t left_pwms[2],uint16_t right_pwms[2])
 {
@@ -78,3 +79,25 @@ void sabertooth_v2_controller_t::send_motor_m(const uint8_t address,const uint8_
 
 	serial_m->write(data,4);
 }
+
+/// Register our devices with tabula_setup
+REGISTER_TABULA_DEVICE(bts_controller_t, 
+	uint16_t left[2]; uint16_t right[2]; 
+	left[0]=src.readPin();	left[1]=src.readPin();
+	right[0]=src.readPin(); right[1]=src.readPin();
+	actions_10ms.add(new bts_controller_t(left,right));
+)
+
+REGISTER_TABULA_DEVICE(sabertooth_v1_controller_t,
+	Stream *saber=src.readSerial(9600);
+	actions_10ms.add(new sabertooth_v1_controller_t(*saber));
+)
+
+REGISTER_TABULA_DEVICE(sabertooth_v2_controller_t,
+	Stream *saber=src.readSerial(9600);
+	delay(2000); // datasheet: wait 2 seconds after startup
+	saber->write(0xAA); // send the "bauding character"
+	delay(10); // paranoia
+	actions_10ms.add(new sabertooth_v2_controller_t(*saber));
+)
+

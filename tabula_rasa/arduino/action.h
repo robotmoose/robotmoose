@@ -3,8 +3,8 @@
  
  Dr. Orion Lawlor, lawlor@alaska.edu, 2015-03-17 (Public Domain)
 */
-#ifndef __action__H
-#define __action__H
+#ifndef __ACTION__H
+#define __ACTION__H
 
 #include <Arduino.h>
 
