@@ -32,13 +32,13 @@ void bts_controller_t::drive(const int16_t left,const int16_t right)
 	analogWrite(right_pwms_m[right>=0],abs(right));
 }
 
-sabertooth_controller_t::sabertooth_controller_t(HardwareSerial& serial,const uint32_t baud):
+sabertooth_controller_t::sabertooth_controller_t(Stream& serial,const uint32_t baud):
 	serial_m(&serial),baud_m(baud)
 {}
 
 void sabertooth_controller_t::setup()
 {
-	serial_m->begin(baud_m);
+	// serial_m->begin(baud_m);
 }
 
 void sabertooth_controller_t::drive(const int16_t left,const int16_t right)
