@@ -1,8 +1,6 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
-#include "motor_controller.h"
-
 #if(defined(__AVR))
 	#include <Arduino.h>
 #else
@@ -45,19 +43,12 @@ class battery_t
 		float* cells;
 };
 
-class robot_t
+struct robot_t
 {
-	public:
-		robot_t(motor_controller_t* controller);
-		void loop();
-
-		drive_t drive;
-		rotation_t rotation;
-		position_t position;
-		battery_t battery;
-
-	private:
-		motor_controller_t* controller_m;
+	drive_t drive;
+	rotation_t rotation;
+	position_t position;
+	battery_t battery;
 };
 
 #endif

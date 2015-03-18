@@ -1,12 +1,7 @@
 #ifndef MOTOR_CONTROLLER
 #define MOTOR_CONTROLLER
 
-#if(defined(__AVR))
-	#include <Arduino.h>
-#else
-	#include <cstdint>
-	#include <cstdlib>
-#endif
+#include <Arduino.h>
 
 class motor_controller_t
 {
