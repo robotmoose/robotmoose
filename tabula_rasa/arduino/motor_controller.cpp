@@ -103,7 +103,13 @@ REGISTER_TABULA_DEVICE(sabertooth_v2_controller_t,
 
 REGISTER_TABULA_DEVICE(create2_controller_t,
 	Stream *roomba_serial=src.read_serial(19200);
+	Serial.println("About to create a roomba");
 	roomba_t* roomba=new roomba_t (*roomba_serial);
+	Serial.println("Roomba created");
+	roomba->start();
+	Serial.println("Roomba started");
+	roomba->set_mode(roomba_t::FULL);
+	Serial.println("Roomba mode set");
 	actions_10ms.add(new create2_controller_t(*roomba));
 )
 
