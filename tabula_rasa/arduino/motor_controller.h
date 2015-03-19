@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include "action.h"
+#include "tabula_control.h"
 
 class motor_controller_t : public action
 {
@@ -10,10 +11,10 @@ class motor_controller_t : public action
 		virtual void setup()=0;
 		virtual void drive(const int16_t left,const int16_t right)=0;
 
-		/// By default a motor controller takes commands from robot.drive
+		/// By default a motor controller takes two speed commands
+		tabula_command<int16_t> left, right;
 		virtual void loop() {
-			// robot = one big global?
-			// drive(robot.drive.left, robot.drive.right);
+			drive(left.get(), right.get());
 		}
 };
 

@@ -1,5 +1,10 @@
 /**
  Convert string object descriptors into actual runnable objects.
+This involves registering object "factories", and parsing serial
+commands to find the right factory and call it.
+
+The main things most people need to call are the 
+REGISTER_TABULA_DEVICE macro, and the tabula_configure_source object.
 
  Dr. Orion Lawlor, lawlor@alaska.edu, 2015-03-17 (Public Domain)
 */
@@ -30,11 +35,11 @@ public:
 	const char *failure;
 	
 	// This is the string we were parsing before the error.
-	String failedValue;
+	String failed_value;
 	
 	/* A parse error happened--store the error internally */
-	void failed(const char *failure_,const String &failedValue_) {
-		failure=failure_; failedValue=failedValue_;
+	void failed(const char *failure_,const String &failed_value_) {
+		failure=failure_; failed_value=failed_value_;
 	}
 
 	/** 
@@ -43,7 +48,7 @@ public:
 	Blocks until a delimiter is reached.
 	Stops at spaces or commas, and ignores quotes, like csv.
 	*/
-	String readString() {
+	String read_string() {
 		String ret="";
 		while (true) {
 			int c=s.read(); // read one char
@@ -67,8 +72,8 @@ public:
 	Read an integer from this stream object.
 	Returns zero if the integer could not be read.
 	*/
-	long readInt() {
-		String str=readString();
+	long read_int() {
+		String str=read_string();
 		long ret=str.toInt();
 		if (ret==0 && str[0]!='0') failed("Error reading integer",str);
 		return ret;
@@ -78,8 +83,8 @@ public:
 	Read an integer pin number, for an I/O pin.
 	Returns zero if the pin could not be read.
 	*/
-	long readPin() {
-		String str=readString(); str.toUpperCase();
+	long read_pin() {
+		String str=read_string(); str.toUpperCase();
 		bool is_analog=false;
 		if (str[0]=='A') {
 			is_analog=true;
@@ -106,8 +111,8 @@ public:
 	Read a description of a serial port, 
 		and initialize it to this baud rate.
 	*/
-	Stream *readSerial(long baud=0) {
-		String str=readString(); str.toUpperCase();
+	Stream *read_serial(long baud=0) {
+		String str=read_string(); str.toUpperCase();
 
 	#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 	/* Mega has 4 hardware serial ports, like "X1" for Serial1 (RX1/TX1) */
@@ -125,8 +130,8 @@ public:
 	/* Arduino UNO?	Use software serial, like "pins 8 9" (pin 8 RX, pin 9 TX) */
 		SoftwareSerial *ret=NULL;
 		if (str=="PINS") {
-			long rx=readPin();
-			long tx=readPin();
+			long rx=read_pin();
+			long tx=read_pin();
 			if (rx!=0 && tx!=0)
 				 ret=new SoftwareSerial(rx,tx); // FIXME: how can we ever delete this object?
 		}
@@ -140,6 +145,29 @@ public:
 		return ret;
 	}
 
+	// Report this sensor value index back up to the control PC.  
+	// Name is a short one-word value, like "range".
+	// Description is human readable, like "distance in mm from ultrasonic sensor"
+	void sensor_index(const char *name,const __FlashStringHelper *description,int index) {
+		s.print(F("2 index "));
+		s.print(index);
+		s.print(F(" sensor "));
+		s.print(name);
+		s.print(F(": "));
+		s.println(description);
+	}
+
+	// Report this command value index back up to the control PC.  
+	// Name is a short one-word value, like "power".
+	// Description is human readable, like "motor power, from -255 to +255"
+	void command_index(const char *name,const __FlashStringHelper *description,int index) {
+		s.print(F("3 index "));
+		s.print(index);
+		s.print(F(" command "));
+		s.print(name);
+		s.print(F(": "));
+		s.println(description);
+	}
 };
 
 /** This factory is used by tabula_setup to create
@@ -181,7 +209,7 @@ public:
 
 REGISTER_TABULA_DEVICE(my_motor_controller,
 	// This code can use src, a tabula_configure_source
-	int outputPin=src.readPin();
+	int outputPin=src.read_pin();
 	actions_10ms.add(new my_motor_controller(outputPin));
 )
 */

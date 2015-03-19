@@ -5,9 +5,8 @@
  Dr. Orion Lawlor, lawlor@alaska.edu, 2015-03-17 (Public Domain)
 */
 #include "tabula_config.h"
+#include "tabula_control.h"
 #include "action.h"
-#include "motor_controller.h"
-// please add your header here!
 
 // First element of list:
 tabula_factory *tabula_factory::head=0;
@@ -31,24 +30,41 @@ tabula_factory *tabula_factory_find(const String &device_name) {
 // Configure one device
 bool tabula_configure() {
 	tabula_configure_source src(Serial);
-	String device=src.readString();
+	String cmd=src.read_string();
 
-	tabula_factory *factory=tabula_factory_find(device);
+	tabula_factory *factory=tabula_factory_find(cmd);
 	
 	if (factory) { 	// a normal user device
 		factory->create(src);
 		if (!src.failure) {
-			Serial.print(F("Added device "));
-			Serial.println(device);
+			Serial.print(F("1 Added device "));
+			Serial.println(cmd);
 		}
 	}
-	else if (device=="version?") { 
-		Serial.println(F("2015-03-18 Anteater"));
-	}
-	else if (device=="devices?") { 
+	else if (cmd=="devices?") { 
 		tabula_factory_list();
 	}
-	else if (device=="ram?") { // estimate free RAM remaining
+	else if (cmd=="version?") { 
+		Serial.println(F("1 2015-03-18 Anchorage"));
+	}
+	else if (cmd=="sensors?") { 
+		Serial.print(F("1  ")); tabula_sensor_storage.print<unsigned char>();
+	}
+	else if (cmd=="commands?") { 
+		Serial.print(F("1  ")); tabula_command_storage.print<unsigned char>();
+	}
+	else if (cmd=="cmd") { 
+		int index=src.read_int();
+		int value=src.read_int();
+		if (!src.failure) {
+			tabula_command_storage.array[index]=value;
+			Serial.print(F("1  set command index "));
+			Serial.print(index);
+			Serial.print(F(" to value "));
+			Serial.println(value);
+		}
+	}
+	else if (cmd=="ram?") { // estimate free RAM remaining
 		// See http://playground.arduino.cc/code/AvailableMemory
 		extern int __heap_start, *__brkval; 
 		int stack_top; 
@@ -56,32 +72,32 @@ bool tabula_configure() {
 		Serial.print(bytes);
 		Serial.println(F(" bytes free"));
 	}
-	else if (device[0]=='?' || device[0]=='h') { // help/hello/howto
+	else if (cmd[0]=='?' || cmd[0]=='h') { // help/hello/howto
 		Serial.println(F("This interface lets you configure Arduino devices.  Registered devices:"));
 		tabula_factory_list();
 	}
-	else if (device=="print!") { // echo one string to screen
-		Serial.println(src.readString());
+	else if (cmd=="print!") { // echo one string to screen
+		Serial.println(src.read_string());
 	}
-	else if (device=="reset!") { // soft reboot
+	else if (cmd=="reset!") { // soft reboot
 		void (*reset_vector)() = 0; // fn ptr to address 0
 		reset_vector();
 	}
-	else if (device=="loop!") {
+	else if (cmd=="loop!") {
 		return false; // we're done!
 	}
 	else {
-		src.failed("no such device",device);
+		src.failed("no such device or command",cmd);
 	}
 
 /* Report errors back over serial */
 	if (src.failure) {
-		Serial.print(F("ERROR: "));
+		Serial.print(F("0 ERROR: "));
 		Serial.print(src.failure);
 		Serial.print(F(" '"));
-		Serial.print(src.failedValue);
+		Serial.print(src.failed_value);
 		Serial.print(F("' while configuring "));
-		Serial.println(device);
+		Serial.println(cmd);
 	}
 	
 	return true; // ready for more configurations
@@ -93,7 +109,7 @@ void tabula_setup() {
 	action_setup();
 	
 	Serial.begin(57600);
-	Serial.println(F("Please enter configuration strings: device pins..."));
+	Serial.println(F("9 Please enter configuration strings: device pins..."));
 	
 	while (tabula_configure()) {}
 }
