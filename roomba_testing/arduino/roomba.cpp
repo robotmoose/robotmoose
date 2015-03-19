@@ -136,13 +136,8 @@ void roomba_t::update()
 		{
 			if(checksum(ROOMBA_PACKET_HEADER,serial_size_m,serial_buffer_m,data))
 			{
-				std::cout<<"good packet"<<std::endl;
 				parse_sensor_packet_m();
 				dump_sensors();
-			}
-			else
-			{
-				std::cout<<"bad packet"<<std::endl;
 			}
 
 			serial_size_m=0;

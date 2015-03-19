@@ -72,6 +72,13 @@ void sabertooth_v2_controller_t::send_motor_m(const uint8_t address,const uint8_
 
 	serial_m->write(data,4);
 }
+create2_controller_t::create2_controller_t(roomba_t& roomba): roomba_m(&roomba)
+{}
+
+void create2_controller_t::drive(const int16_t left,const int16_t right)
+{
+	roomba_m->drive(left,right);
+}
 
 /// Register our devices with tabula_setup
 REGISTER_TABULA_DEVICE(bts_controller_t, 
@@ -92,5 +99,11 @@ REGISTER_TABULA_DEVICE(sabertooth_v2_controller_t,
 	saber->write(0xAA); // send the "bauding character"
 	delay(10); // paranoia
 	actions_10ms.add(new sabertooth_v2_controller_t(*saber));
+)
+
+REGISTER_TABULA_DEVICE(create2_controller_t,
+	Stream *roomba_serial=src.read_serial(19200);
+	roomba_t* roomba=new roomba_t (*roomba_serial);
+	actions_10ms.add(new create2_controller_t(*roomba));
 )
 
