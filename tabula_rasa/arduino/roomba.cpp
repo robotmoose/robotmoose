@@ -34,7 +34,8 @@
 #define ROOMBA_ID_SENSOR_LIGHT_FR            50
 #define ROOMBA_ID_SENSOR_LIGHT_R             51
 
-#define ROOMBA_SYNC_TIME                    100
+#define ROOMBA_SYNC_TIME                     100
+#define ROOMBA_RESET_TIME                    5000
 
 #define ROOMBA_LED_CHECK                      8
 #define ROOMBA_LED_DOCK                       4
@@ -106,7 +107,7 @@ void roomba_t::reset()
 {
 	uint8_t id=ROOMBA_ID_RESET;
 	serial_m->write(&id,1);
-	roomba_delay(ROOMBA_SYNC_TIME);
+	roomba_delay(ROOMBA_RESET_TIME);
 }
 
 void roomba_t::update()
