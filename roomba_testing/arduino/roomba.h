@@ -8,13 +8,13 @@
 	class roomba_serial_t
 	{
 		public:
-			roomba_serial_t(const HardwareSerial& serial);
+			roomba_serial_t(const Stream& serial);
 			int available();
 			size_t write(const void* buffer,const size_t size);
 			size_t read(void* buffer,const size_t size);
 
 		private:
-			HardwareSerial* serial_m;
+			Stream* serial_m;
 	};
 
 #else

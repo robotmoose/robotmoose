@@ -47,7 +47,7 @@
 
 	void (*roomba_delay)(unsigned long)=delay;
 
-	roomba_serial_t::roomba_serial_t(const HardwareSerial& serial):serial_m((HardwareSerial*)&serial)
+	roomba_serial_t::roomba_serial_t(const Stream& serial):serial_m((Stream*)&serial)
 	{}
 
 	int roomba_serial_t::available()
