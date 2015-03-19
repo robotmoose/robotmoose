@@ -23,3 +23,21 @@ The idea here is a fully dynamically configurable Arduino firmware.
 	loop!             (Done with configuration, enter main loop())
 
 
+Bring up Mike's Leila:
+reset
+commands16
+bts_controller_t 3 5 6 9
+pwm_pin A2
+cmd 4 255
+pwm_pin A3
+cmd 5 255
+pwm_pin A4
+cmd 6 255
+pwm_pin A5
+cmd 7 255
+
+Driving:
+cmd16 0 50 cmd16 2 50
+cmd16 0 0 cmd16 2 0
+
+
