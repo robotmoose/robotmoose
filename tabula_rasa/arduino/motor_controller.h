@@ -4,11 +4,11 @@
 #include <Arduino.h>
 #include "action.h"
 #include "tabula_control.h"
+#include "roomba.h"
 
 class motor_controller_t : public action
 {
 	public:
-		virtual void setup()=0;
 		virtual void drive(const int16_t left,const int16_t right)=0;
 
 		/// By default a motor controller takes two speed commands
@@ -22,7 +22,6 @@ class bts_controller_t : public motor_controller_t
 {
 	public:
 		bts_controller_t(uint16_t left_pwms[2],uint16_t right_pwms[2]);
-		void setup();
 		void drive(const int16_t left,const int16_t right);
 
 	private:
@@ -34,7 +33,6 @@ class sabertooth_controller_t : public motor_controller_t
 {
 	public:
 		sabertooth_controller_t(Stream& serial);
-		void setup();
 		void drive(const int16_t left,const int16_t right);
 
 	protected:
@@ -60,16 +58,15 @@ class sabertooth_v2_controller_t:public sabertooth_controller_t
 		void send_motor_m(const uint8_t address,const uint8_t motor,const int16_t value);
 };
 
-/*class create2_controller_t : public motor_controller_t
+class create2_controller_t : public motor_controller_t
 {
 	public:
-		create2_controller_t(Stream& serial);
-		void setup();
+		create2_controller_t(roomba_t& roomba);
 		void drive(const int16_t left,const int16_t right);
 
 	private:
-		Stream* serial;
-		uint16_t baud;
-};*/
+		roomba_t* roomba_m;
+		
+};
 
 #endif

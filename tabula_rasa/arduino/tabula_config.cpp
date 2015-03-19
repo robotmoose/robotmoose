@@ -64,6 +64,18 @@ bool tabula_configure() {
 			Serial.println(value);
 		}
 	}
+	else if (cmd=="cmd16") { 
+		int index=src.read_int();
+		long value=src.read_int();
+		if (!src.failure) {
+			tabula_command_storage.array[index]=value;
+			tabula_command_storage.array[index+1]=value>>8;
+			Serial.print(F("1  set 16 bit command index "));
+			Serial.print(index);
+			Serial.print(F(" to value "));
+			Serial.println(value);
+		}
+	}
 	else if (cmd=="ram?") { // estimate free RAM remaining
 		// See http://playground.arduino.cc/code/AvailableMemory
 		extern int __heap_start, *__brkval; 
