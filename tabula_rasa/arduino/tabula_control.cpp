@@ -74,7 +74,7 @@ REGISTER_TABULA_DEVICE(ramp,
 	actions_100ms.add(device);
 )
 
-// Watch sensor or command values on serial port
+// Watch sensor or command values on serial port (in ASCII)
 template <class T>
 class sensor_watcher : public action { public:
 	virtual void loop() {
@@ -93,4 +93,16 @@ class command_watcher : public action { public:
 	}	
 };
 REGISTER_TABULA_DEVICE(commands8, actions_1s.add(new command_watcher<unsigned char>());  )
+
+
+// Simple ASCII serial heartbeat
+class heartbeat : public action {
+public:
+   void loop() { Serial.println("Still alive!"); }
+};
+
+REGISTER_TABULA_DEVICE(heartbeat, 
+  actions_1s.add(new heartbeat());
+)
+
 

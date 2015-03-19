@@ -18,7 +18,7 @@ The idea here is a fully dynamically configurable Arduino firmware.
 	sensors16         (Starts showing sensor values as 16-bit numbers)
 	pwm_pin 3         (Create a PWM output device on pin 3)
 	cmd 0 200         (Set command index 0 to value 200)
-	ramp 0            (Change the PWM command index continously)
+	ramp 0            (Change the PWM command index continuously)
 	cmd 1 10          (Set rate of change of PWM command)
 	loop!             (Done with configuration, enter main loop())
 

@@ -3,21 +3,11 @@
 
 void setup()
 {
-  tabula_setup();
+  tabula_setup(); // builds devices based on ASCII serial input.  Blocks until "loop!" command
 }
 
 void loop()
 {
-  action_loop();
+  action_loop(); // runs actions
 }
-
-
-class heartbeat : public action {
-public:
-   void loop() { Serial.println("Still alive!"); }
-};
-
-REGISTER_TABULA_DEVICE(heartbeat, 
-  actions_1s.add(new heartbeat());
-)
 
