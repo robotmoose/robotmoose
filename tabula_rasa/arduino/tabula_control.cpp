@@ -83,7 +83,7 @@ class sensor_watcher : public action { public:
 	}	
 };
 REGISTER_TABULA_DEVICE(sensors8, actions_1s.add(new sensor_watcher<unsigned char>());  )
-REGISTER_TABULA_DEVICE(sensors16, actions_1s.add(new sensor_watcher<uint16_t>());  )
+REGISTER_TABULA_DEVICE(sensors16, actions_1s.add(new sensor_watcher<int16_t>());  )
 
 template <class T>
 class command_watcher : public action { public:
@@ -93,6 +93,7 @@ class command_watcher : public action { public:
 	}	
 };
 REGISTER_TABULA_DEVICE(commands8, actions_1s.add(new command_watcher<unsigned char>());  )
+REGISTER_TABULA_DEVICE(commands16, actions_1s.add(new command_watcher<int16_t>());  )
 
 
 // Simple ASCII serial heartbeat
