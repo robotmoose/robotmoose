@@ -1,5 +1,5 @@
 INC=../include
-CXX=g++
+CXX=g++-4.8
 CFLAGS=-O -pthread -std=c++11 -Wall -I$(INC) -m32
 LIBS=
 

@@ -125,6 +125,7 @@ REGISTER_TABULA_DEVICE(create2_controller_t,
 	Serial.println("Roomba started");
 	roomba->set_mode(roomba_t::FULL);
 	Serial.println("Roomba mode set FULL");
+	roomba->set_led_clean(0xff,0xff); // obvious colors
 	roomba->set_receive_sensors(true);
 	Serial.println("Roomba set receive sensors true");
 	actions_10ms.add(new create2_controller_t(*roomba));

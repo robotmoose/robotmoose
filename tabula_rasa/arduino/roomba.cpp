@@ -325,6 +325,12 @@ void roomba_t::dump_sensors() const
 	#endif
 }
 
+// Read a 16-bit big-endian value from this buffer
+uint16_t read_big_16(uint8_t *src)
+{
+	return (src[0]<<8)|src[1];
+}
+
 bool roomba_t::parse_sensor_packet_m()
 {
 	size_t index=0;
@@ -348,7 +354,7 @@ bool roomba_t::parse_sensor_packet_m()
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_BATT_VOLTAGE)
 		{
 			++index;
-			temp_packet.batt_voltage=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.batt_voltage=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_BATT_TEMP)
@@ -360,49 +366,49 @@ bool roomba_t::parse_sensor_packet_m()
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_BATT_CHARGE)
 		{
 			++index;
-			temp_packet.batt_charge=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.batt_charge=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_BATT_CAPACITY)
 		{
 			++index;
-			temp_packet.batt_capacity=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.batt_capacity=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_ENCODER_L)
 		{
 			++index;
-			temp_packet.encoder_l=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.encoder_l=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_ENCODER_R)
 		{
 			++index;
-			temp_packet.encoder_r=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.encoder_r=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_CLIFF_L)
 		{
 			++index;
-			temp_packet.cliff_l=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.cliff_l=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_CLIFF_FL)
 		{
 			++index;
-			temp_packet.cliff_fl=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.cliff_fl=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_CLIFF_FR)
 		{
 			++index;
-			temp_packet.cliff_fr=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.cliff_fr=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_CLIFF_R)
 		{
 			++index;
-			temp_packet.cliff_r=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.cliff_r=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_MODE)
@@ -420,37 +426,37 @@ bool roomba_t::parse_sensor_packet_m()
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_LIGHT_L)
 		{
 			++index;
-			temp_packet.light_l=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.light_l=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_LIGHT_FL)
 		{
 			++index;
-			temp_packet.light_fl=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.light_fl=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_LIGHT_CL)
 		{
 			++index;
-			temp_packet.light_cl=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.light_cl=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_LIGHT_CR)
 		{
 			++index;
-			temp_packet.light_cr=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.light_cr=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_LIGHT_FR)
 		{
 			++index;
-			temp_packet.light_fr=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.light_fr=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(serial_buffer_m[index]==ROOMBA_ID_SENSOR_LIGHT_R)
 		{
 			++index;
-			temp_packet.light_r=*(uint16_t*)(serial_buffer_m+index);
+			temp_packet.light_r=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else
