@@ -82,15 +82,18 @@ create2_controller_t::create2_controller_t(roomba_t& roomba): roomba_m(&roomba)
 
 void create2_controller_t::loop()
 {
-	static bool resetMode=false;
-	if (resetMode) return;
-
 	roomba_m->update();
 	sensors_m=roomba_m->get_sensors();
-	if (roomba_m->get_sensors().buttons&0x1) 
-	{ // power button is pressed--reboot Create, so it will charge
-		resetMode=true;
-		roomba_m->reset();
+	if (roomba_m->get_sensors().buttons&roomba_t::BUTTON_CLEAN
+	  ||roomba_m->get_sensors().buttons&roomba_t::BUTTON_DOCK) 
+	{ // power button is pressed--enter Passive mode, so it will charge
+		roomba_m->set_mode(roomba_t::PASSIVE);
+	}
+	if (roomba_m->get_sensors().buttons&roomba_t::BUTTON_SPOT) 
+	{ // power button is pressed--come back to Full mode
+		roomba_m->set_mode(roomba_t::FULL);
+		roomba_m->set_led_clean(255,0xff); // orange == 128
+		roomba_m->led_update();
 	}
 	motor_controller_t::loop();
 }

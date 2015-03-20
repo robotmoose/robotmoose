@@ -69,6 +69,16 @@ class roomba_t
 		// User interface buttons:
 			uint8_t buttons;
 		};
+		enum button_t {
+			BUTTON_CLEAN=1<<0, // AKA power
+			BUTTON_SPOT=1<<1,
+			BUTTON_DOCK=1<<2,
+			BUTTON_MINUTE=1<<3,
+			BUTTON_HOUR=1<<4,
+			BUTTON_DAY=1<<5,
+			BUTTON_SCHEDULE=1<<6,
+			BUTTON_CLOCK=1<<7
+		};
 
 		roomba_t(roomba_serial_t& serial);
 
