@@ -87,7 +87,9 @@ static bool checksum(const uint8_t header,const uint8_t size,const void* data,co
 roomba_t::roomba_t(const roomba_serial_t& serial):serial_m((roomba_serial_t*)&serial),leds_m(0),
 	led_clean_color_m(0),led_clean_brightness_m(0),serial_size_m(0),serial_buffer_m(NULL),
 	serial_pointer_m(0),serial_state_m(HEADER)
-{}
+{
+  memset(&sensor_packet_m,0,sizeof(sensor_packet_m));
+}
 
 void roomba_t::start()
 {

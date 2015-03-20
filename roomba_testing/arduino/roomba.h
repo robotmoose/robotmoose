@@ -20,6 +20,7 @@
 #else
 
 	#include <cctype>
+	#include <cstring>
 	#include <msl/serial.hpp>
 	#include <msl/time.hpp>
 

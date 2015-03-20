@@ -84,7 +84,6 @@ void create2_controller_t::loop()
 {
 	roomba_m->update();
 	roomba_sensors_m=roomba_m->get_sensors();
-        Serial.println(roomba_m->get_sensors().bumper_drop);
 	motor_controller_t::loop();
 }
 
