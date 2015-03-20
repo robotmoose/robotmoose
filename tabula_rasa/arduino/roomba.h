@@ -40,7 +40,7 @@ class roomba_t
 			uint8_t mode;
 			uint8_t bumper_drop;
 		
-		// Charge state
+		// Battery charge state
 			uint8_t charge_state;
 			int8_t batt_temp;
 			uint16_t batt_voltage;
@@ -65,6 +65,9 @@ class roomba_t
 			uint16_t light_fr;
 			uint16_t light_r;
 			uint8_t light_field;
+		
+		// User interface buttons:
+			uint8_t buttons;
 		};
 
 		roomba_t(roomba_serial_t& serial);

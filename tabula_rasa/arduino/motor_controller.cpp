@@ -82,8 +82,16 @@ create2_controller_t::create2_controller_t(roomba_t& roomba): roomba_m(&roomba)
 
 void create2_controller_t::loop()
 {
+	static bool resetMode=false;
+	if (resetMode) return;
+
 	roomba_m->update();
-	roomba_sensors_m=roomba_m->get_sensors();
+	sensors_m=roomba_m->get_sensors();
+	if (roomba_m->get_sensors().buttons&0x1) 
+	{ // power button is pressed--reboot Create, so it will charge
+		resetMode=true;
+		roomba_m->reset();
+	}
 	motor_controller_t::loop();
 }
 
@@ -121,7 +129,7 @@ REGISTER_TABULA_DEVICE(create2_controller_t,
 	Serial.println("Roomba reset");
 	roomba->start();
 	roomba->set_mode(roomba_t::FULL);
-	roomba->set_led_clean(128,0xff); // orange == 128
+	roomba->set_led_clean(255,0xff); // orange == 128
 	roomba->led_update();
 	roomba->set_receive_sensors(true);
 	actions_10ms.add(new create2_controller_t(*roomba));

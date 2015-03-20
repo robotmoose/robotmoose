@@ -65,7 +65,7 @@ class create2_controller_t : public motor_controller_t
 
 	private:
 		roomba_t* roomba_m;
-		tabula_sensor<roomba_t::sensor_t> roomba_sensors_m;	
+		tabula_sensor<roomba_t::sensor_t> sensors_m;
 };
 
 #endif
