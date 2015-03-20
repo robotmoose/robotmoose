@@ -96,6 +96,8 @@ bool tabula_configure() {
 		reset_vector();
 	}
 	else if (cmd=="loop!") {
+		Serial.println(tabula_command_storage.count); //size in bytes for backend side to read
+		Serial.println(tabula_sensor_storage.count); //size in bytes for backend side to read
 		return false; // we're done!
 	}
 	else {
