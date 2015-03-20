@@ -115,8 +115,7 @@ REGISTER_TABULA_DEVICE(sabertooth_v2_controller_t,
 
 REGISTER_TABULA_DEVICE(create2_controller_t,
 	Stream *roomba_serial=src.read_serial(115200);
-	roomba_serial_t* real_roomba_serial=new roomba_serial_t(*roomba_serial);
-	roomba_t* roomba=new roomba_t (*real_roomba_serial);
+	roomba_t* roomba=new roomba_t (*roomba_serial);
 	Serial.println("Resetting roomba (wait for beep)");
 	roomba->reset();
 	Serial.println("Roomba reset");

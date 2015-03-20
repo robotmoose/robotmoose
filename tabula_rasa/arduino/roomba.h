@@ -5,18 +5,7 @@
 
 	#include <Arduino.h>
 
-	class roomba_serial_t
-	{
-		public:
-			roomba_serial_t(const Stream& serial);
-			int available();
-			size_t write(const void* buffer,const size_t size);
-			size_t read(void* buffer,const size_t size);
-
-		private:
-			Stream* serial_m;
-	};
-
+	typedef Stream roomba_serial_t;
 #else
 
 	#include <cctype>
@@ -78,7 +67,7 @@ class roomba_t
 			uint8_t light_field;
 		};
 
-		roomba_t(const roomba_serial_t& serial);
+		roomba_t(roomba_serial_t& serial);
 
 		void start();
 		void stop();

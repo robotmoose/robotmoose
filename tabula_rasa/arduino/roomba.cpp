@@ -1,3 +1,8 @@
+/**
+  iRobot Roomba / Create 2 Interface
+  
+  Mike Moss, 2015-02
+*/
 #include "roomba.h"
 
 #define ROOMBA_ID_START                     128
@@ -46,31 +51,12 @@
 
 #if(defined(__AVR))
 
-	void (*roomba_delay)(unsigned long)=delay;
-
-	roomba_serial_t::roomba_serial_t(const Stream& serial):serial_m((Stream*)&serial)
-	{}
-
-	int roomba_serial_t::available()
-	{
-		return serial_m->available();
-	}
-
-	size_t roomba_serial_t::write(const void* buffer,const size_t size)
-	{
-		return serial_m->write((const uint8_t*)buffer,size);
-	}
-
-	size_t roomba_serial_t::read(void* buffer,const size_t size)
-	{
-		return serial_m->readBytes((char*)buffer,size);
-	}
+#  define roomba_delay delay
 
 #else
 
-	#include <iostream>
-
-	void (*roomba_delay)(const std::int64_t)=msl::delay_ms;
+#  include <iostream>
+#  define roomba_delay msl::delay_ms
 
 #endif
 
@@ -84,7 +70,7 @@ static bool checksum(const uint8_t header,const uint8_t size,const void* data,co
 	return (sum&0xff)==0;
 }
 
-roomba_t::roomba_t(const roomba_serial_t& serial):serial_m((roomba_serial_t*)&serial),leds_m(0),
+roomba_t::roomba_t(roomba_serial_t& serial):serial_m(&serial),leds_m(0),
 	led_clean_color_m(0),led_clean_brightness_m(0),serial_size_m(0),serial_buffer_m(NULL),
 	serial_pointer_m(0),serial_state_m(HEADER)
 {
@@ -116,7 +102,13 @@ void roomba_t::update()
 {
 	uint8_t data;
 
-	while(serial_m->available()>0&&serial_m->read(&data,1)==1)
+	while(serial_m->available()>0 && serial_m->
+	#ifdef __AVR
+		readBytes((char *)&data,1)==1
+	#else
+		read(&data,1)==1
+	#endif
+		)
 	{
 		if(serial_state_m==HEADER&&data==ROOMBA_PACKET_HEADER)
 		{
