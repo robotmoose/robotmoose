@@ -48,26 +48,34 @@ class roomba_t
 
 		struct sensor_t
 		{
+			uint8_t mode;
 			uint8_t bumper_drop;
+		
+		// Charge state
 			uint8_t charge_state;
-			uint16_t batt_voltage;
 			int8_t batt_temp;
+			uint16_t batt_voltage;
 			uint16_t batt_charge;
 			uint16_t batt_capacity;
+		
+		// Wheel encoders
 			uint16_t encoder_l;
 			uint16_t encoder_r;
+		
+		// Downward-facing light sensors:
 			uint16_t cliff_l;
 			uint16_t cliff_fl;
 			uint16_t cliff_fr;
 			uint16_t cliff_r;
-			uint8_t mode;
-			uint8_t light_field;
+		
+		// Forward-facing reflectance sensors:
 			uint16_t light_l;
 			uint16_t light_fl;
 			uint16_t light_cl;
 			uint16_t light_cr;
 			uint16_t light_fr;
 			uint16_t light_r;
+			uint8_t light_field;
 		};
 
 		roomba_t(const roomba_serial_t& serial);
