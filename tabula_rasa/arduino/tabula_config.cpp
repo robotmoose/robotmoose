@@ -87,7 +87,7 @@ bool tabula_configure() {
 		Serial.println(F(" bytes free"));
 	}
 	else if (cmd[0]=='?' || cmd[0]=='h') { // help/hello/howto
-		Serial.println(F("This interface lets you configure Arduino devices.  Registered devices:"));
+		Serial.println(F("This is how you configure your Arduino at runtime.  Registered devices:"));
 		tabula_factory_list();
 	}
 	else if (cmd=="print!") { // echo one string to screen
@@ -125,7 +125,7 @@ void tabula_setup() {
 	action_setup();
 	
 	Serial.begin(57600);
-	Serial.println(F("9 Please enter configuration strings: device pins..."));
+	Serial.println(F("9 Enter your tabula device names now:"));
 	
 	while (tabula_configure()) {}
 }

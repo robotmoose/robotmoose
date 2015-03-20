@@ -4,9 +4,9 @@
 
  Dr. Orion Lawlor, lawlor@alaska.edu, 2015-03-18 (Public Domain)
 */
+#include <Servo.h>
 #include "tabula_control.h"
 #include "tabula_config.h"
-#include <Servo.h>
 
 // Servo output example:
 class servo_device : public action {
@@ -67,26 +67,6 @@ REGISTER_TABULA_DEVICE(analog_sensor,
 	actions_10ms.add(device);
 )
 
-// Simple "ramp" meta-command example:
-//   Updates current command array at specified index
-class ramp : public action {
-public:
-	int index; // command index to ramp
-	tabula_command<signed char> delta; // change per 100 milliseconds
-	
-	virtual void loop() {
-		tabula_command_storage.array[index]+=delta.get();
-	}
-};
-
-REGISTER_TABULA_DEVICE(ramp,
-	int index=src.read_int();
-	ramp *device=new ramp;
-	device->index=index;
-	src.command_index("delta",F("change to apply per 100 milliseconds"),device->delta.get_index());
-	actions_100ms.add(device);
-)
-
 // Watch sensor or command values on serial port (in ASCII)
 template <class T>
 class sensor_watcher : public action { public:
@@ -112,7 +92,7 @@ REGISTER_TABULA_DEVICE(commands16, actions_1s.add(new command_watcher<int16_t>()
 // Simple ASCII serial heartbeat
 class heartbeat : public action {
 public:
-   void loop() { Serial.println("Still alive!"); }
+   void loop() { Serial.println("Heartbeat!"); }
 };
 
 REGISTER_TABULA_DEVICE(heartbeat, 
