@@ -23,6 +23,13 @@ The idea here is a fully dynamically configurable Arduino firmware.
 	loop!             (Done with configuration, enter main loop())
 
 
+Bring up Create 2, on a Mega's TX3:
+reset
+commands16
+create2_controller_t X3
+
+
+
 Bring up Mike's Leila:
 reset
 commands16
@@ -39,5 +46,6 @@ cmd 7 255
 Driving:
 cmd16 0 50 cmd16 2 50
 cmd16 0 0 cmd16 2 0
+
 
 
