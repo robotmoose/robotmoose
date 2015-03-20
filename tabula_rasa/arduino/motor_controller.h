@@ -13,9 +13,7 @@ class motor_controller_t : public action
 
 		/// By default a motor controller takes two speed commands
 		tabula_command<int16_t> left, right;
-		virtual void loop() {
-			drive(left.get(), right.get());
-		}
+		virtual void loop();
 };
 
 class bts_controller_t : public motor_controller_t
@@ -62,11 +60,12 @@ class create2_controller_t : public motor_controller_t
 {
 	public:
 		create2_controller_t(roomba_t& roomba);
+		virtual void loop();
 		void drive(const int16_t left,const int16_t right);
 
 	private:
 		roomba_t* roomba_m;
-		
+		tabula_sensor<roomba_t::sensor_t> roomba_sensors_m;	
 };
 
 #endif

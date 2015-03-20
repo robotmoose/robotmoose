@@ -289,8 +289,6 @@ void roomba_t::set_receive_sensors(const bool on)
 		uint8_t id=ROOMBA_ID_STREAM_SENSORS_STOP;
 		serial_m->write(&id,1);
 	}
-
-	roomba_delay(ROOMBA_SYNC_TIME);
 }
 
 roomba_t::sensor_t roomba_t::get_sensors() const

@@ -1,6 +1,11 @@
 #include "motor_controller.h"
 #include "tabula_config.h"
 
+void motor_controller_t::loop()
+{
+	drive(left.get(), right.get());
+}
+
 bts_controller_t::bts_controller_t(uint16_t left_pwms[2],uint16_t right_pwms[2])
 {
 	for(int16_t ii=0;ii<2;++ii)
@@ -75,6 +80,14 @@ void sabertooth_v2_controller_t::send_motor_m(const uint8_t address,const uint8_
 create2_controller_t::create2_controller_t(roomba_t& roomba): roomba_m(&roomba)
 {}
 
+void create2_controller_t::loop()
+{
+	roomba_m->update();
+	roomba_sensors_m=roomba_m->get_sensors();
+        Serial.println(roomba_m->get_sensors().bumper_drop);
+	motor_controller_t::loop();
+}
+
 void create2_controller_t::drive(const int16_t left,const int16_t right)
 {
 	roomba_m->drive(left,right);
@@ -102,14 +115,19 @@ REGISTER_TABULA_DEVICE(sabertooth_v2_controller_t,
 )
 
 REGISTER_TABULA_DEVICE(create2_controller_t,
-	Stream *roomba_serial=src.read_serial(19200);
+	Stream *roomba_serial=src.read_serial(115200);
+	roomba_serial_t* real_roomba_serial=new roomba_serial_t(*roomba_serial);
 	Serial.println("About to create a roomba");
-	roomba_t* roomba=new roomba_t (*roomba_serial);
+	roomba_t* roomba=new roomba_t (*real_roomba_serial);
 	Serial.println("Roomba created");
+	roomba->reset();
+	Serial.println("Roomba reset");
 	roomba->start();
 	Serial.println("Roomba started");
 	roomba->set_mode(roomba_t::FULL);
-	Serial.println("Roomba mode set");
+	Serial.println("Roomba mode set FULL");
+	roomba->set_receive_sensors(true);
+	Serial.println("Roomba set receive sensors true");
 	actions_10ms.add(new create2_controller_t(*roomba));
 )
 
