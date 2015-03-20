@@ -39,6 +39,8 @@ bool tabula_configure() {
 		if (!src.failure) {
 			Serial.print(F("1 Added device "));
 			Serial.println(cmd);
+			if (cmd=="serial_controller") 
+				return false; // stop configuration and read binary packets from here.
 		}
 	}
 	else if (cmd=="devices?") { 

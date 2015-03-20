@@ -25,9 +25,10 @@ The idea here is a fully dynamically configurable Arduino firmware.
 
 
 Bring up Create 2, on a Mega's TX3/RX3 lines:
-reset
+reset!
 commands16
 create2_controller_t X3
+sensors16
 
 Create 2 pinout, viewed from vacuum cleaner side looking toward bumpers
  TX3      RX3
@@ -36,7 +37,7 @@ Create 2 pinout, viewed from vacuum cleaner side looking toward bumpers
 
 
 Bring up Mike's Leila:
-reset
+reset!
 commands16
 bts_controller_t 3 5 6 9
 pwm_pin A2

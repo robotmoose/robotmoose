@@ -1,4 +1,5 @@
 #include <SoftwareSerial.h>
+#include <Servo.h>
 #include "tabula_config.h"
 
 void setup()
