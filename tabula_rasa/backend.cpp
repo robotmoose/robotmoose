@@ -30,6 +30,138 @@
 #include "../include/osl/webservice.cpp"
 #include "../include/json.cpp"
 
+/**
+ This is the location of one field in a JSON object,
+   for example, robot.foo.bar[3] stored as {"foo","bar"}, 3
+*/
+class json_path {
+public:
+	std::vector<std::string> path;
+	int index; // array index, or -1 if not an array
+	json_path(const std::string &rootField,int index_=-1) 
+		:index(index_) {path.push_back(rootField);}
+	json_path(const std::string &rootField,const std::string &sub1Field,int index_=-1) 
+		:index(index_) {path.push_back(rootField); path.push_back(sub1Field); }
+	json_path(const std::string &rootField,const std::string &sub1Field,const std::string &sub2Field,int index_=-1) 
+		:index(index_) {path.push_back(rootField); path.push_back(sub1Field); path.push_back(sub2Field); }
+	
+	// Index this json root object down to our path.  
+	//  This read-only version will not create missing parts of the path,
+	//  but throw exceptions.
+	const json::Value &in(const json::Value &root) const {
+		const json::Value *cur=&root; // use pointers because we can't re-seat references
+		for (unsigned int i=0;i<path.size();i++) {
+			cur=&((*cur)[path[i]]);
+		}
+		if (index!=-1) {
+			cur=&cur->ToArray()[index];
+		}
+		return *cur;
+	}
+	
+	// Index this json root object down to our path.  
+	//  This read-write version will create enclosing fields.
+	json::Value &in(json::Value &root) const {
+		json::Value *cur=&root; // use pointers because we can't re-seat references
+		for (unsigned int i=0;i<path.size();i++) {
+			if (!cur->HasKey(path[i])) { // missing intermediate
+				if (i==path.size()-1 && index!=-1) // array last time
+					(*cur)[path[i]]=json::Array();
+				else // normally intermediate object
+					(*cur)[path[i]]=json::Object();
+			}
+			cur=&((*cur)[path[i]]);
+		}
+		
+		if (index!=-1) {
+			json::Array &a=cur->ToArray();
+			if ((int)a.size()<=index) { // need to lengthen array
+				while ((int)a.size()<=index) a.push_back(json::Value());
+			}
+			cur=&a[index];
+		}
+		return *cur;
+	}
+};
+
+/**
+ This represents a way of reading or writing stored JSON values.
+*/
+class json_target {
+public:
+	json_path path;
+	json_target(const json_path &path_) :path(path_) {}
+	virtual ~json_target() {}
+	
+	virtual void modify(json::Value &root) =0;
+};
+
+/// All sensor and command data is stored in these arrays.
+tabula_control_storage tabula_sensor_storage;
+tabula_control_storage tabula_command_storage;
+
+/**
+ Read this sensor from the storage array, and write it into JSON
+*/
+template <class jsonT,class deviceT>
+class json_sensor : public json_target {
+public:
+	tabula_sensor<deviceT> sensor;
+	json_sensor(const json_path &path_) :json_target(path_) {}
+	
+	virtual void modify(json::Value &root) {
+		deviceT d=*(deviceT *)&tabula_sensor_storage.array[sensor.get_index()];
+		path.in(root) = (jsonT)d;
+	}
+};
+
+// Type conversion specialization interface
+template <class jsonT,class deviceT>
+deviceT json_command_conversion(const jsonT &v) { 
+	return v;  // default: no conversion
+}
+
+// Motor power conversion from float [-1..+1] to signed int [-255..+255]
+template <>
+int16_t json_command_conversion<float,int16_t>(const float &v) { 
+	int iv=(int)(255.99*v);
+	     if (iv<-255) return -255;
+	else if (iv>+255) return +255;
+	else return (int16_t)iv;  // motor power: clamp and scale
+}
+// Motor power conversion from float [-1..+1] to signed char [-127..+127]
+template <>
+int8_t json_command_conversion<float,int8_t>(const float &v) { 
+	int iv=(int)(127.99*(0.5+0.5*v));
+	     if (iv<-127) return -127;
+	else if (iv>+127) return 127;
+	else return (int8_t)iv;  
+}
+
+// PWM conversion from float [0..1] to unsigned char [0..255]
+template <>
+uint8_t json_command_conversion<float,uint8_t>(const float &v) { 
+	int iv=(int)(255.99*(0.5+0.5*v));
+	     if (iv<0) return 0;
+	else if (iv>255) return 255;
+	else return (uint8_t)iv;  
+}
+
+/**
+ Read this command from JSON, optionally convert it,
+ and write it to the storage array.
+*/
+template <class jsonT,class deviceT>
+class json_command : public json_target {
+public:
+	tabula_command<deviceT> command;
+	json_command(const json_path &path_) :json_target(path_) {}
+	
+	virtual void modify(json::Value &root) {
+		deviceT d=json_command_conversion<jsonT,deviceT>(path.in(root));
+		*(deviceT *)&tabula_command_storage.array[command.get_index()]=d;
+	}
+};
 
 /**
   Read commands from superstar, and send them to the robot.
@@ -40,6 +172,10 @@ private:
 	osl::http_connection superstar; // HTTP keepalive connection
 	std::string robotName;
 	A_packet_formatter<SerialPort> *pkt;
+
+	// These are the central magic that lets us convert data to/from JSON:
+	std::vector<json_target *> sensors;
+	std::vector<json_target *> commands;
 public:
 	double LRtrim;
 	bool debug;
@@ -52,16 +188,14 @@ public:
 	}
 	~robot_backend() {
 		delete pkt;
+		for (unsigned int i=0;i< sensors.size();i++) delete  sensors[i];
+		for (unsigned int i=0;i<commands.size();i++) delete commands[i];
 	}
 	void read_sensors(const A_packet& current_p);
 	
 	/** Update pilot commands from network */
 	void read_network(void);
 	void send_network(void);
-	
-	// Raw binary data from dynamically configured Arduino devices:
-	std::vector<unsigned char> sensor;
-	std::vector<unsigned char> command;
 	
 	// Configure these devices
 	void setup_devices(std::string robot_config);
@@ -108,14 +242,17 @@ void robot_backend::setup_devices(std::string robot_config)
 			continue; // skip configuration commands
 		}
 		else if (device=="analog_sensor") {
-			// make_sensor<unsigned int>
+			static int analogs=0;
+			sensors.push_back(new json_sensor<int,uint16_t>(json_path("analog",analogs++)));
 		}
 		else if (device=="pwm_pin") {
-			// make_command<unsigned char>
-			command.push_back(200);
+			static int pwms=0;
+			commands.push_back(new json_command<float,uint8_t>(json_path("pwm",pwms++)));
 		}
 		else std::cout<<"Arduino backend: ignoring unknown device '"<<device<<"'\n";
 	}
+	printf("Backend configured: %d command bytes, %d sensor bytes!\n",
+		(int)tabula_command_storage.count,(int)tabula_sensor_storage.count);
 }
 
 void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
@@ -139,8 +276,13 @@ void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 void robot_backend::read_sensors(const A_packet& current_p)
 {
 	printf("Arduino sent %d bytes of sensor data\n",current_p.length);
-	// if (current_p.length!=
-	// memcpy(&sensors[0],current_p.data,current_p.length);
+	if (current_p.length!=tabula_sensor_storage.count) {
+		printf("Device and backend mismatch!  Arduino sensors %d bytes, backend sensors %d bytes!\n",
+			(int)current_p.length,(int)tabula_sensor_storage.count);
+	}
+	else {
+		memcpy(tabula_sensor_storage.array,current_p.data,current_p.length);
+	}
 }
 
 /** Read anything the robot wants to send to us. */
@@ -170,7 +312,9 @@ void robot_backend::read_serial(void) {
 void robot_backend::send_serial(void) {
 	if (pkt==0) return; // simulation only
 	
-	pkt->write_packet(0xC,command.size(),&command[0]);
+	pkt->write_packet(0xC,
+		tabula_command_storage.count,
+		tabula_command_storage.array);
 }
 
 /** Read pilot data from superstar, and store into ourselves */
@@ -244,6 +388,18 @@ void robot_backend::read_network()
 void robot_backend::send_network(void)
 {
 	double start = time_in_seconds();
+	std::string path = "/superstar/" + robotName + "/sensors?set="; //data from robot
+	try {
+		json::Value root=json::Object();
+		for (unsigned int i=0;i< sensors.size();i++) sensors[i]->modify(root);
+		
+		std::string str = json::Serialize(root);
+		// superstar.send_get(path+str); 
+		std::cout<<"Sensor JSON: "<<str<<"\n";
+	} catch (std::exception &e) {
+		printf("Exception while sending network JSON: %s\n",e.what());
+		// stop();
+	}
 /*
 	std::string path = "/superstar/" + robotName + "/data?set="; //data from robot
 	//uggly will fix this so that its not converting so much
@@ -255,10 +411,7 @@ void robot_backend::send_network(void)
 	temp["uSound5"] = current_sensors.uSound5;
 	//end uggly
 	std::string data = json::Serialize(temp);
-	//auth!!!! grrr
-	superstar.send_get(path+data); //auth will fail this
-	// above needs fixed!!! but its not braking anything right now just not setting
-
+	superstar.send_get(path+data); 
 */
 	double elapsed = time_in_seconds() - start;
 	double per = elapsed;
