@@ -232,7 +232,7 @@ const std::string& Value::ToString() const
 	return mStringVal;
 }
 
-Object Value::ToObject() const	
+const Object &Value::ToObject() const	
 {
 	if (mValueType != ObjectVal)
 		throw std::runtime_error("json mValueType==ObjectVal required");
@@ -240,13 +240,30 @@ Object Value::ToObject() const
 	return mObjectVal;
 }
 
-Array Value::ToArray() const		
+const Array &Value::ToArray() const		
 {
 	if (mValueType != ArrayVal)
 		throw std::runtime_error("json mValueType==ArrayVal required");
 
 	return mArrayVal;
 }
+
+Object &Value::ToObject()	
+{
+	if (mValueType != ObjectVal)
+		throw std::runtime_error("json mValueType==ObjectVal required");
+
+	return mObjectVal;
+}
+
+Array &Value::ToArray()		
+{
+	if (mValueType != ArrayVal)
+		throw std::runtime_error("json mValueType==ArrayVal required");
+
+	return mArrayVal;
+}
+
 
 Value::operator int() const
 { 

@@ -442,8 +442,10 @@ namespace json
 			double 				ToDouble() const;
 			bool 				ToBool() const;
 			const std::string&	ToString() const;
-			Object 				ToObject() const;
-			Array 				ToArray() const;
+			const Object& 			ToObject() const;
+			const Array& 			ToArray() const;
+			Object& 			ToObject();
+			Array& 				ToArray();
 
 			// These versions do the same as above but will return your specified default value in the event there's an error, and thus **don't** throw an exception.
 			int					ToInt(int def) const					{return IsNumeric() ? mIntVal : def;}
