@@ -13,7 +13,10 @@ Currently we just have one single huge command and sensor storage buffer.
 #ifndef __TABULA_CONTROL_H
 #define __TABULA_CONTROL_H
 
-#include <Arduino.h>
+#ifdef __AVR
+#  include <Arduino.h>
+#endif
+
 #include <stdlib.h> /* for realloc */
 
 /// This array stores all our sensor or command data,
@@ -38,6 +41,7 @@ public:
 		return index;
 	}
 
+#ifdef __AVR
 	/// For debugging, print the whole array as this datatype.
 	template <class T>
 	void print() {
@@ -50,6 +54,7 @@ public:
 		}
 		Serial.println();
 	}
+#endif
 
 private: // do NOT copy or assign these objects
 	tabula_control_storage(const tabula_control_storage &src);

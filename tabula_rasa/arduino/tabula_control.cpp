@@ -92,6 +92,8 @@ public:
 };
 
 REGISTER_TABULA_DEVICE(serial_controller,
-	actions_10ms.add(new serial_controller(Serial));
+	HardwareSerial &channel=Serial;
+	channel.println(-1); // switching to binary mode
+	actions_10ms.add(new serial_controller(channel));
 )
 
