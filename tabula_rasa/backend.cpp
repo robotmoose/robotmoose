@@ -245,6 +245,10 @@ void robot_backend::setup_devices(std::string robot_config)
 			static int analogs=0;
 			sensors.push_back(new json_sensor<int,uint16_t>(json_path("analog",analogs++)));
 		}
+		else if (device=="servo") {
+			static int servos=0;
+			commands.push_back(new json_command<float,uint8_t>(json_path("servo",servos++)));
+		}
 		else if (device=="pwm_pin") {
 			static int pwms=0;
 			commands.push_back(new json_command<float,uint8_t>(json_path("pwm",pwms++)));
@@ -297,7 +301,7 @@ void robot_backend::read_serial(void) {
 			if (debug) printf("P");
 			printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data); // last printf give all of this (no longer need)
 			if (p.command == 0) printf("    Arduino sent echo request %d bytes, '%.*s'\n", p.length, p.length, p.data);
-			else if (p.command==0xE) printf("    Arduino sent error packet: %d bytes, '%.*s'\n", p.length, p.length, p.data);
+			else if (p.command==0xE) printf("ERROR sent from Arduino: %d bytes, '%.*s'\n", p.length, p.length, p.data);
 			else if (p.command == 0xC)
 			{
 				//printf("    Arduino sent sensor data: %d bytes, '%.*s'\n", p.length, p.length, p.data);
@@ -451,6 +455,8 @@ int main(int argc, char *argv[])
 	std::string robot_config=
 "analog_sensor A0\n"
 "analog_sensor A5\n"
+"servo 10\n"
+"servo 9\n"
 "pwm_pin 3\n"
 "cmd 0 200\n"
 "serial_controller\n"
