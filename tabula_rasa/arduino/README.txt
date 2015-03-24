@@ -25,8 +25,12 @@ The idea here is a fully dynamically configurable Arduino firmware.
 
 
 Bring up Create 2, on a Mega's TX3/RX3 lines:
+	- Create 2 top light MUST be green.  Press clean or CLOCK until this is true.
+	- Start backend and configure create2_controller_t.  
+	- Top light MUST turn red, or it hasn't started properly.
+	- Press clean again to power off so it can charge (forget this, and the battery will slowly die!)
+
 reset!
-commands16
 create2_controller_t X3
 sensors16
 
