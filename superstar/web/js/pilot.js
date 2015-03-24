@@ -169,23 +169,34 @@ function data_receive()
 		"/superstar/";
 	var url_start=host;
 	var robot=document.getElementById('robot_name').value;
-	var starpath=robot+"/data";
+	var starpath=robot+"/sensors";
 	var url_rec=url_start+starpath+"?get";
 	
 	xmlrec.open("GET",url_rec,true);
 	xmlrec.send(null);
+	
 	var pilot_received = emptyUSonic();
 	console.log(pilot_received);
 	xmlrec.onreadystatechange = function(){
 	if(this.readyState==4){ //check for network change
 	var pilot_received = JSON.parse(xmlrec.responseText);
+	
 	console.log(pilot_received);
-/* Read Ultrasonic sensor data sent by backend*/
+	
+	var out=document.getElementById('p_outputSensors');
+	if (out) {
+		var prettySensors=JSON.stringify(pilot_received,null,4);
+		prettySensors=prettySensors.replace(/["]/g,"");
+		out.innerHTML="Sensors:<pre>robot="+prettySensors+"</pre>";
+	}
+	
+/* Read Ultrasonic sensor data sent by backend
 	document.getElementById('USonic1').value=Sensors.USonic.USensor1 = pilot_received.uSound1;
 	document.getElementById('USonic2').value=Sensors.USonic.USensor2 = pilot_received.uSound2;
 	document.getElementById('USonic3').value=Sensors.USonic.USensor3 = pilot_received.uSound3;
 	document.getElementById('USonic4').value=Sensors.USonic.USensor4 = pilot_received.uSound4;
 	document.getElementById('USonic5').value=Sensors.USonic.USensor5 = pilot_received.uSound5; 
+*/
 	}
 }
 	
