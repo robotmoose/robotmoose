@@ -298,7 +298,7 @@ void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 	while (true) {
 		std::string status=getline_serial(port);
 		if (status=="-1") break;
-		std::cout<<"Arduino status: "<<status<<"\n";
+		std::cout<<"Arduino config: "<<status<<"\n";
 	}
 	
 	std::cout<<"Arduino switching to binary communication\n";
