@@ -234,12 +234,40 @@ void robot_backend::setup_devices(std::string robot_config)
 		if (!std::getline(robot_config_stream,pins_etc)) break;
 		
 		
-		// This is probably stupid, and should be replaced with registration from tabula_config.h
+		// This fixed table could be replaced with registration from tabula_config.h
 		if (device=="serial_controller") { 
-			break; // end of file
+			break; // end of configuration file
+		}
+		else if (device=="sabertooth_v1_controller_t" 
+			|| device=="sabertooth_v2_controller_t" 
+			|| device=="bts_controller_t" 
+			|| device=="create2_controller_t")
+		{
+			// Virtually all motor controllers just need motor power, left and right:
+			commands.push_back(new json_command<float,int16_t>(json_path("power","L")));
+			commands.push_back(new json_command<float,int16_t>(json_path("power","R")));
+			
+			if (device=="create2_controller_t") 
+			{ // Add all the arduino/roomba.h roomba_t::sensor_t sensors:
+				sensors.push_back(new json_sensor<int,uint8_t>(json_path("roomba","mode")));
+				sensors.push_back(new json_sensor<int,uint8_t>(json_path("roomba","bumper")));
+				sensors.push_back(new json_sensor<int,uint8_t>(json_path("battery","charge")));
+				sensors.push_back(new json_sensor<int,int8_t>(json_path("battery","temperature")));
+				sensors.push_back(new json_sensor<int,uint16_t>(json_path("battery","voltage")));
+				sensors.push_back(new json_sensor<int,uint16_t>(json_path("battery","charge")));
+				sensors.push_back(new json_sensor<int,uint16_t>(json_path("battery","capacity")));
+				sensors.push_back(new json_sensor<int,uint16_t>(json_path("encoder","L")));
+				sensors.push_back(new json_sensor<int,uint16_t>(json_path("encoder","R")));
+				for (int cliff=0;cliff<4;cliff++)
+					sensors.push_back(new json_sensor<int,uint16_t>(json_path("roomba","cliff",cliff)));
+				for (int light=0;light<6;light++)
+					sensors.push_back(new json_sensor<int,uint16_t>(json_path("roomba","light",light)));
+				sensors.push_back(new json_sensor<int,uint8_t>(json_path("roomba","lightfield")));
+				sensors.push_back(new json_sensor<int,uint8_t>(json_path("roomba","buttons")));
+			}
 		}
 		else if (device=="cmd") {
-			continue; // skip configuration commands
+			continue; // skip over configuration commands
 		}
 		else if (device=="analog_sensor") {
 			static int analogs=0;
@@ -261,8 +289,11 @@ void robot_backend::setup_devices(std::string robot_config)
 
 void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 {
-	std::string start=getline_serial(port); // wait for Arduino to boot
-	std::cout<<"Arduino startup: "<<start<<"\n";
+	while (true) { // wait for Arduino to boot
+		std::string start=getline_serial(port); 
+		std::cout<<"Arduino startup: "<<start<<"\n";
+		if (start[0]=='9') break;
+	}
 	port.write(&robot_config[0],robot_config.size()); // dump to Arduino
 	while (true) {
 		std::string status=getline_serial(port);
@@ -299,12 +330,12 @@ void robot_backend::read_serial(void) {
 		while (-1==pkt->read_packet(p)) { }
 		if (p.valid) {
 			if (debug) printf("P");
-			printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data); // last printf give all of this (no longer need)
+			if (debug) printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data);
 			if (p.command == 0) printf("    Arduino sent echo request %d bytes, '%.*s'\n", p.length, p.length, p.data);
 			else if (p.command==0xE) printf("ERROR sent from Arduino: %d bytes, '%.*s'\n", p.length, p.length, p.data);
 			else if (p.command == 0xC)
 			{
-				//printf("    Arduino sent sensor data: %d bytes, '%.*s'\n", p.length, p.length, p.data);
+				if (debug) printf("    Arduino sent sensor data: %d bytes, '%.*s'\n", p.length, p.length, p.data);
 				read_sensors(p);
 			}
 			else printf("    Arduino sent unknown packet 0x%X command %d bytes, '%.*s'\n", p.command, p.length, p.length, p.data);
@@ -328,10 +359,49 @@ void robot_backend::read_network()
 	double start=time_in_seconds();
 	superstar.send_get(path);
 	std::string json_data=superstar.receive();
+	
+	try {
+
+		json::Value v=json::Deserialize(json_data);
+		
+		// Pull registered commands from JSON
+		for (unsigned int i=0;i< commands.size();i++) commands[i]->modify(v);
+
+#ifndef	_WIN32
+		// Script execution magic
+		static std::string last_cmd_arg="";
+		std::string run=v["cmd"]["run"];
+		std::string arg=v["cmd"]["arg"];
+
+		if (run.find_first_of("./\\\"")==std::string::npos) { // looks clean
+			std::string cmd_arg=run+arg;
+			if (last_cmd_arg!=cmd_arg) { // new script command: run it
+
+				std::string path="./"+run;
+				printf("RUNNING SCRIPT: '%s' with arg '%s'\n",
+					path.c_str(),arg.c_str());
+
+				if (fork()==0) {
+					if (chdir("scripts")!=0) {
+						printf("SCRIPT chdir FAILED\n");
+					}
+
+					else {
+						execl(path.c_str(),path.c_str(),arg.c_str(),(char *)NULL);
+						perror("SCRIPT EXECUTE FAILED\n");
+					}
+					exit(0);
+				}
+			}
+
+			last_cmd_arg=cmd_arg;
+
+		}
+
+#endif
 
 /*
-	try {
-		json::Value v=json::Deserialize(json_data);
+// Unported:
 		L=limit_power(v["power"]["L"]);
 		R=limit_power(LRtrim*float(v["power"]["R"]));
 		S1 = v["power"]["arms"];
@@ -346,44 +416,24 @@ void robot_backend::read_network()
 		led_green = (int16_t)(tempRBG * 255);
 		tempRBG = v["LED"]["B"];
 		led_blue = (int16_t)(tempRBG * 255);
-#ifndef	_WIN32
-		static std::string last_cmd_arg="";
-		std::string run=v["cmd"]["run"];
-		std::string arg=v["cmd"]["arg"];
-		if (run.find_first_of("./\\\"")==std::string::npos) { // looks clean
-			std::string cmd_arg=run+arg;
-			if (last_cmd_arg!=cmd_arg) { // new script command: run it
-				std::string path="./"+run;
-				printf("RUNNING SCRIPT: '%s' with arg '%s'\n",
-					path.c_str(),arg.c_str());
-				if (fork()==0) {
-					if (chdir("scripts")!=0) {
-						printf("SCRIPT chdir FAILED\n");
-					}
-					else {
-						execl(path.c_str(),path.c_str(),arg.c_str(),(char *)NULL);
-						perror("SCRIPT EXECUTE FAILED\n");
-					}
-					exit(0);
-				}
-			}
-			last_cmd_arg=cmd_arg;
-		}
-#endif
+
 		if (debug)
 		{
 			printf("Power commands: %.2f L  %.2f R  %.2f S1  %.2f S2 %.2f S3\nLED on/demo : ", L, R, S1, S2, S3);
 			printf(ledOn ? "true/" : "false/");
 			printf(ledDemo ? "true\n" : "false\n");
 			printf("RGB Values: %d R %d G %d B \n", led_red, led_blue, led_green);
+
 			//printf("   Network data: %ld bytes, '%s'\n", json_data.size(), json_data.c_str());
 		}
+*/
+
 	} catch (std::exception &e) {
+
 		printf("Exception while processing network JSON: %s\n",e.what());
 		printf("   Network data: %ld bytes, '%s'\n", json_data.size(),json_data.c_str());
-		stop();
+		// stop();
 	}
-*/
 	double elapsed=time_in_seconds()-start;
 	double per=elapsed;
 	printf("\nRead Time:	%.1f ms/request, %.1f req/sec\n",per*1.0e3, 1.0/per);
@@ -393,13 +443,14 @@ void robot_backend::send_network(void)
 {
 	double start = time_in_seconds();
 	std::string path = "/superstar/" + robotName + "/sensors?set="; //data from robot
-	try {
+	try 
+	{ // send all registered sensor values
 		json::Value root=json::Object();
 		for (unsigned int i=0;i< sensors.size();i++) sensors[i]->modify(root);
 		
 		std::string str = json::Serialize(root);
-		// superstar.send_get(path+str); 
-		std::cout<<"Sensor JSON: "<<str<<"\n";
+		superstar.send_get(path+str); 
+		std::cout<<"Sent sensor JSON: "<<str<<"\n";
 	} catch (std::exception &e) {
 		printf("Exception while sending network JSON: %s\n",e.what());
 		// stop();
@@ -452,13 +503,19 @@ int main(int argc, char *argv[])
 	backend->debug = debug; // more output, more mess, but more data
 	
 	
+	// FIXME: should pull robot configuration from superstar robotName/+"config"
 	std::string robot_config=
 "analog_sensor A0\n"
 "analog_sensor A5\n"
+
+"create2_controller_t X3\n"
+
+#if 0 // need smarter web front end here
 "servo 10\n"
 "servo 9\n"
 "pwm_pin 3\n"
 "cmd 0 200\n"
+#endif
 "serial_controller\n"
 ;
 	backend->setup_devices(robot_config);
