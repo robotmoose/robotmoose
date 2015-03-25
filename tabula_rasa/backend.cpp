@@ -483,11 +483,13 @@ int main(int argc, char *argv[])
 	bool debug = false;  // spams more output data
 	std::string superstarURL = "http://sandy.cs.uaf.edu/";
 	std::string robotName = "layla/uaf";
+	std::string configMotor = "create2_controller_t X3";
 	int baudrate = 57600;  // serial comms
 	for (int argi = 1; argi<argc; argi++) {
 		if (0 == strcmp(argv[argi], "--robot")) robotName = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--superstar")) superstarURL = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--baudrate")) baudrate = atoi(argv[++argi]);
+		else if (0 == strcmp(argv[argi], "--config")) configMotor = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--trim")) LRtrim = atof(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--debug")) debug = true;
 		else if (0 == strcmp(argv[argi], "--sim")) { // no hardware, for debugging
@@ -509,7 +511,7 @@ int main(int argc, char *argv[])
 "analog_sensor A0\n"
 "analog_sensor A5\n"
 
-"create2_controller_t X3\n"
++configMotor+"\n"
 
 #if 0 // need smarter web front end here
 "servo 10\n"
