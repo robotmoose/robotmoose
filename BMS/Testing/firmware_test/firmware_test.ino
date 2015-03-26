@@ -93,8 +93,8 @@ void setup()
 //---------------------------------------------------------------------------------------------------------------------
 // I2C configs
  Wire.begin(2);                // join i2c bus with address #2
- Wire.onRequest(requestEvent); // register event
- Wire.onReceive(receiveEvent);
+ Wire.onRequest(requestEvent); // request event
+ //Wire.onReceive(receiveEvent);
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -311,10 +311,10 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
 //---------------------------------------------------------------------------------------------------------------------
 // I2C communication code
 
-void receiveEvent(int command)
+/*void receiveEvent(int command)
 {
   x = Wire.read();    // receive byte as an integer
-}
+}*/
 
 void requestEvent()
 {
