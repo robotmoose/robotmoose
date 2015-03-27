@@ -22,13 +22,13 @@ void setup()
 void readI2C()
 {
  
-    Wire.requestFrom(2, 1);    // request 6 bytes from slave device #2
-    byte x;
+    Wire.requestFrom(2, 1);    // request 1 bytes from slave device #2
+    char x;
     while(Wire.available())    // slave may send less than requested
     {
         x = Wire.read(); // receive a byte as character
         Serial.print(x);   // print the character
-         Serial.println("");
+        Serial.println("");
     }
 }
 

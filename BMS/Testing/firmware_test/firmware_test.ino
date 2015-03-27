@@ -315,6 +315,8 @@ void requestEvent()
   Wire.beginTransmission(2);
   Wire.write(make_battery(cellVoltage).percentage);
   Wire.endTransmission();
+  Serial.print("Wire.write(make_battery(cellVoltage).percentage); : ");
+  Serial.println(make_battery(cellVoltage).percentage);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
