@@ -218,11 +218,11 @@ void setCFGR1( float cellVoltage[], byte & CFGR1 )
 
 void Charge()    // Function to turn on charging and cell balancing
 {
-  // Artificially set to test if statements:
-  //cellVoltage[0] = 4.3;
-  //cellVoltage[1] = 4.1;
-  //cellVoltage[2]=4.19;
-  //digitalWrite(CHARGE_INPUT, HIGH);
+//  // Artificially set to test if statements:
+//  cellVoltage[0] = 4.15;
+//  cellVoltage[1] = 3.9;
+//  cellVoltage[2]=4.15;
+//  digitalWrite(CHARGE_INPUT, HIGH);
 
 
   //Sets CFGR1 to manage cell discharging
@@ -312,10 +312,16 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
 
 void requestEvent()
 {
-  Wire.write(make_battery(cellVoltage).percentage);
-  Serial.print("I2C Request Performed: ");
-  Serial.println(make_battery(cellVoltage).percentage);
+  byte data [2] = {(byte)make_battery(cellVoltage).percentage, setChargeByte()};
+  Wire.write(data, 2);
+  //Wire.write(setChargeByte());
 }
+
+byte setChargeByte()
+{
+  return ((chargeflag << 3) | CFGR1);
+}
+  
 
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
@@ -331,7 +337,7 @@ void loop()
   AvgerageCell();
   totalCell();
   Charge();
-  
+
   for(int i=0; i<3; i++)
   {
     Serial.print("Cell ");
@@ -347,14 +353,9 @@ void loop()
   Serial.print("Total Cell Voltages: ");
   Serial.print(cellVoltTotal,4);
   Serial.println(" V");
-  
-  Serial.print("Battery Percentage: ");
-  Serial.print(make_battery(cellVoltage).percentage);
-  Serial.println("%");
 
   Serial.print("Charge flag: ");
   Serial.println(chargeflag);
-  
   Serial.println("-------------------------------------");
   delay(1200);
 }
