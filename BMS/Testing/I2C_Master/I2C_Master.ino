@@ -37,5 +37,5 @@ void readI2C()
 void loop()
 {
   readI2C();
-  delay(500);
+  delay(1200);
 }

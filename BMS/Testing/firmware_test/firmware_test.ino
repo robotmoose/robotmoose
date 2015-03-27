@@ -314,7 +314,8 @@ void requestEvent()
 {
   byte data [2] = {(byte)make_battery(cellVoltage).percentage, setChargeByte()};
   Wire.write(data, 2);
-  //Wire.write(setChargeByte());
+  Serial.print("I2C Request Performed: ");
+  Serial.println(make_battery(cellVoltage).percentage);
 }
 
 byte setChargeByte()
@@ -346,6 +347,11 @@ void loop()
     Serial.print(cellVoltage[i], 4);
     Serial.println(" V");
   }
+  
+  Serial.print("Battery Percentage: ");
+  Serial.print(make_battery(cellVoltage).percentage);
+  Serial.println("%");
+
   Serial.print("Average Cell Voltage: ");
   Serial.print(AvgCellVolts,4);
   Serial.println(" V");
@@ -356,6 +362,7 @@ void loop()
 
   Serial.print("Charge flag: ");
   Serial.println(chargeflag);
+  
   Serial.println("-------------------------------------");
   delay(1200);
 }
