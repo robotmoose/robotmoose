@@ -61,7 +61,7 @@ unsigned int RawData[6];       // Raw data from voltage registers
 float cellVoltage[3];          // Calculated voltages for each cell
 float AvgCellVolts;
 float cellVoltTotal;
-int chargeflag;
+byte chargeflag;
 
 // PEC Variables
 static byte crc8_table[256];   // 8-bit table for PEC calc
@@ -94,7 +94,6 @@ void setup()
 // I2C configs
  Wire.begin(2);                // join i2c bus with address #2
  Wire.onRequest(requestEvent); // register event
- Wire.onReceive(receiveEvent);
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -219,11 +218,11 @@ void setCFGR1( float cellVoltage[], byte & CFGR1 )
 
 void Charge()    // Function to turn on charging and cell balancing
 {
-  // Artificially set to test if statements:
-  //cellVoltage[0] = 4.3;
-  //cellVoltage[1] = 4.1;
-  //cellVoltage[2]=4.19;
-  //digitalWrite(CHARGE_INPUT, HIGH);
+//  // Artificially set to test if statements:
+//  cellVoltage[0] = 4.15;
+//  cellVoltage[1] = 3.9;
+//  cellVoltage[2]=4.15;
+//  digitalWrite(CHARGE_INPUT, HIGH);
 
 
   //Sets CFGR1 to manage cell discharging
@@ -311,16 +310,19 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
 //---------------------------------------------------------------------------------------------------------------------
 // I2C communication code
 
-void receiveEvent(int command)
-{
-  x = Wire.read();    // receive byte as an integer
-}
-
 void requestEvent()
 {
-  send_battery(make_battery(cellVoltage));
+  byte data [2] = {(byte)make_battery(cellVoltage).percentage, setChargeByte()};
+  Wire.write(data, 2);
+  Serial.print("I2C Request Performed: ");
+  Serial.println(make_battery(cellVoltage).percentage);
 }
 
+byte setChargeByte()
+{
+  return ((chargeflag << 3) | CFGR1);
+}
+  
 
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
@@ -345,6 +347,11 @@ void loop()
     Serial.print(cellVoltage[i], 4);
     Serial.println(" V");
   }
+  
+  Serial.print("Battery Percentage: ");
+  Serial.print(make_battery(cellVoltage).percentage);
+  Serial.println("%");
+
   Serial.print("Average Cell Voltage: ");
   Serial.print(AvgCellVolts,4);
   Serial.println(" V");
@@ -355,6 +362,7 @@ void loop()
 
   Serial.print("Charge flag: ");
   Serial.println(chargeflag);
+  
   Serial.println("-------------------------------------");
   delay(1200);
 }
