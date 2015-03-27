@@ -61,7 +61,7 @@ unsigned int RawData[6];       // Raw data from voltage registers
 float cellVoltage[3];          // Calculated voltages for each cell
 float AvgCellVolts;
 float cellVoltTotal;
-int chargeflag;
+byte chargeflag;
 
 // PEC Variables
 static byte crc8_table[256];   // 8-bit table for PEC calc
@@ -312,10 +312,8 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
 
 void requestEvent()
 {
-  Wire.beginTransmission(2);
   Wire.write(make_battery(cellVoltage).percentage);
-  Wire.endTransmission();
-  Serial.print("Wire.write(make_battery(cellVoltage).percentage); : ");
+  Serial.print("I2C Request Performed: ");
   Serial.println(make_battery(cellVoltage).percentage);
 }
 
@@ -333,7 +331,6 @@ void loop()
   AvgerageCell();
   totalCell();
   Charge();
-  requestEvent();
   
   for(int i=0; i<3; i++)
   {
@@ -350,9 +347,14 @@ void loop()
   Serial.print("Total Cell Voltages: ");
   Serial.print(cellVoltTotal,4);
   Serial.println(" V");
+  
+  Serial.print("Battery Percentage: ");
+  Serial.print(make_battery(cellVoltage).percentage);
+  Serial.println("%");
 
   Serial.print("Charge flag: ");
   Serial.println(chargeflag);
+  
   Serial.println("-------------------------------------");
   delay(1200);
 }
