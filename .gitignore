@@ -21,3 +21,8 @@ roomba_testing/roomba
 roomba_testing/roomba.exe
 tabula_rasa/tester
 tabula_rasa/tester.exe
+sensors/imu/show_IMU/main
+sensors/imu/show_IMU/main.exe
+sensors/imu/show_IMU/main.o
+sensors/imu/show_IMU/ogl/glew.o
+
