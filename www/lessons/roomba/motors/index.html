@@ -99,6 +99,8 @@
 
 				roomba.drive(left,right);
 				drive_update();
+				
+				document.getElementById("status").innerHTML=roomba.get_status();
 			}
 
 
@@ -126,7 +128,17 @@
 				emulator.stop();
 				run_button.disabled=false;
 				stop_button.disabled=true;
+				
+				// Turn off manual commands, so robot actually stops:
+				document.getElementById("drive_left").value=0;
+				document.getElementById("drive_right").value=0;
 			}
+			
+			function reset()
+			{
+				roomba.reset();
+			}
+
 
 			function drive_update()
 			{
@@ -159,12 +171,14 @@
 							<input type="button" class="btn btn-sm btn-primary" id="verify" value="Verify" onclick="verify();"/>
 							<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();"  title="[alt-shift-r]" accesskey="r"  />
 							<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
+							<input type="button" class="btn btn-sm btn-primary" id="reset" value="Reset" onclick="reset();"/>
 						</td>
 						<td style="vertical-align:top;">
 							Left: <span id="show_left"></span>
 								<input type="range" id="drive_left" min="-500" max="500" value="0" oninput="drive_update();"/>
 							Right: <span id="show_right"></span>
 								<input type="range"id="drive_right" min="-500" max="500" value="0" oninput="drive_update();"/><br/>
+							<p id="status"></p>
 						</td>
 					</tr>
 				</table>

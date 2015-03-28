@@ -28,15 +28,7 @@ function roomba_t(renderer)
 	var model_color=0x404040;
 	
 	// Positions of Left and Right wheels
-	this.wheelbase=250; // mm
-	this.wheel=[];
-	this.wheel[0]=new vec3(-0.5*this.wheelbase,0,0);
-	this.wheel[1]=new vec3(+0.5*this.wheelbase,0,0);
-	// Robot coordinate system:
-	this.P=new vec3(0,0,0); // position
-	this.UP=new vec3(0,0,1); // Z is up
-	this.LR=new vec3(1,0,0); // left-to-right wheel
-	this.FW=new vec3(0,1,0); // drive forward
+	this.reset();
 	
 	this.renderer=renderer;
 
@@ -76,6 +68,22 @@ function roomba_t(renderer)
 };
 
 
+
+// Reset positions of wheels:
+roomba_t.prototype.reset=function() 
+{
+	this.wheelbase=250; // mm
+	this.wheel=[];
+	this.wheel[0]=new vec3(-0.5*this.wheelbase,0,0);
+	this.wheel[1]=new vec3(+0.5*this.wheelbase,0,0);
+	// Robot coordinate system:
+	this.P=new vec3(0,0,0); // position
+	this.UP=new vec3(0,0,1); // Z is up
+	this.LR=new vec3(1,0,0); // left-to-right wheel
+	this.FW=new vec3(0,1,0); // drive forward
+}
+
+// Simulate robot motion
 roomba_t.prototype.loop=function(dt)
 {
 	dt = dt || 0.001; // weird startup, null dt?
@@ -108,9 +116,10 @@ roomba_t.prototype.loop=function(dt)
 	
 
 	// Robot's Z rotation rotation, in radians
-	var orient=Math.atan2(this.LR.y,this.LR.x);
-	// console.log("P="+this.P+" and orient="+orient+" rads");
-	this.model.rotation.z=orient;
+	this.orient_rad=Math.atan2(this.LR.y,this.LR.x);
+	this.orient=180.0/Math.PI*this.orient_rad;
+	// console.log("P="+this.P+" and orient="+this.orient_rad+" rads");
+	this.model.rotation.z=this.orient_rad;
 
 	// Update robot center position
 	this.model.position.copy(this.P); 
@@ -120,4 +129,19 @@ roomba_t.prototype.loop=function(dt)
 	renderer.controls.object.position.set(
 		this.P.x,this.P.y-1200,this.P.z+1400);
 };
+
+// Print current status
+roomba_t.prototype.get_status=function() 
+{
+	var status="robot.position = ";
+	for (var axis=0;axis<3;axis++) {
+		var v=0xffFFffFF&this.P.getComponent(axis);
+		status+=v;
+		if (axis<2) status+=", ";
+	}
+	status+=" mm<br>";
+	status+=" robot.angle = "+(0xffFFffFF&this.orient)+" degrees<br>";
+	return status;
+}
+
 
