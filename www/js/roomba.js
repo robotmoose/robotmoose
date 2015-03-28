@@ -25,7 +25,7 @@ function roomba_t(renderer)
 
 	var model_path=url_path+"models/roomba/body.obj";
 	myself.model=null;
-	var model_color=0xcc0000;
+	var model_color=0x404040;
 	
 	// Positions of Left and Right wheels
 	this.wheelbase=250; // mm
@@ -37,6 +37,8 @@ function roomba_t(renderer)
 	this.UP=new vec3(0,0,1); // Z is up
 	this.LR=new vec3(1,0,0); // left-to-right wheel
 	this.FW=new vec3(0,1,0); // drive forward
+	
+	this.renderer=renderer;
 
 	myself.model=renderer.load_obj(model_path);
 	myself.model.rotation.set(0,0,0);
@@ -112,6 +114,10 @@ roomba_t.prototype.loop=function(dt)
 
 	// Update robot center position
 	this.model.position.copy(this.P); 
-
+	
+	// Update camera position to follow robot
+	renderer.controls.center.set(this.P.x,this.P.y,this.P.z);
+	renderer.controls.object.position.set(
+		this.P.x,this.P.y-1200,this.P.z+1400);
 };
 
