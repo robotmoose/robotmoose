@@ -239,6 +239,10 @@ void MPU9150_readings::setup(){
   MPU9150_writeSensor(0x64, 0x01); //override register
   MPU9150_writeSensor(0x6A, 0x20); //enable master i2c mode
   MPU9150_writeSensor(0x34, 0x13); //disable slv4
+  
+  MPU9150_writeSensor(MPU9150_GYRO_CONFIG, 0x0); //2000 deg/sec full scale
+  MPU9150_writeSensor(MPU9150_CONFIG, 0x4); //20Hz low pass filter (DLPF)
+  
 }
 
 // Read a two-byte, 16-bit value from these addresses.
