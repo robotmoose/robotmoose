@@ -133,9 +133,9 @@ function pilot_send() {
 	var robot;
 	function set_robot() // Set global robot depending on checkbox selected 
 	{
-		if (document.getElementById("layla_gray").checked) robot=layla/gray;
-		else if(document.getElementById("layla_orange").checked) robot=layla/orange;
-		else if(document.getElementById("create_2").checked) robot=create/'2';
+		if (document.getElementById("layla_gray").checked) robot="layla/gray";
+		else if(document.getElementById("layla_orange").checked) robot="layla/orange";
+		else if(document.getElementById("create_2").checked) robot="create/2";
 	}
 	var starpath=robot+"/pilot";
 	var url=url_start+starpath+"?set="+encodeURIComponent(pilotStr);
