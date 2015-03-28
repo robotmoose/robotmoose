@@ -39,7 +39,12 @@
 
 				<div class="tab-content">
 					<div role="tabpanel" class="tab-pane active" id="setup">
-						Robot Name:<input type="text" id="robot_name" rows="1" cols="30" onChange="run();" value="layla/uaf"/>
+						<!--Robot Name:<input type="text" id="robot_name" rows="1" cols="30" onChange="run();" value="layla/uaf"/>!-->
+						Robot Name: <input type ="checkbox" id="layla_gray" name="Layla Gray" value="layla/gray" onclick="set_robot()"> Layla Gray
+									<input type ="checkbox" id="layla_orange" name="Layla Orange" value="layla/orange" onclick="set_robot()"> Layla Orange		
+									<input type ="checkbox" id="create_2" name="Layla Gray" value="create/2" onclick="set_robot()"> Create 2
+						<br>
+									
 						<input value="Video - Gruveo" type="button" onClick="runCmd('video','r'+((new Date()).getTime())); openGruveoVideo()"/><br/>
 
 						RTC video name: <input type="text" id="robot_videoname" rows="1" cols="30" onChange="updateRTCVideo()" value="layla/uaf"/>
