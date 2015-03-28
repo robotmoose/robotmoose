@@ -91,15 +91,14 @@ function model_t(scene)
 	myself.scene=scene;
 	myself.mesh=null;
 	myself.position=new THREE.Vector3(0,0,0);
-	myself.rotation=new THREE.Vector3(0,0,0);
+	myself.rotation=new THREE.Euler(0,0,0);
 	myself.scale=new THREE.Vector3(1,1,1);
 
 	myself.set_color=function(color)
 	{
 		if(myself.loaded&&myself.mesh)
 		{
-			myself.mesh.traverse(function(child){if(child instanceof THREE.Mesh)
-				child.material.color.setHex(color);});
+			myself.mesh.material.color.setHex(color);
 		}
 		else
 		{
@@ -249,33 +248,34 @@ function renderer_t(div,setup_func,loop_func)
 		var model=new model_t(myself.scene);
 		var loader=new THREE.OBJLoader();
 
-		loader.addEventListener("load",function(event)
+		loader.load(filename,function(container)
 		{
-			var object=event.content;
-
+			var mesh=container.children[0];
+			
+			mesh.geometry.computeFaceNormals();
+			mesh.material=new THREE.MeshPhongMaterial({color:0xffffff});
+			
 			if(texture)
-				object.traverse(function(child){
-					if(child instanceof THREE.Mesh)
-					{
-						THREE.GeometryUtils.center(child.geometry);
-						child.geometry.computeFaceNormals();
-						child.material.map=texture;
-					}
-					});
+			{
+				THREE.GeometryUtils.center(mesh.geometry);
+				mesh.material.map=texture;
+			}
+			
+			mesh.position.copy(model.position);
+			mesh.rotation.copy(model.rotation);
+			mesh.scale.copy(model.scale);
+			mesh.castShadow=true;
+			mesh.receiveShadow=true;
 
-			object.position=model.position;
-			object.rotation=model.rotation;
-			object.scale=model.scale;
-
-			model.scene.add(object);
-			model.mesh=object;
+			model.scene.add(mesh);
+			model.mesh=mesh;
 			model.position=model.mesh.position;
 			model.rotation=model.mesh.rotation;
 			model.scale=model.mesh.scale;
 			model.loaded=true;
-		});
-
-		loader.load(filename);
+			console.log("Loaded OBJ mesh from "+filename);
+		}
+		);
 
 		return model;
 	};
@@ -292,7 +292,7 @@ function renderer_t(div,setup_func,loop_func)
 
 	myself.create_grid=function(size,width,height)
 	{
-		var plane_geometry=new THREE.PlaneGeometry(size*width,size*height,size,size);
+		var plane_geometry=new THREE.PlaneBufferGeometry(size*width,size*height,size,size);
 		plane_geometry.normalsNeedUpdate=true;
 		var plane_material=new THREE.MeshBasicMaterial({color:0xd8eef4,depthWrite:false,
 				side:THREE.DoubleSide});

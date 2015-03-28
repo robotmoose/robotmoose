@@ -4,67 +4,30 @@
  * @author angelxuanchang
  */
 
-THREE.MTLLoader = function( baseUrl, options ) {
+THREE.MTLLoader = function( baseUrl, options, crossOrigin ) {
 
-	THREE.EventDispatcher.call( this );
-	
 	this.baseUrl = baseUrl;
 	this.options = options;
+	this.crossOrigin = crossOrigin;
 
 };
 
 THREE.MTLLoader.prototype = {
 
-	/**
-	 * Loads a MTL file
-	 *
-	 * Loading progress is indicated by the following events:
-	 *   "load" event (successful loading): type = 'load', content = THREE.MTLLoader.MaterialCreator
-	 *   "error" event (error loading): type = 'load', message
-	 *   "progress" event (progress loading): type = 'progress', loaded, total
-	 *
-	 * @param url - location of MTL file
-	 */
-	load: function( url ) {
+	constructor: THREE.MTLLoader,
+
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
-		var xhr = new XMLHttpRequest();
 
-		function onloaded( event ) {
+		var loader = new THREE.XHRLoader();
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
 
-			if ( event.target.status === 200 || event.target.status === 0 ) {
+			onLoad( scope.parse( text ) );
 
-				var materialCreator = scope.parse( event.target.responseText );
+		}, onProgress, onError );
 
-				// Notify caller, that I'm done
-
-				scope.dispatchEvent( { type: 'load', content: materialCreator } );
-
-			} else {
-
-				scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']',
-					response: event.target.responseText } );
-
-			}
-
-		}
-
-		xhr.addEventListener( 'load', onloaded, false );
-
-		xhr.addEventListener( 'progress', function ( event ) {
-
-			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
-
-		}, false );
-
-		xhr.addEventListener( 'error', function () {
-
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
-
-		}, false );
-
-		xhr.open( 'GET', url, true );
-		xhr.send( null );
 	},
 
 	/**
@@ -72,14 +35,14 @@ THREE.MTLLoader.prototype = {
 	 * @param text - Content of MTL file
 	 * @return {THREE.MTLLoader.MaterialCreator}
 	 */
-	parse: function( text ) {
+	parse: function ( text ) {
 
 		var lines = text.split( "\n" );
 		var info = {};
 		var delimiter_pattern = /\s+/;
 		var materialsInfo = {};
 
-			for ( var i = 0; i < lines.length; i ++ ) {
+		for ( var i = 0; i < lines.length; i ++ ) {
 
 			var line = lines[ i ];
 			line = line.trim();
@@ -93,7 +56,7 @@ THREE.MTLLoader.prototype = {
 
 			var pos = line.indexOf( ' ' );
 
-			var key = ( pos >= 0 ) ? line.substring( 0, pos) : line;
+			var key = ( pos >= 0 ) ? line.substring( 0, pos ) : line;
 			key = key.toLowerCase();
 
 			var value = ( pos >= 0 ) ? line.substring( pos + 1 ) : "";
@@ -124,6 +87,7 @@ THREE.MTLLoader.prototype = {
 		}
 
 		var materialCreator = new THREE.MTLLoader.MaterialCreator( this.baseUrl, this.options );
+		materialCreator.crossOrigin = this.crossOrigin
 		materialCreator.setMaterials( materialsInfo );
 		return materialCreator;
 
@@ -150,8 +114,6 @@ THREE.MTLLoader.prototype = {
 
 THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
 
-	THREE.EventDispatcher.call( this );
-
 	this.baseUrl = baseUrl;
 	this.options = options;
 	this.materialsInfo = {};
@@ -165,6 +127,8 @@ THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
 };
 
 THREE.MTLLoader.MaterialCreator.prototype = {
+
+	constructor: THREE.MTLLoader.MaterialCreator,
 
 	setMaterials: function( materialsInfo ) {
 
@@ -325,7 +289,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Diffuse color (color under white light) using RGB values
 
-					params[ 'diffuse' ] = new THREE.Color().setRGB( value[0], value[1], value[2] );
+					params[ 'diffuse' ] = new THREE.Color().fromArray( value );
 
 					break;
 
@@ -333,14 +297,14 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Ambient color (color under shadow) using RGB values
 
-					params[ 'ambient' ] = new THREE.Color().setRGB( value[0], value[1], value[2] );
+					params[ 'ambient' ] = new THREE.Color().fromArray( value );
 
 					break;
 
 				case 'ks':
 
 					// Specular color (color when light is reflected from shiny surface) using RGB values
-					params[ 'specular' ] = new THREE.Color().setRGB( value[0], value[1], value[2] );
+					params[ 'specular' ] = new THREE.Color().fromArray( value );
 
 					break;
 
@@ -348,7 +312,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Diffuse texture map
 
-					params[ 'map' ] = THREE.MTLLoader.loadTexture( this.baseUrl + value );
+					params[ 'map' ] = this.loadTexture( this.baseUrl + value );
 					params[ 'map' ].wrapS = this.wrap;
 					params[ 'map' ].wrapT = this.wrap;
 
@@ -395,51 +359,46 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 		this.materials[ materialName ] = new THREE.MeshPhongMaterial( params );
 		return this.materials[ materialName ];
 
-	}
+	},
 
-};
 
-THREE.MTLLoader.loadTexture = function ( url, mapping, onLoad, onError ) {
+	loadTexture: function ( url, mapping, onLoad, onError ) {
 
-	var isCompressed = url.toLowerCase().endsWith( ".dds" );
+		var texture;
+		var loader = THREE.Loader.Handlers.get( url );
 
-	if ( isCompressed ) {
+		if ( loader !== null ) {
 
-		var texture = THREE.ImageUtils.loadCompressedTexture( url, mapping, onLoad, onError );
+			texture = loader.load( url, onLoad );
 
-	} else {
+		} else {
 
-		var image = new Image();
-		var texture = new THREE.Texture( image, mapping );
+			texture = new THREE.Texture();
 
-		var loader = new THREE.ImageLoader();
+			loader = new THREE.ImageLoader();
+			loader.crossOrigin = this.crossOrigin;
+			loader.load( url, function ( image ) {
 
-		loader.addEventListener( 'load', function ( event ) {
+				texture.image = THREE.MTLLoader.ensurePowerOfTwo_( image );
+				texture.needsUpdate = true;
 
-			texture.image = THREE.MTLLoader.ensurePowerOfTwo_( event.content );
-			texture.needsUpdate = true;
-			if ( onLoad ) onLoad( texture );
+				if ( onLoad ) onLoad( texture );
 
-		} );
+			} );
 
-		loader.addEventListener( 'error', function ( event ) {
+		}
 
-			if ( onError ) onError( event.message );
+		if ( mapping !== undefined ) texture.mapping = mapping;
 
-		} );
-
-		loader.crossOrigin = this.crossOrigin;
-		loader.load( url, image );
+		return texture;
 
 	}
-
-	return texture;
 
 };
 
 THREE.MTLLoader.ensurePowerOfTwo_ = function ( image ) {
 
-	if ( ! THREE.MTLLoader.isPowerOfTwo_( image.width ) || ! THREE.MTLLoader.isPowerOfTwo_( image.height ) ) {
+	if ( ! THREE.Math.isPowerOfTwo( image.width ) || ! THREE.Math.isPowerOfTwo( image.height ) ) {
 
 		var canvas = document.createElement( "canvas" );
 		canvas.width = THREE.MTLLoader.nextHighestPowerOfTwo_( image.width );
@@ -452,12 +411,6 @@ THREE.MTLLoader.ensurePowerOfTwo_ = function ( image ) {
 	}
 
 	return image;
-
-};
-
-THREE.MTLLoader.isPowerOfTwo_ = function ( x ) {
-
-	return ( x & ( x - 1 ) ) === 0;
 
 };
 
@@ -475,3 +428,4 @@ THREE.MTLLoader.nextHighestPowerOfTwo_ = function( x ) {
 
 };
 
+THREE.EventDispatcher.prototype.apply( THREE.MTLLoader.prototype );

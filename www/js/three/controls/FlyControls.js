@@ -19,8 +19,6 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	// disable default target object behavior
 
-	this.object.useQuaternion = true;
-
 	// internals
 
 	this.tmpQuaternion = new THREE.Quaternion();
@@ -130,10 +128,12 @@ THREE.FlyControls = function ( object, domElement ) {
 
 			switch ( event.button ) {
 
-				case 0: this.object.moveForward = true; break;
-				case 2: this.object.moveBackward = true; break;
+				case 0: this.moveState.forward = 1; break;
+				case 2: this.moveState.back = 1; break;
 
 			}
+
+			this.updateMovementVector();
 
 		}
 
@@ -171,10 +171,12 @@ THREE.FlyControls = function ( object, domElement ) {
 
 			switch ( event.button ) {
 
-				case 0: this.moveForward = false; break;
-				case 2: this.moveBackward = false; break;
+				case 0: this.moveState.forward = 0; break;
+				case 2: this.moveState.back = 0; break;
 
 			}
+
+			this.updateMovementVector();
 
 		}
 
@@ -194,9 +196,8 @@ THREE.FlyControls = function ( object, domElement ) {
 		this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
 		this.object.quaternion.multiply( this.tmpQuaternion );
 
-		this.object.matrix.setPosition( this.object.position );
-		this.object.matrix.setRotationFromQuaternion( this.object.quaternion );
-		this.object.matrixWorldNeedsUpdate = true;
+		// expose the rotation vector for convenience
+		this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
 
 
 	};
@@ -253,12 +254,14 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 
+	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+
 	this.domElement.addEventListener( 'mousemove', bind( this, this.mousemove ), false );
 	this.domElement.addEventListener( 'mousedown', bind( this, this.mousedown ), false );
 	this.domElement.addEventListener( 'mouseup',   bind( this, this.mouseup ), false );
 
-	this.domElement.addEventListener( 'keydown', bind( this, this.keydown ), false );
-	this.domElement.addEventListener( 'keyup',   bind( this, this.keyup ), false );
+	window.addEventListener( 'keydown', bind( this, this.keydown ), false );
+	window.addEventListener( 'keyup',   bind( this, this.keyup ), false );
 
 	this.updateMovementVector();
 	this.updateRotationVector();
