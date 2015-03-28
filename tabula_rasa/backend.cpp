@@ -9,6 +9,10 @@
 #include <vector>
 #include <sstream>
 
+#ifdef _WIN32
+#include <stdint.h>  // for unit8-16 and whatnot
+#endif
+
 // Arduino comms:
 #include "arduino/serial_packet.h" // serial comms format
 #include "arduino/tabula_control.h" // sensor and command formatting

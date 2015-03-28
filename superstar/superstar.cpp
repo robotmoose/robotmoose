@@ -17,7 +17,7 @@
 #include "osl/sha2_auth.h" /* for authentication */
 #include "osl/sha2.cpp" /* for easier linking */
 
-const std::string ADDRESS="0.0.0.0:8081";
+ std::string ADDRESS="0.0.0.0:8081";
 
 /// Utility: integer to string
 std::string my_itos(int i) {
@@ -223,8 +223,14 @@ void *thread_code(void *) {
 }
 
 
-int main(void)
+int main(int argc, char *argv[])
 {
+	for (int argi = 1; argi < argc; argi++) {
+		if (0 == strcmp(argv[argi], "--address")) ADDRESS = argv[++argi];
+		else {
+			printf("Unrecognized command line argument '%s'\n", argv[argi]);
+		}
+	}
   /* Start threads to be redundant servers.  This seems to do nothing. */
   for (int thread=0;thread<0;thread++)
   {
