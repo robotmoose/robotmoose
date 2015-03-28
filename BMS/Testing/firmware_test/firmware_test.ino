@@ -89,7 +89,7 @@ void setup()
   SPI.setClockDivider(SPI_CLOCK_DIV16);
 
   SPI.begin();          // Start SPI
-  Serial.begin(9600);   // Open serial port
+  Serial.begin(57600);   // Open serial port
 //---------------------------------------------------------------------------------------------------------------------
 // I2C configs
  Wire.begin(2);                // join i2c bus with address #2
@@ -314,8 +314,8 @@ void requestEvent()
 {
   byte data [2] = {(byte)make_battery(cellVoltage).percentage, setChargeByte()};
   Wire.write(data, 2);
-  Serial.print("I2C Request Performed: ");
-  Serial.println(make_battery(cellVoltage).percentage);
+  //Serial.print("I2C Request Performed: ");
+  //Serial.println(make_battery(cellVoltage).percentage);
 }
 
 byte setChargeByte()
@@ -348,9 +348,9 @@ void loop()
     Serial.println(" V");
   }
   
-  Serial.print("Battery Percentage: ");
+  /*Serial.print("Battery Percentage: ");
   Serial.print(make_battery(cellVoltage).percentage);
-  Serial.println("%");
+  Serial.println("%");*/
 
   Serial.print("Average Cell Voltage: ");
   Serial.print(AvgCellVolts,4);
