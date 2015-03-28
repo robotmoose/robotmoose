@@ -59,13 +59,7 @@ function roomba_t(renderer)
 	{
 		if(dt)
 		{
-			//need an easy way of getting the actual model bounding box...
-			var stl_scaler=10;
-
-			var mm=1;
-
-			if(myself.model[1].scale)
-				mm=myself.model[1].scale.x*stl_scaler/33.655;
+			var mm=1; // from mm to model coordinates
 
 			if(myself.left>500)
 				myself.left=500;
