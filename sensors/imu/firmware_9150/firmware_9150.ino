@@ -11,6 +11,7 @@ Jumpers for Arduno Uno:
 This began life as example code from:
 http://playground.arduino.cc/Main/MPU-9150
  MPU-9150 Accelerometer + Gyro + Compass + Temperature
+*/
 // -----------------------------
 //
 // By arduino.cc user "frtrobotik" (Tobias Hübner)
@@ -36,7 +37,6 @@ http://playground.arduino.cc/Main/MPU-9150
 // playground.arduino.cc/Main/MPU-6050
 // There are more Registervalues. Here are only the most
 // necessary ones to get started with this sensor.
-*/
 
 #include <Wire.h>
 
@@ -147,17 +147,32 @@ http://playground.arduino.cc/Main/MPU-9150
 // I2C address 0x69 or 0x68, depends on your wiring. 
 #define MPU9150_I2C_ADDRESS  0x68
 
-
-//Variables where our values can be stored
-typedef struct {
-int cmps[3];
-int accl[3];
-int gyro[3];
-int temp; // in tenths of a degree C
-} MPU9150_readings;
-
-void MPU9150_read(MPU9150_readings *imu) {
+// Structure where our readings can be stored
+struct MPU9150_readings {
+  int16_t A[3]; // accelerometer XYZ
+  int16_t G[3]; // gyro
+  int16_t C[3]; // compass
+  int16_t T; // temperature, in tenths of a degree C
   
+  static MPU9150_readings read(void);
+};
+
+MPU9150_readings MPU9150_readings::read(void) {
+  MPU9150_readings imu;
+  imu.A[0]=MPU9150_readSensor(MPU9150_ACCEL_XOUT_L,MPU9150_ACCEL_XOUT_H);
+  imu.A[1]=MPU9150_readSensor(MPU9150_ACCEL_YOUT_L,MPU9150_ACCEL_YOUT_H);
+  imu.A[2]=MPU9150_readSensor(MPU9150_ACCEL_ZOUT_L,MPU9150_ACCEL_ZOUT_H);
+  
+  imu.G[0]=MPU9150_readSensor(MPU9150_GYRO_XOUT_L,MPU9150_GYRO_XOUT_H);
+  imu.G[1]=MPU9150_readSensor(MPU9150_GYRO_YOUT_L,MPU9150_GYRO_YOUT_H);
+  imu.G[2]=MPU9150_readSensor(MPU9150_GYRO_ZOUT_L,MPU9150_GYRO_ZOUT_H);
+  
+  imu.C[0]=MPU9150_readSensor(MPU9150_CMPS_XOUT_L,MPU9150_CMPS_XOUT_H);
+  imu.C[1]=MPU9150_readSensor(MPU9150_CMPS_YOUT_L,MPU9150_CMPS_YOUT_H);
+  imu.C[2]=MPU9150_readSensor(MPU9150_CMPS_ZOUT_L,MPU9150_CMPS_ZOUT_H);
+  
+  imu.T=( MPU9150_readSensor(MPU9150_TEMP_OUT_L,MPU9150_TEMP_OUT_H) + 12412) / 34;
+  return imu;
 }
 
 void setup()
@@ -168,44 +183,25 @@ void setup()
   // Initialize the 'Wire' class for the I2C-bus.
   Wire.begin();
 
-  // Clear the 'sleep' bit to start the sensor.
-  MPU9150_writeSensor(MPU9150_PWR_MGMT_1, 0);
-
-  MPU9150_setupCompass();
+  MPU9150_setup();
 }
 
 
 void loop()
 {
-  // Print all sensor values which the sensor provides
-  // Formated all values as x, y, and z in order for
-  // Compass, Gyro, Acceleration. The First value is
-  // the temperature.
+  MPU9150_readings imu=MPU9150_readings::read();
 
   Serial.print("  A ");
-  Serial.print(MPU9150_readSensor(MPU9150_ACCEL_XOUT_L,MPU9150_ACCEL_XOUT_H));
-  Serial.print("  ");
-  Serial.print(MPU9150_readSensor(MPU9150_ACCEL_YOUT_L,MPU9150_ACCEL_YOUT_H));
-  Serial.print("  ");
-  Serial.print(MPU9150_readSensor(MPU9150_ACCEL_ZOUT_L,MPU9150_ACCEL_ZOUT_H));
+  for (int i=0;i<3;i++) { Serial.print(imu.A[i]); Serial.print(" "); }
   
   Serial.print("  G  ");
-  Serial.print(MPU9150_readSensor(MPU9150_GYRO_XOUT_L,MPU9150_GYRO_XOUT_H));
-  Serial.print("  ");
-  Serial.print(MPU9150_readSensor(MPU9150_GYRO_YOUT_L,MPU9150_GYRO_YOUT_H));
-  Serial.print("  ");
-  Serial.print(MPU9150_readSensor(MPU9150_GYRO_ZOUT_L,MPU9150_GYRO_ZOUT_H));
+  for (int i=0;i<3;i++) { Serial.print(imu.G[i]); Serial.print(" "); }
   
   Serial.print("  C  ");
-  Serial.print(MPU9150_readSensor(MPU9150_CMPS_XOUT_L,MPU9150_CMPS_XOUT_H));
-  Serial.print("  ");
-  Serial.print(MPU9150_readSensor(MPU9150_CMPS_YOUT_L,MPU9150_CMPS_YOUT_H));
-  Serial.print("  ");
-  Serial.print(MPU9150_readSensor(MPU9150_CMPS_ZOUT_L,MPU9150_CMPS_ZOUT_H));
+  for (int i=0;i<3;i++) { Serial.print(imu.C[i]); Serial.print(" "); }
   
   Serial.print("  T  ");
-  float dT = ( (float) MPU9150_readSensor(MPU9150_TEMP_OUT_L,MPU9150_TEMP_OUT_H) + 12412.0) / 340.0;
-  Serial.print(dT);
+  Serial.print(imu.T);
   Serial.println();
   delay(100);
 }
@@ -215,8 +211,10 @@ int MPU9150_I2C_TARGET=MPU9150_I2C_ADDRESS;
 
 //http://pansenti.wordpress.com/2013/03/26/pansentis-invensense-mpu-9150-software-for-arduino-is-now-on-github/
 //Thank you to pansenti for setup code.
-//I will documented this one later.
-void MPU9150_setupCompass(){
+void MPU9150_setup(){
+  // Clear the 'sleep' bit to start the sensor.
+  MPU9150_writeSensor(MPU9150_PWR_MGMT_1, 0);
+
   MPU9150_I2C_TARGET = 0x0C;      //change Adress to Compass
 
   MPU9150_writeSensor(0x0A, 0x00); //PowerDownMode
@@ -232,7 +230,7 @@ void MPU9150_setupCompass(){
   MPU9150_writeSensor(0x28, 0x0C); //set i2c address at slv1 at 0x0C
   MPU9150_writeSensor(0x29, 0x0A); //Set where reading at slave 1 starts
   MPU9150_writeSensor(0x2A, 0x81); //Enable at set length to 1
-  MPU9150_writeSensor(0x64, 0x01); //overvride register
+  MPU9150_writeSensor(0x64, 0x01); //override register
   MPU9150_writeSensor(0x67, 0x03); //set delay rate
   MPU9150_writeSensor(0x01, 0x80);
 
@@ -244,10 +242,7 @@ void MPU9150_setupCompass(){
   MPU9150_writeSensor(0x34, 0x13); //disable slv4
 }
 
-////////////////////////////////////////////////////////////
-///////// I2C functions to get easier all values ///////////
-////////////////////////////////////////////////////////////
-
+// Read a two-byte, 16-bit value from these addresses.
 int MPU9150_readSensor(int addrL, int addrH){
   Wire.beginTransmission(MPU9150_I2C_TARGET);
   Wire.write(addrL);
@@ -266,6 +261,7 @@ int MPU9150_readSensor(int addrL, int addrH){
   return (int16_t)((H<<8)+L);
 }
 
+// Read a one-byte value from this address.
 int MPU9150_readSensor(int addr){
   Wire.beginTransmission(MPU9150_I2C_TARGET);
   Wire.write(addr);
@@ -275,6 +271,7 @@ int MPU9150_readSensor(int addr){
   return Wire.read();
 }
 
+// Send this one-byte data value to this address.
 int MPU9150_writeSensor(int addr,int data){
   Wire.beginTransmission(MPU9150_I2C_TARGET);
   Wire.write(addr);
