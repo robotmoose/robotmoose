@@ -63,14 +63,18 @@
 			{
 				renderer.set_size(480,453); // FIXME: there's a bottom border that is hard to get rid of...
 
-				grid=renderer.create_grid(64,8,8);
+				grid=renderer.create_grid(300,16,16); // 1 foot grid
+				grid.rotation.x=0;
 
-				var size=1000;
+				var size=100000;
 				var intensity=0.8;
 				lights[0]=new renderer.create_light(intensity,
-					new THREE.Vector3(-size/2,+size,+size/2));
+					new THREE.Vector3(-size/2,-size/2,+size));
 
 				roomba=new roomba_t(renderer);
+				
+				renderer.controls.center.set(0,0,0); // robot?
+				renderer.controls.object.position.set(0,-1200,1400);
 			}
 
 			function loop(dt)

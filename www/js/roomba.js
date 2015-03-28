@@ -28,7 +28,7 @@ function roomba_t(renderer)
 	myself.model[2]=0xcc0000;
 
 	myself.model[1]=renderer.load_obj(myself.model[0]);
-	myself.model[1].rotation.set(3*Math.PI/2,0,0);
+	myself.model[1].rotation.set(0,0,0);
 	myself.model[1].position.set(0,0,0);
 	myself.model[1].scale.set(1,1,1);
 	myself.model[1].set_color(myself.model[2]);
@@ -59,13 +59,7 @@ function roomba_t(renderer)
 	{
 		if(dt)
 		{
-			//need an easy way of getting the actual model bounding box...
-			var stl_scaler=10;
-
-			var mm=1;
-
-			if(myself.model[1].scale)
-				mm=myself.model[1].scale.x*stl_scaler/33.655;
+			var mm=1; // from mm to model coordinates
 
 			if(myself.left>500)
 				myself.left=500;
@@ -79,7 +73,7 @@ function roomba_t(renderer)
 			var speed=myself.left*mm*dt;
 
 			var pos=myself.get_position();
-			myself.set_position(pos.x,pos.y,pos.z+speed);
+			myself.set_position(pos.x,pos.y+speed,pos.z);
 		}
 	};
 
