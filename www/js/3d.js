@@ -1,5 +1,48 @@
 var url_path="/"; // "http://robotmoose.com/";
 
+// Dr. Lawlor's vector utilities:
+
+/* Rename vectors to be be more like GLSL: */
+var vec2=THREE.Vector2;
+var vec3=THREE.Vector3;
+var vec4=THREE.Vector4;
+
+/* Allow vec3 to be output like a string */
+vec3.prototype.toString=function() {
+	return " ("+
+		this.x.toFixed(6)+", "+
+		this.y.toFixed(6)+", "+
+		this.z.toFixed(6)+") "
+	;
+}
+
+/* Short-named arithmetic functions that allocate vectors instead of trashing their arguments.
+ Plus:   A.p(B): returns new vector for A+B
+ Minus:  A.m(B): A-B
+ Times:  A.t(b): A*b (scalar)
+ There are also "Plus-Equals" versions: A.pe(B) is A+=B.
+*/
+vec3.prototype.p=function(B) { return this.clone().add(B); }
+vec3.prototype.pe=vec3.prototype.add;
+vec3.prototype.m=function(B) { return this.clone().sub(B); }
+vec3.prototype.me=vec3.prototype.sub;
+vec3.prototype.t=function(s) { return this.clone().multiplyScalar(s); }
+vec3.prototype.te=vec3.prototype.multiplyScalar;
+vec3.prototype.rand=function(scale) {
+	this.x=scale*(Math.random()-0.5);
+	this.y=scale*(Math.random()-0.5);
+	this.z=scale*(Math.random()-0.5);
+	return this;
+}
+vec3.prototype.randSphere=function(scale) {
+	do {
+		this.rand(scale);
+	} while (this.length()>scale*0.5);
+	return this;
+}
+
+
+
 function load_js(js)
 {
 	var scr=document.createElement("script");

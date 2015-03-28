@@ -23,58 +23,60 @@ function roomba_t(renderer)
 	myself.left=0;
 	myself.right=0;
 
-	myself.model[0]=url_path+"models/roomba/body.obj";
-	myself.model[1]=null;
-	myself.model[2]=0xcc0000;
+	var model_path=url_path+"models/roomba/body.obj";
+	myself.model=null;
+	var model_color=0xcc0000;
 
-	myself.model[1]=renderer.load_obj(myself.model[0]);
-	myself.model[1].rotation.set(0,0,0);
-	myself.model[1].position.set(0,0,0);
-	myself.model[1].scale.set(1,1,1);
-	myself.model[1].set_color(myself.model[2]);
-	myself.model[1].castShadow=true;
-	myself.model[1].receiveShadow=true;
+	myself.model=renderer.load_obj(model_path);
+	myself.model.rotation.set(0,0,0);
+	myself.model.position.set(0,0,0);
+	myself.model.scale.set(1,1,1);
+	myself.model.set_color(model_color);
+	myself.model.castShadow=true;
+	myself.model.receiveShadow=true;
 
 	myself.set_position=function(x,y,z)
 	{
-		myself.model[1].position.set(x,y,z);
+		myself.model.position.set(x,y,z);
 	};
 
 	myself.get_position=function()
 	{
-		return myself.model[1].position;
+		return myself.model.position;
 	};
 
 	myself.set_rotation=function(x,y,z)
 	{
-		myself.model[1].rotation.set(x,y,z);
+		myself.model.rotation.set(x,y,z);
 	};
 
 	myself.get_rotation=function()
 	{
-		return myself.model[1].rotation;
+		return myself.model.rotation;
 	};
 
 	myself.loop=function(dt)
 	{
-		if(dt)
-		{
-			var mm=1; // from mm to model coordinates
+		dt = dt || 0.001; // weird startup, null dt?
+		var mm=1; // from mm to model coordinates
 
-			if(myself.left>500)
-				myself.left=500;
-			if(myself.left<-500)
-				myself.left=-500;
-			if(myself.right>500)
-				myself.right=500;
-			if(myself.right<-500)
-				myself.right=-500;
+		// Limit motor power
+		if(myself.left>500)
+			myself.left=500;
+		if(myself.left<-500)
+			myself.left=-500;
+		if(myself.right>500)
+			myself.right=500;
+		if(myself.right<-500)
+			myself.right=-500;
+		
+		var speed=mm*dt;
+		var speedL=speed*myself.left;
+		var speedR=speed*myself.right;
 
-			var speed=myself.left*mm*dt;
-
-			var pos=myself.get_position();
-			myself.set_position(pos.x,pos.y+speed,pos.z);
-		}
+		var pos=myself.get_position();
+		myself.set_position(pos.x+speedR,pos.y+speedL,pos.z); // HACK!
+	
 	};
 
 	myself.drive=function(left,right)
