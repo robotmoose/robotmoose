@@ -28,7 +28,7 @@ function roomba_t(renderer)
 	myself.model[2]=0xcc0000;
 
 	myself.model[1]=renderer.load_obj(myself.model[0]);
-	myself.model[1].rotation.set(3*Math.PI/2,0,0);
+	myself.model[1].rotation.set(0,0,0);
 	myself.model[1].position.set(0,0,0);
 	myself.model[1].scale.set(1,1,1);
 	myself.model[1].set_color(myself.model[2]);
@@ -73,7 +73,7 @@ function roomba_t(renderer)
 			var speed=myself.left*mm*dt;
 
 			var pos=myself.get_position();
-			myself.set_position(pos.x,pos.y,pos.z+speed);
+			myself.set_position(pos.x,pos.y+speed,pos.z);
 		}
 	};
 
