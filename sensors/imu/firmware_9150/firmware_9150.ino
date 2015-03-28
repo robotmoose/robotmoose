@@ -25,12 +25,10 @@ http://playground.arduino.cc/Main/MPU-9150
 // Documentation:
 // - The InvenSense documents:
 //   - "MPU-9150 Product Specification Revision 4.0",
-//     PS-MPU-9150A.pdf
+//     http://www.invensense.com/mems/gyro/documents/PS-MPU-9150A.pdf
 //   - "MPU-9150 Register Map and Descriptions Revision 4.0",
-//     RM-MPU-9150A-00.pdf
-//   - "MPU-9150 9-Axis Evaluation Board User Guide"
-//     AN-MPU-9150EVB-00.pdf
-//
+//      http://www.invensense.com/mems/gyro/documents/RM-MPU-9150A-00v4_2.pdf
+
 // The accuracy is 16-bits.
 //
 // Some parts are copied by the MPU-6050 Playground page.

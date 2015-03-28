@@ -1,5 +1,5 @@
 /**
-  IMU output analyzer
+  IMU output analyzer, for MPU-9150 IMU
   
   Dr. Orion Sky Lawlor, olawlor@acm.org, 2011-01-20 (Public Domain)
 */
@@ -72,7 +72,13 @@ public:
 		
 	// Update gyro
 		vec3 gyro_del=gyro_raw-gyro_raw_avg; // rotation rate estimate
-		gyro=gyro_del*(2.0/(16000.0)); // units: radians/sec
+		static vec3 gyro_del_last=vec3(0.0);
+		if (length(gyro_del-gyro_del_last)<100 && length(gyro_raw)<2000) { // not spinning fast
+			gyro_raw_avg=gyro_raw_avg+dt*gyro_del; // slow accumulate
+		}
+		gyro_del_last=gyro_del;
+		
+		gyro=gyro_del*(2000.0/(65536/2.0) /57.6); // old units: 2000 deg/sec full scale. new units: radians/sec
 		
 		static int count=0;
 		if ((++count)%100==0) {
@@ -87,7 +93,7 @@ public:
 		
 		if ((length(accel)-9.8)<0.5) 
 		{ // mostly pure gravity (not much body motion):
-		// this is our chance to fix gyro drift!
+		// this is our chance to fix up gyro drift!
 			double fixrate=0.2; // radians/sec of fix, per m/s^2 of error
 			vec3 world_accel=accel;
 			world_accel.z+=9.8; // gravity should face down: if not, fix it!
