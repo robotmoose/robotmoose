@@ -240,26 +240,15 @@ void MPU9150_readings::setup(){
   MPU9150_writeSensor(0x6A, 0x20); //enable master i2c mode
   MPU9150_writeSensor(0x34, 0x13); //disable slv4
   
-  MPU9150_writeSensor(MPU9150_GYRO_CONFIG, 0x0); //2000 deg/sec full scale
+  MPU9150_writeSensor(MPU9150_GYRO_CONFIG, 0x18); //2000 deg/sec full scale
   MPU9150_writeSensor(MPU9150_CONFIG, 0x4); //20Hz low pass filter (DLPF)
   
 }
 
 // Read a two-byte, 16-bit value from these addresses.
 int MPU9150_readSensor(int addrL, int addrH){
-  Wire.beginTransmission(MPU9150_I2C_TARGET);
-  Wire.write(addrL);
-  Wire.endTransmission(false);
-
-  Wire.requestFrom(MPU9150_I2C_TARGET, 1, true);
-  byte L = Wire.read();
-
-  Wire.beginTransmission(MPU9150_I2C_TARGET);
-  Wire.write(addrH);
-  Wire.endTransmission(false);
-
-  Wire.requestFrom(MPU9150_I2C_TARGET, 1, true);
-  byte H = Wire.read();
+  byte L = MPU9150_readSensor(addrL);
+  byte H = MPU9150_readSensor(addrH);
 
   return (int16_t)((H<<8)+L);
 }

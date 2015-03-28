@@ -72,12 +72,15 @@ public:
 		
 	// Update gyro
 		vec3 gyro_del=gyro_raw-gyro_raw_avg; // rotation rate estimate
+	#if 1 // there doesn't seem to be much zero-point bias
 		static vec3 gyro_del_last=vec3(0.0);
-		if (length(gyro_del-gyro_del_last)<100 && length(gyro_raw)<2000) { // not spinning fast
+		if (length(gyro_del-gyro_del_last)<5) // not changing fast
+		if (length(gyro_raw)<100) { // not spinning fast
 			gyro_raw_avg=gyro_raw_avg+dt*gyro_del; // slow accumulate
 		}
 		gyro_del_last=gyro_del;
-		
+	#endif
+	
 		gyro=gyro_del*(2000.0/(65536/2.0) /57.6); // old units: 2000 deg/sec full scale. new units: radians/sec
 		
 		static int count=0;
@@ -152,6 +155,16 @@ public:
 			}
 		}
 	}
+	
+	// Draw 3D vector, and 2D shadow
+	void drawVec(vec3 v) {
+		glVertex3fv(origin);
+		glVertex3fv(origin+v);
+		
+		glColor4f(0.0,0.0,0.0,0.4);
+		glVertex2fv(origin);
+		glVertex2fv(origin+v);
+	}
 
 	// Draw local 3D coordinate system onscreen
 	void draw(physics::library &lib) {
@@ -159,32 +172,17 @@ public:
 		
 		glBegin(GL_LINES);
 		for (int axis=0;axis<3;axis++) {
-			vec3 dir=((vec3 *)&frame)[axis];
-			dir+=origin;
-			
+			vec3 dir=((vec3 *)&frame)[axis];			
 			vec3 color(0.0); color[axis]=1.0;
 			
 			glColor3fv(color);
-			glVertex3fv(origin);
-			glColor3fv(color);
-			glVertex3fv(dir);
-			
-			// Shadow:
-			glColor4f(0.0,0.0,0.0,0.4);
-			glVertex2fv(origin);
-			glVertex2fv(dir);
+			drawVec(dir);
 		}
 		glColor3f(1.0,0.0,1.0);
-		glVertex3fv(origin);
-		vec3 down=accel_avg;
-		down*=0.03;
-		down+=origin;
-		glVertex3fv(down);
+		drawVec(accel_avg*0.03);
 		
-		// Shadow:
-		glColor4f(0.0,0.0,0.0,0.4);
-		glVertex2fv(origin);
-		glVertex2fv(down);
+		glColor3f(0.0,1.0,1.0);
+		drawVec(compass_raw*1.0/1000);
 		
 		glEnd();
         }
