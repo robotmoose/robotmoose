@@ -154,6 +154,7 @@ struct MPU9150_readings {
   int16_t C[3]; // compass
   int16_t T; // temperature, in tenths of a degree C
   
+  static void setup(void);
   static MPU9150_readings read(void);
 };
 
@@ -183,7 +184,7 @@ void setup()
   // Initialize the 'Wire' class for the I2C-bus.
   Wire.begin();
 
-  MPU9150_setup();
+  MPU9150_readings::setup();
 }
 
 
@@ -191,7 +192,7 @@ void loop()
 {
   MPU9150_readings imu=MPU9150_readings::read();
 
-  Serial.print("  A ");
+  Serial.print("A ");
   for (int i=0;i<3;i++) { Serial.print(imu.A[i]); Serial.print(" "); }
   
   Serial.print("  G  ");
@@ -203,7 +204,7 @@ void loop()
   Serial.print("  T  ");
   Serial.print(imu.T);
   Serial.println();
-  delay(100);
+  delay(10);
 }
 
 // This is the I2C bus address of the current target sensor
@@ -211,7 +212,7 @@ int MPU9150_I2C_TARGET=MPU9150_I2C_ADDRESS;
 
 //http://pansenti.wordpress.com/2013/03/26/pansentis-invensense-mpu-9150-software-for-arduino-is-now-on-github/
 //Thank you to pansenti for setup code.
-void MPU9150_setup(){
+void MPU9150_readings::setup(){
   // Clear the 'sleep' bit to start the sensor.
   MPU9150_writeSensor(MPU9150_PWR_MGMT_1, 0);
 
