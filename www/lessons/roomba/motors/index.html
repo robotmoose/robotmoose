@@ -45,6 +45,8 @@
 					"void loop()\n"+
 					"{\n"+
 					"\t//Things written in here keep happening\n"+
+					"\troomba.drive(100,100);\n"+
+					"\tdelay(100);\n"+
 					"}"
 					);
 				editor.set_size(480,460);
@@ -72,21 +74,30 @@
 					new THREE.Vector3(-size/2,-size/2,+size));
 
 				roomba=new roomba_t(renderer);
-				
+
 				renderer.controls.center.set(0,0,0); // robot?
 				renderer.controls.object.position.set(0,-1200,1400);
 			}
 
 			function loop(dt)
 			{
-				if(emulator.running())
+				roomba.loop(dt);
+
+				var left=parseInt(document.getElementById("drive_left").value);
+				var right=parseInt(document.getElementById("drive_right").value);
+
+				if(emulator.running()&&emulator.roombas["Serial"])
 				{
-					roomba.loop(dt);
-					var left=parseInt(document.getElementById("drive_left").value);
-					var right=parseInt(document.getElementById("drive_right").value);
-					roomba.drive(left,right);
+					left=emulator.roombas["Serial"].left;
+					right=emulator.roombas["Serial"].right;
+
+					document.getElementById("drive_left").value=left;
+					document.getElementById("drive_right").value=right;
+
+					console.log(left+" "+right);
 				}
 
+				roomba.drive(left,right);
 				drive_update();
 			}
 
