@@ -5,8 +5,8 @@ Reading 9DOF sensor stick from Sparkfun
 Arduino Uno R3: 
   VCC 5V
   gnd 0v
-  SDA A5
-  SCL A6
+  SDA A4
+  SCL A5
 
 Original by DARPA Team Mojavaton
 http://playground.arduino.cc//Main/SEN-10724
