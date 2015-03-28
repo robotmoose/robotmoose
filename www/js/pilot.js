@@ -130,7 +130,13 @@ function pilot_send() {
 	var pilotStr=JSON.stringify(pilot);
 	console.log(pilotStr);
 	
-	var robot=document.getElementById('robot_name').value;
+	var robot;
+	function set_robot() // Set global robot depending on checkbox selected 
+	{
+		if (document.getElementById("layla_gray").checked) robot=layla/gray;
+		else if(document.getElementById("layla_orange").checked) robot=layla/orange;
+		else if(document.getElementById("create_2").checked) robot=create/'2';
+	}
 	var starpath=robot+"/pilot";
 	var url=url_start+starpath+"?set="+encodeURIComponent(pilotStr);
 	
@@ -269,7 +275,7 @@ function updateRTCVideo()
 //Open Gruveo Video
 function openGruveoVideo()
 {
-  var currentRobot = document.getElementById('robot_name').value;
+  var currentRobot = robot;
   var splitName = currentRobot.split('/');
 
  
