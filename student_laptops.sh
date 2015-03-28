@@ -7,8 +7,8 @@ set -e
 CWD=$(pwd)
 
 #Uninstall Packages
-echo "Unnstall Packages"
-sudo apt-get remove --purge modemmanager
+echo "Uninstall Packages"
+sudo apt-get remove -y --purge modemmanager
 
 #Install Categories
 common="gnome-panel chromium-browser exfat-fuse flashplugin-installer flashplugin-nonfree-extrasound icedtea-plugin git libgnome-keyring-dev"
@@ -17,16 +17,19 @@ hardware="arduino avrdude binutils-avr gcc-avr avr-libc"
 library="freeglut3-dev libftgl-dev libglew-dev libncurses5-dev libopencv-dev libsoil-dev"
 
 #Updates
+echo "Update Package Lists"
 sudo apt-get update
-sudo apt-get upgrade
+
+echo "Upgrade"
+sudo apt-get upgrade -y
 
 #Install Packages
 echo "Install Packages"
-sudo apt-get install $common $development $hardware $library
+sudo apt-get install -y $common $development $hardware $library
 
 #Remove Uneeded Packages
 echo "Remove Uneeded Packages"
-sudo apt-get autoremove
+sudo apt-get autoremove -y
 
 #Setup Git Keyring
 echo "Setup Git Keyring"
@@ -49,3 +52,12 @@ sudo rm $GPP
 echo "#!/bin/bash"|sudo tee --append $GPP
 echo "$GPP-exe \$@ -Wl,--no-as-needed -pthread"|sudo tee --append $GPP
 sudo chmod +x $GPP
+
+#Serial Port Permissions
+echo "Serial Port Permissions"
+usermod -a -G dialout egg
+
+#Reboot
+echo "All Done, Press [ENTER] to reboot."
+read -n 1
+sudo reboot
