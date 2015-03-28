@@ -75,7 +75,6 @@ inline bool file_exists(const std::string& name)
 
 	return false;
 }
-
 static bool parse_errors(const std::string& file_name,const std::string& error_data,std::vector<myerror_t>& errors)
 {
 	auto lines=data_to_lines(error_data);
@@ -164,7 +163,7 @@ static bool parse_errors(const std::string& file_name,const std::string& error_d
 /* Make a valid directory to run this example code:
      logs/code/<day>/<rand>/code.cpp
 */
-std::string make_directory(void) 
+std::string make_directory(void)
 {
 	while (true) {
 		std::string logdir="logs";
@@ -176,7 +175,7 @@ std::string make_directory(void)
 		if(0!=mkdir(dir.c_str(),0777))
 		{ // somebody using that ID already, or just missing parent?
 			exec("mkdir -p "+daydir,temp); // make parent
-			continue; 
+			continue;
 		}
 		return dir;
 	}
@@ -197,10 +196,12 @@ bool cppcheck(const std::string& file_data,std::vector<myerror_t>& errors)
 		std::string error_data;
 		std::string remove_data;
 
-		std::string compile_command="avr-g++ -I../../../arduino/hardware/variants/standard -mmcu=atmega328p -DF_CPU=16000000UL -I../../../arduino/hardware/cores -I../../../arduino/hardware/cores/arduino ../../../arduino/hardware/cores/arduino/*.cpp ../../../arduino/hardware/cores/arduino/*.c -o test.elf -Wno-sign-compare -Wno-unused-variable -Wall -lm -Wl,--gc-sections -DUSB_VID=null -DUSB_PID=null -DARDUINO=103 -Wno-strict-aliasing";
+		//This stuff needs a LOT of work...
+		std::string copy_headers_command="cp ../../../../tabula_rasa/arduino/roomba.h .";
+		std::string compile_command="avr-g++ -I../../../arduino/hardware/variants/standard -mmcu=atmega328p -DF_CPU=16000000UL -I../../../arduino/hardware/cores -I../../../arduino/hardware/cores/arduino ../../../arduino/hardware/cores/arduino/*.cpp ../../../arduino/hardware/cores/arduino/*.c ../../../../tabula_rasa/arduino/roomba.cpp -o test.elf -Wno-sign-compare -Wno-unused-variable -Wall -lm -Wl,--gc-sections -DUSB_VID=null -DUSB_PID=null -DARDUINO=103 -Wno-strict-aliasing";
 		std::string link_command="avr-objcopy -R .eeprom -O ihex test.elf test.hex";
 
-		auto command1="cd \""+dir+"\"&&"+compile_command+" \""+file_name+"\" 2>&1 && "+link_command+" 2>&1  | tee \""+file_name+".log\""; // |grep \""+file_name+":\"";
+		auto command1="cd \""+dir+"\"&&"+copy_headers_command+"&&"+compile_command+" \""+file_name+"\" 2>&1 && "+link_command+" 2>&1  | tee \""+file_name+".log\""; // |grep \""+file_name+":\"";
 		// auto command2="rm -rf \""+identifier_str+"\"";
 
 		auto ret=exec(command1,error_data); // &&exec(command2,remove_data);

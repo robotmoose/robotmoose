@@ -14,6 +14,129 @@ function load_dependencies()
 
 (function(){load_dependencies()})();
 
+function arduino_roomba_sensor_t()
+{
+	var myself=this;
+	myself.mode;
+	myself.bumper_drop;
+	myself.charge_state;
+	myself.batt_temp;
+	myself.batt_voltage;
+	myself.batt_charge;
+	myself.batt_capacity;
+	myself.encoder_l;
+	myself.encoder_r;
+	myself.cliff_l;
+	myself.cliff_fl;
+	myself.cliff_fr;
+	myself.cliff_r;
+	myself.light_l;
+	myself.light_fl;
+	myself.light_cl;
+	myself.light_cr;
+	myself.light_fr;
+	myself.light_r;
+	myself.light_field;
+	myself.buttons;
+};
+
+function arduino_roomba_t(controller)
+{
+	var myself=this;
+
+	myself.leds_m=0;
+	myself.led_clean_color_m=0;
+	myself.led_clean_brightness_m=0;
+	myself.sensor_packet_m=new arduino_roomba_sensor_t();
+
+	myself.start=function()
+	{
+		console.log("Roomba start");
+	};
+
+	myself.stop=function()
+	{
+		console.log("Roomba stop");
+	};
+
+	myself.reset=function()
+	{
+		console.log("Roomba reset");
+	};
+
+	myself.update=function()
+	{
+		console.log("Roomba update");
+	};
+
+	myself.set_mode=function(mode)
+	{
+		console.log("Roomba set_mode "+mode);
+	};
+
+	myself.drive=function(left,right)
+	{
+		console.log("Roomba drive "+left+" "+right);
+	};
+
+	myself.set_led_check=function(on)
+	{
+		console.log("Roomba set_led_check "+on);
+	};
+
+	myself.set_led_dock=function(on)
+	{
+		console.log("Roomba set_led_dock "+on);
+	};
+
+	myself.set_led_spot=function(on)
+	{
+		console.log("Roomba set_led_spot "+on);
+	};
+
+	myself.set_led_debris=function(on)
+	{
+		console.log("Roomba set_led_debris "+on);
+	};
+
+	myself.set_led_clean=function(color,brightness)
+	{
+		console.log("Roomba set_led_clean "+color+" "+brightness);
+	};
+
+	myself.led_update=function()
+	{
+		console.log("Roomba led_update");
+	};
+
+	myself.set_7_segment=function(text)
+	{
+		console.log("Roomba set_7_segment "+text);
+	};
+
+	myself.play_song=function(number)
+	{
+		console.log("Roomba play_song "+number);
+	};
+
+	myself.set_receive_sensors=function(on)
+	{
+		console.log("Roomba set_receive_sensors "+on);
+	};
+
+	myself.get_sensors=function()
+	{
+		console.log("Roomba get_sensors");
+		var temp=JSON.stringify(myself.sensor_packet_m);
+		return JSON.parse(temp);
+	};
+
+	myself.dump_sensors=function()
+	{
+		console.log("Roomba dump_sensors");
+	};
+};
+
 function arduino_servo_t(controller)
 {
 	var myself=this;
@@ -173,7 +296,7 @@ function arduino_emulator_t()
 			};
 		}
 	};
-	
+
 	myself.compile=function(code, error_handler)
 	{
 		(function()
@@ -181,19 +304,14 @@ function arduino_emulator_t()
 			try
 			{
 				myself.json.controller=myself;
-				code=code.replace(/\#include/ig,"//#include");
-				code=code.replace(/\#\s+include/ig,"//#include");
-				code=code.replace(/\#if/ig,"//#if");
-				code=code.replace(/\#\s+if/ig,"//#if");
-				code=code.replace(/\#ifdef/ig,"//#ifdef");
-				code=code.replace(/\#\s+ifdef/ig,"//#ifdef");
-				code=code.replace(/\#ifndef/ig,"//#ifndef");
-				code=code.replace(/\#\s+ifndef/ig,"//#ifndef");
-				code=code.replace(/\#else/ig,"//#else");
-				code=code.replace(/\#\s+else/ig,"//#else");
-				code=code.replace(/\#endif/ig,"//#endif");
-				code=code.replace(/\#\s+endif/ig,"//#endif");
-				code=code.replace(/\Servo\s(.*)[;]/ig,"var $1=new arduino_servo_t(get_controller());");
+				code=code.replace(/\#\s*include/ig,"//#include");
+				code=code.replace(/\#\s*if/ig,"//#if");
+				code=code.replace(/\#\s*define/ig,"//#define");
+				code=code.replace(/\#\s*else/ig,"//#else");
+				code=code.replace(/\#\s*endif/ig,"//#endif");
+				code=code.replace(/Servo\s+(.*);/g,"var $1=new arduino_servo_t(get_controller());");
+				code=code.replace(/roomba_t\s+(.*)\(\s*(.*)\s*\)\s*;/g,"var $1=new arduino_roomba_t(get_controller(),$2);");
+				//alert(code);
 
 				this.OUTPUT=0;
 				this.INPUT=1;
@@ -211,7 +329,7 @@ function arduino_emulator_t()
 				this.get_controller=function(){return myself;};
 
 				eval(Processing.compile(code).sourceCode)(myself.json);
-				
+
 				myself.json.delay=myself.delay;
 
 				myself.json.sqrt=Math.sqrt;
@@ -239,7 +357,7 @@ function arduino_emulator_t()
 							myself.commands[0]();
 					};
 				};
-				
+
 				if(myself.commands.length>0)
 					myself.commands[0]();
 			}
