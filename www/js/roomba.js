@@ -14,7 +14,30 @@ function load_dependencies()
 
 (function(){load_dependencies()})();
 
-function roomba_t(renderer)
+
+function obstacles_t(renderer) 
+{
+	this.renderer=renderer;
+	this.obstacles=[];
+}
+obstacles_t.prototype.add=function (options)
+{
+	// console.log("Added obstacle at "+options.position);
+	var obs=options;
+	obs.mesh=new THREE.Mesh(
+		new THREE.CylinderGeometry(options.radius,options.radius,
+			options.ht,16),
+		new THREE.MeshPhongMaterial({color:options.color})
+	);
+	obs.mesh.rotation.set(Math.PI/2,0,0);
+	obs.mesh.position.copy(options.position);
+	this.renderer.scene.add(obs.mesh);
+	this.obstacles.push(obs);
+}
+
+
+
+function roomba_t(renderer,obstacles)
 {
 	var myself=this;
 
@@ -39,6 +62,37 @@ function roomba_t(renderer)
 	myself.model.set_color(model_color);
 	myself.model.castShadow=true;
 	myself.model.receiveShadow=true;
+	
+	myself.sensorObject3D=new THREE.Object3D(); // container object (OBJ isn't loaded yet)
+	renderer.scene.add(myself.sensorObject3D);
+	
+	var shiftGeometry=function (geom,shiftBy) {
+		for (var i=0;i<geom.vertices.length;i++) 
+			geom.vertices[i].pe(shiftBy);
+		geom.verticesNeedUpdate=true;
+		geom.computeBoundingSphere();
+		return geom;
+	}
+	
+	// Array of light sensors:
+	myself.light=[];
+	for (var i=0;i<6;i++) {
+		var l={};
+		l.start=150; // start range (mm)
+		l.range=250; // max sensor range
+		l.mesh=new THREE.Mesh(
+			shiftGeometry(new THREE.CylinderGeometry(50.0,2.0, l.range, 8),
+				new vec3(0,l.start+l.range*0.5,50)),
+			new THREE.MeshPhongMaterial({
+				transparent:true, opacity:0.5,
+				color:0xff0080
+			})
+		);
+		l.angle_rad=Math.PI*0.3*(i/2.5-1.0); // radians relative to robot centerline
+		l.mesh.rotation.set(0,0,l.angle_rad);
+		myself.sensorObject3D.add(l.mesh);
+		myself.light[i]=l;
+	}
 
 	myself.set_position=function(x,y,z)
 	{
@@ -118,11 +172,13 @@ roomba_t.prototype.loop=function(dt)
 	// Robot's Z rotation rotation, in radians
 	this.orient_rad=Math.atan2(this.LR.y,this.LR.x);
 	this.orient=180.0/Math.PI*this.orient_rad;
-	// console.log("P="+this.P+" and orient="+this.orient_rad+" rads");
+	// console.log("Roomba P="+this.P+" mm and orient="+this.orient+" degrees");
 	this.model.rotation.z=this.orient_rad;
+	this.sensorObject3D.rotation.z=this.orient_rad;
 
 	// Update robot center position
 	this.model.position.copy(this.P); 
+	this.sensorObject3D.position.copy(this.P); 
 	
 	// Update camera position to follow robot
 	renderer.controls.center.set(this.P.x,this.P.y,this.P.z);
