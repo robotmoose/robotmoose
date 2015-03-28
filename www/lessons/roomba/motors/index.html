@@ -51,7 +51,7 @@
 					);
 				editor.set_size(480,460);
 				editor.on_change=function(){stop(); verify_button.value="Verify"; }
-				editor.on_compiled=function(){stop(); verify_button.value="Verified"; };
+				editor.on_compiled=function(){ verify_button.value="Verified"; };
 
 				renderer=new renderer_t(document.getElementById("container"),setup,loop);
 
@@ -104,6 +104,7 @@
 
 			function verify()
 			{
+				stop();
 				editor.compile();
 			}
 
