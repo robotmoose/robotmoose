@@ -6,9 +6,9 @@ jpeg_video_test/server
 jpeg_video_test/server.exe
 jpeg_video_test/client
 jpeg_video_test/client.exe
-code_editor/code_editor
-code_editor/code_editor.exe
-code_editor/logs
+interactive_code/code_editor/code_editor
+interactive_code/code_editor/code_editor.exe
+interactive_code/code_editor/logs
 code_editor/web
 superstar/netbench
 superstar/netbench.exe

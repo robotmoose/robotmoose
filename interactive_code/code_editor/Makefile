@@ -1,4 +1,4 @@
-INC=../include
+INC=../../include
 CXX=g++
 OPTS=-O
 CFLAGS=$(OPTS) -std=c++11 -Wall -I$(INC)
