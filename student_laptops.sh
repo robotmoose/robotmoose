@@ -55,7 +55,7 @@ sudo chmod +x $GPP
 
 #Serial Port Permissions
 echo "Serial Port Permissions"
-usermod -a -G dialout egg
+sudo usermod -a -G dialout egg
 
 #Reboot
 echo "All Done, Press [ENTER] to reboot."
