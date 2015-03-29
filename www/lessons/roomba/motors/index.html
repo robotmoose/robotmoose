@@ -24,6 +24,7 @@
 			var grid;
 			var lights=new Array();;
 			var roomba;
+			var obstacles;
 
 			function initialize()
 			{
@@ -65,7 +66,10 @@
 			{
 				renderer.set_size(480,453); // FIXME: there's a bottom border that is hard to get rid of...
 
-				grid=renderer.create_grid(300,32,32); // 1 foot grid
+				var grid_feet=32;
+				var per_foot=300;
+				grid=renderer.create_grid(per_foot,grid_feet,grid_feet); // 1 foot grid
+				var grid_size=per_foot*grid_feet;
 				grid.rotation.x=0;
 
 				var size=100000;
@@ -73,7 +77,23 @@
 				lights[0]=new renderer.create_light(intensity,
 					new THREE.Vector3(-size/2,-size/2,+size));
 
-				roomba=new roomba_t(renderer);
+				// Add randomly created obstacles
+				obstacles=new obstacles_t(renderer);
+				for (var i=0;i<50;i++) {
+					var options={
+						position:new vec3().rand(grid_size),
+						radius:Math.random()*200+100,
+						ht:Math.random()*100+300,
+						color:(Math.random()*0xffFFff)&0xffFFff
+					}
+					options.position.z=0.0;
+					if (options.position.length()>400) {
+						options.position.z=options.ht/2.0;
+						obstacles.add(options);
+					}
+				}
+				
+				roomba=new roomba_t(renderer,obstacles);
 
 				renderer.controls.center.set(0,0,0); // robot?
 				renderer.controls.object.position.set(0,-1200,1400);
@@ -94,11 +114,13 @@
 					document.getElementById("drive_left").value=left;
 					document.getElementById("drive_right").value=right;
 
-					console.log(left+" "+right);
+					// console.log(left+" "+right);
 				}
 
 				roomba.drive(left,right);
 				drive_update();
+				
+				document.getElementById("status").innerHTML=roomba.get_status();
 			}
 
 
@@ -126,7 +148,17 @@
 				emulator.stop();
 				run_button.disabled=false;
 				stop_button.disabled=true;
+				
+				// Turn off manual commands, so robot actually stops:
+				document.getElementById("drive_left").value=0;
+				document.getElementById("drive_right").value=0;
 			}
+			
+			function reset()
+			{
+				roomba.reset();
+			}
+
 
 			function drive_update()
 			{
@@ -159,12 +191,14 @@
 							<input type="button" class="btn btn-sm btn-primary" id="verify" value="Verify" onclick="verify();"/>
 							<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();"  title="[alt-shift-r]" accesskey="r"  />
 							<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
+							<input type="button" class="btn btn-sm btn-primary" id="reset" value="Reset" onclick="reset();"/>
 						</td>
 						<td style="vertical-align:top;">
 							Left: <span id="show_left"></span>
 								<input type="range" id="drive_left" min="-500" max="500" value="0" oninput="drive_update();"/>
 							Right: <span id="show_right"></span>
 								<input type="range"id="drive_right" min="-500" max="500" value="0" oninput="drive_update();"/><br/>
+							<p id="status"></p>
 						</td>
 					</tr>
 				</table>
