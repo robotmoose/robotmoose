@@ -48,7 +48,7 @@
 					"{\n"+
 					"\t//Things written in here keep happening\n"+
 					"\troomba.drive(100,100);\n"+
-					"\tdelay(100);\n"+
+					"\tdelay(500);\n"+
 					"}"
 					);
 				editor.set_size(480,460);
@@ -187,6 +187,53 @@
 					</tr>
 				</table>
 			</center>
+			
+			
+			
+			<div class="well">
+				How does this work?
+				<ul>
+					<li>Drag the left or right slider, and the left or right wheel will drive back and forth.
+					<li>The wheels keep driving at the speed you set them.  Speed goes from -500 to +500 millimeters per second.
+					<li>The left wheel leaves a purple line, and the right wheel leaves a red line.
+					<li>You can edit the code above, and press Run to have the simulated Roomba run it.</li>
+					<li>When we call roomba.drive(100,100); the Arduino tells the roomba's left and right wheels to go at speed 100 millimeters/second</li>
+					<li>If you call roomba.drive(-100,-100); the Roomba drives backward at the same speed.</li>
+					<li>If you call roomba.drive(-100,100); the Roomba's left wheel drives backwards, and the right wheel drives forwards, turning the robot (which way?).</li>
+					<li><i>roomba</i> is an object, which we declared as type Roomba_t at the top.</li>
+					<li><i>drive</i> is a member function to run with parameters left and right wheel speeds.</li>
+					<li>The semicolon ; ends a function call in many programming languages.</li>
+					<li>This is C++ code (used to build operating systems), but JavaScript (used to build apps) looks very similar.</li>
+				</ul>
+			</div>
+
+			<div class="well">
+				Challenges!
+				<ul>
+					<li>Change the numbers passed into the drive calls, and see where the robot moves.</li>
+					<li>You can animate a series of motions by making more drive calls inside loop.  For example, this drives forward, then turns:</li>
+
+					<pre>	
+//Things written in here keep happening
+roomba.drive(200,200); // drive forward
+delay(1000);	
+roomba.drive(0,400); // turn left
+delay(700);
+					</pre>
+					Try this!
+
+					<li>The delay(700); command waits for 700 milliseconds.  If you wait less time, like delay(200), the robot doesn't turn as far.
+					<li>What delay is needed to make the robot turn 90 degrees?
+					<li>How far does the robot turn if you wait half as long?  Twice as long?
+					<li>Drive the robot in an octagon pattern (like a stop sign).</li>
+					<li>If you turn slower, like roomba.drive(0,200), now how long do you need to delay to turn 90 degrees?
+					<li>If you turn faster, like roomba.drive(0,400), now how long do you need to delay to turn 90 degrees?
+					<li>Drive the robot in an "I" pattern.  I is a rectangle that is taller than it is wide.</li>
+					<li>Drive the robot in a "T" pattern.  I is a rectangle that is taller than it is wide.</li>
+					<li>Draw a pretty pattern with the robot's wheels.  Take a screenshot to save the picture and code!
+					<li>Make the robot "dance" with a series of delays and drive commands!
+				</ul>
+			</div>
 		</div>
 	</body>
 <br><br><br><font size="1"><div xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/" about="http://www.thingiverse.com/thing:94504"><span property="dct:title">Model used in simulation is "vRoomba - Pull Back Motor Vacuum Robot"</span> (<a rel="cc:attributionURL" property="cc:attributionName" href="http://www.thingiverse.com/halley">halley</a>) / <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a></div></font>
