@@ -192,6 +192,8 @@ function editor_t()
 			myself.set_status("Compiling...");
 			send_request("POST",editor_path,"code","",myself.compile_response,myself.error_response,
 				myself.get_value(),"application/octet-stream");
+			clearInterval(myself.timeout);
+			myself.timeout=null;
 		}
 	};
 
