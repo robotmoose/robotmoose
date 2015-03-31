@@ -41,6 +41,7 @@
 					"void setup()\n"+
 					"{\n"+
 					"\t//Things written in here happen once\n"+
+					"\troomba.start();\n"+
 					"}\n"+
 					"\n"+
 					"void loop()\n"+
@@ -92,7 +93,7 @@
 						obstacles.add(options);
 					}
 				}
-				
+
 				roomba=new roomba_t(renderer,obstacles);
 
 				renderer.controls.center.set(0,0,0); // robot?
@@ -119,7 +120,7 @@
 
 				roomba.drive(left,right);
 				drive_update();
-				
+
 				document.getElementById("status").innerHTML=roomba.get_status();
 			}
 
@@ -148,17 +149,16 @@
 				emulator.stop();
 				run_button.disabled=false;
 				stop_button.disabled=true;
-				
+
 				// Turn off manual commands, so robot actually stops:
 				document.getElementById("drive_left").value=0;
 				document.getElementById("drive_right").value=0;
 			}
-			
+
 			function reset()
 			{
 				roomba.reset();
 			}
-
 
 			function drive_update()
 			{
