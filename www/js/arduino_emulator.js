@@ -54,266 +54,288 @@ function arduino_roomba_t(controller,serial)
 	myself.left=0;
 	myself.right=0;
 	myself.started=false;
+};
 
-	myself.start=function()
-	{
-		var json_original={"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
+arduino_roomba_t.prototype.start=function()
+{
+	var myself=this;
 
-		myself.controller.commands[myself.controller.commands.length]=function()
+	myself.controller.add_command
+	(
+		function(controller,data)
 		{
+			console.log("roomba on");
 			myself.started=true;
+		}
+	);
+};
 
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
+arduino_roomba_t.prototype.stop=function()
+{
+	var myself=this;
 
-	myself.stop=function()
-	{
-		var json_original={"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
+	myself.controller.add_command
+	(
+		function(controller,data)
 		{
+			console.log("roomba off");
+			myself.leds_m=0;
+			myself.led_clean_color_m=0;
+			myself.led_clean_brightness_m=0;
+			myself.sensor_packet_m=new arduino_roomba_sensor_t();
+			myself.left=0;
+			myself.right=0;
 			myself.started=false;
+		}
+	);
+};
 
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
+arduino_roomba_t.prototype.reset=function()
+{
+	var myself=this;
 
-	myself.reset=function()
-	{
-	};
-
-	myself.update=function()
-	{
-		var json_original={"started":myself.started,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
+	myself.controller.add_command
+	(
+		function(controller,data)
 		{
-			if(json.started)
+			console.log("roomba reset");
+			myself.started=false;
+		}
+	);
+};
+
+arduino_roomba_t.prototype.update=function()
+{
+	var myself=this;
+
+	myself.controller.add_command
+	(
+		function(controller,data)
+		{
+			if(myself.started)
+				console.log("roomba update");
+		}
+	);
+};
+
+arduino_roomba_t.prototype.set_mode=function(mode)
+{
+	var myself=this;
+
+	myself.controller.add_command
+	(
+		function(controller,data)
+		{
+			if(myself.started)
+				console.log("Roomba set_mode "+data.mode);
+		}
+		,
+		{"mode":mode}
+	);
+};
+
+arduino_roomba_t.prototype.drive=function(left,right)
+{
+	var myself=this;
+
+	myself.controller.add_command
+	(
+		function(controller,data)
+		{
+			console.log("testing "+myself.started);
+
+			if(myself.started)
 			{
-				console.log("Roomba update");
+				console.log("roomba drive "+data.left+" "+data.right);
+				myself.left=data.left;
+				myself.right=data.right;
 			}
+		}
+		,
+		{"left":left,"right":right}
+	);
+};
 
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
+arduino_roomba_t.prototype.set_led_check=function(on)
+{
+	var myself=this;
 
-	myself.set_mode=function(mode)
-	{
-		var json_original={"started":myself.started,"mode":mode,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
+	myself.controller.add_command
+	(
+		function(controller,data)
 		{
-			if(json.started)
+			if(myself.started)
+				console.log("roomba led check "+data.on);
+		}
+		,
+		{"on":on}
+	);
+};
+
+arduino_roomba_t.prototype.set_led_dock=function(on)
+{
+	var myself=this;
+
+	myself.controller.add_command
+	(
+		function(controller,data)
+		{
+			if(myself.started)
+				console.log("roomba led dock "+data.on);
+		}
+		,
+		{"on":on}
+	);
+};
+
+arduino_roomba_t.prototype.set_led_spot=function(on)
+{
+	var myself=this;
+
+	myself.controller.add_command
+	(
+		function(controller,data)
+		{
+			if(myself.started)
+				console.log("roomba led spot "+data.on);
+		}
+		,
+		{"on":on}
+	);
+};
+
+arduino_roomba_t.prototype.set_led_debris=function(on)
+{
+	var myself=this;
+
+	myself.controller.add_command
+	(
+		function(controller,data)
+		{
+			if(myself.started)
+				console.log("roomba led debris "+data.on);
+		}
+		,
+		{"on":on}
+	);
+};
+
+arduino_roomba_t.prototype.set_led_clean=function(color,brightness)
+{
+	var myself=this;
+
+	myself.controller.add_command
+	(
+		function(controller,data)
+		{
+			if(myself.started)
+				console.log("roomba led clean "+data.color+" "+data.brightness);
+		}
+		,
+		{"color":color,"brightness":brightness}
+	);
+};
+
+arduino_roomba_t.prototype.led_update=function()
+{
+	var myself=this;
+
+	myself.controller.add_command
+	(
+		function(controller,data)
+		{
+			if(myself.started)
+				console.log("roomba led update ");
+		}
+		,
+		{"started":myself.started}
+	);
+};
+
+arduino_roomba_t.prototype.set_7_segment=function(text)
+{
+	var myself=this;
+
+	myself.controller.add_command
+	(
+		function(controller,data)
+		{
+			if(myself.started)
+				console.log("roomba led 7segment "+data.text);
+		}
+		,
+		{"text":text}
+	);
+};
+
+arduino_roomba_t.prototype.play_song=function(number)
+{
+	var myself=this;
+
+	myself.controller.add_command
+	(
+		function(controller,data)
+		{
+			if(myself.started)
+				console.log("roomba song "+data.number);
+		}
+		,
+		{"number":number}
+	);
+};
+
+arduino_roomba_t.prototype.set_receive_sensors=function(on)
+{
+	var myself=this;
+
+	myself.controller.add_command
+	(
+		function(controller,data)
+		{
+			if(myself.started)
+				console.log("roomba receive sensors "+data.on);
+		}
+		,
+		{"on":on}
+	);
+};
+
+arduino_roomba_t.prototype.get_sensors=function()
+{
+	var myself=this;
+
+	myself.controller.add_command
+	(
+		function(controller,data)
+		{
+			if(myself.started)
 			{
-				console.log("Roomba set_mode "+json.mode);
+				console.log("roomba get sensors");
+				return data.sensor_packet;
 			}
+		}
+		,
+		{"sensor_packet":myself.sensor_packet_m}
+	);
+};
 
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
+arduino_roomba_t.prototype.dump_sensors=function()
+{
+	var myself=this;
 
-	myself.drive=function(left,right)
-	{
-		var json_original={"started":myself.started,"left":left,"right":right,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
+	myself.controller.add_command
+	(
+		function(controller,data)
 		{
-			if(json.started)
-			{
-				myself.left=json.left;
-				myself.right=json.right;
-			}
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
-
-	myself.set_led_check=function(on)
-	{
-		var json_original={"started":myself.started,"on":on,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
-		{
-			console.log("Roomba set_led_check "+json.on);
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
-
-	myself.set_led_dock=function(on)
-	{
-		var json_original={"started":myself.started,"on":on,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
-		{
-			if(json.started)
-			{
-				console.log("Roomba set_led_dock "+json.on);
-			}
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
-
-	myself.set_led_spot=function(on)
-	{
-		var json_original={"started":myself.started,"on":on,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
-		{
-			if(json.started)
-			{
-				console.log("Roomba set_led_spot "+json.on);
-			}
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
-
-	myself.set_led_debris=function(on)
-	{
-		var json_original={"started":myself.started,"on":on,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
-		{
-			if(json.started)
-			{
-				console.log("Roomba set_led_debris "+json.on);
-			}
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
-
-	myself.set_led_clean=function(color,brightness)
-	{
-		var json_original={"started":myself.started,"color":color,"brightness":brightness,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
-		{
-			if(json.started)
-			{
-				console.log("Roomba set_led_clean "+json.color+" "+json.brightness);
-			}
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
-
-	myself.led_update=function()
-	{
-		var json_original={"started":myself.started,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
-		{
-			if(json.started)
-			{
-				console.log("Roomba led_update");
-			}
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
-
-	myself.set_7_segment=function(text)
-	{
-		var json_original={"started":myself.started,"text":text,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
-		{
-			if(json.started)
-			{
-				console.log("Roomba set_7_segment "+json.text);
-			}
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
-
-	myself.play_song=function(number)
-	{
-		var json_original={"started":myself.started,"number":number,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
-		{
-			if(json.started)
-			{
-				console.log("Roomba play_song "+json.number);
-			}
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
-
-	myself.set_receive_sensors=function(on)
-	{
-		var json_original={"started":myself.started,"on":on,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
-		{
-			if(json.started)
-			{
-				console.log("Roomba set_receive_sensors "+json.on);
-			}
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
-
-	myself.get_sensors=function()
-	{
-		console.log("Roomba get_sensors");
-		var temp=JSON.stringify(myself.sensor_packet_m);
-		return JSON.parse(temp);
-	};
-
-	myself.dump_sensors=function()
-	{
-		var json_original={"started":myself.started,"sensor_packet":myself.sensor_packet_m,
-				"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
-		{
-			if(json.started)
+			if(myself.started)
 			{
 				//json.sensor_packet
-				console.log("Roomba dump_sensors");
+				console.log("roomba dump_sensors");
 			}
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
-	};
+		}
+		,
+		{"sensor_packet":myself.sensor_packet_m}
+	);
 };
 
 function arduino_servo_t(controller)
@@ -657,5 +679,19 @@ function arduino_emulator_t()
 	myself.running=function()
 	{
 		return (myself.commands.length>0);
+	};
+
+	myself.add_command=function(callback,data)
+	{
+		var json_original={"data":data,"counter":myself.commands.length};
+		var json=JSON.parse(JSON.stringify(json_original));
+
+		myself.commands[myself.commands.length]=function()
+		{
+			callback(myself,data);
+
+			if(json.counter+1<myself.commands.length)
+				myself.commands[json.counter+1]();
+		};
 	};
 };
