@@ -78,22 +78,6 @@
 				lights[0]=new renderer.create_light(intensity,
 					new THREE.Vector3(-size/2,-size/2,+size));
 
-				// Add randomly created obstacles
-				obstacles=new obstacles_t(renderer);
-				for (var i=0;i<50;i++) {
-					var options={
-						position:new vec3().rand(grid_size),
-						radius:Math.random()*200+100,
-						ht:Math.random()*100+300,
-						color:(Math.random()*0xffFFff)&0xffFFff
-					}
-					options.position.z=0.0;
-					if (options.position.length()>400) {
-						options.position.z=options.ht/2.0;
-						obstacles.add(options);
-					}
-				}
-
 				roomba=new roomba_t(renderer,obstacles);
 
 				renderer.controls.center.set(0,0,0); // robot?

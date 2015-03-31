@@ -35,6 +35,46 @@ obstacles_t.prototype.add=function (options)
 	this.obstacles.push(obs);
 }
 
+/* Tracks the wheel positions onscreen */
+function wheel_tracker_t(renderer,lineOptions)
+{
+	this.max=10000; // maximum vertex count
+	this.cur=0; // current vertex number
+
+	this.geom=new THREE.Geometry();
+	/* for some reason THREE.js doesn't let you change 
+	   vertex counts, so preallocate lots of vertices. */
+	for (var x=0;x<this.max;x++) 
+	{
+		this.geom.vertices.push(new vec3(0,0,0));
+	}
+	
+
+	this.line=new THREE.Line(this.geom,
+	  new THREE.LineBasicMaterial(lineOptions)
+	);
+	renderer.scene.add(this.line);
+}
+
+/* Add a new wheel location to this chart. */
+wheel_tracker_t.prototype.add=function(pos) {
+  if (!this.last || pos.m(this.last).length()>10.0) { // moved enough to be visible:
+    if (this.cur<this.max) { // still have space to write
+	// stupid: write all future vertices as this point
+	for (var i=this.cur++;i<this.max;i++)
+	     this.geom.vertices[i]=pos;
+	this.geom.verticesNeedUpdate=true;
+	this.geom.computeBoundingSphere();
+    }
+    this.last=pos;
+  }
+}
+
+wheel_tracker_t.prototype.reset=function() {
+  this.cur=0;
+  this.last=undefined;
+}
+
 
 
 function roomba_t(renderer,obstacles)
@@ -45,6 +85,10 @@ function roomba_t(renderer,obstacles)
 
 	myself.left=0;
 	myself.right=0;
+	myself.left_tracker=new wheel_tracker_t(renderer,{
+		color: 0x8f00ff, linewidth:4 }); // purple left
+	myself.right_tracker=new wheel_tracker_t(renderer,{
+		color: 0xff0000, linewidth:4 }); // red right
 
 	var model_path=url_path+"models/roomba/body.obj";
 	myself.model=null;
@@ -66,33 +110,6 @@ function roomba_t(renderer,obstacles)
 	myself.sensorObject3D=new THREE.Object3D(); // container object (OBJ isn't loaded yet)
 	renderer.scene.add(myself.sensorObject3D);
 	
-	var shiftGeometry=function (geom,shiftBy) {
-		for (var i=0;i<geom.vertices.length;i++) 
-			geom.vertices[i].pe(shiftBy);
-		geom.verticesNeedUpdate=true;
-		geom.computeBoundingSphere();
-		return geom;
-	}
-	
-	// Array of light sensors:
-	myself.light=[];
-	for (var i=0;i<6;i++) {
-		var l={};
-		l.start=150; // start range (mm)
-		l.range=250; // max sensor range
-		l.mesh=new THREE.Mesh(
-			shiftGeometry(new THREE.CylinderGeometry(50.0,2.0, l.range, 8),
-				new vec3(0,l.start+l.range*0.5,50)),
-			new THREE.MeshPhongMaterial({
-				transparent:true, opacity:0.5,
-				color:0xff0080
-			})
-		);
-		l.angle_rad=Math.PI*0.3*(i/2.5-1.0); // radians relative to robot centerline
-		l.mesh.rotation.set(0,0,l.angle_rad);
-		myself.sensorObject3D.add(l.mesh);
-		myself.light[i]=l;
-	}
 
 	myself.set_position=function(x,y,z)
 	{
@@ -121,20 +138,52 @@ function roomba_t(renderer,obstacles)
 	};
 };
 
+// Add sensor objects & render geometry
+roomba_t.prototype.add_sensors=function() {
 
+	var shiftGeometry=function (geom,shiftBy) {
+		for (var i=0;i<geom.vertices.length;i++) 
+			geom.vertices[i].pe(shiftBy);
+		geom.verticesNeedUpdate=true;
+		geom.computeBoundingSphere();
+		return geom;
+	}
+	// Array of light sensors:
+	this.light=[];
+	for (var i=0;i<6;i++) {
+		var l={};
+		l.start=150; // start range (mm)
+		l.range=250; // max sensor range
+		l.mesh=new THREE.Mesh(
+			shiftGeometry(new THREE.CylinderGeometry(50.0,2.0, l.range, 8),
+				new vec3(0,l.start+l.range*0.5,50)),
+			new THREE.MeshPhongMaterial({
+				transparent:true, opacity:0.5,
+				color:0xff0080
+			})
+		);
+		l.angle_rad=Math.PI*0.3*(i/2.5-1.0); // radians relative to robot centerline
+		l.mesh.rotation.set(0,0,l.angle_rad);
+		this.sensorObject3D.add(l.mesh);
+		this.light[i]=l;
+	}
+}
 
 // Reset positions of wheels:
 roomba_t.prototype.reset=function() 
 {
 	this.wheelbase=250; // mm
 	this.wheel=[];
-	this.wheel[0]=new vec3(-0.5*this.wheelbase,0,0);
-	this.wheel[1]=new vec3(+0.5*this.wheelbase,0,0);
+	this.wheel[0]=new vec3(-0.5*this.wheelbase,0,0.01);
+	this.wheel[1]=new vec3(+0.5*this.wheelbase,0,0.01);
 	// Robot coordinate system:
 	this.P=new vec3(0,0,0); // position
 	this.UP=new vec3(0,0,1); // Z is up
 	this.LR=new vec3(1,0,0); // left-to-right wheel
 	this.FW=new vec3(0,1,0); // drive forward
+	
+	this.left_tracker.reset();
+	this.right_tracker.reset();
 }
 
 // Simulate robot motion
@@ -167,7 +216,8 @@ roomba_t.prototype.loop=function(dt)
 	wheeloff.te(this.wheelbase*0.5);
 	this.wheel[0]=this.P.m(wheeloff);
 	this.wheel[1]=this.P.p(wheeloff);
-	
+	this.left_tracker.add(this.wheel[0]);
+	this.right_tracker.add(this.wheel[1]);
 
 	// Robot's Z rotation rotation, in radians
 	this.orient_rad=Math.atan2(this.LR.y,this.LR.x);
