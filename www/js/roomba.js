@@ -86,9 +86,9 @@ function roomba_t(renderer,obstacles)
 	myself.left=0;
 	myself.right=0;
 	myself.left_tracker=new wheel_tracker_t(renderer,{
-		color: 0x8f00ff, linewidth:4 }); // purple left
+		color: 0x8f00ff, linewidth:2 }); // purple left
 	myself.right_tracker=new wheel_tracker_t(renderer,{
-		color: 0xff0000, linewidth:4 }); // red right
+		color: 0xff0000, linewidth:2 }); // red right
 
 	var model_path=url_path+"models/roomba/body.obj";
 	myself.model=null;
