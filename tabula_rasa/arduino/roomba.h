@@ -34,36 +34,37 @@ class roomba_t
 			DATA,
 			CHECKSUM
 		};
+		
+		struct battery_t
+		{
+			uint8_t state; // charging/discharging
+			int8_t temperature; // deg C
+			uint16_t voltage; // millivolts
+			uint16_t charge; // milliamp-hours current charge state
+			uint16_t capacity; // milliamp-hours maximum charge
+		};
+		struct encoder_t
+		{
+			uint16_t L; // left wheel
+			uint16_t R; // right wheel
+		};
 
 		struct sensor_t
 		{
 			uint8_t mode;
-			uint8_t bumper_drop;
+			uint8_t bumper;
 		
 		// Battery charge state
-			uint8_t charge_state;
-			int8_t batt_temp;
-			uint16_t batt_voltage;
-			uint16_t batt_charge;
-			uint16_t batt_capacity;
+			battery_t battery;
 		
 		// Wheel encoders
-			uint16_t encoder_l;
-			uint16_t encoder_r;
+			encoder_t encoder;
 		
 		// Downward-facing light sensors:
-			uint16_t cliff_l;
-			uint16_t cliff_fl;
-			uint16_t cliff_fr;
-			uint16_t cliff_r;
+			uint16_t floor[4];
 		
 		// Forward-facing reflectance sensors:
-			uint16_t light_l;
-			uint16_t light_fl;
-			uint16_t light_cl;
-			uint16_t light_cr;
-			uint16_t light_fr;
-			uint16_t light_r;
+			uint16_t light[6];
 			uint8_t light_field;
 		
 		// User interface buttons:

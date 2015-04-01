@@ -256,7 +256,7 @@ void robot_backend::setup_devices(std::string robot_config)
 			//  These MUST match arduino/roomba.h roomba_t::sensor_t in size and order!
 				sensors.push_back(new json_sensor<int,uint8_t>(json_path("roomba","mode")));
 				sensors.push_back(new json_sensor<int,uint8_t>(json_path("roomba","bumper")));
-				sensors.push_back(new json_sensor<int,uint8_t>(json_path("battery","charge")));
+				sensors.push_back(new json_sensor<int,uint8_t>(json_path("battery","state")));
 				sensors.push_back(new json_sensor<int,int8_t>(json_path("battery","temperature")));
 				sensors.push_back(new json_sensor<int,uint16_t>(json_path("battery","voltage")));
 				sensors.push_back(new json_sensor<int,uint16_t>(json_path("battery","charge")));
@@ -267,7 +267,7 @@ void robot_backend::setup_devices(std::string robot_config)
 					sensors.push_back(new json_sensor<int,uint16_t>(json_path("roomba","floor",i)));
 				for (int i=0;i<6;i++)
 					sensors.push_back(new json_sensor<int,uint16_t>(json_path("roomba","light",i)));
-				sensors.push_back(new json_sensor<int,uint8_t>(json_path("roomba","lightfield")));
+				sensors.push_back(new json_sensor<int,uint8_t>(json_path("roomba","light_field")));
 				sensors.push_back(new json_sensor<int,uint8_t>(json_path("roomba","buttons")));
 			}
 		}

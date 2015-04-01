@@ -17,27 +17,14 @@ function load_dependencies()
 function arduino_roomba_sensor_t()
 {
 	var myself=this;
-	myself.mode;
-	myself.bumper_drop;
-	myself.charge_state;
-	myself.batt_temp;
-	myself.batt_voltage;
-	myself.batt_charge;
-	myself.batt_capacity;
-	myself.encoder_l;
-	myself.encoder_r;
-	myself.cliff_l;
-	myself.cliff_fl;
-	myself.cliff_fr;
-	myself.cliff_r;
-	myself.light_l;
-	myself.light_fl;
-	myself.light_cl;
-	myself.light_cr;
-	myself.light_fr;
-	myself.light_r;
-	myself.light_field;
-	myself.buttons;
+	myself.mode=0;
+	myself.bumper=0;
+	myself.battery={"state":0, "temp":0, "voltage":0, "charge":2600, "capacity":2600};
+	myself.encoder={"L":0,"R":0};
+	myself.floor=[2500,2500,2500,2500]; // array of 4 floor sensors
+	myself.light=[0,0,0,0,0,0]; // array of 6 light sensors
+	myself.light_field=0;
+	myself.buttons=0;
 };
 
 function arduino_roomba_t(controller,serial)
@@ -142,13 +129,14 @@ arduino_roomba_t.prototype.drive=function(left,right)
 	(
 		function(controller,data)
 		{
-			console.log("testing "+myself.started);
-
 			if(myself.started)
 			{
 				console.log("roomba drive "+data.left+" "+data.right);
 				myself.left=data.left;
 				myself.right=data.right;
+			}
+			else {
+				console.log("roomba drive error: roomba started= "+myself.started);
 			}
 		}
 		,
@@ -284,6 +272,7 @@ arduino_roomba_t.prototype.play_song=function(number)
 	);
 };
 
+// What is this?  A sensor callback?
 arduino_roomba_t.prototype.set_receive_sensors=function(on)
 {
 	var myself=this;
@@ -303,20 +292,12 @@ arduino_roomba_t.prototype.set_receive_sensors=function(on)
 arduino_roomba_t.prototype.get_sensors=function()
 {
 	var myself=this;
-
-	myself.controller.add_command
-	(
-		function(controller,data)
-		{
-			if(myself.started)
-			{
-				console.log("roomba get sensors");
-				return data.sensor_packet;
-			}
-		}
-		,
-		{"sensor_packet":myself.sensor_packet_m}
-	);
+	
+	// HACK: return current sensor packet.  
+	//  This won't work in a loop, because the delays haven't happened yet
+	//  (could we run the sensor simulation forward through the delays perhaps?)
+	//  but might be semi-OK for simple sense-response processing.
+	return myself.sensor_packet_m;
 };
 
 arduino_roomba_t.prototype.dump_sensors=function()
@@ -347,47 +328,35 @@ function arduino_servo_t(controller)
 
 	myself.attach=function(pin)
 	{
-		var json_original={"value":pin,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
-		{
-			myself.pin=json.value;
-			myself.controller.pin_directions[myself.pin]=3;
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
+		myself.controller.add_command(
+			function (controller,data) {
+				myself.pin=data.value;
+				myself.controller.pin_directions[myself.pin]=3;
+			}
+			,{"value":pin}
+		);
 	};
 
 	myself.write=function(pos)
 	{
-		var json_original={"value":pos,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
-		{
-			myself.pos=Math.max(0,Math.min(180,json.value));
-			myself.controller.pin_servos[myself.pin]=myself.controller.map(myself.pos,0,180,0,255);
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
+		myself.controller.add_command(
+			function (controller,data) {
+				myself.pos=Math.max(0,Math.min(180,data.value));
+				myself.controller.pin_servos[myself.pin]=myself.controller.map(myself.pos,0,180,0,255);
+			}
+			,{"value":pos}
+		);
 	};
 
 	myself.writeMicroseconds=function(us)
-	{
-		var json_original={"value":us,"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
-		{
-			myself.pos=Math.max(0,Math.min(180,myself.map(json.value,544,2400,0,180)));
-			myself.controller.pin_servos[myself.pin]=myself.controller.map(myself.pos,0,180,0,255);
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
+	{	
+		myself.controller.add_command(
+			function (controller,data) {
+				myself.pos=Math.max(0,Math.min(180,myself.map(data.value,544,2400,0,180)));
+				myself.controller.pin_servos[myself.pin]=myself.controller.map(myself.pos,0,180,0,255);
+			}
+			,{"value":us}
+		);
 	};
 
 	myself.read=function()
@@ -402,18 +371,13 @@ function arduino_servo_t(controller)
 
 	myself.detach=function()
 	{
-		var json_original={"counter":myself.controller.commands.length};
-		var json=JSON.parse(JSON.stringify(json_original));
-
-		myself.controller.commands[myself.controller.commands.length]=function()
-		{
-			myself.controller.pin_directions[myself.pin]=1;
-			myself.controller.pin_servos[myself.pin]=0;
-			myself.pin=-1;
-
-			if(json.counter+1<myself.controller.commands.length)
-				myself.controller.commands[json.counter+1]();
-		};
+		myself.controller.add_command(
+			function (controller,data) {
+				myself.controller.pin_directions[myself.pin]=1;
+				myself.controller.pin_servos[myself.pin]=0;
+				myself.pin=-1;
+			}
+		);
 	};
 };
 
