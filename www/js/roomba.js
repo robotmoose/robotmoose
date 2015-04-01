@@ -23,17 +23,31 @@ function obstacles_t(renderer)
 obstacles_t.prototype.add=function (options)
 {
 	// console.log("Added obstacle at "+options.position);
-	var obs=options;
+	var obs={};
 	obs.mesh=new THREE.Mesh(
 		new THREE.CylinderGeometry(options.radius,options.radius,
 			options.ht,16),
 		new THREE.MeshPhongMaterial({color:options.color})
 	);
+	obs.position=options.position.clone();
+	obs.P2=obs.position.clone();
+	obs.P2.z=0.0; // 2D position
+	obs.radius=options.radius;
+	obs.radius2=options.radius*options.radius;
+
 	obs.mesh.rotation.set(Math.PI/2,0,0);
-	obs.mesh.position.copy(options.position);
+	obs.mesh.position.copy(obs.position);
+
+	// Return true if this point is inside us
+	obs.contains=function(P) {
+		var l2=obs.P2.distanceToSquared(P);
+		// console.log("Comparing length "+Math.sqrt(l2)+" for P="+P+" P2="+obs.P2);
+		return l2<obs.radius2;
+	}
 	this.renderer.scene.add(obs.mesh);
 	this.obstacles.push(obs);
 }
+
 
 /* Tracks the wheel positions onscreen */
 function wheel_tracker_t(renderer,lineOptions)
@@ -82,6 +96,7 @@ function roomba_t(renderer,obstacles)
 	var myself=this;
 
 	myself.model=new Array();
+	myself.obstacles=obstacles.obstacles;
 
 	myself.left=0;
 	myself.right=0;
@@ -135,43 +150,13 @@ function roomba_t(renderer,obstacles)
 	};
 };
 
-// Add sensor objects & render geometry
-roomba_t.prototype.add_sensors=function() {
-
-	var shiftGeometry=function (geom,shiftBy) {
-		for (var i=0;i<geom.vertices.length;i++) 
-			geom.vertices[i].pe(shiftBy);
-		geom.verticesNeedUpdate=true;
-		geom.computeBoundingSphere();
-		return geom;
-	}
-	// Array of light sensors:
-	this.light=[];
-	for (var i=0;i<6;i++) {
-		var l={};
-		l.start=150; // start range (mm)
-		l.range=250; // max sensor range
-		l.mesh=new THREE.Mesh(
-			shiftGeometry(new THREE.CylinderGeometry(50.0,2.0, l.range, 8),
-				new vec3(0,l.start+l.range*0.5,50)),
-			new THREE.MeshPhongMaterial({
-				transparent:true, opacity:0.5,
-				color:0xff0080
-			})
-		);
-		l.angle_rad=Math.PI*0.3*(i/2.5-1.0); // radians relative to robot centerline
-		l.mesh.rotation.set(0,0,l.angle_rad-Math.PI*0.5);
-		this.sensorObject3D.add(l.mesh);
-		this.light[i]=l;
-	}
-}
 
 // Reset positions of wheels:
 roomba_t.prototype.reset=function() 
 {
 	this.wheelbase=250; // mm
 	this.wheel=[];
-	this.wheel[0]=new vec3(-0.5*this.wheelbase,0,0.01);
+	this.wheel[0]=new vec3(-0.5*this.wheelbase,0.3*this.wheelbase,0.01);
 	this.wheel[1]=new vec3(+0.5*this.wheelbase,0,0.01);
 	// Robot coordinate system:
 	this.P=new vec3(0,0,0); // position
@@ -246,13 +231,17 @@ roomba_t.prototype.loop=function(dt)
 	renderer.controls.object.position.set(
 		this.P.x,this.P.y-1200,this.P.z+1400);
 	
+	this.sensor_check();
+};
+
+roomba_t.prototype.sensor_check=function() {
 	// Update emulated sensors:
 	if (this.light && emulator) {
 		if (emulator.roomba) {
 			this.sensors_to_emulator(emulator.roomba.get_sensors());
 		}
 	}
-};
+}
 
 // Return the world-coordinates XYZ of this robot polar coordinates position
 roomba_t.prototype.world_from_robot=function(radius,angle_rad,height) 
@@ -273,23 +262,74 @@ roomba_t.prototype.out_of_bounds=function(C)
 	return Math.abs(C.x)>bounds || Math.abs(C.y)>bounds;
 }
 
+// Return true if this XYZ coordinate is inside an obstacle
+roomba_t.prototype.obstructed=function(C) 
+{
+	for (var i=0;i<this.obstacles.length;i++)
+		if (this.obstacles[i].contains(C))
+			return true;
+	return false;
+}
+
+// Add sensor objects & render geometry
+roomba_t.prototype.add_sensors=function() {
+
+	var shiftGeometry=function (geom,shiftBy) {
+		for (var i=0;i<geom.vertices.length;i++) 
+			geom.vertices[i].pe(shiftBy);
+		geom.verticesNeedUpdate=true;
+		geom.computeBoundingSphere();
+		return geom;
+	}
+	// Array of light sensors:
+	this.light=[];
+	for (var i=0;i<6;i++) {
+		var l={};
+		l.start=150; // start range (mm)
+		l.range=250; // max sensor range
+		l.mesh=new THREE.Mesh(
+			shiftGeometry(new THREE.CylinderGeometry(50.0,2.0, l.range, 8),
+				new vec3(0,l.start+l.range*0.5,50)),
+			new THREE.MeshPhongMaterial({
+				transparent:true, opacity:0.5,
+				color:0xff0080
+			})
+		);
+		l.angle_rad=Math.PI*0.3*(1.0-i/2.5); // radians relative to robot centerline
+		l.mesh.rotation.set(0,0,l.angle_rad-Math.PI*0.5);
+		this.sensorObject3D.add(l.mesh);
+		this.light[i]=l;
+	}
+	
+	this.floor=[];
+	for (var i=0;i<4;i++) {
+		this.floor[i]={
+			"last":0,
+			"angle_rad":Math.PI*0.3*(1.0-i/1.5)
+		};
+	}
+}
+
+
 // Copy our simulated sensors into emulator's arduino_roomba_sensor_t
 roomba_t.prototype.sensors_to_emulator=function(robot)
 {
 	robot.position=this.P;
 	robot.angle=this.angle;
 	robot.angle_rad=this.angle_rad;
-	
+
+	// Floor sensors
 	var noff=0;
 	for (var i=0;i<4;i++) {
-		robot.floor[i]=2600; // assume floor by default
+		var v=2600; // assume floor by default
 		if (this.out_of_bounds(this.world_from_robot(180,
-			Math.PI*0.3*(i/1.5-1.0) // radian angle of floor sensor
+			this.floor[i].angle_rad
 		   ))) 
 		{ // off the edge!
-			robot.floor[i]=0;
+			v=0;
 			noff++;
 		}
+		robot.floor[i]=this.floor[i].last=v;
 	}
 	if (noff>0) {
 		console.log("Robot floor sensors off edge: "+noff+"\n");
@@ -298,12 +338,33 @@ roomba_t.prototype.sensors_to_emulator=function(robot)
 		this.falling=true;
 	}
 	
-	console.log("Updated robot sensors");
+	// Obstacle sensors
+	for (var i=0;i<6;i++) {
+		var v=0; // assume no hits
+		var L=this.light[i];
+		L.mesh.material.color.setHex(0x0000ff); // blue by default
+		var reflect=1000;
+		for (var range=20;range<L.range;range+=100) {
+			var W=this.world_from_robot(L.start+range,L.angle_rad);
+			// console.log("Checking obstruction at W "+W);
+			if (this.obstructed(W)) {
+				//console.log("Hit obstruction at range "+range);
+				v=reflect;
+				L.mesh.material.color.setHex(0xff0000); // red on hit
+				break; // keep closest value only
+			}
+			// assume rapid fall-off in reflectance
+			reflect=0.5*reflect;
+		}
+		robot.light[i]=L.last=v;
+	}
 }
 
 // Print current status
 roomba_t.prototype.get_status=function() 
 {
+	this.sensor_check();
+	
 	var status="robot.position = ";
 	for (var axis=0;axis<3;axis++) {
 		var v=0xffFFffFF&this.P.getComponent(axis);
@@ -312,7 +373,16 @@ roomba_t.prototype.get_status=function()
 	}
 	status+=" mm<br>";
 	status+=" robot.angle = "+(0xffFFffFF&this.angle)+" degrees<br>";
+	if (this.light) {
+		status+="robot.floor";
+		for (var i=0;i<4;i++) {
+			status+="["+i+"] = "+this.floor[i].last+"; \n";
+		}
+		status+="<br> robot.light";
+		for (var i=0;i<6;i++) {
+			status+="["+i+"] = "+this.light[i].last+";\n";
+		}
+	}
 	return status;
 }
-
 
