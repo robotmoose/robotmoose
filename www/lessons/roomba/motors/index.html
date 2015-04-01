@@ -91,10 +91,10 @@
 				var left=parseInt(document.getElementById("drive_left").value);
 				var right=parseInt(document.getElementById("drive_right").value);
 
-				if(emulator.running()&&emulator.roombas["Serial"])
+				if(emulator.running()&&emulator.roomba)
 				{
-					left=emulator.roombas["Serial"].left;
-					right=emulator.roombas["Serial"].right;
+					left=emulator.roomba.left;
+					right=emulator.roomba.right;
 
 					document.getElementById("drive_left").value=left;
 					document.getElementById("drive_right").value=right;

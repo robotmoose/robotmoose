@@ -32,7 +32,7 @@ function arduino_roomba_t(controller,serial)
 	var myself=this;
 
 	myself.controller=controller;
-	myself.controller.roombas[serial]=myself;
+	myself.controller.roomba=myself;
 	myself.serial_m=serial;
 	myself.leds_m=0;
 	myself.led_clean_color_m=0;
@@ -393,7 +393,6 @@ function arduino_emulator_t()
 	myself.pin_pwms=new Array();
 	myself.pin_analogs=new Array();
 	myself.pin_servos=new Array();
-	myself.roombas={};
 
 	for(var ii=0;ii<myself.pin_count;++ii)
 	{

@@ -234,7 +234,20 @@ roomba_t.prototype.loop=function(dt)
 	renderer.controls.center.set(this.P.x,this.P.y,this.P.z);
 	renderer.controls.object.position.set(
 		this.P.x,this.P.y-1200,this.P.z+1400);
+	
+	// Update emulated sensors:
+	if (emulator) {
+		if (emulator.roomba) {
+			this.sensors_to_emulator(emulator.roomba.get_sensors());
+		}
+	}
 };
+
+// Copy sensors into emulator's arduino_roomba_sensor_t
+roomba_t.prototype.sensors_to_emulator=function(robot)
+{
+	
+}
 
 // Print current status
 roomba_t.prototype.get_status=function() 
