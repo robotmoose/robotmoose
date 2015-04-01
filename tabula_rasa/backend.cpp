@@ -254,8 +254,8 @@ void robot_backend::setup_devices(std::string robot_config)
 			if (device=="create2_controller_t") 
 			{ // Add all the Roomba's onboard sensors
 			//  These MUST match arduino/roomba.h roomba_t::sensor_t in size and order!
-				sensors.push_back(new json_sensor<int,uint8_t>(json_path("roomba","mode")));
-				sensors.push_back(new json_sensor<int,uint8_t>(json_path("roomba","bumper")));
+				sensors.push_back(new json_sensor<int,uint8_t>(json_path("mode")));
+				sensors.push_back(new json_sensor<int,uint8_t>(json_path("bumper")));
 				sensors.push_back(new json_sensor<int,uint8_t>(json_path("battery","state")));
 				sensors.push_back(new json_sensor<int,int8_t>(json_path("battery","temperature")));
 				sensors.push_back(new json_sensor<int,uint16_t>(json_path("battery","voltage")));
@@ -264,11 +264,11 @@ void robot_backend::setup_devices(std::string robot_config)
 				sensors.push_back(new json_sensor<int,uint16_t>(json_path("encoder","L")));
 				sensors.push_back(new json_sensor<int,uint16_t>(json_path("encoder","R")));
 				for (int i=0;i<4;i++)
-					sensors.push_back(new json_sensor<int,uint16_t>(json_path("roomba","floor",i)));
+					sensors.push_back(new json_sensor<int,uint16_t>(json_path("floor",i)));
 				for (int i=0;i<6;i++)
-					sensors.push_back(new json_sensor<int,uint16_t>(json_path("roomba","light",i)));
-				sensors.push_back(new json_sensor<int,uint8_t>(json_path("roomba","light_field")));
-				sensors.push_back(new json_sensor<int,uint8_t>(json_path("roomba","buttons")));
+					sensors.push_back(new json_sensor<int,uint16_t>(json_path("light",i)));
+				sensors.push_back(new json_sensor<int,uint8_t>(json_path("light_field")));
+				sensors.push_back(new json_sensor<int,uint8_t>(json_path("buttons")));
 			}
 		}
 		else if (device=="cmd") {

@@ -127,14 +127,10 @@ REGISTER_TABULA_DEVICE(sabertooth_v2_controller_t,
 REGISTER_TABULA_DEVICE(create2_controller_t,
 	Stream *roomba_serial=src.read_serial(115200);
 	roomba_t* roomba=new roomba_t (*roomba_serial);
-	Serial.println("Resetting roomba (wait for beep)");
-	roomba->reset();
+	Serial.println("Resetting roomba (push CLEAN if this step hangs!)");
+	roomba->setup();
 	Serial.println("Roomba reset");
-	roomba->start();
-	roomba->set_mode(roomba_t::FULL);
-	roomba->set_led_clean(255,0xff); // orange == 128
-	roomba->led_update();
-	roomba->set_receive_sensors(true);
+
 	actions_10ms.add(new create2_controller_t(*roomba));
 )
 

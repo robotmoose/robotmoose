@@ -78,6 +78,27 @@ roomba_t::roomba_t(roomba_serial_t& serial):serial_m(&serial),leds_m(0),
   memset(&sensor_packet_m,0,sizeof(sensor_packet_m));
 }
 
+void roomba_t::setup() 
+{
+	for (int attempt=0;attempt<10;attempt++) 
+	{
+		sensor_packet_m.mode=0;
+		reset();
+		start();
+		set_mode(roomba_t::FULL);
+		set_led_clean(255,0xff); // orange == 128
+		led_update();
+		set_receive_sensors(true);
+		for (int wait=0;wait<10;wait++) {
+			update();
+			if (sensor_packet_m.mode!=0) { // success!
+				return;
+			}
+			roomba_delay(100);
+		}
+	}
+}
+
 void roomba_t::start()
 {
 	uint8_t id=ROOMBA_ID_START;
@@ -287,7 +308,7 @@ void roomba_t::set_receive_sensors(const bool on)
 	}
 }
 
-roomba_t::sensor_t roomba_t::get_sensors() const
+const roomba_t::sensor_t &roomba_t::get_sensors() const
 {
 	return sensor_packet_m;
 }

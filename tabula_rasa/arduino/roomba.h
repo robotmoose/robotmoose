@@ -82,6 +82,8 @@ class roomba_t
 		};
 
 		roomba_t(roomba_serial_t& serial);
+		
+		void setup();
 
 		void start();
 		void stop();
@@ -107,7 +109,7 @@ class roomba_t
 
 		void set_receive_sensors(const bool on);
 
-		sensor_t get_sensors() const;
+		const sensor_t &get_sensors() const;
 
 		void dump_sensors() const;
 
