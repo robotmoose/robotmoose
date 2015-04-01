@@ -292,21 +292,38 @@ roomba_t.prototype.add_sensors=function() {
 				new vec3(0,l.start+l.range*0.5,50)),
 			new THREE.MeshPhongMaterial({
 				transparent:true, opacity:0.5,
-				color:0xff0080
+				color:0x0000ff
 			})
 		);
 		l.angle_rad=Math.PI*0.3*(1.0-i/2.5); // radians relative to robot centerline
 		l.mesh.rotation.set(0,0,l.angle_rad-Math.PI*0.5);
 		this.sensorObject3D.add(l.mesh);
+		l.last=0; // assume no obstacles
 		this.light[i]=l;
 	}
 	
 	this.floor=[];
 	for (var i=0;i<4;i++) {
-		this.floor[i]={
-			"last":0,
-			"angle_rad":Math.PI*0.3*(1.0-i/1.5)
+		var l={
+			"last":2600, // assume the floor is visible
+			"angle_rad":Math.PI*0.4*(1.0-i/1.5)
 		};
+		l.mesh=new THREE.Mesh(
+			new THREE.CylinderGeometry(30.0,30.0, 200, 8),
+			new THREE.MeshPhongMaterial({
+				transparent:true, opacity:0.5,
+				color:0x0000ff
+			})
+		);
+		var radius=130;
+		l.mesh.position.set(
+			radius*Math.cos(l.angle_rad),
+			radius*Math.sin(l.angle_rad),
+			50
+		);
+		l.mesh.rotation.set(Math.PI/2,0,0);
+		this.sensorObject3D.add(l.mesh);
+		this.floor[i]=l;
 	}
 }
 
@@ -321,15 +338,18 @@ roomba_t.prototype.sensors_to_emulator=function(robot)
 	// Floor sensors
 	var noff=0;
 	for (var i=0;i<4;i++) {
+		var L=this.floor[i];
 		var v=2600; // assume floor by default
+		L.mesh.material.color.setHex(0x0000ff); // blue by default
 		if (this.out_of_bounds(this.world_from_robot(180,
 			this.floor[i].angle_rad
 		   ))) 
 		{ // off the edge!
+			L.mesh.material.color.setHex(0xff0000); // orange on error
 			v=0;
 			noff++;
 		}
-		robot.floor[i]=this.floor[i].last=v;
+		robot.floor[i]=L.last=v;
 	}
 	if (noff>0) {
 		console.log("Robot floor sensors off edge: "+noff+"\n");

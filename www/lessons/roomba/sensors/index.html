@@ -48,9 +48,11 @@
 					"{\n"+
 					"\t//Things written in here keep happening\n"+
 					"\troomba_sensor_t robot=roomba.get_sensors();\n"+
-					"\troomba.drive(-20,-20); // back up slowly by default\n"+
-					"\tif (robot.floor[0]>=500) { // floor exists!  Drive forward\n"+
+					"\tif (robot.floor[0] > 500) { // floor exists!  Drive forward\n"+
 					"\t\troomba.drive(400,400);\n"+
+					"\t}\n"+
+					"\telse { // no floor?!\n"+
+					"\t\troomba.drive(-20,-20); // back up slowly\n"+
 					"\t}\n"+
 					"\tdelay(100);\n"+
 					"}"
@@ -180,7 +182,7 @@
 		<!--#include virtual="/navbar.html"-->
 		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
 			<div class="page-header">
-				<h1>Roomba Motors</h1>
+				<h1>Roomba Sensors</h1>
 			</div>
 			<center>
 				<table data-toggle="table">
@@ -209,6 +211,36 @@
 					</tr>
 				</table>
 			</center>
+			
+			
+<div class="well">
+How does this work?
+<ul>
+	<li>The roomba has four "robot.floor" sensors looking down at the floor.  If they see the floor, they output a large number like 2600.  Sensor robot.floor[0] is on the left side of the robot, sensors [1] and [2] are in the middle, and robot.floor[3] is on the right side.
+	<li>You can use an "if statement" to read the sensor value and drive differently depending on what the sensor tells you.  This usually looks like:<br>
+    if (<i>robot sensor</i> &gt; <i>some number</i>) { <br>
+&nbsp;&nbsp;&nbsp;&nbsp;<i>do something</i><br>
+} else {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<i>do another thing</i><br>
+}<br>
+
+	<li>if (robot.floor[0] &gt; 500) will do something if the floor is there.
+	<li>if (robot.floor[0] <strong>&lt;</strong> 500) will do something if the floor is not there.
+	<li>The &gt; symbol is called "greater than", and &lt; is called "less than".
+	
+	<li>If the middle of the robot drives off the table, now it will fall off!  (Hit Reset to get back on the table.)
+</ul>
+</div>
+
+<div class="well">
+Challenges!
+<ul>
+	<li>When the left floor sensor (robot.floor[0]) reads zero, turn right while backing up.  
+	<li>When the right floor sensor (robot.floor[3]) reads zero, turn left while backing up.
+	<li>Do both at once, and bounce around while keeping the roomba on the table.
+</ul>
+</div>
+			
 			
 		</div>
 	</body>
