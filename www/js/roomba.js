@@ -220,7 +220,7 @@ roomba_t.prototype.loop=function(dt)
 	this.right_tracker.add(this.wheel[1]);
 
 	// Robot's Z rotation rotation, in radians
-	this.angle_rad=Math.atan2(this.LR.x,this.LR.y);
+	this.angle_rad=Math.atan2(this.LR.x,-this.LR.y);
 	this.angle=180.0/Math.PI*this.angle_rad;
 	// console.log("Roomba P="+this.P+" mm and angle="+this.angle+" degrees");
 	this.model.rotation.z=this.angle_rad-Math.PI/2;
@@ -236,20 +236,58 @@ roomba_t.prototype.loop=function(dt)
 		this.P.x,this.P.y-1200,this.P.z+1400);
 	
 	// Update emulated sensors:
-	if (emulator) {
+	if (this.light && emulator) {
 		if (emulator.roomba) {
-			this.sensors_to_emulator(emulator.roomba.get_sensors());
+			this.sensors_to_emulator(emulator.roomba.get_sensors(),dt);
 		}
 	}
 };
 
-// Copy sensors into emulator's arduino_roomba_sensor_t
-roomba_t.prototype.sensors_to_emulator=function(robot)
+// Return the world-coordinates XYZ of this robot polar coordinates position
+roomba_t.prototype.world_from_robot=function(radius,angle_rad,height) 
+{
+	var W=new vec3(
+		radius*Math.cos(angle_rad+this.angle_rad),
+		radius*Math.sin(angle_rad+this.angle_rad),
+		height || 0.0
+	);
+	W.pe(this.P); // robot-relative
+	return W;
+}
+
+// Return true if this XYZ coordinate is "off the table"
+roomba_t.prototype.out_of_bounds=function(C) 
+{
+	var bounds=1200; // mm from origin to edge (FIXME: parameterize this)
+	return Math.abs(C.x)>bounds || Math.abs(C.y)>bounds;
+}
+
+// Copy our simulated sensors into emulator's arduino_roomba_sensor_t
+roomba_t.prototype.sensors_to_emulator=function(robot,dt)
 {
 	robot.position=this.P;
 	robot.angle=this.angle;
 	robot.angle_rad=this.angle_rad;
-	console.log("Updated robot sensors");
+	
+	var noff=0;
+	for (var i=0;i<4;i++) {
+		robot.floor[i]=2600; // assume floor by default
+		if (this.out_of_bounds(this.world_from_robot(180,
+			Math.PI*0.3*(i/1.5-1.0) // radian angle of floor sensor
+		   ))) 
+		{ // off the edge!
+			robot.floor[i]=0;
+			noff++;
+		}
+	}
+	if (noff>0)
+		console.log("Robot floor sensors off edge: "+noff+"\n");
+	if (noff==4) { // animate falling robot!
+		for (var i=0;i<2;i++) this.wheel[i].z-=2.0*dt;
+		this.wheel[0].pe(this.FW.t(dt));
+	}
+	
+	// console.log("Updated robot sensors");
 }
 
 // Print current status
