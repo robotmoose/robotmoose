@@ -94,7 +94,7 @@
 						color:(Math.random()*0xffFFff)&0xffFFff
 					}
 					options.position.z=0.0;
-					if (options.position.length()>500) 
+					if (options.position.length()>500)
 					{
 						options.position.z=options.ht/2.0;
 						obstacles.add(options);
@@ -166,6 +166,8 @@
 			function reset()
 			{
 				roomba.reset();
+				document.getElementById("drive_left").value=0;
+				document.getElementById("drive_right").value=0;
 			}
 
 			function drive_update()
@@ -211,8 +213,8 @@
 					</tr>
 				</table>
 			</center>
-			
-			
+
+
 <div class="well">
 How does this work?
 <ul>
@@ -227,7 +229,7 @@ How does this work?
 	<li>if (robot.floor[0] &gt; 500) will do something if the floor is there.
 	<li>if (robot.floor[0] <strong>&lt;</strong> 500) will do something if the floor is not there.
 	<li>The &gt; symbol is called "greater than", and &lt; is called "less than".
-	
+
 	<li>If the middle of the robot drives off the table, now it will fall off!  (Hit Reset to get back on the table.)
 </ul>
 </div>
@@ -235,13 +237,13 @@ How does this work?
 <div class="well">
 Challenges!
 <ul>
-	<li>When the left floor sensor (robot.floor[0]) reads zero, turn right while backing up.  
+	<li>When the left floor sensor (robot.floor[0]) reads zero, turn right while backing up.
 	<li>When the right floor sensor (robot.floor[3]) reads zero, turn left while backing up.
 	<li>Do both at once, and bounce around while keeping the roomba on the table.
 </ul>
 </div>
-			
-			
+
+
 		</div>
 	</body>
 <br><br><br><font size="1"><div xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/" about="http://www.thingiverse.com/thing:94504"><span property="dct:title">Model used in simulation is "vRoomba - Pull Back Motor Vacuum Robot"</span> (<a rel="cc:attributionURL" property="cc:attributionName" href="http://www.thingiverse.com/halley">halley</a>) / <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a></div></font>

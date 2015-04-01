@@ -92,7 +92,7 @@
 						color:(Math.random()*0xffFFff)&0xffFFff
 					}
 					options.position.z=0.0;
-					if (options.position.length()>500) 
+					if (options.position.length()>500)
 					{
 						options.position.z=options.ht/2.0;
 						obstacles.add(options);
@@ -164,6 +164,8 @@
 			function reset()
 			{
 				roomba.reset();
+				document.getElementById("drive_left").value=0;
+				document.getElementById("drive_right").value=0;
 			}
 
 			function drive_update()
@@ -209,7 +211,7 @@
 					</tr>
 				</table>
 			</center>
-			
+
 		</div>
 	</body>
 <br><br><br><font size="1"><div xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/" about="http://www.thingiverse.com/thing:94504"><span property="dct:title">Model used in simulation is "vRoomba - Pull Back Motor Vacuum Robot"</span> (<a rel="cc:attributionURL" property="cc:attributionName" href="http://www.thingiverse.com/halley">halley</a>) / <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a></div></font>
