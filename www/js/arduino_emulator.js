@@ -415,51 +415,34 @@ function arduino_emulator_t()
 
 		print:function(text)
 		{
-			var json_original={"value":text,"counter":myself.commands.length};
-			var json=JSON.parse(JSON.stringify(json_original));
-
-			myself.commands[myself.commands.length]=function()
-			{
-				console.log(json.value);
-
-				if(myself.pin_directions[pin]==0)
-				{
-					myself.pin_pwms[pin]=0;
-
-					if(value>=0&&value<=255)
-						myself.pin_pwms[pin]=value;
+			myself.add_command(
+				function(controller,data) {
+					console.log(data.value);
 				}
-			};
+				,{"value":text}
+			);
 		},
 
 		println:function(text)
 		{
-			var json_original={"value":text,"counter":myself.commands.length};
-			var json=JSON.parse(JSON.stringify(json_original));
-
-			myself.commands[myself.commands.length]=function()
-			{
-				console.log(json.value);
-
-				if(json.counter+1<myself.commands.length)
-					myself.commands[json.counter+1]();
-			};
+			myself.add_command(
+				function(controller,data) {
+					console.log(data.value);
+				}
+				,{"value":text}
+			);
 		},
 
 		read:function(){return 0},
 
 		write:function(text)
 		{
-			var json_original={"value":text,"counter":myself.commands.length};
-			var json=JSON.parse(JSON.stringify(json_original));
-
-			myself.commands[myself.commands.length]=function()
-			{
-				console.log(json.value);
-
-				if(json.counter+1<myself.commands.length)
-					myself.commands[json.counter+1]();
-			};
+			myself.add_command(
+				function(controller,data) {
+					console.log(data.value);
+				}
+				,{"value":text}
+			);
 		}
 	};
 
@@ -494,7 +477,8 @@ function arduino_emulator_t()
 				this.analogRead=myself.analogRead;
 				this.get_controller=function(){return myself;};
 
-				eval(Processing.compile(code).sourceCode)(myself.json);
+				myself.user_code=eval(Processing.compile(code).sourceCode);
+				myself.user_code(myself.json);
 
 				myself.json.delay=myself.delay;
 
@@ -508,24 +492,27 @@ function arduino_emulator_t()
 
 				myself.commands.length=0;
 				myself.json.setup();
-
-				myself.commands[myself.commands.length]=function()
+				
+				var call_loop=function(controller,data)
 				{
+					// flush any old commands (from setup, or last loop, etc)
 					myself.commands.length=0;
+					
+					// Run user's loop function
 					myself.json.loop();
 
-					if(myself.commands.length>0)
-						myself.commands[0]();
-
-					myself.commands[myself.commands.length]=function()
-					{
-						if(myself.commands.length>0)
-							myself.commands[0]();
-					};
-				};
-
-				if(myself.commands.length>0)
+					// Call ourselves afterwards (weird recursive closure!)
+					myself.add_command(call_loop);
+					
+					// Start the delay chain:
 					myself.commands[0]();
+				}
+				
+				// Add function to run after setup, to run loop:
+				myself.add_command(call_loop);
+
+				// start the chain of commands
+				myself.commands[0]();
 			}
 			catch(e)
 			{
