@@ -125,4 +125,7 @@ class roomba_t
 		bool parse_sensor_packet_m();
 };
 
+// The web front end needs a sensor name without colons::
+typedef roomba_t::sensor_t roomba_sensor_t;
+
 #endif

@@ -163,7 +163,7 @@ roomba_t.prototype.add_sensors=function() {
 			})
 		);
 		l.angle_rad=Math.PI*0.3*(i/2.5-1.0); // radians relative to robot centerline
-		l.mesh.rotation.set(0,0,l.angle_rad);
+		l.mesh.rotation.set(0,0,l.angle_rad-Math.PI*0.5);
 		this.sensorObject3D.add(l.mesh);
 		this.light[i]=l;
 	}
@@ -220,11 +220,11 @@ roomba_t.prototype.loop=function(dt)
 	this.right_tracker.add(this.wheel[1]);
 
 	// Robot's Z rotation rotation, in radians
-	this.orient_rad=Math.atan2(this.LR.y,this.LR.x);
-	this.orient=180.0/Math.PI*this.orient_rad;
-	// console.log("Roomba P="+this.P+" mm and orient="+this.orient+" degrees");
-	this.model.rotation.z=this.orient_rad;
-	this.sensorObject3D.rotation.z=this.orient_rad;
+	this.angle_rad=Math.atan2(this.LR.x,this.LR.y);
+	this.angle=180.0/Math.PI*this.angle_rad;
+	// console.log("Roomba P="+this.P+" mm and angle="+this.angle+" degrees");
+	this.model.rotation.z=this.angle_rad-Math.PI/2;
+	this.sensorObject3D.rotation.z=this.angle_rad;
 
 	// Update robot center position
 	this.model.position.copy(this.P); 
@@ -246,7 +246,10 @@ roomba_t.prototype.loop=function(dt)
 // Copy sensors into emulator's arduino_roomba_sensor_t
 roomba_t.prototype.sensors_to_emulator=function(robot)
 {
-	
+	robot.position=this.P;
+	robot.angle=this.angle;
+	robot.angle_rad=this.angle_rad;
+	console.log("Updated robot sensors");
 }
 
 // Print current status
@@ -259,7 +262,7 @@ roomba_t.prototype.get_status=function()
 		if (axis<2) status+=", ";
 	}
 	status+=" mm<br>";
-	status+=" robot.angle = "+(0xffFFffFF&this.orient)+" degrees<br>";
+	status+=" robot.angle = "+(0xffFFffFF&this.angle)+" degrees<br>";
 	return status;
 }
 
