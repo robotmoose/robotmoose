@@ -94,21 +94,18 @@ function roomba_t(renderer,obstacles)
 	myself.model=null;
 	var model_color=0x404040;
 	
-	// Positions of Left and Right wheels
-	this.reset();
-	
 	this.renderer=renderer;
 
 	myself.model=renderer.load_obj(model_path);
-	myself.model.rotation.set(0,0,0);
-	myself.model.position.set(0,0,0);
-	myself.model.scale.set(1,1,1);
 	myself.model.set_color(model_color);
 	myself.model.castShadow=true;
 	myself.model.receiveShadow=true;
 	
 	myself.sensorObject3D=new THREE.Object3D(); // container object (OBJ isn't loaded yet)
 	renderer.scene.add(myself.sensorObject3D);
+	
+	// Clear everything else in our object
+	this.reset();
 	
 
 	myself.set_position=function(x,y,z)
@@ -184,6 +181,12 @@ roomba_t.prototype.reset=function()
 	
 	this.left_tracker.reset();
 	this.right_tracker.reset();
+	
+	this.falling=false;
+	this.sensorObject3D.rotation.set(0,0,0);
+	this.model.rotation.set(0,0,0);
+	this.model.position.set(0,0,0);
+	this.model.scale.set(1,1,1);
 }
 
 // Simulate robot motion
@@ -223,6 +226,14 @@ roomba_t.prototype.loop=function(dt)
 	this.angle_rad=Math.atan2(this.LR.x,-this.LR.y);
 	this.angle=180.0/Math.PI*this.angle_rad;
 	// console.log("Roomba P="+this.P+" mm and angle="+this.angle+" degrees");
+	
+	
+	if (this.falling) {
+		for (var i=0;i<2;i++) this.wheel[i].z-=2000.0*dt;
+		this.model.rotation.x=this.model.rotation.x-dt;
+		this.sensorObject3D.rotation.x=this.model.rotation.x;
+	}
+	
 	this.model.rotation.z=this.angle_rad-Math.PI/2;
 	this.sensorObject3D.rotation.z=this.angle_rad;
 
@@ -238,7 +249,7 @@ roomba_t.prototype.loop=function(dt)
 	// Update emulated sensors:
 	if (this.light && emulator) {
 		if (emulator.roomba) {
-			this.sensors_to_emulator(emulator.roomba.get_sensors(),dt);
+			this.sensors_to_emulator(emulator.roomba.get_sensors());
 		}
 	}
 };
@@ -263,7 +274,7 @@ roomba_t.prototype.out_of_bounds=function(C)
 }
 
 // Copy our simulated sensors into emulator's arduino_roomba_sensor_t
-roomba_t.prototype.sensors_to_emulator=function(robot,dt)
+roomba_t.prototype.sensors_to_emulator=function(robot)
 {
 	robot.position=this.P;
 	robot.angle=this.angle;
@@ -280,14 +291,14 @@ roomba_t.prototype.sensors_to_emulator=function(robot,dt)
 			noff++;
 		}
 	}
-	if (noff>0)
+	if (noff>0) {
 		console.log("Robot floor sensors off edge: "+noff+"\n");
-	if (noff==4) { // animate falling robot!
-		for (var i=0;i<2;i++) this.wheel[i].z-=2.0*dt;
-		this.wheel[0].pe(this.FW.t(dt));
+	}
+	if (noff==4 && this.out_of_bounds(this.P)) { // animate falling robot!
+		this.falling=true;
 	}
 	
-	// console.log("Updated robot sensors");
+	console.log("Updated robot sensors");
 }
 
 // Print current status
