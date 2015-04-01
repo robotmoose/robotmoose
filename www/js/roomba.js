@@ -167,6 +167,7 @@ roomba_t.prototype.reset=function()
 	this.UP=new vec3(0,0,1); // Z is up
 	this.LR=new vec3(1,0,0); // left-to-right wheel
 	this.FW=new vec3(0,1,0); // drive forward
+	this.L=this.R=0.0; // motor speeds
 
 	this.left_tracker.reset();
 	this.right_tracker.reset();
@@ -192,18 +193,20 @@ roomba_t.prototype.loop=function(dt)
 	}
 	var L=limit(this.left);
 	var R=limit(this.right);
+	this.L+=(L-this.L)*dt*20.0; // inertia
+	this.R+=(R-this.R)*dt*20.0; 
 
 	var speed=mm*dt; // world units per step
 
 	// Drive wheels forward
-	this.wheel[0].pe(this.FW.t(L*speed));
-	this.wheel[1].pe(this.FW.t(R*speed));
+	this.wheel[0].pe(this.FW.t(this.L*speed));
+	this.wheel[1].pe(this.FW.t(this.R*speed));
 
 	// Enforce wheelbase
 	this.P=this.wheel[0].p(this.wheel[1]).te(0.5);
 	this.LR=this.wheel[1].m(this.wheel[0]); // left-to-right
 	this.LR.normalize();
-	this.FW=new vec3(-this.LR.y,this.LR.x,0.0); // forward
+	this.FW=new vec3(0,0,1).cross(this.LR);  // forward
 	var wheeloff=this.LR.clone();
 	wheeloff.te(this.wheelbase*0.5);
 	this.wheel[0]=this.P.m(wheeloff);
@@ -212,7 +215,7 @@ roomba_t.prototype.loop=function(dt)
 	this.right_tracker.add(this.wheel[1]);
 
 	// Robot's Z rotation rotation, in radians
-	this.angle_rad=Math.atan2(this.LR.x,-this.LR.y);
+	this.angle_rad=Math.atan2(this.FW.y,this.FW.x);
 	this.angle=180.0/Math.PI*this.angle_rad;
 	// console.log("Roomba P="+this.P+" mm and angle="+this.angle+" degrees");
 
