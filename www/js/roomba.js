@@ -15,7 +15,7 @@ function load_dependencies()
 (function(){load_dependencies()})();
 
 
-function obstacles_t(renderer) 
+function obstacles_t(renderer)
 {
 	this.renderer=renderer;
 	this.obstacles=[];
@@ -56,13 +56,13 @@ function wheel_tracker_t(renderer,lineOptions)
 	this.cur=0; // current vertex number
 
 	this.geom=new THREE.Geometry();
-	/* for some reason THREE.js doesn't let you change 
+	/* for some reason THREE.js doesn't let you change
 	   vertex counts, so preallocate lots of vertices. */
-	for (var x=0;x<this.max;x++) 
+	for (var x=0;x<this.max;x++)
 	{
 		this.geom.vertices.push(new vec3(0,0,0));
 	}
-	
+
 
 	this.line=new THREE.Line(this.geom,
 	  new THREE.LineBasicMaterial(lineOptions)
@@ -96,7 +96,11 @@ function roomba_t(renderer,obstacles)
 	var myself=this;
 
 	myself.model=new Array();
-	myself.obstacles=obstacles.obstacles;
+
+	if(obstacles)
+		myself.obstacles=obstacles.obstacles;
+	else
+		myself.obstacles=null;
 
 	myself.left=0;
 	myself.right=0;
@@ -108,20 +112,20 @@ function roomba_t(renderer,obstacles)
 	var model_path=url_path+"models/roomba/body.obj";
 	myself.model=null;
 	var model_color=0x404040;
-	
+
 	this.renderer=renderer;
 
 	myself.model=renderer.load_obj(model_path);
 	myself.model.set_color(model_color);
 	myself.model.castShadow=true;
 	myself.model.receiveShadow=true;
-	
+
 	myself.sensorObject3D=new THREE.Object3D(); // container object (OBJ isn't loaded yet)
 	renderer.scene.add(myself.sensorObject3D);
-	
+
 	// Clear everything else in our object
 	this.reset();
-	
+
 
 	myself.set_position=function(x,y,z)
 	{
@@ -152,7 +156,7 @@ function roomba_t(renderer,obstacles)
 
 
 // Reset positions of wheels:
-roomba_t.prototype.reset=function() 
+roomba_t.prototype.reset=function()
 {
 	this.wheelbase=250; // mm
 	this.wheel=[];
@@ -163,10 +167,10 @@ roomba_t.prototype.reset=function()
 	this.UP=new vec3(0,0,1); // Z is up
 	this.LR=new vec3(1,0,0); // left-to-right wheel
 	this.FW=new vec3(0,1,0); // drive forward
-	
+
 	this.left_tracker.reset();
 	this.right_tracker.reset();
-	
+
 	this.falling=false;
 	this.sensorObject3D.rotation.set(0,0,0);
 	this.model.rotation.set(0,0,0);
@@ -188,9 +192,9 @@ roomba_t.prototype.loop=function(dt)
 	}
 	var L=limit(this.left);
 	var R=limit(this.right);
-	
+
 	var speed=mm*dt; // world units per step
-	
+
 	// Drive wheels forward
 	this.wheel[0].pe(this.FW.t(L*speed));
 	this.wheel[1].pe(this.FW.t(R*speed));
@@ -211,26 +215,26 @@ roomba_t.prototype.loop=function(dt)
 	this.angle_rad=Math.atan2(this.LR.x,-this.LR.y);
 	this.angle=180.0/Math.PI*this.angle_rad;
 	// console.log("Roomba P="+this.P+" mm and angle="+this.angle+" degrees");
-	
-	
+
+
 	if (this.falling) {
 		for (var i=0;i<2;i++) this.wheel[i].z-=2000.0*dt;
 		this.model.rotation.x=this.model.rotation.x-dt;
 		this.sensorObject3D.rotation.x=this.model.rotation.x;
 	}
-	
+
 	this.model.rotation.z=this.angle_rad-Math.PI/2;
 	this.sensorObject3D.rotation.z=this.angle_rad;
 
 	// Update robot center position
-	this.model.position.copy(this.P); 
-	this.sensorObject3D.position.copy(this.P); 
-	
+	this.model.position.copy(this.P);
+	this.sensorObject3D.position.copy(this.P);
+
 	// Update camera position to follow robot
 	renderer.controls.center.set(this.P.x,this.P.y,this.P.z);
 	renderer.controls.object.position.set(
 		this.P.x,this.P.y-1200,this.P.z+1400);
-	
+
 	this.sensor_check();
 };
 
@@ -244,7 +248,7 @@ roomba_t.prototype.sensor_check=function() {
 }
 
 // Return the world-coordinates XYZ of this robot polar coordinates position
-roomba_t.prototype.world_from_robot=function(radius,angle_rad,height) 
+roomba_t.prototype.world_from_robot=function(radius,angle_rad,height)
 {
 	var W=new vec3(
 		radius*Math.cos(angle_rad+this.angle_rad),
@@ -256,14 +260,14 @@ roomba_t.prototype.world_from_robot=function(radius,angle_rad,height)
 }
 
 // Return true if this XYZ coordinate is "off the table"
-roomba_t.prototype.out_of_bounds=function(C) 
+roomba_t.prototype.out_of_bounds=function(C)
 {
 	var bounds=1200; // mm from origin to edge (FIXME: parameterize this)
 	return Math.abs(C.x)>bounds || Math.abs(C.y)>bounds;
 }
 
 // Return true if this XYZ coordinate is inside an obstacle
-roomba_t.prototype.obstructed=function(C) 
+roomba_t.prototype.obstructed=function(C)
 {
 	for (var i=0;i<this.obstacles.length;i++)
 		if (this.obstacles[i].contains(C))
@@ -275,7 +279,7 @@ roomba_t.prototype.obstructed=function(C)
 roomba_t.prototype.add_sensors=function() {
 
 	var shiftGeometry=function (geom,shiftBy) {
-		for (var i=0;i<geom.vertices.length;i++) 
+		for (var i=0;i<geom.vertices.length;i++)
 			geom.vertices[i].pe(shiftBy);
 		geom.verticesNeedUpdate=true;
 		geom.computeBoundingSphere();
@@ -301,7 +305,7 @@ roomba_t.prototype.add_sensors=function() {
 		l.last=0; // assume no obstacles
 		this.light[i]=l;
 	}
-	
+
 	this.floor=[];
 	for (var i=0;i<4;i++) {
 		var l={
@@ -343,7 +347,7 @@ roomba_t.prototype.sensors_to_emulator=function(robot)
 		L.mesh.material.color.setHex(0x0000ff); // blue by default
 		if (this.out_of_bounds(this.world_from_robot(180,
 			this.floor[i].angle_rad
-		   ))) 
+		   )))
 		{ // off the edge!
 			L.mesh.material.color.setHex(0xff0000); // orange on error
 			v=0;
@@ -357,7 +361,7 @@ roomba_t.prototype.sensors_to_emulator=function(robot)
 	if (noff==4 && this.out_of_bounds(this.P)) { // animate falling robot!
 		this.falling=true;
 	}
-	
+
 	// Obstacle sensors
 	for (var i=0;i<6;i++) {
 		var v=0; // assume no hits
@@ -381,10 +385,10 @@ roomba_t.prototype.sensors_to_emulator=function(robot)
 }
 
 // Print current status
-roomba_t.prototype.get_status=function() 
+roomba_t.prototype.get_status=function()
 {
 	this.sensor_check();
-	
+
 	var status="robot.position = ";
 	for (var axis=0;axis<3;axis++) {
 		var v=0xffFFffFF&this.P.getComponent(axis);
