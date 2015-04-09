@@ -4,4 +4,4 @@ killall firefox
 cd `dirname $0`
 . ./config
 
-DISPLAY=:0 firefox https://www.gruveo.com/#layla$color &
+DISPLAY=:0 firefox https://www.gruveo.com/#$videoname &

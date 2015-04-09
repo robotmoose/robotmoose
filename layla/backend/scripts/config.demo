@@ -1,5 +1,6 @@
 #!/bin/sh
 #  Shell script to set variables used by other shell scripts.
 color="demo"
+videoname="layla$color"
 backend_args="--robot layla/$color"
 
