@@ -105,6 +105,27 @@ function LEDdemo()
 
 
 
+// Return our robot's name.  This is also the superstar path.
+function robot_name() {
+	return document.getElementById('robot_name').value;
+}
+
+// Send this command off to superstar:
+function superstar_send(starpath,starcmd,callback) {
+	var url_start="/superstar/"; // absolute URL
+	var url=url_start+starpath+starcmd
+	
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.onreadystatechange=function()
+	{ // this function is called when network progress happens
+		if(xmlhttp.readyState!=4) return;
+		else callback(xmlhttp);
+	};
+	xmlhttp.open("GET",url,true);
+	xmlhttp.send(null);
+}
+
+
 // Return the current wall clock time, in seconds
 function pilot_time() {
 	return (new Date()).getTime()/1000.0;
@@ -115,42 +136,27 @@ var networkBusy=0;
 
 // Send our last-used piloting command out across the network
 function pilot_send() {
-	var host=// "http://localhost:8080"+ // <- explicit host not needed, browser will use the .html server by default.
-		"/superstar/";
-	var url_start=host;
-
 	if (networkBusy>1)
 	{ // prevent overloading network: skip sending if already busy
 		document.getElementById('p_outputNet').innerHTML="network lag";
 		return;
 	}
-
 	networkBusy++;
 	var send_time=pilot.time=pilot_time();
 	var pilotStr=JSON.stringify(pilot);
 	console.log(pilotStr);
 	
-	var robot;
-	function set_robot() // Set global robot depending on checkbox selected 
-	{
-		if (document.getElementById("layla_gray").checked) robot="layla/gray";
-		else if(document.getElementById("layla_orange").checked) robot="layla/orange";
-		else if(document.getElementById("create_2").checked) robot="create/2";
-	}
-	var starpath=robot+"/pilot";
-	var url=url_start+starpath+"?set="+encodeURIComponent(pilotStr);
+	var starpath=robot_name()+"/pilot";
+	var starcmd="?set="+encodeURIComponent(pilotStr);
 	
 	var password=document.getElementById('robot_auth').value;
 	if (password) { // append authentication code
 		var seq="0"; //<- FIXME: get sequence number on first connection
 		var auth=getAuthCode(password,starpath,pilotStr,seq);
-		url+="&auth="+auth;
+		starcmd+="&auth="+auth;
 	}
-	
-	var xmlhttp=new XMLHttpRequest();
-	xmlhttp.onreadystatechange=function()
-	{ // this function called when network progress happens
-		if(xmlhttp.readyState!=4) return;
+
+	superstar_send(starpath,starcmd,function(xmlhttp) {
 		var status="Network Error";
 		if (xmlhttp.status==200)
 		{
@@ -159,42 +165,42 @@ function pilot_send() {
 		}
 		document.getElementById('p_outputNet').innerHTML=status;
 		networkBusy--;
-	}
-	xmlhttp.open("GET",url,true);
-	xmlhttp.send(null);
-	data_receive(); // Read Sensor Data at every Send
+	});
+	
+	sensor_receive(); // Read Sensor Data at every Send
 }
+
 //Read sensor data every 250 ms
-window.setInterval(function(){data_receive()},250);
+window.setInterval(function(){sensor_receive()},250);
+
+var sensors = {"error":"network not connected"};
 
 // Recieve Sensor Values sent by backend 
-function data_receive()
+function sensor_receive()
 {
-	var xmlrec=new XMLHttpRequest();
-	var host=// "http://localhost:8080"+ // <- explicit host not needed, browser will use the .html server by default.
-		"/superstar/";
-	var url_start=host;
-	var robot=document.getElementById('robot_name').value;
-	var starpath=robot+"/data";
-	var url_rec=url_start+starpath+"?get";
+	var starpath=robot_name()+"/sensors";
+	var starcmd="?get";
 	
-	xmlrec.open("GET",url_rec,true);
-	xmlrec.send(null);
-	var pilot_received = emptyUSonic();
-	console.log(pilot_received);
-	xmlrec.onreadystatechange = function(){
-	if(this.readyState==4){ //check for network change
-	var pilot_received = JSON.parse(xmlrec.responseText);
-	console.log(pilot_received);
-/* Read Ultrasonic sensor data sent by backend*/
-	document.getElementById('USonic1').value=Sensors.USonic.USensor1 = pilot_received.uSound1;
-	document.getElementById('USonic2').value=Sensors.USonic.USensor2 = pilot_received.uSound2;
-	document.getElementById('USonic3').value=Sensors.USonic.USensor3 = pilot_received.uSound3;
-	document.getElementById('USonic4').value=Sensors.USonic.USensor4 = pilot_received.uSound4;
-	document.getElementById('USonic5').value=Sensors.USonic.USensor5 = pilot_received.uSound5; 
-	}
-}
-	
+	superstar_send(starpath,starcmd,function(xmlhttp) {
+		if (xmlhttp.status==200) {
+			var sensor_data=xmlhttp.responseText;
+			console.log("sensors: "+sensor_data);
+			try {
+				sensors=JSON.parse(sensor_data);
+			}
+			catch (err) {
+				sensors.error="Exception: "+err;
+				sensors.data=sensor_data;
+    			}
+		}
+		
+		var out=document.getElementById('p_outputSensors');
+		if (out) {
+			var prettySensors=JSON.stringify(sensors,null,4);
+			prettySensors=prettySensors.replace(/["]/g,"");
+			out.innerHTML="<pre>robot="+prettySensors+"</pre>";
+		}
+	});
 }
 
 
