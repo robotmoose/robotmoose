@@ -269,11 +269,11 @@ function pilot_mouse(event,upState) {
 function updateRTCVideo()
 {
   var currentRobot = document.getElementById('robot_videoname').value;
-  var splitName = currentRobot.split('/');
+  var robotVideo = currentRobot.replace(/[/]/g,"");
 
 
  // Use AppRTC instead of gruveo for video
-  var videoURL = "https://appear.in/" + splitName[0] + splitName[1];
+  var videoURL = "https://appear.in/" + robotVideo;
   document.getElementById("video_frame").src = videoURL;
 
 }
@@ -281,11 +281,9 @@ function updateRTCVideo()
 //Open Gruveo Video
 function openGruveoVideo()
 {
-  var currentRobot = robot;
-  var splitName = currentRobot.split('/');
-
+  var robotVideo = robot_name().replace(/[/]/g,"");
  
-  var videoURL = "http://gruveo.com/#" + splitName[0] + splitName[1];
+  var videoURL = "http://gruveo.com/#" + robotVideo;
 
   // On Firefox or Chrome, specifying a width and height opens a new window, not a tab.
   //  (On IE, it's up to the user's preferences)
