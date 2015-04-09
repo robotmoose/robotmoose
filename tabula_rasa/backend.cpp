@@ -387,7 +387,7 @@ void robot_backend::read_network()
 					path.c_str(),arg.c_str());
 
 				if (fork()==0) {
-					if (chdir("scripts")!=0) {
+					if (chdir("../layla/backend/scripts")!=0) {
 						printf("SCRIPT chdir FAILED\n");
 					}
 
