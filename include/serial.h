@@ -31,7 +31,7 @@ public:
 	/// Usage: Serial.begin(115200);
 	int begin(int baudrate) {
 		std::vector<std::string> ports=port_list();
-		if (ports.size()==0) { printf("ERROR!  No serial ports found!  (Is it plugged in?"); return -1; }
+		if (ports.size()==0) { printf("ERROR!  No serial ports found!  (Is it plugged in?)\n"); return -1; }
 		
 		if (0==Open(port_list()[0])) {
 			printf("\nOpened serial port %s, baud rate %d\n",
