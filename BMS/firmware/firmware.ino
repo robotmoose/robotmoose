@@ -48,10 +48,11 @@ byte CFGR1=0x00;
 // Arduino Pins
 
 #define SS_PIN        10   // Designate Chip select pin ***Change this to pin 53 when uploading to Mega***
-#define CHARGE_INPUT  5    // Will be pulled high when AC power is available
+#define CHARGE_INPUT  7    // Will be pulled high when AC power is available
 #define CHARGE_RELAY  9    // Set to high to turn on charging relay
 #define POWER         6    // Power pin for BMS shield
 #define ADDRESS       0x80 // Designate Chip address: 10000000
+#define OK            8    // OK signal for system power
 
 //---------------------------------------------------------------------------------------------------------------------
 // Calculation Variables
@@ -77,6 +78,7 @@ int x=0;
 void setup()
 {
   pinMode(SS_PIN, OUTPUT);
+  pinMode(OK, OUTPUT);
   pinMode(CHARGE_INPUT, INPUT);
   pinMode(POWER, OUTPUT);
   pinMode(CHARGE_RELAY, OUTPUT);
@@ -231,6 +233,7 @@ void Charge()    // Function to turn on charging and cell balancing
   SetConfig();
   if (digitalRead(CHARGE_INPUT) == HIGH)
   {
+    Serial.println("Charger Connected");
     //If a single cell's voltage is greater than the absolute max, turns off charging
     if ((cellVoltage[0] >= ABS_max) || (cellVoltage[1] >= ABS_max) || (cellVoltage[2] >= ABS_max))
     {
@@ -246,8 +249,23 @@ void Charge()    // Function to turn on charging and cell balancing
   }
   else if (digitalRead(CHARGE_INPUT) == LOW)
   {
+    Serial.println("Charger Disconnected");
     digitalWrite(CHARGE_RELAY, LOW);
     chargeflag=0;
+  }
+}
+
+void BatteryCritical()
+{
+  if ((cellVoltage[0] <= ABS_min) || (cellVoltage[1] <= ABS_min) || (cellVoltage[2] <= ABS_min))
+  {
+    digitalWrite(OK, LOW);
+    Serial.println("Battery is LOW! OK pin set to LOW.");
+  }
+  else 
+  {
+    digitalWrite(OK, HIGH);
+    Serial.println("Battery is OK. OK pin set to HIGH.");
   }
 }
 
@@ -362,9 +380,14 @@ void loop()
   ADCconvert();
   getCellVolts();
   cellVoltage[3]=CellConvert(BitShiftCombine(RawData[1], RawData[0]), BitShiftCombine(RawData[2], RawData[1]), BitShiftCombine(RawData[4], RawData[3]));
+  BatteryCritical();
   AvgerageCell();
   totalCell();
   Charge();
+  
+  Serial.print("Charge flag: ");
+  Serial.println(chargeflag,3);
+  
   for(int i=0; i<3; i++)
   {
     Serial.print("Cell ");
@@ -380,9 +403,7 @@ void loop()
   Serial.print("Total Cell Voltages: ");
   Serial.print(cellVoltTotal,3);
   Serial.println(" V");
-  
-  Serial.print("Charge flag: ");
-  Serial.println(chargeflag,3);
+
   Serial.println("-------------------------------------");
   delay(1200);
 }
