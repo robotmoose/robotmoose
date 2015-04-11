@@ -30,13 +30,12 @@ std::string msl::to_hex_string(const std::string& str)
 
 std::string msl::replace_all(std::string str,const std::string& find,const std::string& replace)
 {
-	size_t found=str.find(find,0);
+	size_t pos=0;
 
-	while(found!=std::string::npos)
+	while((pos=str.find(find,pos))!=std::string::npos)
 	{
-		str.replace(found,find.size(),replace);
-		found+=replace.size();
-		found=str.find(find,found-find.size()+replace.size());
+		str.replace(pos,find.size(),replace);
+		pos+=replace.size();
 	}
 
 	return str;
