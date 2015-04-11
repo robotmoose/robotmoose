@@ -40,10 +40,7 @@
 				<div class="tab-content">
 					<div role="tabpanel" class="tab-pane active" id="setup">
 						<!--Robot Name:<input type="text" id="robot_name" rows="1" cols="30" onChange="run();" value="layla/uaf"/>!-->
-						Robot Name: <input type ="checkbox" id="layla_gray" name="Layla Gray" value="layla/gray" onclick="set_robot()"> Layla Gray
-									<input type ="checkbox" id="layla_orange" name="Layla Orange" value="layla/orange" onclick="set_robot()"> Layla Orange		
-									<input type ="checkbox" id="create_2" name="Layla Gray" value="create/2" onclick="set_robot()"> Create 2
-						<br>
+						Robot Name: <input type="text" id="robot_name" rows="1" cols="30" onChange="run()" value="demo"/>
 									
 						<input value="Video - Gruveo" type="button" onClick="runCmd('video','r'+((new Date()).getTime())); openGruveoVideo()"/><br/>
 
@@ -84,19 +81,7 @@
 						</div>
 					</div>
 					<div role="tabpanel" class="tab-pane" id="sensors">
-						<table>
-							<CAPTION> Current Sensor Values</CAPTION>
-							<tr>
-								<td colspan="5">
-									Ultrasonic Sensors
-									<input id="USonic1" size ="3" disabled/>
-									<input id="USonic2" size ="3" disabled/>
-									<input id="USonic3" size ="3" disabled/>
-									<input id="USonic4" size ="3" disabled/>
-									<input id="USonic5" size ="3" disabled/>
-								</td>
-							</tr>
-						</table>
+						<p id="p_outputSensors"></p>
 					</div>
 					<div role="tabpanel" class="tab-pane" id="robot_health">
 						<table>

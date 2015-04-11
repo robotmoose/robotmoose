@@ -294,9 +294,11 @@ void robot_backend::setup_devices(std::string robot_config)
 
 void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 {
+	std::cout.flush();
 	while (true) { // wait for Arduino to boot
+		(std::cout<<"Arduino startup: ").flush();
 		std::string start=getline_serial(port); 
-		std::cout<<"Arduino startup: "<<start<<"\n";
+		std::cout<<start<<"\n";
 		if (start[0]=='9') break;
 	}
 	port.write(&robot_config[0],robot_config.size()); // dump to Arduino
@@ -387,7 +389,7 @@ void robot_backend::read_network()
 					path.c_str(),arg.c_str());
 
 				if (fork()==0) {
-					if (chdir("scripts")!=0) {
+					if (chdir("../layla/backend/scripts")!=0) {
 						printf("SCRIPT chdir FAILED\n");
 					}
 
@@ -429,14 +431,14 @@ void robot_backend::read_network()
 			printf(ledDemo ? "true\n" : "false\n");
 			printf("RGB Values: %d R %d G %d B \n", led_red, led_blue, led_green);
 
-			//printf("   Network data: %ld bytes, '%s'\n", json_data.size(), json_data.c_str());
+			//printf("   Network data: %ld bytes, '%s'\n", (long)json_data.size(), json_data.c_str());
 		}
 */
 
 	} catch (std::exception &e) {
 
 		printf("Exception while processing network JSON: %s\n",e.what());
-		printf("   Network data: %ld bytes, '%s'\n", json_data.size(),json_data.c_str());
+		printf("   Network data: %ld bytes, '%s'\n", (long)json_data.size(),json_data.c_str());
 		// stop();
 	}
 	double elapsed=time_in_seconds()-start;
@@ -485,8 +487,8 @@ int main(int argc, char *argv[])
 	double LRtrim=1.0;
 	bool sim = false; // use --sim to enable simulation mode
 	bool debug = false;  // spams more output data
-	std::string superstarURL = "http://sandy.cs.uaf.edu/";
-	std::string robotName = "layla/uaf";
+	std::string superstarURL = "http://robotmoose.com/";
+	std::string robotName = "demo";
 	std::string configMotor = "create2_controller_t X3";
 	int baudrate = 57600;  // serial comms
 	for (int argi = 1; argi<argc; argi++) {
