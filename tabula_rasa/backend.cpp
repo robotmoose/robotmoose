@@ -158,11 +158,15 @@ uint8_t json_command_conversion<float,uint8_t>(const float &v) {
 template <class jsonT,class deviceT>
 class json_command : public json_target {
 public:
+	jsonT scaleFactor; // from JSON to device value
 	tabula_command<deviceT> command;
-	json_command(const json_path &path_) :json_target(path_) {}
+	json_command(const json_path &path_,jsonT scaleFactor_=1.0) 
+		:json_target(path_), scaleFactor(scaleFactor_) { }
 	
 	virtual void modify(json::Value &root) {
-		deviceT d=json_command_conversion<jsonT,deviceT>(path.in(root));
+		jsonT j=path.in(root);
+		j*=scaleFactor;
+		deviceT d=json_command_conversion<jsonT,deviceT>(j);
 		*(deviceT *)&tabula_command_storage.array[command.get_index()]=d;
 	}
 };
@@ -249,7 +253,7 @@ void robot_backend::setup_devices(std::string robot_config)
 		{
 			// Virtually all motor controllers just need motor power, left and right:
 			commands.push_back(new json_command<float,int16_t>(json_path("power","L")));
-			commands.push_back(new json_command<float,int16_t>(json_path("power","R")));
+			commands.push_back(new json_command<float,int16_t>(json_path("power","R"),LRtrim));
 			
 			if (device=="create2_controller_t") 
 			{ // Add all the Roomba's onboard sensors
