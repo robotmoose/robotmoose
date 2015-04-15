@@ -13,6 +13,7 @@
 #include <openssl/rsa.h>
 #include <openssl/sha.h>
 #include <cstdint>
+#include <mutex>
 
 #define RSA_PKCS1_PADDING_SIZE			11
 #define RSA_PKCS1_OAEP_PADDING_SIZE		41
@@ -21,12 +22,16 @@
 #define SHA256_BLOCK_SIZE				64
 #define SHA512_BLOCK_SIZE				128
 
+static std::mutex ossl_lock;
+
 bool msl::encrypt_rsa(const void* plain,const size_t size,const std::string& key,std::string& cipher)
 {
 	bool success=true;
+	ossl_lock.lock();
 	ERR_load_crypto_strings();
 	OpenSSL_add_all_algorithms();
 	BIO* keybio=BIO_new_mem_buf((uint8_t*)key.c_str(),-1);
+	ossl_lock.unlock();
 
 	if(keybio==nullptr)
 		success=false;
@@ -55,12 +60,14 @@ bool msl::encrypt_rsa(const void* plain,const size_t size,const std::string& key
 		cipher=std::string((char*)temp_data,temp_size);
 
 	delete[] temp_data;
+	ossl_lock.lock();
 	BIO_free(keybio);
 	RSA_free(rsa);
 	ERR_free_strings();
 	EVP_cleanup();
 	ERR_remove_state(0);
 	CRYPTO_cleanup_all_ex_data();
+	ossl_lock.unlock();
 	return success;
 }
 
@@ -72,10 +79,12 @@ bool msl::encrypt_rsa(const std::string& plain,const std::string& key,std::strin
 bool msl::encrypt_aes256(const void* plain,const size_t size,const std::string& key,const std::string& iv,std::string& cipher)
 {
 	bool success=false;
+	ossl_lock.lock();
 	ERR_load_crypto_strings();
 	OpenSSL_add_all_algorithms();
 	EVP_CIPHER_CTX* ctx=EVP_CIPHER_CTX_new();
 	uint8_t* temp_data=new uint8_t[(size/16+1)*16];
+	ossl_lock.unlock();
 
 	int temp_length;
 	int temp_unaligned_length;
@@ -90,11 +99,13 @@ bool msl::encrypt_aes256(const void* plain,const size_t size,const std::string& 
 	}
 
 	delete[] temp_data;
+	ossl_lock.lock();
 	EVP_CIPHER_CTX_free(ctx);
 	ERR_free_strings();
 	EVP_cleanup();
 	ERR_remove_state(0);
 	CRYPTO_cleanup_all_ex_data();
+	ossl_lock.unlock();
 	return success;
 }
 
@@ -106,9 +117,11 @@ bool msl::encrypt_aes256(const std::string& plain,const std::string& key,const s
 bool msl::decrypt_rsa(const void* cipher,const size_t size,const std::string& key,std::string& plain)
 {
 	bool success=true;
+	ossl_lock.lock();
 	ERR_load_crypto_strings();
 	OpenSSL_add_all_algorithms();
 	BIO* keybio=BIO_new_mem_buf((uint8_t*)key.c_str(),-1);
+	ossl_lock.unlock();
 
 	if(keybio==nullptr)
 		success=false;
@@ -137,12 +150,14 @@ bool msl::decrypt_rsa(const void* cipher,const size_t size,const std::string& ke
 		plain=std::string((char*)temp_data,temp_size);
 
 	delete[] temp_data;
+	ossl_lock.lock();
 	BIO_free(keybio);
 	RSA_free(rsa);
 	ERR_free_strings();
 	EVP_cleanup();
 	ERR_remove_state(0);
 	CRYPTO_cleanup_all_ex_data();
+	ossl_lock.unlock();
 	return success;
 }
 
@@ -154,6 +169,7 @@ bool msl::decrypt_rsa(const std::string& cipher,const std::string& key,std::stri
 bool msl::decrypt_aes256(const void* cipher,const size_t size,const std::string& key,const std::string& iv,std::string& plain)
 {
 	bool success=false;
+	ossl_lock.lock();
 	ERR_load_crypto_strings();
 	OpenSSL_add_all_algorithms();
 	EVP_CIPHER_CTX* ctx=EVP_CIPHER_CTX_new();
@@ -177,6 +193,7 @@ bool msl::decrypt_aes256(const void* cipher,const size_t size,const std::string&
 	EVP_cleanup();
 	ERR_remove_state(0);
 	CRYPTO_cleanup_all_ex_data();
+	ossl_lock.unlock();
 	return success;
 }
 
