@@ -260,12 +260,12 @@ void BatteryCritical()
   if ((cellVoltage[0] <= ABS_min) || (cellVoltage[1] <= ABS_min) || (cellVoltage[2] <= ABS_min))
   {
     digitalWrite(OK, LOW);
-    Serial.println("Battery is LOW! OK pin set to LOW.");
+    Serial.println("Battery is AT OR BELOW MINIMUM VOLTAGE! SYSTEM OK pin set to LOW.");
   }
   else 
   {
     digitalWrite(OK, HIGH);
-    Serial.println("Battery is OK. OK pin set to HIGH.");
+    Serial.println("Battery level is above minimum. SYSTEM OK pin set to HIGH.");
   }
 }
 

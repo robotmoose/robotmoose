@@ -1,8 +1,8 @@
 //Windows Dependencies:
-//		-lcrypto -lgdi32
+//		-lcrypto -lgdi32 -lpthread
 
 //Linux Dependencies:
-//		-lcrypto
+//		-lcrypto -lpthread
 
 #ifndef MSL_C11_CRYPTO_HPP
 #define MSL_C11_CRYPTO_HPP
