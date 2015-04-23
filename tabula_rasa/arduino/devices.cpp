@@ -5,6 +5,7 @@
  Dr. Orion Lawlor, lawlor@alaska.edu, 2015-03-18 (Public Domain)
 */
 #include <Servo.h>
+#include <Wire.h>
 #include "tabula_control.h"
 #include "tabula_config.h"
 
@@ -66,6 +67,30 @@ REGISTER_TABULA_DEVICE(analog_sensor,
 	src.sensor_index("value",F("analog input value from 0 to 1023"),device->value.get_index());
 	actions_10ms.add(device);
 )
+
+// Battery Management System
+class BMS : public action {
+public:
+        const int bms_addr = 2; // Address of BMS on I2C
+        const int numbytes = 2; // # of bytes to request from BMS
+	virtual void loop() {
+		Wire.requestFrom(bms_addr, numbytes);
+                while(Wire.available() <= 2 && Wire.available() >= 1)    // slave may send less than requested
+                {
+                           byte x = Wire.read(); // receive a byte as character
+                           Serial.print(x);   // print the character
+                           Serial.println("");
+                }
+
+	}	
+};
+
+REGISTER_TABULA_DEVICE(BMS,
+        Wire.begin();
+	BMS *device=new BMS();
+	actions_10s.add(device);
+)
+    
 
 // Watch sensor or command values on serial port (in ASCII)
 template <class T>

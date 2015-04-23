@@ -12,6 +12,7 @@
 #define ROOMBA_ID_SAFE_MODE                 131
 #define ROOMBA_ID_FULL_MODE                 132
 #define ROOMBA_ID_DRIVE_DIRECT              145
+#define ROOMBA_ID_DRIVE_VELRAD				137
 #define ROOMBA_ID_LEDS                      139
 #define ROOMBA_ID_7_SEGMENT                 164
 #define ROOMBA_ID_PLAY_SONG                 141
@@ -178,7 +179,7 @@ void roomba_t::set_mode(const mode_t& mode)
 	roomba_delay(ROOMBA_SYNC_TIME);
 }
 
-void roomba_t::drive(const int16_t left,const int16_t right)
+/*void roomba_t::drive(const int16_t left,const int16_t right)
 {
 	uint8_t id=ROOMBA_ID_DRIVE_DIRECT;
 	serial_m->write(&id,1);
@@ -186,6 +187,25 @@ void roomba_t::drive(const int16_t left,const int16_t right)
 	serial_m->write((uint8_t*)&right,1);
 	serial_m->write((uint8_t*)&left+1,1);
 	serial_m->write((uint8_t*)&left,1);
+}*/
+
+// Velocity and radius drive mode
+//Command Sequence: [137][V High][V Low][R High][R Low]
+void roomba_t::drive(const int16_t velocity, const int16_t radius)
+{
+	int16_t testv = 50;
+	int16_t testr = 32768; //drive straight
+	uint8_t id=ROOMBA_ID_DRIVE_VELRAD;
+	serial_m->write(&id, 1);
+	serial_m->write((uint8_t*)&testv+1,1);
+	serial_m->write((uint8_t*)&testv,1);
+	serial_m->write((uint8_t*)&testr+1,1);
+	serial_m->write((uint8_t*)&testr,1);
+	
+	/*serial_m->write((uint8_t*)&velocity+1,1);
+	serial_m->write((uint8_t*)&velocity,1);
+	serial_m->write((uint8_t*)&radius+1,1);
+	serial_m->write((uint8_t*)&radius,1)*/;
 }
 
 void roomba_t::set_led_check(const bool on)

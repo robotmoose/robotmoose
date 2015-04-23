@@ -93,7 +93,8 @@ class roomba_t
 
 		void set_mode(const mode_t& mode);
 
-		void drive(const int16_t left,const int16_t right);
+		//void drive(const int16_t left,const int16_t right);
+		void drive(const int16_t velocity, const int16_t radius);
 
 		void set_led_check(const bool on);
 		void set_led_dock(const bool on);
