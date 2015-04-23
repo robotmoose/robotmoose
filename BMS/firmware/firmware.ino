@@ -5,6 +5,7 @@
 #include <SPI.h> 
 #include <Wire.h>
 #include <stdlib.h>
+#include "battery.h"
 
 // LTC6803 parameters
 
@@ -31,7 +32,7 @@
 
 // Charge function parameters
 
-#define ABS_max           4.200  // Max Cell voltage: DO NOT CHARGE HIGHER
+#define ABS_max           4.110  // Max Cell voltage: DO NOT CHARGE HIGHER
 #define max_working       4.100  // Discharge cells higher than this value
 #define low_cell_working  3.500  // Warning Voltage
 #define ABS_min           3.200  //E-Stop or risk damage
@@ -96,7 +97,6 @@ void setup()
 // I2C configs
  Wire.begin(2);                // join i2c bus with address #2
  Wire.onRequest(requestEvent); // register event
- Wire.onReceive(receiveEvent);
 
 //---------------------------------------------------------------------------------------------------------------------
 
@@ -329,44 +329,17 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
 //---------------------------------------------------------------------------------------------------------------------
 // I2C communication code
 
-void receiveEvent(int command)
-{
-  x = Wire.read();    // receive byte as an integer
-}
-
 void requestEvent()
 {
-     //If value received is 0 
-  if (x == 0) 
-  {
-    char Cell0[5];
-    //cellVoltage[0]=2.567482309;  // Artificially set to test I2C
-    Wire.write(dtostrf(cellVoltage[0],7,5,Cell0));
-    int testflag0=0;
-    //Serial.println(testflag);
-    //Serial.println(Cell);
-  }
-  
-  if (x==1)
-  {
-    char Cell1[5];
-    //cellVoltage[1]=-3.3473632; // Artificially set to test I2C
-    Wire.write(dtostrf(cellVoltage[1],7,5,Cell1));
-    int testflag1=1;
-    //Serial.println(testflag);
-    //Serial.println(Cell);
-  }
-  
-  if (x==2)
-  {
-    char Cell2[5];
-    //cellVoltage[2]=1.48236372; // Artificially set to test I2C
-    Wire.write(dtostrf(cellVoltage[2],7,5,Cell2));
-    int testflag2=2;
-    //Serial.println(testflag);
-    //Serial.println(Cell);
-    
-  }
+  byte data [2] = {(byte)make_battery(cellVoltage).percentage, setChargeByte()};
+  Wire.write(data, 2);
+  //Serial.print("I2C Request Performed: ");
+  //Serial.println(make_battery(cellVoltage).percentage);
+}
+
+byte setChargeByte()
+{
+  return ((chargeflag << 3) | CFGR1);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
