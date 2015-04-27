@@ -78,7 +78,7 @@ public:
 	}
 	
 	/// Return our index in the global array.
-	int get_index(void) { return index; }
+	int get_index(void) const { return index; }
 	
 	/// Get read/write access to the data at this sensor index.
 	inline T &get(void) { 
@@ -102,7 +102,7 @@ public:
 	}
 	
 	/// Return our index in the global array.
-	int get_index(void) { return index; }
+	int get_index(void) const { return index; }
 	
 	/// Get read/write access to the data at this command index.
 	inline T &get(void) { 

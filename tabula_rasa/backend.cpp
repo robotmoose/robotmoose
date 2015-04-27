@@ -34,6 +34,86 @@
 #include "../include/osl/webservice.cpp"
 #include "../include/json.cpp"
 
+#include "../include/location_binary.h" /* for computer vision marker I/O */
+#include "../include/osl/vec4.h" /* for vec3, used for arithmetic */
+
+#ifndef M_PI
+# define M_PI 3.1415926535897
+#endif
+
+/**
+  This class is used to localize the robot
+*/
+class robot_location {
+public:
+	/** Merged location */
+	location_binary merged;
+	
+	/** Values from computer vision */
+	location_binary vision;
+	location_reader vision_reader;
+	
+	/** Update computer vision values */
+	void update_vision(const char *marker_path) {
+		if (vision_reader.updated(marker_path,vision)) {
+			if (vision.valid) {
+				merged=vision; // <- HACK!  Always trusts camera, even if it's bouncing around.
+			}
+		}
+	}
+	
+	double coordfix(double coordinate) {
+		return long(coordinate*1000.0)/1000.0; // round to mm accuracy
+	}
+	
+	/* Write our location values into this robot object */
+	void copy_to_json(json::Value &robot) {
+		robot["location"]=json::Object();
+		robot["location"]["x"]=coordfix(merged.x);
+		robot["location"]["y"]=coordfix(merged.y);
+		robot["location"]["z"]=coordfix(merged.z);
+		robot["location"]["angle"]=(int)merged.angle; // (int) to avoid extra decimal places
+		robot["location"]["count"]=(int)merged.count; // counter to verify progress
+		robot["location"]["ID"]=(int)merged.marker_ID;
+	}
+	
+	/* Update absolute robot position based on these incremental 
+	   wheel encoder distances.
+	   These are normalized such that left and right are the 
+	   actual distances the wheels rolled, and wheelbase is the 
+	   effective distance between the wheels' center of traction.
+	   Default units for vision_reader are in meters.
+	*/
+	void move_wheels(float left,float right,float wheelbase) {
+	// Extract position and orientation from absolute location
+		vec3 P=vec3(merged.x,merged.y,merged.z); // position of robot (center of wheels)
+		double ang_rads=merged.angle*M_PI/180.0; // 2D rotation of robot
+		
+	// Reconstruct coordinate system and wheel locations
+		vec3 FW=vec3(cos(ang_rads),sin(ang_rads),0.0); // forward vector
+		vec3 UP=vec3(0,0,1); // up vector
+		vec3 LR=FW.cross(UP); // left-to-right vector
+		vec3 wheel[2];
+		wheel[0]=P-0.5*wheelbase*LR;
+		wheel[1]=P+0.5*wheelbase*LR;
+		
+	// Move wheels forward by specified amounts
+		wheel[0]+=FW*left;
+		wheel[1]+=FW*right;
+		
+	// Extract new robot position and orientation
+		P=(wheel[0]+wheel[1])*0.5;
+		LR=normalize(wheel[1]-wheel[0]);
+		FW=UP.cross(LR);
+		ang_rads=atan2(FW.y,FW.x);
+		
+	// Put back into merged absolute location
+		merged.angle=180.0/M_PI*ang_rads;
+		merged.x=P.x; merged.y=P.y; merged.z=P.z;
+	}
+};
+
+
 /**
  This is the location of one field in a JSON object,
    for example, robot.foo.bar[3] stored as {"foo","bar"}, 3
@@ -113,8 +193,14 @@ public:
 	tabula_sensor<deviceT> sensor;
 	json_sensor(const json_path &path_) :json_target(path_) {}
 	
+	// Return the last-read value of our sensor
+	deviceT read(void) const {
+		return *(deviceT *)&tabula_sensor_storage.array[sensor.get_index()];
+	}
+	
+	// Write our sensor value into this JSON object
 	virtual void modify(json::Value &root) {
-		deviceT d=*(deviceT *)&tabula_sensor_storage.array[sensor.get_index()];
+		deviceT d=read();
 		path.in(root) = (jsonT)d;
 	}
 };
@@ -151,6 +237,41 @@ uint8_t json_command_conversion<float,uint8_t>(const float &v) {
 	else return (uint8_t)iv;  
 }
 
+template <class deviceT>
+class wheel_encoders : public json_target {
+	deviceT oldL, oldR;
+public:
+	robot_location &location;
+	json_sensor<int,deviceT> L;
+	json_sensor<int,deviceT> R;
+	float distance_per_count, wheelbase;
+	wheel_encoders(robot_location &location_,float distance_per_count_,float wheelbase_) 
+		:json_target(json_path("encoder")), location(location_),
+		 L(json_path("encoder","L")), R(json_path("encoder","R")),
+		 distance_per_count(distance_per_count_), wheelbase(wheelbase_)
+	{
+		oldL=L.read();
+		oldR=R.read();
+	}
+	
+	virtual void modify(json::Value &root) {
+		// Pass new encoder values up to robot location
+		deviceT newL=L.read(), newR=R.read();
+		double delL=newL-oldL, delR=newR-oldR;
+		if (delL!=0 || delR!=0) {
+			location.move_wheels(
+				delL*distance_per_count,
+				delR*distance_per_count,
+				wheelbase);
+		}
+		oldL=newL; oldR=newR;
+		
+		// Pass value out to JSON
+		L.modify(root);
+		R.modify(root);
+	}
+};
+
 /**
  Read this command from JSON, optionally convert it,
  and write it to the storage array.
@@ -185,6 +306,7 @@ private:
 	std::vector<json_target *> sensors;
 	std::vector<json_target *> commands;
 public:
+	robot_location location;
 	double LRtrim;
 	bool debug;
 
@@ -265,8 +387,12 @@ void robot_backend::setup_devices(std::string robot_config)
 				sensors.push_back(new json_sensor<int,uint16_t>(json_path("battery","voltage")));
 				sensors.push_back(new json_sensor<int,uint16_t>(json_path("battery","charge")));
 				sensors.push_back(new json_sensor<int,uint16_t>(json_path("battery","capacity")));
-				sensors.push_back(new json_sensor<int,uint16_t>(json_path("encoder","L")));
-				sensors.push_back(new json_sensor<int,uint16_t>(json_path("encoder","R")));
+				
+				sensors.push_back(new wheel_encoders<uint16_t>(location,
+					0.0005, // wheel travel distance (m) per encoder count: about 600 counts per foot
+					0.3 // roomba's wheelbase
+					));
+				
 				for (int i=0;i<4;i++)
 					sensors.push_back(new json_sensor<int,uint16_t>(json_path("floor",i)));
 				for (int i=0;i<6;i++)
@@ -457,6 +583,7 @@ void robot_backend::send_network(void)
 	try 
 	{ // send all registered sensor values
 		json::Value root=json::Object();
+		location.copy_to_json(root);
 		for (unsigned int i=0;i< sensors.size();i++) sensors[i]->modify(root);
 		
 		std::string str = json::Serialize(root);
@@ -491,24 +618,27 @@ int main(int argc, char *argv[])
 	double LRtrim=1.0;
 	bool sim = false; // use --sim to enable simulation mode
 	bool debug = false;  // spams more output data
-	std::string superstarURL = "http://robotmoose.com/";
-	std::string robotName = "demo";
-	std::string configMotor = "create2_controller_t X3";
-	int baudrate = 57600;  // serial comms
+	std::string superstarURL = "http://robotmoose.com/"; // superstar server
+	std::string robotName = "demo"; // superstar robot name
+	std::string configMotor = "create2_controller_t X3"; // Arduino firmware device name
+	std::string markerFile=""; // computer vision marker file
+	int baudrate = 57600;  // serial comms to Arduino
 	for (int argi = 1; argi<argc; argi++) {
 		if (0 == strcmp(argv[argi], "--robot")) robotName = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--superstar")) superstarURL = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--baudrate")) baudrate = atoi(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--config")) configMotor = argv[++argi];
+		else if (0 == strcmp(argv[argi], "--marker")) markerFile = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--trim")) LRtrim = atof(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--debug")) debug = true;
-		else if (0 == strcmp(argv[argi], "--sim")) { // no hardware, for debugging
+		else if (0 == strcmp(argv[argi], "--sim")) { // no Arduino, for debugging
 			robotName="sim/uaf";
 			sim = true;
 			baudrate=0;
 		}
 		else {
 			printf("Unrecognized command line argument '%s'\n", argv[argi]);
+			exit(1);
 		}
 	}
 	backend=new robot_backend(superstarURL, robotName);
@@ -519,7 +649,7 @@ int main(int argc, char *argv[])
 	// FIXME: should pull robot configuration from superstar robotName/+"config"
 	std::string robot_config=
 "analog_sensor A0\n"
-"analog_sensor A5\n"
+"analog_sensor A1\n"
 
 +configMotor+"\n"
 
@@ -542,6 +672,7 @@ int main(int argc, char *argv[])
 		backend->read_network();
 		backend->send_serial();
 		backend->read_serial();
+		if (markerFile!="") backend->location.update_vision(markerFile.c_str());
 		backend->send_network();
 #ifdef __unix__
 		usleep(10*1000); // limit rate to 100Hz, to be kind to serial port and network

@@ -6,6 +6,7 @@ arduino_emulator.js: Processing implementation of Arduino calls.  delay() is han
 editor.js: Syntax highlighting, line counting text editor, with error line number display.
 pilot.js: Drive a robot around.
 quizbot.js: Simulate a two-servo "quizbot".
+robot_2wd.js: Simulate a generic robot with tank-style 2 wheel driving.
 roomba_sim.js: Simulate a Roomba.
 xmlhttp.js: Thin wrapper around XMLHttpRequest.
 
