@@ -254,10 +254,14 @@ public:
 		oldR=R.read();
 	}
 	
+	double wraparound_fix(deviceT devDiff) {
+		return (0xff&(devDiff+128))-128;
+	}
+	
 	virtual void modify(json::Value &root) {
 		// Pass new encoder values up to robot location
 		deviceT newL=L.read(), newR=R.read();
-		double delL=newL-oldL, delR=newR-oldR;
+		double delL=wraparound_fix(newL-oldL), delR=wraparound_fix(newR-oldR);
 		if (delL!=0 || delR!=0) {
 			location.move_wheels(
 				delL*distance_per_count,
@@ -389,7 +393,7 @@ void robot_backend::setup_devices(std::string robot_config)
 				sensors.push_back(new json_sensor<int,uint16_t>(json_path("battery","capacity")));
 				
 				sensors.push_back(new wheel_encoders<uint16_t>(location,
-					0.0005, // wheel travel distance (m) per encoder count: about 600 counts per foot
+					0.00044, // wheel travel distance (m) per encoder count: about 600 counts per foot
 					0.23 // roomba's wheelbase
 					));
 				
