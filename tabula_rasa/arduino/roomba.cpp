@@ -179,7 +179,9 @@ void roomba_t::set_mode(const mode_t& mode)
 	roomba_delay(ROOMBA_SYNC_TIME);
 }
 
-/*void roomba_t::drive(const int16_t left,const int16_t right)
+#if 1
+/* Normal left-right driving mode */
+void roomba_t::drive(const int16_t left,const int16_t right)
 {
 	uint8_t id=ROOMBA_ID_DRIVE_DIRECT;
 	serial_m->write(&id,1);
@@ -187,9 +189,10 @@ void roomba_t::set_mode(const mode_t& mode)
 	serial_m->write((uint8_t*)&right,1);
 	serial_m->write((uint8_t*)&left+1,1);
 	serial_m->write((uint8_t*)&left,1);
-}*/
+}
 
-// Velocity and radius drive mode
+#else
+// Velocity and radius drive mode (Ryker hacky testing)
 //Command Sequence: [137][V High][V Low][R High][R Low]
 void roomba_t::drive(const int16_t velocity, const int16_t radius)
 {
@@ -207,6 +210,7 @@ void roomba_t::drive(const int16_t velocity, const int16_t radius)
 	serial_m->write((uint8_t*)&radius+1,1);
 	serial_m->write((uint8_t*)&radius,1)*/;
 }
+#endif
 
 void roomba_t::set_led_check(const bool on)
 {
