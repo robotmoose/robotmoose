@@ -502,7 +502,7 @@ void robot_backend::read_network()
 	std::string json_data=superstar.receive();
 	
 	try {
-
+		std::cout<<"Received pilot commands: "+json_data+"\n";
 		json::Value v=json::Deserialize(json_data);
 		
 		// Pull registered commands from JSON
