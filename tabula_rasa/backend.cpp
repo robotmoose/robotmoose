@@ -390,7 +390,7 @@ void robot_backend::setup_devices(std::string robot_config)
 				
 				sensors.push_back(new wheel_encoders<uint16_t>(location,
 					0.0005, // wheel travel distance (m) per encoder count: about 600 counts per foot
-					0.3 // roomba's wheelbase
+					0.23 // roomba's wheelbase
 					));
 				
 				for (int i=0;i<4;i++)
