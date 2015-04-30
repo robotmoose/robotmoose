@@ -393,7 +393,7 @@ void robot_backend::setup_devices(std::string robot_config)
 				sensors.push_back(new json_sensor<int,uint16_t>(json_path("battery","capacity")));
 				
 				sensors.push_back(new wheel_encoders<uint16_t>(location,
-					0.00044, // wheel travel distance (m) per encoder count: about 600 counts per foot
+					0.00044, // wheel travel distance (m) per encoder count
 					0.23 // roomba's wheelbase
 					));
 				

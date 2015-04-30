@@ -71,8 +71,8 @@ REGISTER_TABULA_DEVICE(analog_sensor,
 // Battery Management System
 class BMS : public action {
 public:
-        const int bms_addr = 2; // Address of BMS on I2C
-        const int numbytes = 2; // # of bytes to request from BMS
+        enum { bms_addr = 2 }; // Address of BMS on I2C
+        enum { numbytes = 2 }; // # of bytes to request from BMS
 	virtual void loop() {
 		Wire.requestFrom(bms_addr, numbytes);
                 while(Wire.available() <= 2 && Wire.available() >= 1)    // slave may send less than requested
