@@ -41,6 +41,11 @@
 # define M_PI 3.1415926535897
 #endif
 
+
+bool sim = false; // use --sim to enable simulation mode
+bool debug = false;  // spams more output data
+
+
 /**
   This class is used to localize the robot
 */
@@ -565,7 +570,17 @@ void robot_backend::read_network()
 		}
 
 #endif
-
+		
+		if (sim) {
+			double distance_per_power=0.02; // meters per timestep
+			double wheelbase=0.3; // meters
+			double delL=v["power"]["L"];
+			double delR=v["power"]["R"];
+			location.move_wheels(
+				delL*distance_per_power,
+				delR*distance_per_power,
+				wheelbase);
+		}
 /*
 // Unported:
 		L=limit_power(v["power"]["L"]);
@@ -645,8 +660,6 @@ robot_backend *backend=NULL; // the singleton robot
 int main(int argc, char *argv[])
 {
 	double LRtrim=1.0;
-	bool sim = false; // use --sim to enable simulation mode
-	bool debug = false;  // spams more output data
 	std::string superstarURL = "http://robotmoose.com/"; // superstar server
 	std::string robotName = "demo"; // superstar robot name
 	std::string configMotor = "create2_controller_t X3"; // Arduino firmware device name
@@ -670,6 +683,8 @@ int main(int argc, char *argv[])
 			exit(1);
 		}
 	}
+	
+	std::cout<<"Connecting to superstar at "<<superstarURL<<std::endl;
 	backend=new robot_backend(superstarURL, robotName);
 	backend->LRtrim=LRtrim;
 	backend->debug = debug; // more output, more mess, but more data
