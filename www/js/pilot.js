@@ -342,7 +342,7 @@ function pilotReady() {
 			// Add grid
 			var grid_cells=100;
 			var per_cell=1000; // one meter cells (in mm)
-			grid=renderer.create_grid(per_cell,grid_cells,grid_cells);
+			grid=renderer.create_grid(per_cell,grid_cells,grid_cells,20);
 			grid.rotation.x=0;
 
 			// Add light source

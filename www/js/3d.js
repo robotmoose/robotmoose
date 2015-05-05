@@ -333,7 +333,7 @@ function renderer_t(div,setup_func,loop_func)
 		return new light_t(myself.scene,intensity,position);
 	};
 
-	myself.create_grid=function(size,width,height)
+	myself.create_grid=function(size,width,height,showOrigin)
 	{
 		var plane_geometry=new THREE.PlaneBufferGeometry(size*width,size*height,size,size);
 		plane_geometry.normalsNeedUpdate=true;
@@ -356,6 +356,14 @@ function renderer_t(div,setup_func,loop_func)
 		{
 			line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0+yy*size,-size*height/2,0));
 			line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0+yy*size,size*height/2,0));
+		}
+		if (showOrigin) { // add extra lines around origin
+		  for (var del=-showOrigin;del<=showOrigin;del+=showOrigin/32) {
+			line_geometry.vertices.push(new THREE.Vector3(del,-size*height/2,0));
+			line_geometry.vertices.push(new THREE.Vector3(del,+size*height/2,0));
+			line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0,del,0));
+			line_geometry.vertices.push(new THREE.Vector3(+size*width/2.0,del,0));
+		  }
 		}
 
 		var line=new THREE.Line(line_geometry,line_material,THREE.LinePieces);
