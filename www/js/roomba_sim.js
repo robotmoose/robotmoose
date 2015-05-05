@@ -138,16 +138,24 @@ roomba_t.prototype.loop=function(dt)
 	var speed=mm*dt; // world units per step
 
 	this.drive_wheels(this.L*speed,this.R*speed);
-	
-	this.left_tracker.add(this.wheel[0]);
-	this.right_tracker.add(this.wheel[1]);
 
 	if (this.falling) {
 		for (var i=0;i<2;i++) this.wheel[i].z-=2000.0*dt;
 		this.model.rotation.x=this.model.rotation.x-dt;
 		this.sensorObject3D.rotation.x=this.model.rotation.x;
 	}
+	
+	this.set_location(this.P,this.angle_rad);
 
+	this.sensor_check();
+}
+
+// Set our onscreen location to this vec3 position, and this angle in radians
+roomba_t.prototype.set_location=function(P,angle_rad)
+{
+	this.angle_rad=angle_rad;
+	this.P.copy(P);
+	
 	this.model.rotation.z=this.angle_rad-Math.PI/2;
 	this.sensorObject3D.rotation.z=this.angle_rad;
 
@@ -159,8 +167,10 @@ roomba_t.prototype.loop=function(dt)
 	renderer.controls.center.set(this.P.x,this.P.y,this.P.z);
 	renderer.controls.object.position.set(
 		this.P.x,this.P.y-1200,this.P.z+1400);
-
-	this.sensor_check();
+	
+	// Update wheel trackers
+	this.left_tracker.add(this.wheel[0]);
+	this.right_tracker.add(this.wheel[1]);
 };
 
 roomba_t.prototype.sensor_check=function() {

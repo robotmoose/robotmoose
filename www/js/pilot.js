@@ -5,17 +5,6 @@
 
 
 
-/* Main update: display costs for user's selected values. */
-function run() {
-  document.getElementById('p_errorout').innerHTML="";
-  try {
-
-  } catch (err) {
-    document.getElementById('p_errorout').innerHTML="Exception: "+err;
-  }
-}
-
-
 /* Walk the DOM to get the client X,Y position of this element's topleft corner.
   From www.kirupa.com/snippets/examples/move_to_click_position.htm */
  /*Gets the client X,Y position with .getBoundingClientRectangle
@@ -318,5 +307,66 @@ function runCmd(run,arg) {
 }
 
 
+var map;
+var mapRobot;
+var renderer;
 
+// Map renderer loop
+function mapLoop(dt) {
+	if (sensors.location) {
+		// Convert angle from degrees to radians
+		var angle_rad=sensors.location.angle*Math.PI/180.0;
+		// Convert position from meters to mm (rendering units)
+		var P=new vec3(sensors.location.x,sensors.location.y,0.0).te(1000.0);
+		
+		// Move onscreen robot there
+		mapRobot.set_location(P,angle_rad);
+		
+		// Place the wheels (so wheel tracks work)
+		mapRobot.wheel[0]=mapRobot.world_from_robot(150,+Math.PI*0.5);
+		mapRobot.wheel[1]=mapRobot.world_from_robot(150,-Math.PI*0.5);
+		
+		// FIXME: obstacle sensors?
+	}
+}
+
+/* Main setup */
+function pilotReady() {
+  document.getElementById('p_errorout').innerHTML="";
+//  try {
+	map=document.getElementById("map_area");
+	if (map) {
+		var setup=function() {
+			renderer.set_size(map.offsetWidth,map.offsetWidth); // FIXME resize this
+		
+			// Add grid
+			var grid_cells=100;
+			var per_cell=1000; // one meter cells (in mm)
+			grid=renderer.create_grid(per_cell,grid_cells,grid_cells);
+			grid.rotation.x=0;
+
+			// Add light source
+			var size=100000;
+			var intensity=0.8;
+			var light=new renderer.create_light(intensity,
+				new THREE.Vector3(-size/2,-size/2,+size));
+			
+			// Add a robot
+			mapRobot=new roomba_t(renderer,null);
+		
+			// Set initial camera
+			renderer.controls.center.set(0,0,0); // robot?
+			renderer.controls.object.position.set(0,-1200,1400);
+			console.log("Set up renderer");
+		};
+		renderer=new renderer_t(map,setup,mapLoop);
+		if(!renderer)
+			alert("Is WebGL enabled?");
+		else
+			renderer.setup();
+	}
+//  } catch (err) {
+//	document.getElementById('p_errorout').innerHTML="Setup exception: "+err;
+//  }
+}
 
