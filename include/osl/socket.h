@@ -24,7 +24,16 @@ Written by Orion Sky Lawlor, olawlor@acm.org 1999-2006 (Public Domain)
 #ifndef __SOCK_ROUTINES_H
 #define __SOCK_ROUTINES_H
 
-/*Preliminaries*/
+/*C++ exception error reporting*/
+#include <stdexcept>
+class skt_error : public std::runtime_error
+{
+public:
+	int errcode;
+	skt_error(int errcode_,const char *msg_)
+		:std::runtime_error(msg_), errcode(errcode_) {}
+};
+
 #include <string.h>
 #if defined(_WIN32) && ! defined(__CYGWIN__)
   /*For windows systems:*/
@@ -52,10 +61,6 @@ Written by Orion Sky Lawlor, olawlor@acm.org 1999-2006 (Public Domain)
 
 /** Server sockets are the same data type as regular sockets */
 #define SERVER_SOCKET SOCKET
-
-#ifdef __cplusplus
-   extern "C" {
-#endif
 
 /*************** IP Addresses and DNS ******************/
 
@@ -196,33 +201,9 @@ void skt_setSockBuf(SOCKET skt, int bufsize);
 void skt_init(void);
 
 
-/** An "idle function": called when waiting for the network (e.g., select, recv, send) */
-typedef void (*skt_idleFn)(void);
-
-/** Set the current idle routine to this new function. */
-void skt_set_idle(skt_idleFn new_fn);
-
-
-/** An "abort function": called when a serious socket error happens. 
-  It's best for the abort function to never return--e.g.,
-  by exiting the program, or throwing an exception.  But anything
-  returned by the abort function will be passed out to the calling
-  routine, if you prefer working with error codes.
-*/
-typedef int (*skt_abortFn)(int errCode,const char *msg);
-
-/** Set the abort routine to this new function.  Returns the old function. */
-skt_abortFn skt_set_abort(skt_abortFn new_fn);
-
-/** Call the current skt_abort routine. */
-int skt_call_abort(const char *msg);
-
-
-
 #ifdef __cplusplus
-}; /* end plain C interface, begin C++ interface. */
 
-/******** Utility routines ********/
+/******** C++ Utility routines ********/
 #include <string>
 #include <iostream>
 

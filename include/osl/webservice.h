@@ -76,14 +76,14 @@ public:
 	std::string receive(void);
 	/** Look up the value of the HTTP header line with this keyword */
 	std::string receive_header(const std::string &keyword);
+
+	// Make HTTP connection to this TCP port.  Called during constructor.
+	void connect(int port,int timeout);
 	
 	/** Close our TCP connection.  Happens automatically when object is destroyed,
 	  and can safely be repeated. */
 	void close(void) { if (s) skt_close(s); s=0; }
 private:
-	// Make HTTP connection to this TCP port.  Called during constructor.
-	void connect(int port,int timeout);
-	
 	std::string host; /**< DNS hostname we will connect to */
 	network_progress *p; /**< progress indicator, or NULL if none */
 	SOCKET s; /**< connected TCP/IP socket we talk on */

@@ -5,10 +5,9 @@ This code should build out-of-the-box with no problems on:
    - UNIX boxes with Berkeley Sockets: Linux, Solaris, BSD, Mac OS X
    - Windows
 
-This code can be compiled as C or C++ with no problems,
-as long as both this file and the caller are compiled the same way.
+This code should be compiled as C++.
 
-Written by Orion Sky Lawlor, olawlor@acm.org 1999-2006 (Public Domain)
+Written by Orion Sky Lawlor, olawlor@acm.org 1999-2015 (Public Domain)
  *****************************************************************************/
 
 #include "socket.h" /* osl/socket.h */
@@ -28,26 +27,15 @@ Written by Orion Sky Lawlor, olawlor@acm.org 1999-2006 (Public Domain)
   typedef int socklen_t;
 #endif
 
-/*Just print out error message and exit*/
-static int default_skt_abort(int code,const char *msg)
+/**
+ This is our generic error reporting strategy--throw a skt_abort.
+*/
+int skt_abort(int errCode,const char *msg)
 {
-  fprintf(stderr,"Fatal socket error-- %s (%d)\n",msg,code);
-  exit(1);
-  return -1;
+	throw skt_error(errCode,msg);
+	return -1;
 }
 
-static skt_idleFn idleFunc=NULL;
-static skt_abortFn skt_abort=default_skt_abort;
-void skt_set_idle(skt_idleFn f) {idleFunc=f;}
-skt_abortFn skt_set_abort(skt_abortFn f) 
-{
-	skt_abortFn old=skt_abort;
-	skt_abort=f;
-	return old;
-}
-int skt_call_abort(const char *msg) {
-	return skt_abort(93999,msg);
-}
 
 /* These little flags are used to ignore the SIGPIPE signal
  * while we're inside one of our socket calls.
@@ -129,12 +117,14 @@ static int skt_should_retry(void)
 #endif
 	if (isinterrupt) {
 		/*We were interrupted by an alarm.  Schedule, then retry.*/
-		if (idleFunc!=NULL) idleFunc();
+		// if (skt_idleFn!=NULL) skt_idleFn();
+		sleep(0);
 	}
 	else if (istransient)
 	{ /*A transient error-- idle a while, then try again later.*/
-		if (idleFunc!=NULL) idleFunc();
-		else sleep(1);
+		// if (skt_idleFn!=NULL) skt_idleFn();
+		// else 
+		sleep(0);
 	}
 	else 
 		return 0; /*Some unrecognized problem-- abort!*/
@@ -453,7 +443,7 @@ int skt_sendV(SOCKET fd,int nBuffers,const void **bufs,int *lens)
 	int b,len=0;
 	for (b=0;b<nBuffers;b++) len+=lens[b];
 	if (len<=skt_sendV_max) { /*Short message: Copy and do one big send*/
-		char *buf=(char *)malloc(skt_sendV_max);
+		char buf[skt_sendV_max];
 		char *dest=buf;
 		int ret;
 		for (b=0;b<nBuffers;b++) {
@@ -461,7 +451,6 @@ int skt_sendV(SOCKET fd,int nBuffers,const void **bufs,int *lens)
 			dest+=lens[b];
 		}
 		ret=skt_sendN(fd,buf,len);
-		free(buf);
 		return ret;
 	}
 	else { /*Big message: Just send one-by-one as usual*/

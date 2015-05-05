@@ -303,6 +303,8 @@ class robot_backend {
 private:
 	osl::url_parser parseURL;
 	osl::http_connection superstar; // HTTP keepalive connection
+	std::string superstar_send_get(const std::string &path); // HTTP request
+	
 	std::string robotName;
 	A_packet_formatter<SerialPort> *pkt;
 
@@ -493,13 +495,36 @@ void robot_backend::send_serial(void) {
 		tabula_command_storage.array);
 }
 
+/** Send this HTTP get request for this path, and return the resulting string. */
+std::string robot_backend::superstar_send_get(const std::string &path)
+{
+	for (int run=0;run<5;run++) {
+		try {
+			superstar.send_get(path);
+			return superstar.receive();
+		} catch (skt_error &e) {
+			std::cout<<"NETWORK ERROR! "<<e.what()<<std::endl;
+			std::cout<<"Retrying connection to superstar "<<parseURL.host<<":"<<parseURL.port<<std::endl;
+			// Reopen HTTP connection
+			superstar.close(); // close old connection
+			if (run>0) sleep(1);
+			// make new connection (or die trying)
+			superstar.connect(parseURL.port,60+30*run);
+			std::cout<<"Reconnected to superstar!\n";
+		}
+	}
+	std::cout<<"NETWORK ERROR talking to superstar.\n";
+	std::cout<<"Exiting...\n";
+	exit(1);
+	// return "";
+}
+
 /** Read pilot data from superstar, and store into ourselves */
 void robot_backend::read_network()
 {
 	std::string path="/superstar/"+robotName+"/pilot?get";
 	double start=time_in_seconds();
-	superstar.send_get(path);
-	std::string json_data=superstar.receive();
+	std::string json_data=superstar_send_get(path);
 	
 	try {
 		std::cout<<"Received pilot commands: "+json_data+"\n";
@@ -591,7 +616,7 @@ void robot_backend::send_network(void)
 		for (unsigned int i=0;i< sensors.size();i++) sensors[i]->modify(root);
 		
 		std::string str = json::Serialize(root);
-		superstar.send_get(path+str); 
+		std::string response = superstar_send_get(path+str); 
 		std::cout<<"Sent sensor JSON: "<<str<<"\n";
 	} catch (std::exception &e) {
 		printf("Exception while sending network JSON: %s\n",e.what());
