@@ -1,6 +1,6 @@
 // Written By Clayton Auld
-// clayauld@gmail.com
-// Nov 20 2014
+// cauld@alaska.edu or clayauld@gmail.com
+// Nov 20, 2014
 
 #include <SPI.h> 
 #include <Wire.h>
