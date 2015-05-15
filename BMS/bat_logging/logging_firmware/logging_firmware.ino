@@ -91,7 +91,7 @@ void setup()
   SPI.setClockDivider(SPI_CLOCK_DIV16);
 
   SPI.begin();          // Start SPI
-  Serial.begin(921600);   // Open serial port
+  Serial.begin(115200);   // Open serial port
 //---------------------------------------------------------------------------------------------------------------------
 
 // I2C configs
@@ -345,7 +345,7 @@ byte setChargeByte()
 
 void serialvolt()
 {
-  if (Serial.available() > 0)
+  if (Serial.available())
   {
     int x;
     x=Serial.read()-'0';
@@ -367,6 +367,7 @@ void serialvolt()
     }
   x=0;
   }
+  else exit;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -380,12 +381,14 @@ void loop()
   getCellVolts();
   cellVoltage[3]=CellConvert(BitShiftCombine(RawData[1], RawData[0]), BitShiftCombine(RawData[2], RawData[1]), BitShiftCombine(RawData[4], RawData[3]));
   BatteryCritical();
-  //AvgerageCell();
-  //totalCell();
+  AvgerageCell();
+  totalCell();
   Charge();
+  
+  
   serialvolt();
-
-  //delay(1200);
+  //Serial.println("end of loop");
+  delay(1200);
 }
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------

@@ -17,12 +17,14 @@ import time # Import time library
 
 # Setup function
 start_time=time.time() # Log start time of program
-arduino=serial.Serial('/dev/ttyACM0',921600,timeout=5) # Open serial port to Arduino
+arduino=serial.Serial('/dev/ttyACM0',115200,timeout=5) # Open serial port to Arduino
 
 #Set up new CSV file with data headers
 with open('./battery_data.csv','w') as csvfile:
     DWriter=csv.writer(csvfile, dialect='excel') # Define CSV writer function
     DWriter.writerow(['Time (sec)','Cell0 (V)','Cell1 (V)','Cell2 (V)'])
+
+t=0;
 
 while True:
     arduino.write('1')  # Send request for Cell0 voltage
@@ -45,10 +47,12 @@ while True:
     with open('./battery_data.csv', 'a') as csvfile: # Open CSV file for logging
         DWriter=csv.writer(csvfile, dialect='excel') # Define CSV writer function
         DWriter.writerow([current_time,cell0,cell1,cell2]) # Write data to CSV
-
+    
+    print('Data Point %d\n' %t)
     print 'Cell 0: ' + cell0 + ' V' # Print Cell0 info
     print 'Cell 1: ' + cell1 + ' V' # Print Cell1 info
     print 'Cell 2: ' + cell2 + ' V' # Print Cell2 info
     print('Time: %s seconds\n' %current_time)   # Print time since program start
 
     print('---------------------------------\n') # Print deliminator
+    t=t+1

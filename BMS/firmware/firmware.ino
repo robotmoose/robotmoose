@@ -91,7 +91,7 @@ void setup()
   SPI.setClockDivider(SPI_CLOCK_DIV16);
 
   SPI.begin();          // Start SPI 
-  Serial.begin(9600);   // Open serial port
+  Serial.begin(115200);   // Open serial port
 //---------------------------------------------------------------------------------------------------------------------
 
 // I2C configs
