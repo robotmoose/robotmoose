@@ -19,6 +19,8 @@ quizbot_reader/quizbot_reader
 quizbot_reader/quizbot_reader.exe
 roomba_testing/roomba
 roomba_testing/roomba.exe
+tabula_rasa/backend
+tabula_rasa/backend.exe
 tabula_rasa/tester
 tabula_rasa/tester.exe
 sensors/imu/show_IMU/main
