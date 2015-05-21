@@ -1,11 +1,12 @@
 // Written By Clayton Auld
-// clayauld@gmail.com
-// Nov 20 2014
+// cauld@alaska.edu or clayauld@gmail.com
+// Nov 20, 2014
 
-#include <SPI.h>
+#include <SPI.h> 
 #include <Wire.h>
 #include <stdlib.h>
-#include "battery.h"
+//#include "battery.h"
+#include "percentage.h"
 
 // LTC6803 parameters
 
@@ -32,7 +33,7 @@
 
 // Charge function parameters
 
-#define ABS_max           4.200  // Max Cell voltage: DO NOT CHARGE HIGHER
+#define ABS_max           4.110  // Max Cell voltage: DO NOT CHARGE HIGHER
 #define max_working       4.100  // Discharge cells higher than this value
 #define low_cell_working  3.500  // Warning Voltage
 #define ABS_min           3.200  //E-Stop or risk damage
@@ -40,7 +41,7 @@
 // Configuration Registers for measure mode
 
 #define CFGR0       0xE1
-byte CFGR1=0x00;
+byte CFGR1=0x00;   
 #define CFGR2       0x00
 #define CFGR3       0xFF
 #define CFGR4       0x00
@@ -49,10 +50,11 @@ byte CFGR1=0x00;
 // Arduino Pins
 
 #define SS_PIN        10   // Designate Chip select pin ***Change this to pin 53 when uploading to Mega***
-#define CHARGE_INPUT  5    // Will be pulled high when AC power is available
+#define CHARGE_INPUT  7    // Will be pulled high when AC power is available
 #define CHARGE_RELAY  9    // Set to high to turn on charging relay
 #define POWER         6    // Power pin for BMS shield
 #define ADDRESS       0x80 // Designate Chip address: 10000000
+#define OK            8    // OK signal for system power
 
 //---------------------------------------------------------------------------------------------------------------------
 // Calculation Variables
@@ -61,7 +63,7 @@ unsigned int RawData[6];       // Raw data from voltage registers
 float cellVoltage[3];          // Calculated voltages for each cell
 float AvgCellVolts;
 float cellVoltTotal;
-byte chargeflag;
+int chargeflag;
 
 // PEC Variables
 static byte crc8_table[256];   // 8-bit table for PEC calc
@@ -78,6 +80,7 @@ int x=0;
 void setup()
 {
   pinMode(SS_PIN, OUTPUT);
+  pinMode(OK, OUTPUT);
   pinMode(CHARGE_INPUT, INPUT);
   pinMode(POWER, OUTPUT);
   pinMode(CHARGE_RELAY, OUTPUT);
@@ -88,9 +91,10 @@ void setup()
   SPI.setDataMode(SPI_MODE3);
   SPI.setClockDivider(SPI_CLOCK_DIV16);
 
-  SPI.begin();          // Start SPI
-  Serial.begin(57600);   // Open serial port
+  SPI.begin();          // Start SPI 
+  Serial.begin(115200);   // Open serial port
 //---------------------------------------------------------------------------------------------------------------------
+
 // I2C configs
  Wire.begin(2);                // join i2c bus with address #2
  Wire.onRequest(requestEvent); // register event
@@ -217,19 +221,20 @@ void setCFGR1( float cellVoltage[], byte & CFGR1 )
 }
 
 void Charge()    // Function to turn on charging and cell balancing
-{
-//  // Artificially set to test if statements:
-//  cellVoltage[0] = 4.15;
-//  cellVoltage[1] = 3.9;
-//  cellVoltage[2]=4.15;
-//  digitalWrite(CHARGE_INPUT, HIGH);
-
-
+{ 
+  // Artificially set to test if statements:
+  //cellVoltage[0] = 4.3;
+  //cellVoltage[1] = 4.1;
+  //cellVoltage[2]=4.19;                   
+  //digitalWrite(CHARGE_INPUT, HIGH);
+  
+  
   //Sets CFGR1 to manage cell discharging
   setCFGR1(cellVoltage, CFGR1);
   SetConfig();
   if (digitalRead(CHARGE_INPUT) == HIGH)
   {
+    Serial.println("Charger Connected");
     //If a single cell's voltage is greater than the absolute max, turns off charging
     if ((cellVoltage[0] >= ABS_max) || (cellVoltage[1] >= ABS_max) || (cellVoltage[2] >= ABS_max))
     {
@@ -245,8 +250,23 @@ void Charge()    // Function to turn on charging and cell balancing
   }
   else if (digitalRead(CHARGE_INPUT) == LOW)
   {
+    Serial.println("Charger Disconnected");
     digitalWrite(CHARGE_RELAY, LOW);
     chargeflag=0;
+  }
+}
+
+void BatteryCritical()
+{
+  if ((cellVoltage[0] <= ABS_min) || (cellVoltage[1] <= ABS_min) || (cellVoltage[2] <= ABS_min))
+  {
+    digitalWrite(OK, LOW);
+    Serial.println("Battery is AT OR BELOW MINIMUM VOLTAGE! SYSTEM OK pin set to LOW.");
+  }
+  else 
+  {
+    digitalWrite(OK, HIGH);
+    Serial.println("Battery level is above minimum. SYSTEM OK pin set to HIGH.");
   }
 }
 
@@ -295,7 +315,7 @@ byte calcPECbyte(byte m) // Calculate PEC from single byte
 }
 
 byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number of bytes currently in packet[]
-{
+{         
   int z;
   byte PECpacket = 0x41;  // initialize PECpacket
   if (!made_table) {  // Check and make sure lookup table is generated
@@ -312,17 +332,15 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
 
 void requestEvent()
 {
-  byte data [2] = {(byte)make_battery(cellVoltage).percentage, setChargeByte()};
+  byte data [2] = {(byte)Percentage(cellVoltTotal), setChargeByte()};
   Wire.write(data, 2);
   //Serial.print("I2C Request Performed: ");
-  //Serial.println(make_battery(cellVoltage).percentage);
 }
 
 byte setChargeByte()
 {
   return ((chargeflag << 3) | CFGR1);
 }
-  
 
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
@@ -335,33 +353,33 @@ void loop()
   ADCconvert();
   getCellVolts();
   cellVoltage[3]=CellConvert(BitShiftCombine(RawData[1], RawData[0]), BitShiftCombine(RawData[2], RawData[1]), BitShiftCombine(RawData[4], RawData[3]));
+  BatteryCritical();
   AvgerageCell();
   totalCell();
   Charge();
-
+  
+  Serial.print("Charge flag: ");
+  Serial.println(chargeflag,3);
+  
   for(int i=0; i<3; i++)
   {
     Serial.print("Cell ");
     Serial.print(i);
     Serial.print(": ");
-    Serial.print(cellVoltage[i], 4);
+    Serial.print(cellVoltage[i], 3);
     Serial.println(" V");
   }
-  
-  /*Serial.print("Battery Percentage: ");
-  Serial.print(make_battery(cellVoltage).percentage);
-  Serial.println("%");*/
-
   Serial.print("Average Cell Voltage: ");
-  Serial.print(AvgCellVolts,4);
+  Serial.print(AvgCellVolts,3);
   Serial.println(" V");
-
+  
   Serial.print("Total Cell Voltages: ");
-  Serial.print(cellVoltTotal,4);
+  Serial.print(cellVoltTotal,3);
   Serial.println(" V");
-
-  Serial.print("Charge flag: ");
-  Serial.println(chargeflag);
+  
+  Serial.print("Battery Percentage: ");
+  Serial.print(Percentage(cellVoltTotal));
+  Serial.println(" %");
   
   Serial.println("-------------------------------------");
   delay(1200);
