@@ -5,7 +5,6 @@
 #include <SPI.h> 
 #include <Wire.h>
 #include <stdlib.h>
-//#include "battery.h"
 #include "percentage.h"
 
 // LTC6803 parameters

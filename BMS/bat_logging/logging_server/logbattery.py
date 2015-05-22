@@ -22,7 +22,7 @@ arduino=serial.Serial('/dev/ttyACM0',115200,timeout=5) # Open serial port to Ard
 #Set up new CSV file with data headers
 with open('./battery_data.csv','w') as csvfile:
     DWriter=csv.writer(csvfile, dialect='excel') # Define CSV writer function
-    DWriter.writerow(['Time (sec)','Cell0 (V)','Cell1 (V)','Cell2 (V)'])
+    DWriter.writerow(['Time (sec)','Cell0 (V)','Cell1 (V)','Cell2 (V),Percentage'])
 
 t=0;
 
@@ -42,16 +42,22 @@ while True:
     #print 'Cell 2: ' + cell2 + ' V'
     #print('Time: %s seconds\n' %(time.time()-start_time))
 
+    arduino.write('4')  # Send request for Cell2 voltage
+    percent=arduino.readline()    # Read Cell2 voltage
+    #print 'Cell 2: ' + cell2 + ' V'
+    #print('Time: %s seconds\n' %(time.time()-start_time))
+
     current_time=time.time()-start_time # Find time since program start
 
     with open('./battery_data.csv', 'a') as csvfile: # Open CSV file for logging
         DWriter=csv.writer(csvfile, dialect='excel') # Define CSV writer function
-        DWriter.writerow([current_time,cell0,cell1,cell2]) # Write data to CSV
-    
+        DWriter.writerow([current_time,cell0,cell1,cell2,percent]) # Write data to CSV
+
     print('Data Point %d\n' %t)
     print 'Cell 0: ' + cell0 + ' V' # Print Cell0 info
     print 'Cell 1: ' + cell1 + ' V' # Print Cell1 info
     print 'Cell 2: ' + cell2 + ' V' # Print Cell2 info
+    print 'Percentage: ' + percent + ' %'
     print('Time: %s seconds\n' %current_time)   # Print time since program start
 
     print('---------------------------------\n') # Print deliminator

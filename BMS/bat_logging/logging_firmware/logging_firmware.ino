@@ -5,7 +5,8 @@
 #include <SPI.h>
 #include <Wire.h>
 #include <stdlib.h>
-#include "battery.h"
+//#include "battery.h"
+#include "percentage.h"
 
 // LTC6803 parameters
 
@@ -331,10 +332,9 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
 
 void requestEvent()
 {
-  byte data [2] = {(byte)make_battery(cellVoltage).percentage, setChargeByte()};
+  byte data [2] = {(byte)Percentage(cellVoltTotal), setChargeByte()};
   Wire.write(data, 2);
   //Serial.print("I2C Request Performed: ");
-  //Serial.println(make_battery(cellVoltage).percentage);
 }
 
 byte setChargeByte()
@@ -360,6 +360,10 @@ void serialvolt()
     else if (x==3)
     {
       Serial.print(cellVoltage[2],4);
+    }
+    else if (x==4)
+    {
+      Serial.print(Percentage(cellVoltTotal),4);
     }
     else
     {
