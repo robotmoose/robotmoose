@@ -73,10 +73,10 @@ if platform.system()=='Darwin':
         exit()
 
 elif platform.system()=='Linux':
-    if (os.path.exists('/dev/ttyACM0')=='True'):
+    if (os.path.exists('/dev/ttyACM0')==True):
         arduino=serial.Serial('/dev/ttyACM0',115200,timeout=5) # Open serial port to Arduino)
         loop()
-    elif (os.path.exists('/dev/ttyACM1')=='True'):
+    elif (os.path.exists('/dev/ttyACM1')==True):
         arduino=serial.Serial('/dev/ttyACM1',115200,timeout=5)
         loop()
     else:
