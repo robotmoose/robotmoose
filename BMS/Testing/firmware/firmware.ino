@@ -187,6 +187,12 @@ int CellConvert(unsigned int combined1, unsigned int combined2, unsigned int com
   {
     cellVoltage[i] = 1.5/1000*(Cell[i] - 512);
   }
+  if ((cellVoltage[0] + cellVoltage[1] + cellVoltage[2]) >= 16)
+  {
+    cellVoltage[0] = 0;
+    cellVoltage[1] = 0;
+    cellVoltage[2] = 0;
+  }
   return cellVoltage[3];
 }
 
@@ -257,7 +263,12 @@ void Charge()    // Function to turn on charging and cell balancing
 
 void BatteryCritical()
 {
-  if ((cellVoltage[0] <= ABS_min) || (cellVoltage[1] <= ABS_min) || (cellVoltage[2] <= ABS_min))
+  if ((cellVoltage[0] + cellVoltage[1] + cellVoltage[2]) == 0)
+  {
+    digitalWrite(OK, LOW);
+    Serial.println("Battery is DISCONNECTED! SYSTEM OK pin set to LOW.");
+  }
+  else if ((cellVoltage[0] <= ABS_min) || (cellVoltage[1] <= ABS_min) || (cellVoltage[2] <= ABS_min))
   {
     digitalWrite(OK, LOW);
     Serial.println("Battery is AT OR BELOW MINIMUM VOLTAGE! SYSTEM OK pin set to LOW.");

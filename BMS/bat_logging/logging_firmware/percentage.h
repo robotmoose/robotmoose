@@ -26,14 +26,15 @@
 float Percentage(float x)
 {
   float percent;
-  if ((x < transition) && (x>=minimum))
+  
+  if ((x < transition) && (x>minimum))
   {
     x=(x-10.64)/0.314;
     percent = p1*pow(x,7) + p2*pow(x,6) + p3*pow(x,5) + p4*pow(x,4) + p5*pow(x,3) + 
     p6*pow(x,2) + p7*x + p8;
   }
   
- else if ((x >= transition) && (x<=maximum))
+  else if ((x >= transition) && (x<=maximum))
   {
     x=(x-11.49)/0.3152;
     percent = p10*pow(x,7) + p20*pow(x,6) + p30*pow(x,5) + p40*pow(x,4) + p50*pow(x,3) + 
