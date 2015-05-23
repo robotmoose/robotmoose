@@ -5,7 +5,7 @@
 #include <SPI.h> 
 #include <Wire.h>
 #include <stdlib.h>
-#include "battery.h"
+#include "percentage.h"
 
 // LTC6803 parameters
 
@@ -187,6 +187,12 @@ int CellConvert(unsigned int combined1, unsigned int combined2, unsigned int com
   {
     cellVoltage[i] = 1.5/1000*(Cell[i] - 512);
   }
+  if ((cellVoltage[0] + cellVoltage[1] + cellVoltage[2]) >= 16)
+  {
+    cellVoltage[0] = 0;
+    cellVoltage[1] = 0;
+    cellVoltage[2] = 0;
+  }
   return cellVoltage[3];
 }
 
@@ -257,15 +263,28 @@ void Charge()    // Function to turn on charging and cell balancing
 
 void BatteryCritical()
 {
-  if ((cellVoltage[0] <= ABS_min) || (cellVoltage[1] <= ABS_min) || (cellVoltage[2] <= ABS_min))
+  if ((cellVoltage[0] + cellVoltage[1] + cellVoltage[2]) == 0)
   {
     digitalWrite(OK, LOW);
-    Serial.println("Battery is AT OR BELOW MINIMUM VOLTAGE! SYSTEM OK pin set to LOW.");
+    Serial.println("Battery is DISCONNECTED!\nSYSTEM OK pin set to LOW.");
+  }
+  else if ((cellVoltage[0] <= ABS_min) || (cellVoltage[1] <= ABS_min) || (cellVoltage[2] <= ABS_min))
+  {
+    if (digitalRead(CHARGE_INPUT) == LOW)
+    {
+      digitalWrite(OK, LOW);
+      Serial.println("Battery is AT OR BELOW MINIMUM VOLTAGE!\nSYSTEM OK pin set to LOW.");
+    }
+    else if (digitalRead(CHARGE_INPUT == HIGH))
+    {
+      digitalWrite(OK, HIGH);
+      Serial.println("Battery is AT OR BELOW MINIMUM VOLTAGE!\nSYSTEM OK pin set to LOW.");
+    }
   }
   else 
   {
     digitalWrite(OK, HIGH);
-    Serial.println("Battery level is above minimum. SYSTEM OK pin set to HIGH.");
+    Serial.println("Battery level is above minimum.\nSYSTEM OK pin set to HIGH.");
   }
 }
 
@@ -331,10 +350,9 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
 
 void requestEvent()
 {
-  byte data [2] = {(byte)make_battery(cellVoltage).percentage, setChargeByte()};
+  byte data [2] = {(byte)Percentage(cellVoltTotal), setChargeByte()};
   Wire.write(data, 2);
   //Serial.print("I2C Request Performed: ");
-  //Serial.println(make_battery(cellVoltage).percentage);
 }
 
 byte setChargeByte()
@@ -376,7 +394,11 @@ void loop()
   Serial.print("Total Cell Voltages: ");
   Serial.print(cellVoltTotal,3);
   Serial.println(" V");
-
+  
+  Serial.print("Battery Percentage: ");
+  Serial.print(Percentage(cellVoltTotal));
+  Serial.println(" %");
+  
   Serial.println("-------------------------------------");
   delay(1200);
 }
