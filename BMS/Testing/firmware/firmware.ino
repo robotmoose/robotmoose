@@ -266,17 +266,25 @@ void BatteryCritical()
   if ((cellVoltage[0] + cellVoltage[1] + cellVoltage[2]) == 0)
   {
     digitalWrite(OK, LOW);
-    Serial.println("Battery is DISCONNECTED! SYSTEM OK pin set to LOW.");
+    Serial.println("Battery is DISCONNECTED!\nSYSTEM OK pin set to LOW.");
   }
   else if ((cellVoltage[0] <= ABS_min) || (cellVoltage[1] <= ABS_min) || (cellVoltage[2] <= ABS_min))
   {
-    digitalWrite(OK, LOW);
-    Serial.println("Battery is AT OR BELOW MINIMUM VOLTAGE! SYSTEM OK pin set to LOW.");
+    if (digitalRead(CHARGE_INPUT) == LOW)
+    {
+      digitalWrite(OK, LOW);
+      Serial.println("Battery is AT OR BELOW MINIMUM VOLTAGE!\nSYSTEM OK pin set to LOW.");
+    }
+    else if (digitalRead(CHARGE_INPUT == HIGH))
+    {
+      digitalWrite(OK, HIGH);
+      Serial.println("Battery is AT OR BELOW MINIMUM VOLTAGE!\nSYSTEM OK pin set to LOW.");
+    }
   }
   else 
   {
     digitalWrite(OK, HIGH);
-    Serial.println("Battery level is above minimum. SYSTEM OK pin set to HIGH.");
+    Serial.println("Battery level is above minimum.\nSYSTEM OK pin set to HIGH.");
   }
 }
 
