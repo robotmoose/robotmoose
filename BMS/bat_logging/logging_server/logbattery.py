@@ -79,6 +79,12 @@ elif platform.system()=='Linux':
     elif (os.path.exists('/dev/ttyACM1')==True):
         arduino=serial.Serial('/dev/ttyACM1',115200,timeout=5)
         loop()
+    elif (os.path.exists('/dev/ttyUSB0')==True):
+        arduino=serial.Serial('/dev/ttyUSB0',115200,timeout=5)
+        loop()
+    elif (os.path.exists('/dev/ttyUSB1')==True):
+        arduino=serial.Serial('/dev/ttyUSB1',115200,timeout=5)
+        loop()
     else:
         print 'ERROR! DEVICE NOT FOUND!'
         exit()
