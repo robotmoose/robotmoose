@@ -12,14 +12,14 @@ uri_src=uri.cpp
 uri_parser_src=$(INC)/uriparser/*.c
 webcam_src=webcam.cpp
 
-all: server client
+all: server forwarder
 
 server: server.cpp
 	$(C) $(CFLAGS) $(uri_parser_src)
 	$(CXX) $(CXXFLAGS) $< *.o $(json_src) $(mongoose_src) $(msl_src) $(uri_src) $(webcam_src) -o $@ $(LIBS)
 	-rm *.o
 
-client: client.cpp
+forwarder: forwarder.cpp
 	$(C) $(CFLAGS) $(uri_parser_src)
 	$(CXX) $(CXXFLAGS) $< *.o $(json_src) $(mongoose_src) $(msl_src) $(uri_src) $(webcam_src) -o $@ $(LIBS)
 	-rm *.o
@@ -29,4 +29,4 @@ install_ubuntu:
 
 clean:
 	-rm -f server
-	-rm -f client
+	-rm -f forwarder

@@ -1,16 +1,16 @@
 #include <iostream>
-#include <map>
 #include <mutex>
 #include <msl/time.hpp>
 #include "uri.hpp"
+#include "webcam.hpp"
 #include <msl/webserver.hpp>
 
 bool client_func(const mg_connection& connection,enum mg_event event);
 
-msl::webserver_t server(client_func,"0.0.0.0:8080","web");
-
-std::mutex cam_lock;
-std::map<std::string,std::string> cams={{"172.20.230.221:8081",""}};
+msl::webserver_t server(client_func,"0.0.0.0:8081","web");
+webcam_t cam;
+std::string jpg="";
+std::mutex jpg_lock;
 
 int main()
 {
@@ -23,14 +23,23 @@ int main()
 
 	while(server.good())
 	{
-		for(auto& ii:cams)
+		size_t num=0;
+		cam.open(num);
+
+		if(cam.good())
+			std::cout<<"Connected with camera "<<num<<"."<<std::endl;
+
+		while(cam.good())
 		{
-			auto jpg=get_jpg(ii.first,"/cam.jpg");
-			cam_lock.lock();
-			ii.second=jpg;
-			cam_lock.unlock();
+			msl::delay_ms(1);
+			auto jpg_update=cam.jpg(15);
+			jpg_lock.lock();
+			jpg=jpg_update;
+			jpg_lock.unlock();
 		}
-		msl::delay_ms(10);
+
+		std::cout<<"Lost connection with camera "<<num<<"."<<std::endl;
+		msl::delay_ms(1);
 	}
 
 	server.close();
@@ -52,28 +61,11 @@ bool client_func(const mg_connection& connection,enum mg_event event)
 
 		if(request=="/cam.jpg")
 		{
-			std::string who="";
-			std::string jpg="";
-
-			if(connection.query_string!=nullptr)
-				for(auto ii:uri_parse_query("?"+std::string(connection.query_string)))
-					if(ii.first=="who")
-						who=ii.second;
-
-			if(cams.count(who)>0)
-			{
-				cam_lock.lock();
-				jpg=cams[who];
-				cam_lock.unlock();
-			}
-
-			if(jpg!="")
-			{
-				send_jpg(connection,jpg);
-				return true;
-			}
-
-			return false;
+			jpg_lock.lock();
+			auto jpg_copy=jpg;
+			jpg_lock.unlock();
+			send_jpg(connection,jpg_copy);
+			return true;
 		}
 	}
 
