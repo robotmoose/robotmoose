@@ -75,6 +75,7 @@ var Sensors={
 	USonic:emptyUSonic() 
 };
 	
+element.addEventListener("keypress",keyboardDrive);
 
 function LEDtoggle(){
 	pilot.LED.On = document.getElementById("LEDtoggle").checked;
@@ -192,6 +193,37 @@ function sensor_receive()
 	});
 }
 
+//This function is called at every keypress event
+// FIXME: Add proportional control 
+function keyboardDrive(e)
+{
+	var newPower = emptyPower();
+	var maxPower=0.7;
+	var powerUI=document.getElementById('robot_power').value*0.01;
+	if (isNaN(powerUI)) maxPower=0.0;
+	else if (powerUI<maxPower) { maxPower=powerUI; }
+	
+	if(e.charCode == "97" || e.charCode == "65") // 'a' is pressed, turn left 
+	{
+		newPower.L = -maxPower;
+		newPower.R = maxPower;
+	}
+	else if(e.charCode == "100" || e.charCode == "68") //'d' is pressed, turn right 
+	{
+		newPower.L = maxPower;
+		newPower.R = -maxPower;
+	}
+	else if(e.charCode == "115" || e.charCode == "83") //'s' is pressed, reverse 
+	{
+		newPower.L = newPower.R = -maxPower;
+	}
+	else if(e.charCode == "119" || e.charCode == "87") //'w' is pressed, go forward 
+	{
+		newPower.L = newPower.R = maxPower;
+	}
+	pilot.power = newPower;
+	pilot_send();
+}
 
 // This function is called at every mouse event.
 //   upState: 0 if down, 1 if up, 2 if not changing
