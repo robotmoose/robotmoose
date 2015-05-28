@@ -21,7 +21,7 @@
 
 #define transition 11.014
 #define maximum      12.3
-#define minimum         0
+#define minimum       9.6
 
 float Percentage(float x)
 {
