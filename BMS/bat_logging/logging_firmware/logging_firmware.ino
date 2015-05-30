@@ -272,7 +272,8 @@ void BatteryCritical()
   {
     if (digitalRead(CHARGE_INPUT) == LOW)
     {
-      digitalWrite(OK, LOW);
+      digitalWrite(OK, LOW); //Set the OK signal low
+      digitalWrite(POWER, LOW); //Set the BMS power to off
       //Serial.println("Battery is AT OR BELOW MINIMUM VOLTAGE!\nSYSTEM OK pin set to LOW.");
     }
     else if (digitalRead(CHARGE_INPUT == HIGH))
