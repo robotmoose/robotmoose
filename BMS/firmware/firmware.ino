@@ -269,6 +269,7 @@ void BatteryCritical()
     Serial.println("Battery is DISCONNECTED!\nSYSTEM OK pin set to LOW.");
   }
   else if ((cellVoltage[0] <= ABS_min) || (cellVoltage[1] <= ABS_min) || (cellVoltage[2] <= ABS_min))
+  //else if (Percentage(cellVoltTotal) <= 0)
   {
     if (digitalRead(CHARGE_INPUT) == LOW)
     {
