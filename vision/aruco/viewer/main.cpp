@@ -56,7 +56,7 @@ struct marker_info_t {
 	int id; // marker's ID, from 0-1023 
 	float true_size; // side length, in meters, of black part of pattern
 	
-	enum { FLAG_REFINE=1<<0,  FLAG_PARALLAX=1<<3 };
+	enum { FLAG_REFINE=1<<0,  FLAG_PARALLAX=1<<3, FLAG_CHAPMAN=1<<4 };
 	int flags; // e.g. refinement
 	
 	int slot; // location in output array (0 for default)
@@ -64,10 +64,9 @@ struct marker_info_t {
 	float x_shift; // translation from origin, in meters, of center of pattern
 	float y_shift; 
 	float z_shift; 
-	
-	float rotate2D; // rotation around pattern's center, in degrees (0 for upright, 90 for rotated on side)
-	float rotate3D; // rotation about pattern's X axis, in degrees
 };
+
+const double tile=4*12*0.0254; // ceiling tile spacing, in meters (4 foot size)
 
 const static marker_info_t marker_info[]={
 	{-1,0.508}, // fallback default case
@@ -79,13 +78,10 @@ const static marker_info_t marker_info[]={
 */
 
 /* 2015-06 Chapman 2nd floor markers */
-	{0, 0.508, 0, 0, 1.0,0.0,0.0,   0,0 },
-	{1, 0.508, 0, 0, 7.0,0.0,0.0,   0,0 },
-	{2, 0.508, 0, 0, 10.0,0.0,0.0,  0,0 },
-	{3, 0.508, 0, 0, 13.0,0.0,0.0,  0,0 },
-	{4, 0.508, 0, 0, 16.0,0.0,0.0,  0,0 },
-	{5, 0.508, 0, 0, 19.0,0.0,0.0,  0,0 },
-	{16,0.508, 0, 0, 4.0,0.0,0.0,   0,0 },
+	{0, 0.508, marker_info_t::FLAG_CHAPMAN, 0, 0.0,0.0,0.0},
+	{1, 0.508, marker_info_t::FLAG_CHAPMAN, 0, (7)*tile,0.0,0.0 },
+	{2, 0.508, marker_info_t::FLAG_CHAPMAN, 0, (7+6)*tile,0.0,0.0 },
+	{3, 0.508, marker_info_t::FLAG_CHAPMAN, 0, (7+6+5)*tile,0.0,0.0 },
 
 /* 2015-04 Lathrop high school markers, reinstalled at Chapman
 	{0, 0.508, 0, 0, 1.0,0.0,0.0,   0,90 },
@@ -96,16 +92,6 @@ const static marker_info_t marker_info[]={
 	{4, 0.508, 0, 0, 16.0,0.0,0.0,  0,90 },
 	{5, 0.508, 0, 0, 19.0,0.0,0.0,  0,90 },
 */
-
-/* 2014-07 fabric marker setup */
-	{236,0.77,marker_info_t::FLAG_REFINE}, // big 'A'
-	{771,0.245, 0,1, -0.60,0.0,0.0  }, // 'U'
-	{816,0.245, 0,2, +0.60,0.0,0.0, 90}, // 'F' (rotated on its side)
-
-/* 2014-05 foam marker setup */
-	{0,0.765}, // big
-	{16,0.25,0,1,-0.5725}, // left side
-	{787,0.25,0,2,+0.5725}, // right side
 };
 
 // Look up the calibration parameters for this marker
@@ -211,6 +197,19 @@ public:
 marker_parallax parallax[8];
 
 
+/* Swap these coordinate axis in this matrix */
+void swap_axes(Mat &full,int axis1,int axis2) {
+	for (int i=0; i<3; i++) {
+		std::swap(full.at<float>(i,axis1),full.at<float>(i,axis2));
+	}
+}
+/* Flip this coordinate axis */
+void flip_axis(Mat &full,int axis) {
+	for (int i=0; i<3; i++) {
+		full.at<float>(i,axis) *= -1.0;
+	}
+}
+
 
 /* Extract location data from this valid, detected marker. 
    Does not modify the location for an invalid marker.
@@ -242,7 +241,14 @@ void extract_location(location_binary &bin,const Marker &marker)
 	full.at<float>(3,1)=0.0;
 	full.at<float>(3,2)=0.0;
 	full.at<float>(3,3)=1.0;
-	
+
+	if (mi.flags & marker_info_t::FLAG_CHAPMAN) {
+		swap_axes(full,0,2); // swap X and Z
+		swap_axes(full,1,2); // swap Y and Z
+		flip_axis(full,0); // X negative
+		flip_axis(full,2); // Z negative
+	}
+/*
 	if (mi.rotate2D==90) {
 		for (int i=0; i<3; i++) {
 			std::swap(full.at<float>(i,0),full.at<float>(i,2)); // swap X and Z
@@ -256,7 +262,7 @@ void extract_location(location_binary &bin,const Marker &marker)
 			full.at<float>(i,0)*=-1; // invert (new) X
 		}
 	}
-
+*/
 
 	// Invert, to convert marker-from-camera into camera-from-marker
 	Mat back=full.inv();
@@ -275,7 +281,7 @@ if (false) {
 	bin.x=back.at<float>(0,3)*scale+mi.x_shift;
 	bin.y=back.at<float>(1,3)*scale+mi.y_shift;
 	bin.z=back.at<float>(2,3)*scale+mi.z_shift;
-	bin.angle=180.0/M_PI*atan2(back.at<float>(1,0),-back.at<float>(0,0));
+	bin.angle=180.0/M_PI*atan2(back.at<float>(1,0),back.at<float>(0,0));
 	bin.marker_ID=marker.id;
 
 	// Print grep-friendly output
