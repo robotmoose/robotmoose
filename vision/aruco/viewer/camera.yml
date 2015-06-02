@@ -1,0 +1,23 @@
+%YAML:1.0
+camera_type: "Genius 120 degree FOV Webcam"
+calibration_time: "Mon Apr  7 15:02:38 2014"
+image_width: 640
+image_height: 480
+board_width: 9
+board_height: 6
+square_size: 2.5000000372529030e-02
+flags: 0
+camera_matrix: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ 3.0138277722267304e+02, 0., 3.2048915976619230e+02, 0.,
+       3.0056800391743684e+02, 2.3255492852442100e+02, 0., 0., 1. ]
+distortion_coefficients: !!opencv-matrix
+   rows: 5
+   cols: 1
+   dt: d
+   data: [ 2.7150673617277313e-02, -6.7495725918004762e-02,
+       4.7596699535769040e-04, -4.5633370093747889e-03,
+       2.6522679003360940e-02 ]
+avg_reprojection_error: 3.1239498677018873e-01
