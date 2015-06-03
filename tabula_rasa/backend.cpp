@@ -674,7 +674,6 @@ int main(int argc, char *argv[])
 		else if (0 == strcmp(argv[argi], "--trim")) LRtrim = atof(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--debug")) debug = true;
 		else if (0 == strcmp(argv[argi], "--sim")) { // no Arduino, for debugging
-			robotName="sim/uaf";
 			sim = true;
 			baudrate=0;
 		}
