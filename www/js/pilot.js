@@ -74,8 +74,6 @@ var pilot={
 var Sensors={
 	USonic:emptyUSonic() 
 };
-	
-element.addEventListener("keypress",keyboardDrive);
 
 function LEDtoggle(){
 	pilot.LED.On = document.getElementById("LEDtoggle").checked;
@@ -193,31 +191,40 @@ function sensor_receive()
 	});
 }
 
-//This function is called at every keypress event
-// FIXME: Add proportional control 
-function keyboardDrive(e)
-{
-	var newPower = emptyPower();
+// Return the drive power the user has currently selected
+function get_pilot_power() {
 	var maxPower=0.7;
 	var powerUI=document.getElementById('robot_power').value*0.01;
 	if (isNaN(powerUI)) maxPower=0.0;
 	else if (powerUI<maxPower) { maxPower=powerUI; }
+	return powerUI;
+}
+
+//This function is called at every keypress event
+// FIXME: Add proportional control 
+function keyboardDrive(e)
+{
+	var newPower=emptyPower();
+	var maxPower=get_pilot_power();
+
+	console.log("Key pressed: "+e.charCode);
+	var c=String.fromCharCode(e.charCode); // convert to string
 	
-	if(e.charCode == "97" || e.charCode == "65") // 'a' is pressed, turn left 
+	if(c == 'a' || c == 'A') // 'a' is pressed, turn left 
 	{
 		newPower.L = -maxPower;
 		newPower.R = maxPower;
 	}
-	else if(e.charCode == "100" || e.charCode == "68") //'d' is pressed, turn right 
+	else if(c=='d' || c=='D') //'d' is pressed, turn right 
 	{
 		newPower.L = maxPower;
 		newPower.R = -maxPower;
 	}
-	else if(e.charCode == "115" || e.charCode == "83") //'s' is pressed, reverse 
+	else if(c=='s' || c == "S") //'s' is pressed, reverse 
 	{
 		newPower.L = newPower.R = -maxPower;
 	}
-	else if(e.charCode == "119" || e.charCode == "87") //'w' is pressed, go forward 
+	else if(c == "w" || c == "W") //'w' is pressed, go forward 
 	{
 		newPower.L = newPower.R = maxPower;
 	}
@@ -230,24 +237,19 @@ function keyboardDrive(e)
 var mouse_down=0;
 function pilot_mouse(event,upState) {
 // Allow user to set maximum power
-	var maxPower=0.7;
-	var powerUI=document.getElementById('robot_power').value*0.01;
-	if (isNaN(powerUI)) maxPower=0.0;
-	else if (powerUI<maxPower) { maxPower=powerUI; }
+	var maxPower=get_pilot_power();
 	
-
 	var arrowDiv=document.getElementById('pilot_arrows');
 	var frac=getMouseFraction(event,arrowDiv);
 	var str="";
-	
 
 	var dir={ forward: pretty(0.5-frac.y), turn:pretty(frac.x-0.5) };
 	
 	str+="Move "+dir.forward+" forward, "+dir.turn+" turn<br>\n";
 
 //Proportional control.  The 2.0 is because mouse is from -0.5 to +0.5
-	dir.forward=dir.forward*2.0*powerUI;
-	dir.turn=dir.turn*2.0*powerUI;
+	dir.forward=dir.forward*2.0*maxPower;
+	dir.turn=dir.turn*2.0*maxPower;
 
 	var totPower=Math.abs(dir.forward)+Math.abs(dir.turn);
 	var newPower=emptyPower();
@@ -365,6 +367,10 @@ function mapLoop(dt) {
 /* Main setup */
 function pilotReady() {
   document.getElementById('p_errorout').innerHTML="";
+
+  // Keyboard driving
+  window.addEventListener("keypress",keyboardDrive);
+
 //  try {
 	map=document.getElementById("map_area");
 	if (map) {
