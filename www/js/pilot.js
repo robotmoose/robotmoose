@@ -200,34 +200,43 @@ function get_pilot_power() {
 	return powerUI;
 }
 
+
+// Mike's input keydown handler
+var keyInput;
+var keyboardIsDriving=false;
+
+// Return true if this key (as a string) is pressed
+function keyDown(key,alternateKey) {
+	var code=key.charCodeAt(0);
+	// console.log("Key code "+code+" : "+keyInput.keys_down[code]);
+	
+	if (keyInput.keys_down[code]) return true;
+	
+	if (alternateKey) return keyDown(alternateKey);  // hacky recursion
+	return false;
+}
+
 //This function is called at every keypress event
 // FIXME: Add proportional control 
-function keyboardDrive(e)
+function keyboardDrive()
 {
-	var newPower=emptyPower();
+	console.log("Keyboard activity");
 	var maxPower=get_pilot_power();
 
-	console.log("Key pressed: "+e.charCode);
-	var c=String.fromCharCode(e.charCode); // convert to string
+	var forward=0.0, turn=0.0; 
 	
-	if(c == 'a' || c == 'A') // 'a' is pressed, turn left 
-	{
-		newPower.L = -maxPower;
-		newPower.R = maxPower;
-	}
-	else if(c=='d' || c=='D') //'d' is pressed, turn right 
-	{
-		newPower.L = maxPower;
-		newPower.R = -maxPower;
-	}
-	else if(c=='s' || c == "S") //'s' is pressed, reverse 
-	{
-		newPower.L = newPower.R = -maxPower;
-	}
-	else if(c == "w" || c == "W") //'w' is pressed, go forward 
-	{
-		newPower.L = newPower.R = maxPower;
-	}
+	if(keyDown('a','A')) turn-=1.0; // 'a' is pressed, turn left 
+	if(keyDown('d','D')) turn+=1.0; //'d' is pressed, turn right 
+	if(keyDown('s','S')) forward-=1.0; //'s' is pressed, reverse 
+	if(keyDown('w','W')) forward+=1.0;
+	if(keyDown(' ')) turn=forward=0.0; // stop!
+	
+	if (turn==0.0 && forward==0.0) keyboardIsDriving=false;
+	else keyboardIsDriving=true;
+	
+	var newPower=emptyPower();
+	newPower.L=clamp(maxPower*(forward+turn),-maxPower,+maxPower);
+	newPower.R=clamp(maxPower*(forward-turn),-maxPower,+maxPower);
 	pilot.power = newPower;
 	pilot_send();
 }
@@ -369,7 +378,7 @@ function pilotReady() {
   document.getElementById('p_errorout').innerHTML="";
 
   // Keyboard driving
-  window.addEventListener("keypress",keyboardDrive);
+  keyInput=new input_t(keyboardDrive,window);
 
 //  try {
 	map=document.getElementById("map_area");

@@ -3,17 +3,18 @@ var kb_up=38;
 var kb_right=39;
 var kb_down=40;
 
-function input_t(loop)
+/**
+ Create an input handler, which calls this event function
+ when keys are pressed or released on this DOM object.
+*/
+function input_t(event, DOM)
 {
 	this.interval=null;
-	this.keys_down=[];
-	this.keys_pressed=[];
-	this.keys_released=[];
-	this.user_loop=function(){loop();};
-}
+	this.keys_down=[]; // currently down
+	this.keys_pressed=[]; // has been pressed
+	this.keys_released=[]; // currently released
+	this.user_event=function(){event();};
 
-input_t.prototype.start=function()
-{
 	for(var ii=0;ii<255;++ii)
 	{
 		this.keys_down[ii]=false;
@@ -22,16 +23,10 @@ input_t.prototype.start=function()
 	}
 
 	var myself=this;
-	window.addEventListener("keydown",function(evt){myself.keydown(evt);},true);
-	window.addEventListener("keyup",function(evt){myself.keyup(evt);},true);
-	this.interval=setInterval(function(){myself.loop();},20);
-};
-
-input_t.prototype.stop=function()
-{
-	clearInterval(this.interval);
-	this.interval=null;
-};
+	if (!DOM) DOM=window;
+	DOM.addEventListener("keydown",function(evt){myself.keydown(evt);},true);
+	DOM.addEventListener("keyup",function(evt){myself.keyup(evt);},true);
+}
 
 input_t.prototype.keydown=function(evt)
 {
@@ -39,24 +34,23 @@ input_t.prototype.keydown=function(evt)
 		this.keys_pressed[evt.keyCode]=true;
 
 	this.keys_down[evt.keyCode]=true;
+	this.user_event();
 };
 
 input_t.prototype.keyup=function(evt)
 {
 	this.keys_released[evt.keyCode]=true;
 	this.keys_down[evt.keyCode]=false;
+	this.user_event();
 };
 
-input_t.prototype.loop=function()
-{
-	if(this.user_loop)
-	{
-		this.user_loop();
 
-		for(var ii=0;ii<255;++ii)
-		{
-			this.keys_pressed[ii]=false;
-			this.keys_released[ii]=false;
-		}
+input_t.prototype.clear=function()
+{
+	for(var ii=0;ii<255;++ii)
+	{
+		this.keys_pressed[ii]=false;
+		this.keys_released[ii]=false;
 	}
 };
+
