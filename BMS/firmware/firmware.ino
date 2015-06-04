@@ -32,7 +32,7 @@
 
 // Charge function parameters
 
-#define ABS_max           4.110  // Max Cell voltage: DO NOT CHARGE HIGHER
+#define ABS_max           4.111  // Max Cell voltage: DO NOT CHARGE HIGHER
 #define max_working       4.100  // Discharge cells higher than this value
 #define low_cell_working  3.500  // Warning Voltage
 #define ABS_min           3.200  //E-Stop or risk damage

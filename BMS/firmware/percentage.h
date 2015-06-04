@@ -20,7 +20,7 @@
 #define p80         60.95
 
 #define transition 11.014
-#define maximum      12.3
+#define maximum     12.22
 #define minimum       9.6
 
 float Percentage(float x)
