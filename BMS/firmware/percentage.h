@@ -20,7 +20,7 @@
 #define p80         60.95
 
 #define transition 11.014
-#define maximum     12.22
+#define maximum      12.3
 #define minimum       9.6
 
 float Percentage(float x)
@@ -44,6 +44,11 @@ float Percentage(float x)
     x=(x-11.49)/0.3152;
     percent = p10*pow(x,7) + p20*pow(x,6) + p30*pow(x,5) + p40*pow(x,4) + p50*pow(x,3) + 
     p60*pow(x,2) + p70*x + p80;
+    
+    if (percent > 100)
+    {
+      percent=100;
+    }
   }
   
   else if (x>=maximum)
