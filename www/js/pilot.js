@@ -121,18 +121,20 @@ function pilot_time() {
 
 // This counts outstanding network requests
 var networkBusy=0;
-
+var delayedRequest =false;
 // Send our last-used piloting command out across the network
 function pilot_send() {
 	if (networkBusy>1)
 	{ // prevent overloading network: skip sending if already busy
 		document.getElementById('p_outputNet').innerHTML="network lag";
+		delayedRequest = true;
 		return;
 	}
 	networkBusy++;
+
 	var send_time=pilot.time=pilot_time();
 	var pilotStr=JSON.stringify(pilot);
-	console.log(pilotStr);
+	//console.log(pilotStr);
 	
 	var starpath=robot_name()+"/pilot";
 	var starcmd="?set="+encodeURIComponent(pilotStr);
@@ -153,6 +155,14 @@ function pilot_send() {
 		}
 		document.getElementById('p_outputNet').innerHTML=status;
 		networkBusy--;
+		if(networkBusy == 0)
+		{
+			if(delayedRequest)
+			{
+				delayedRequest = false;
+				pilot_send();
+			}
+		}
 	});
 	
 	sensor_receive(); // Read Sensor Data at every Send
@@ -172,7 +182,7 @@ function sensor_receive()
 	superstar_send(starpath,starcmd,function(xmlhttp) {
 		if (xmlhttp.status==200) {
 			var sensor_data=xmlhttp.responseText;
-			console.log("sensors: "+sensor_data);
+			//console.log("sensors: "+sensor_data);
 			try {
 				sensors=JSON.parse(sensor_data);
 			}
@@ -208,7 +218,7 @@ var keyboardIsDriving=false;
 // Return true if this key (as a string) is pressed
 function keyDown(key,alternateKey) {
 	var code=key.charCodeAt(0);
-	// console.log("Key code "+code+" : "+keyInput.keys_down[code]);
+	 console.log("Key code "+code+" : "+keyInput.keys_down[code]);
 	
 	if (keyInput.keys_down[code]) return true;
 	
