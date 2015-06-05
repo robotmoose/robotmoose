@@ -100,7 +100,7 @@ void create2_controller_t::loop()
 
 void create2_controller_t::drive(const int16_t left,const int16_t right)
 {
-	roomba_m->drive(left,right);
+	roomba_m->drive(left<<1,right<<1); // multiply commands by 2, to go from +-256 to +-512
 }
 
 /// Register our devices with tabula_setup
