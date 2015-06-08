@@ -125,3 +125,49 @@ REGISTER_TABULA_DEVICE(heartbeat,
 )
 
 
+// Neato XV-11 laser distance sensor
+#include "neato_serial.h"
+
+class neato : public action {
+public:
+	NeatoLDS<Stream> n;
+	int neatoMotorPin;
+	neato(Stream &s,int motorPin_) 
+		:n(s), neatoMotorPin(motorPin_)
+	{
+		
+	}
+	
+	void loop() {
+		// Incoming comms
+		int leash=100; // bound maximum latency
+		while (n.read()) { if (--leash<0) break; }
+		
+		// Motor control
+		pinMode(neatoMotorPin,OUTPUT);
+		//if (PC_connected) {
+			if (n.lastBatch.speed64>200.0) { // PWM
+				int target=280; // target RPM
+				int err=n.lastBatch.speed64/64-target;
+				analogWrite(neatoMotorPin,255-constrain(err*10 + 30, 0, 255));
+			} else { // simple hardcoded startup value
+				analogWrite(neatoMotorPin,255);
+			}
+
+		//} else { // PC not connected
+		//	analogWrite(neatoMotorPin,0); // turn motor off
+		//}
+		
+		// Outgoing comms?
+		//  FIXME!
+	}
+};
+
+REGISTER_TABULA_DEVICE(neato, 
+	Stream *s=src.read_serial(115200);
+	int motorPin=src.read_pin();
+	neato *n=new neato(*s,motorPin);
+	actions_10ms.add(n);
+)
+
+
