@@ -215,6 +215,31 @@ function get_pilot_power() {
 var keyInput;
 var keyboardIsDriving=false;
 
+document.addEventListener("visibilitychange",handleVisibilityChange); // Listens for any window visibilty change 
+
+window.setInterval(focusCheck,100); // Check if window is in focus every 100 ms
+
+// If window/tab is hidden, stop the robot 
+function handleVisibilityChange()
+{
+	if(document.hidden)
+	{
+		//console.log("Hidden :" + document.hidden)
+		pilot.power = emptyPower();
+		pilot_send();
+	}
+}
+
+//Stop robot if window is not in focus 
+function focusCheck()
+{
+	    //console.log(document.hasFocus());
+		if(!document.hasFocus()) 
+		{
+			pilot.power = emptyPower();
+			pilot_send();
+		}
+}
 // Return true if this key (as a string) is pressed
 function keyDown(key,alternateKey) {
 	var code=key.charCodeAt(0);
