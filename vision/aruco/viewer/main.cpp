@@ -243,8 +243,8 @@ void extract_location(location_binary &bin,const Marker &marker)
 	full.at<float>(3,3)=1.0;
 
 	if (mi.flags & marker_info_t::FLAG_CHAPMAN) {
-		swap_axes(full,0,2); // swap X and Z
 		swap_axes(full,1,2); // swap Y and Z
+		swap_axes(full,0,1); // swap X and (new) Y
 		flip_axis(full,0); // X negative
 		flip_axis(full,2); // Z negative
 	}
@@ -281,7 +281,7 @@ if (false) {
 	bin.x=back.at<float>(0,3)*scale+mi.x_shift;
 	bin.y=back.at<float>(1,3)*scale+mi.y_shift;
 	bin.z=back.at<float>(2,3)*scale+mi.z_shift;
-	bin.angle=180.0/M_PI*atan2(back.at<float>(1,0),back.at<float>(0,0));
+	bin.angle=180.0/M_PI*atan2(back.at<float>(0,0),-back.at<float>(1,0));
 	bin.marker_ID=marker.id;
 
 	// Print grep-friendly output
