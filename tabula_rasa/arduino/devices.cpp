@@ -131,6 +131,7 @@ REGISTER_TABULA_DEVICE(heartbeat,
 class neato : public action {
 public:
 	NeatoLDS<Stream> n;
+	tabula_sensor<NeatoLDSbatch> batch;
 	int neatoMotorPin;
 	neato(Stream &s,int motorPin_) 
 		:n(s), neatoMotorPin(motorPin_)
@@ -142,7 +143,10 @@ public:
 		// Incoming comms
 		int leash=100; // bound maximum latency
 		while (n.read()) { if (--leash<0) break; }
-		
+				
+		// Outgoing comms--copy over the last batch
+		batch=n.lastBatch;
+
 		// Motor control
 		pinMode(neatoMotorPin,OUTPUT);
 		//if (PC_connected) {
@@ -157,9 +161,6 @@ public:
 		//} else { // PC not connected
 		//	analogWrite(neatoMotorPin,0); // turn motor off
 		//}
-		
-		// Outgoing comms?
-		//  FIXME!
 	}
 };
 
@@ -167,7 +168,7 @@ REGISTER_TABULA_DEVICE(neato,
 	Stream *s=src.read_serial(115200);
 	int motorPin=src.read_pin();
 	neato *n=new neato(*s,motorPin);
-	actions_10ms.add(n);
+	actions_1ms.add(n);
 )
 
 
