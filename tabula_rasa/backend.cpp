@@ -239,9 +239,11 @@ public:
 		root["lidar"]["rpm"]=b.speed64*(1.0/64.0);
 		root["lidar"]["errors"]=b.errors;
 		root["lidar"]["depth"]=json::Array();
+		root["lidar"]["scale"]="0.001";
+		// HACK: distances are integer mm.  meters seems cleaner, but floats get printed like "0.324000", which is big.
 		json::Array &a=root["lidar"]["depth"].ToArray();
 		for (int i=0;i<NDIR;i++) {
-			a.push_back(dirs[i].distance*0.001);
+			a.push_back(dirs[i].distance); 
 		}
 	}
 };
@@ -451,6 +453,9 @@ void robot_backend::setup_devices(std::string robot_config)
 		}
 		else if (device=="cmd") {
 			continue; // skip over configuration commands
+		}
+		else if (device=="latency") {
+			sensors.push_back(new json_sensor<int,uint8_t>(json_path("latency")));
 		}
 		else if (device=="analog_sensor") {
 			static int analogs=0;

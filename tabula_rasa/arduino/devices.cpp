@@ -9,6 +9,8 @@
 #include "tabula_control.h"
 #include "tabula_config.h"
 
+
+
 // Servo output example:
 class servo_device : public action {
 public:
@@ -125,6 +127,36 @@ REGISTER_TABULA_DEVICE(heartbeat,
 )
 
 
+// Latency monitor
+class latency_monitor : public action {
+public:
+  typedef unsigned short milli_t;
+  milli_t the_time() { return micros()>>10; }
+  
+  milli_t worst; // worst latency measured so far
+  milli_t last; // time at last loop call
+  tabula_sensor<unsigned char> latency;
+  void loop() { 
+    milli_t cur=the_time();
+    milli_t d=cur-last;
+    if (d>worst) worst=d;
+    last=cur;
+    latency=worst;
+  }
+};
+class latency_reset : public action {
+public:
+  latency_monitor *m;
+  latency_reset(latency_monitor *m_) :m(m_) {}
+  void loop() { m->worst=0; }
+};
+
+REGISTER_TABULA_DEVICE(latency, 
+  latency_monitor *m=new latency_monitor();
+  actions_1ms.add(m);
+  actions_1s.add(new latency_reset(m));
+)
+
 // Neato XV-11 laser distance sensor
 #include "neato_serial.h"
 
@@ -139,9 +171,9 @@ public:
 		
 	}
 	
-	void loop() {
+	void loop() { 
 		// Incoming comms
-		int leash=100; // bound maximum latency
+		int leash=1000; // bound maximum latency
 		while (n.read()) { if (--leash<0) break; }
 				
 		// Outgoing comms--copy over the last batch
@@ -170,5 +202,3 @@ REGISTER_TABULA_DEVICE(neato,
 	neato *n=new neato(*s,motorPin);
 	actions_1ms.add(n);
 )
-
-
