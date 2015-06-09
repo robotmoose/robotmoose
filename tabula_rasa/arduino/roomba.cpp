@@ -295,15 +295,12 @@ void roomba_t::set_receive_sensors(const bool on)
 	if(on)
 	{
 		uint8_t id=ROOMBA_ID_STREAM_SENSORS_START;
-		const uint8_t sensor_count=21;
 		const static uint8_t sensors[sensor_count]=
 		{
 			ROOMBA_ID_SENSOR_BUMPER_DROP,
 			ROOMBA_ID_SENSOR_CHARGE_STATE,
-			ROOMBA_ID_SENSOR_BATT_VOLTAGE,
 			ROOMBA_ID_SENSOR_BATT_TEMP,
 			ROOMBA_ID_SENSOR_BATT_CHARGE,
-			ROOMBA_ID_SENSOR_BATT_CAPACITY,
 			ROOMBA_ID_SENSOR_ENCODER_L,
 			ROOMBA_ID_SENSOR_ENCODER_R,
 			ROOMBA_ID_SENSOR_CLIFF_L,
@@ -320,6 +317,7 @@ void roomba_t::set_receive_sensors(const bool on)
 			ROOMBA_ID_SENSOR_LIGHT_R,
 			ROOMBA_ID_SENSOR_BUTTONS
 		};
+		const uint8_t sensor_count=sizeof(sensors);
 
 		serial_m->write(&id,1);
 		serial_m->write(&sensor_count,1);
@@ -343,10 +341,8 @@ void roomba_t::dump_sensors() const
 	std::cout<<"m\t"<<(int)sensor_packet_m.mode<<std::endl;
 	std::cout<<"bd\t"<<(int)sensor_packet_m.bumper<<std::endl;
 	std::cout<<"cs\t"<<(int)sensor_packet_m.battery.state<<std::endl;
-	std::cout<<"bv\t"<<(int)sensor_packet_m.battery.voltage<<std::endl;
 	std::cout<<"bt\t"<<(int)sensor_packet_m.battery.temperature<<std::endl;
 	std::cout<<"bch\t"<<(int)sensor_packet_m.battery.charge<<std::endl;
-	std::cout<<"bca\t"<<(int)sensor_packet_m.battery.capacity<<std::endl;
 	std::cout<<"enl\t"<<(int)sensor_packet_m.encoder.L<<std::endl;
 	std::cout<<"enr\t"<<(int)sensor_packet_m.encoder.L<<std::endl;
 	std::cout<<"cl\t"<<(int)sensor_packet_m.floor[0]<<std::endl;
@@ -371,6 +367,22 @@ uint16_t read_big_16(uint8_t *src)
 	return (src[0]<<8)|src[1];
 }
 
+// Convert raw Roomba sensor value (0--4096?) to our more compact 8-bit value
+inline uint8_t adapt_floor(uint16_t v) {
+   return v>>5;
+}
+// Convert raw Roomba light value to our more compact 8-bit value
+inline uint8_t adapt_light(uint16_t v) {
+   if (v<128) return v;
+   else {
+      v-=128; // what .. the ... ???
+      v=v>>2;
+      v+=128;
+      if (v>255) v=255;
+      return v;
+   }
+}
+
 bool roomba_t::parse_sensor_packet_m()
 {
 	size_t index=0;
@@ -389,11 +401,6 @@ bool roomba_t::parse_sensor_packet_m()
 			temp_packet.battery.state=*(uint8_t*)(serial_buffer_m+index);
 			index+=sizeof(uint8_t);
 		}
-		else if(sensor==ROOMBA_ID_SENSOR_BATT_VOLTAGE)
-		{
-			temp_packet.battery.voltage=read_big_16(serial_buffer_m+index);
-			index+=sizeof(uint16_t);
-		}
 		else if(sensor==ROOMBA_ID_SENSOR_BATT_TEMP)
 		{
 			temp_packet.battery.temperature=*(int8_t*)(serial_buffer_m+index);
@@ -402,11 +409,6 @@ bool roomba_t::parse_sensor_packet_m()
 		else if(sensor==ROOMBA_ID_SENSOR_BATT_CHARGE)
 		{
 			temp_packet.battery.charge=read_big_16(serial_buffer_m+index);
-			index+=sizeof(uint16_t);
-		}
-		else if(sensor==ROOMBA_ID_SENSOR_BATT_CAPACITY)
-		{
-			temp_packet.battery.capacity=read_big_16(serial_buffer_m+index);
 			index+=sizeof(uint16_t);
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_ENCODER_L)
@@ -421,22 +423,22 @@ bool roomba_t::parse_sensor_packet_m()
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_CLIFF_L)
 		{
-			temp_packet.floor[0]=read_big_16(serial_buffer_m+index);
+			temp_packet.floor[0]=adapt_floor(read_big_16(serial_buffer_m+index));
 			index+=sizeof(uint16_t);
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_CLIFF_FL)
 		{
-			temp_packet.floor[1]=read_big_16(serial_buffer_m+index);
+			temp_packet.floor[1]=adapt_floor(read_big_16(serial_buffer_m+index));
 			index+=sizeof(uint16_t);
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_CLIFF_FR)
 		{
-			temp_packet.floor[2]=read_big_16(serial_buffer_m+index);
+			temp_packet.floor[2]=adapt_floor(read_big_16(serial_buffer_m+index));
 			index+=sizeof(uint16_t);
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_CLIFF_R)
 		{
-			temp_packet.floor[3]=read_big_16(serial_buffer_m+index);
+			temp_packet.floor[3]=adapt_floor(read_big_16(serial_buffer_m+index));
 			index+=sizeof(uint16_t);
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_MODE)
@@ -451,32 +453,32 @@ bool roomba_t::parse_sensor_packet_m()
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_LIGHT_L)
 		{
-			temp_packet.light[0]=read_big_16(serial_buffer_m+index);
+			temp_packet.light[0]=adapt_light(read_big_16(serial_buffer_m+index));
 			index+=sizeof(uint16_t);
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_LIGHT_FL)
 		{
-			temp_packet.light[1]=read_big_16(serial_buffer_m+index);
+			temp_packet.light[1]=adapt_light(read_big_16(serial_buffer_m+index));
 			index+=sizeof(uint16_t);
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_LIGHT_CL)
 		{
-			temp_packet.light[2]=read_big_16(serial_buffer_m+index);
+			temp_packet.light[2]=adapt_light(read_big_16(serial_buffer_m+index));
 			index+=sizeof(uint16_t);
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_LIGHT_CR)
 		{
-			temp_packet.light[3]=read_big_16(serial_buffer_m+index);
+			temp_packet.light[3]=adapt_light(read_big_16(serial_buffer_m+index));
 			index+=sizeof(uint16_t);
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_LIGHT_FR)
 		{
-			temp_packet.light[4]=read_big_16(serial_buffer_m+index);
+			temp_packet.light[4]=adapt_light(read_big_16(serial_buffer_m+index));
 			index+=sizeof(uint16_t);
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_LIGHT_R)
 		{
-			temp_packet.light[5]=read_big_16(serial_buffer_m+index);
+			temp_packet.light[5]=adapt_light(read_big_16(serial_buffer_m+index));
 			index+=sizeof(uint16_t);
 		}
 		else if (sensor==ROOMBA_ID_SENSOR_BUTTONS)

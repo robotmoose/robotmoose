@@ -434,9 +434,7 @@ void robot_backend::setup_devices(std::string robot_config)
 				sensors.push_back(new json_sensor<int,uint8_t>(json_path("bumper")));
 				sensors.push_back(new json_sensor<int,uint8_t>(json_path("battery","state")));
 				sensors.push_back(new json_sensor<int,int8_t>(json_path("battery","temperature")));
-				sensors.push_back(new json_sensor<int,uint16_t>(json_path("battery","voltage")));
 				sensors.push_back(new json_sensor<int,uint16_t>(json_path("battery","charge")));
-				sensors.push_back(new json_sensor<int,uint16_t>(json_path("battery","capacity")));
 				
 				sensors.push_back(new wheel_encoders<uint16_t>(location,
 					0.00044, // wheel travel distance (m) per encoder count
@@ -444,9 +442,9 @@ void robot_backend::setup_devices(std::string robot_config)
 					));
 				
 				for (int i=0;i<4;i++)
-					sensors.push_back(new json_sensor<int,uint16_t>(json_path("floor",i)));
+					sensors.push_back(new json_sensor<int,uint8_t>(json_path("floor",i)));
 				for (int i=0;i<6;i++)
-					sensors.push_back(new json_sensor<int,uint16_t>(json_path("light",i)));
+					sensors.push_back(new json_sensor<int,uint8_t>(json_path("light",i)));
 				sensors.push_back(new json_sensor<int,uint8_t>(json_path("light_field")));
 				sensors.push_back(new json_sensor<int,uint8_t>(json_path("buttons")));
 			}

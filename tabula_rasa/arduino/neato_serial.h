@@ -29,7 +29,7 @@ serial data protocol.
 */
 class NeatoLDSbatch {
 public:
-	enum {size=24}; // number of reports to accumulate at one time (multiple of 4, evenly divides 360)
+	enum {size=12}; // number of reports to accumulate at one time (multiple of 4, evenly divides 360)
 	short index:10; // starting angle, from 0-359 degrees.  -1 for invalid.
 	unsigned short errors:6; // Neato serial communication errors while receiving this batch
 	unsigned short speed64; // RPM*64

@@ -39,9 +39,9 @@ class roomba_t
 		{
 			uint8_t state; // charging/discharging
 			int8_t temperature; // deg C
-			uint16_t voltage; // millivolts
+			// uint16_t voltage; // millivolts
 			uint16_t charge; // milliamp-hours current charge state
-			uint16_t capacity; // milliamp-hours maximum charge
+			// uint16_t capacity; // milliamp-hours maximum charge
 		};
 		struct encoder_t
 		{
@@ -61,10 +61,10 @@ class roomba_t
 			encoder_t encoder;
 		
 		// Downward-facing light sensors:
-			uint16_t floor[4];
+			uint8_t floor[4];
 		
 		// Forward-facing reflectance sensors:
-			uint16_t light[6];
+			uint8_t light[6];
 			uint8_t light_field;
 		
 		// User interface buttons:
