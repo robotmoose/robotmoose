@@ -210,6 +210,43 @@ public:
 	}
 };
 
+/* Specialization to output sensor data from Neato */
+#include "arduino/neato_serial.h"
+template <>
+class json_sensor<float,NeatoLDSbatch> : public json_target {
+public:
+	enum {NDIR=360};
+	NeatoLDSdir dirs[NDIR];
+	tabula_sensor<NeatoLDSbatch> sensor;
+	json_sensor(const json_path &path_) :json_target(path_) {}
+	
+	// Return the last-read value of our sensor
+	NeatoLDSbatch read(void) const {
+		return *(NeatoLDSbatch *)&tabula_sensor_storage.array[sensor.get_index()];
+	}
+	
+	// Write our sensor value into this JSON object
+	virtual void modify(json::Value &root) {
+		NeatoLDSbatch b=read();
+		if (b.index>=0 && b.index+NeatoLDSbatch::size<=NDIR) 
+		{ // copy data from this latest batch into the global array
+			for (int i=0;i<NeatoLDSbatch::size;i++) {
+				dirs[i+b.index]=b.dir[i];
+			}
+		}
+		
+		root["lidar"]=json::Object();
+		root["lidar"]["rpm"]=b.speed64*(1.0/64.0);
+		root["lidar"]["errors"]=b.errors;
+		root["lidar"]["depth"]=json::Array();
+		json::Array &a=root["lidar"]["depth"].ToArray();
+		for (int i=0;i<NDIR;i++) {
+			a.push_back(dirs[i].distance*0.001);
+		}
+	}
+};
+
+
 // Type conversion specialization interface
 template <class jsonT,class deviceT>
 deviceT json_command_conversion(const jsonT &v) { 
@@ -422,6 +459,9 @@ void robot_backend::setup_devices(std::string robot_config)
 		else if (device=="servo") {
 			static int servos=0;
 			commands.push_back(new json_command<float,uint8_t>(json_path("servo",servos++)));
+		}
+		else if (device=="neato") {
+			sensors.push_back(new json_sensor<float,NeatoLDSbatch>(json_path("lidar")));
 		}
 		else if (device=="pwm_pin") {
 			static int pwms=0;
@@ -664,6 +704,7 @@ int main(int argc, char *argv[])
 	std::string robotName = "demo"; // superstar robot name
 	std::string configMotor = "create2_controller_t X3"; // Arduino firmware device name
 	std::string markerFile=""; // computer vision marker file
+	std::string sensors=""; // All our sensors
 	int baudrate = 57600;  // serial comms to Arduino
 	for (int argi = 1; argi<argc; argi++) {
 		if (0 == strcmp(argv[argi], "--robot")) robotName = argv[++argi];
@@ -671,6 +712,7 @@ int main(int argc, char *argv[])
 		else if (0 == strcmp(argv[argi], "--baudrate")) baudrate = atoi(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--config")) configMotor = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--marker")) markerFile = argv[++argi];
+		else if (0 == strcmp(argv[argi], "--sensor")) sensors += argv[++argi]+std::string("\n");
 		else if (0 == strcmp(argv[argi], "--trim")) LRtrim = atof(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--debug")) debug = true;
 		else if (0 == strcmp(argv[argi], "--sim")) { // no Arduino, for debugging
@@ -693,7 +735,7 @@ int main(int argc, char *argv[])
 	std::string robot_config=
 "analog_sensor A0\n"
 "analog_sensor A1\n"
-
++sensors
 +configMotor+"\n"
 
 #if 0 // need smarter web front end here
