@@ -75,6 +75,11 @@ public:
 */
 extern long action_time_ms; 
 
+/**
+  This bool goes true when we're receiving commands from the PC,
+  and is false otherwise.  It's handy for putting the Roomba into safe mode when the backend shuts down.
+*/
+extern bool pc_connected;
 
 /** 
   These are scheduling rungs, used to avoid inefficient duplicate polling.

@@ -181,7 +181,7 @@ public:
 
 		// Motor control
 		pinMode(neatoMotorPin,OUTPUT);
-		//if (PC_connected) {
+		if (pc_connected) {
 			if (n.lastBatch.speed64>200.0) { // PWM
 				int target=280; // target RPM
 				int err=n.lastBatch.speed64/64-target;
@@ -189,10 +189,9 @@ public:
 			} else { // simple hardcoded startup value
 				analogWrite(neatoMotorPin,255);
 			}
-
-		//} else { // PC not connected
-		//	analogWrite(neatoMotorPin,0); // turn motor off
-		//}
+		} else { // PC not connected
+			analogWrite(neatoMotorPin,0); // turn motor off
+		}
 	}
 };
 

@@ -84,8 +84,17 @@ void create2_controller_t::loop()
 {
 	roomba_m->update();
 	sensors_m=roomba_m->get_sensors();
+	bool go_passive=false;
+	static bool was_connected=false; // true if we've ever seen the PC connected
+	if (pc_connected) was_connected=true;
+
 	if (roomba_m->get_sensors().buttons&roomba_t::BUTTON_CLEAN
 	  ||roomba_m->get_sensors().buttons&roomba_t::BUTTON_DOCK) 
+		go_passive=true;
+	if (!pc_connected && was_connected)
+		go_passive=true;
+	
+	if (go_passive)
 	{ // power button is pressed--enter Passive mode, so it will charge
 		roomba_m->set_mode(roomba_t::PASSIVE);
 	}
