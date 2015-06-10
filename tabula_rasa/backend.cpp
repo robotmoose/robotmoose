@@ -243,7 +243,9 @@ public:
 		// HACK: distances are integer mm.  meters seems cleaner, but floats get printed like "0.324000", which is big.
 		json::Array &a=root["lidar"]["depth"].ToArray();
 		for (int i=0;i<NDIR;i++) {
-			a.push_back(dirs[i].distance); 
+			int in=i;
+			if (true) in=NDIR-1-i; // flip upside down
+			a.push_back(dirs[in].distance); 
 		}
 	}
 };
