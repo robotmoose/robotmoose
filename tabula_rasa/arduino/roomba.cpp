@@ -295,7 +295,7 @@ void roomba_t::set_receive_sensors(const bool on)
 	if(on)
 	{
 		uint8_t id=ROOMBA_ID_STREAM_SENSORS_START;
-		const static uint8_t sensors[sensor_count]=
+		const static uint8_t sensors[]=
 		{
 			ROOMBA_ID_SENSOR_BUMPER_DROP,
 			ROOMBA_ID_SENSOR_CHARGE_STATE,
