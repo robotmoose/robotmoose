@@ -95,6 +95,9 @@ robot_2wd.prototype.drive_wheels=function(L,R)
 
 
 // Return the world-coordinates XYZ of this robot polar coordinates position
+//  radius: distance, in meters
+//  angle_rad: angle, in radians
+//  height: Z coordinate (0.0 by default)
 robot_2wd.prototype.world_from_robot=function(radius,angle_rad,height)
 {
 	var W=new vec3(
@@ -104,6 +107,49 @@ robot_2wd.prototype.world_from_robot=function(radius,angle_rad,height)
 	);
 	W.pe(this.P); // robot-relative
 	return W;
+}
+
+// Draw LIDAR data onscreen
+robot_2wd.prototype.draw_lidar=function(renderer,lidar) {
+	var max_angle=lidar.depth.length;
+	console.log("LIDAR has "+max_angle+" depth values");
+	//var scale=1.0; if (lidar.scale) scale=lidar.scale;
+	var height=10.1; if (lidar.height) height=lidar.height;
+	var origin=this.world_from_robot(0.0,0.0,height);
+
+	var geometry = new THREE.Geometry();
+	geometry.vertices.push(
+		origin // vertex 0 is the origin
+	);
+	
+	var cur=0; // vertex index last added
+	var del=1;
+	for (var angle=0;angle<max_angle;angle+=del) 
+	if (lidar.depth[angle]>0) {
+		var depth=lidar.depth[angle];
+		var rads=angle*(2*Math.PI/max_angle);
+		var xyz=this.world_from_robot(depth,rads,height);
+		
+		cur++;
+		geometry.vertices.push(xyz);
+		if (angle>=del && lidar.depth[angle-del]>0) 
+		{ // last one was valid too--add a face
+			//console.log("  face "+xyz+" from depth "+depth+" at angle "+rads);
+			geometry.faces.push( new THREE.Face3( 0, cur,cur-1 ) );
+		}
+	}
+
+	// for (var i=0;i<4;i++) console.log("  Line: "+geometry.vertices[i]);
+	
+	geometry.verticesNeedUpdate=true;
+	geometry.computeBoundingSphere();
+	var mesh=new THREE.Mesh(geometry,
+		new THREE.MeshBasicMaterial({color:0x8f8f8f, side:THREE.DoubleSide}));
+	if (!window.initted) 
+	{
+		window.initted=true;
+		renderer.scene.add(mesh);
+	}
 }
 
 

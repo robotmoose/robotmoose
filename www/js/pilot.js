@@ -243,7 +243,7 @@ function focusCheck()
 // Return true if this key (as a string) is pressed
 function keyDown(key,alternateKey) {
 	var code=key.charCodeAt(0);
-	 console.log("Key code "+code+" : "+keyInput.keys_down[code]);
+	// console.log("Key code "+code+" : "+keyInput.keys_down[code]);
 	
 	if (keyInput.keys_down[code]) return true;
 	
@@ -255,7 +255,7 @@ function keyDown(key,alternateKey) {
 // FIXME: Add proportional control 
 function keyboardDrive()
 {
-	console.log("Keyboard activity");
+	// console.log("Keyboard activity");
 	var maxPower=get_pilot_power();
 
 	var forward=0.0, turn=0.0; 
@@ -404,7 +404,10 @@ function mapLoop(dt) {
 		mapRobot.wheel[0]=mapRobot.world_from_robot(150,+Math.PI*0.5);
 		mapRobot.wheel[1]=mapRobot.world_from_robot(150,-Math.PI*0.5);
 		
-		// FIXME: obstacle sensors?
+		// Check for obstacle sensors
+		if (sensors.lidar) {
+			mapRobot.draw_lidar(renderer,sensors.lidar);
+		}
 	}
 }
 
