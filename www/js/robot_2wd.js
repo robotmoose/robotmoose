@@ -114,7 +114,7 @@ robot_2wd.prototype.draw_lidar=function(renderer,lidar) {
 	var max_angle=lidar.depth.length;
 	console.log("LIDAR has "+max_angle+" depth values");
 	//var scale=1.0; if (lidar.scale) scale=lidar.scale;
-	var height=10.1; if (lidar.height) height=lidar.height;
+	var height=10.0; if (lidar.height) height=lidar.height;
 	var origin=this.world_from_robot(0.0,0.0,height);
 
 	var geometry = new THREE.Geometry();
@@ -144,11 +144,22 @@ robot_2wd.prototype.draw_lidar=function(renderer,lidar) {
 	geometry.verticesNeedUpdate=true;
 	geometry.computeBoundingSphere();
 	var mesh=new THREE.Mesh(geometry,
-		new THREE.MeshBasicMaterial({color:0x8f8f8f, side:THREE.DoubleSide}));
-	if (!window.initted) 
-	{
-		window.initted=true;
-		renderer.scene.add(mesh);
+		new THREE.MeshBasicMaterial(
+			{color:0x8f0f0f, 
+			 opacity:0.1,
+			 transparent:true, 
+			 side:THREE.DoubleSide}));
+	
+	renderer.scene.add(mesh);
+	
+	if (!this.lidars) { this.lidars=[]; this.last_lidar=0; }
+	if (this.lidars.length<10) { // add new lidar until buffer is full
+		this.lidars.push(mesh);
+	} else { // replace an old lidar image
+		renderer.scene.remove(this.lidars[this.last_lidar]);
+		this.lidars[this.last_lidar]=mesh;
+		this.last_lidar++;
+		if (this.last_lidar>=this.lidars.length) this.last_lidar=0;
 	}
 }
 

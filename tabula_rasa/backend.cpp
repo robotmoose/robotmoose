@@ -215,10 +215,16 @@ public:
 template <>
 class json_sensor<float,NeatoLDSbatch> : public json_target {
 public:
+	unsigned char changes; // nonce counter for updates
+	int updated_count; // number of new samples received
+	int last_index; // last-received batch start index
 	enum {NDIR=360};
 	NeatoLDSdir dirs[NDIR];
 	tabula_sensor<NeatoLDSbatch> sensor;
-	json_sensor(const json_path &path_) :json_target(path_) {}
+	json_sensor(const json_path &path_) :json_target(path_) {
+		changes=0;
+		updated_count=0;
+	}
 	
 	// Return the last-read value of our sensor
 	NeatoLDSbatch read(void) const {
@@ -233,6 +239,14 @@ public:
 			for (int i=0;i<NeatoLDSbatch::size;i++) {
 				dirs[i+b.index]=b.dir[i];
 			}
+			if (b.index!=last_index) {
+				updated_count+=NeatoLDSbatch::size;
+				if (updated_count>=360) {
+					changes++;
+					updated_count=0;
+				}
+				last_index=b.index;
+			}
 		}
 		
 		root["lidar"]=json::Object();
@@ -240,6 +254,7 @@ public:
 		root["lidar"]["errors"]=b.errors;
 		root["lidar"]["depth"]=json::Array();
 		root["lidar"]["scale"]="0.001";
+		root["lidar"]["change"]=changes;
 		// HACK: distances are integer mm.  meters seems cleaner, but floats get printed like "0.324000", which is big.
 		json::Array &a=root["lidar"]["depth"].ToArray();
 		for (int i=0;i<NDIR;i++) {

@@ -388,6 +388,7 @@ function runCmd(run,arg) {
 var map;
 var mapRobot;
 var renderer;
+var last_lidar_change=-1;
 
 // Map renderer loop
 function mapLoop(dt) {
@@ -406,7 +407,10 @@ function mapLoop(dt) {
 		
 		// Check for obstacle sensors
 		if (sensors.lidar) {
-			mapRobot.draw_lidar(renderer,sensors.lidar);
+			if (sensors.lidar.change!=last_lidar_change) {
+				mapRobot.draw_lidar(renderer,sensors.lidar);
+				last_lidar_change=sensors.lidar.change;
+			}
 		}
 	}
 }
