@@ -22,7 +22,7 @@ public:
 	}
 };
 
-REGISTER_TABULA_DEVICE(servo,
+REGISTER_TABULA_DEVICE(servo,"P",
 	int pin=src.read_pin();
 	servo_device *device=new servo_device();
 	device->s.attach(pin);
@@ -41,7 +41,7 @@ public:
 	}	
 };
 
-REGISTER_TABULA_DEVICE(pwm_pin,
+REGISTER_TABULA_DEVICE(pwm,"P",
 	int pin=src.read_pin();
 	pwm_pin *device=new pwm_pin();
 	device->pin=pin;
@@ -62,7 +62,7 @@ public:
 	}	
 };
 
-REGISTER_TABULA_DEVICE(analog_sensor,
+REGISTER_TABULA_DEVICE(analog,"P",
 	int pin=src.read_pin();
 	analog_sensor *device=new analog_sensor();
 	device->pin=pin;
@@ -73,24 +73,30 @@ REGISTER_TABULA_DEVICE(analog_sensor,
 // Battery Management System
 class BMS : public action {
 public:
-        enum { bms_addr = 2 }; // Address of BMS on I2C
-        enum { numbytes = 2 }; // # of bytes to request from BMS
+	tabula_sensor<unsigned char> charge; // percent charge, 0-100 percent
+	tabula_sensor<unsigned char> state; // current charge state
+	enum { bms_addr = 2 }; // Address of BMS on I2C
+	enum { numbytes = 2 }; // # of bytes to request from BMS
 	virtual void loop() {
 		Wire.requestFrom(bms_addr, numbytes);
-                while(Wire.available() <= 2 && Wire.available() >= 1)    // slave may send less than requested
-                {
-                           byte x = Wire.read(); // receive a byte as character
-                           Serial.print(x);   // print the character
-                           Serial.println("");
-                }
-
+		while(Wire.available() <= 2 && Wire.available() >= 1)    // slave may send less than requested
+		{
+			byte x = Wire.read(); // receive a byte as character
+			// Serial.print(x);   // print the character
+			// Serial.println("");
+			if (x&0xC0) { // high bits are set--this is a state report
+				state=x; 
+			} else {
+				charge=x;
+			}
+		}
 	}	
 };
 
-REGISTER_TABULA_DEVICE(BMS,
+REGISTER_TABULA_DEVICE(bms,"",
         Wire.begin();
 	BMS *device=new BMS();
-	actions_10s.add(device);
+	actions_1s.add(device);
 )
     
 
@@ -102,8 +108,8 @@ class sensor_watcher : public action { public:
 		tabula_sensor_storage.print<T>();
 	}	
 };
-REGISTER_TABULA_DEVICE(sensors8, actions_1s.add(new sensor_watcher<unsigned char>());  )
-REGISTER_TABULA_DEVICE(sensors16, actions_1s.add(new sensor_watcher<int16_t>());  )
+REGISTER_TABULA_DEVICE(sensors8,"", actions_1s.add(new sensor_watcher<unsigned char>());  )
+REGISTER_TABULA_DEVICE(sensors16,"", actions_1s.add(new sensor_watcher<int16_t>());  )
 
 template <class T>
 class command_watcher : public action { public:
@@ -112,8 +118,8 @@ class command_watcher : public action { public:
 		tabula_command_storage.print<T>();
 	}	
 };
-REGISTER_TABULA_DEVICE(commands8, actions_1s.add(new command_watcher<unsigned char>());  )
-REGISTER_TABULA_DEVICE(commands16, actions_1s.add(new command_watcher<int16_t>());  )
+REGISTER_TABULA_DEVICE(commands8,"", actions_1s.add(new command_watcher<unsigned char>());  )
+REGISTER_TABULA_DEVICE(commands16,"", actions_1s.add(new command_watcher<int16_t>());  )
 
 
 // Simple ASCII serial heartbeat
@@ -122,7 +128,7 @@ public:
    void loop() { Serial.println("Heartbeat!"); }
 };
 
-REGISTER_TABULA_DEVICE(heartbeat, 
+REGISTER_TABULA_DEVICE(heartbeat,"",
   actions_1s.add(new heartbeat());
 )
 
@@ -151,7 +157,7 @@ public:
   void loop() { m->worst=0; }
 };
 
-REGISTER_TABULA_DEVICE(latency, 
+REGISTER_TABULA_DEVICE(latency,"",
   latency_monitor *m=new latency_monitor();
   actions_1ms.add(m);
   actions_1s.add(new latency_reset(m));
@@ -195,7 +201,7 @@ public:
 	}
 };
 
-REGISTER_TABULA_DEVICE(neato, 
+REGISTER_TABULA_DEVICE(neato,"SP",
 	Stream *s=src.read_serial(115200);
 	int motorPin=src.read_pin();
 	neato *n=new neato(*s,motorPin);

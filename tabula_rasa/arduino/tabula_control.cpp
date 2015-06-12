@@ -92,7 +92,7 @@ public:
 	}
 };
 
-REGISTER_TABULA_DEVICE(serial_controller,
+REGISTER_TABULA_DEVICE(serial_controller,"",
 	HardwareSerial &channel=Serial;
 	channel.println();
 	channel.println(-1); // switching to binary mode

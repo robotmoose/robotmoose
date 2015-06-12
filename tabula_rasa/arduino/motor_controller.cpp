@@ -113,19 +113,19 @@ void create2_controller_t::drive(const int16_t left,const int16_t right)
 }
 
 /// Register our devices with tabula_setup
-REGISTER_TABULA_DEVICE(bts_controller_t, 
+REGISTER_TABULA_DEVICE(bts, "PPPP",
 	uint16_t left[2]; uint16_t right[2]; 
 	left[0]=src.read_pin();	left[1]=src.read_pin();
 	right[0]=src.read_pin(); right[1]=src.read_pin();
 	actions_10ms.add(new bts_controller_t(left,right));
 )
 
-REGISTER_TABULA_DEVICE(sabertooth_v1_controller_t,
+REGISTER_TABULA_DEVICE(sabertooth1, "S",
 	Stream *saber=src.read_serial(9600);
 	actions_10ms.add(new sabertooth_v1_controller_t(*saber));
 )
 
-REGISTER_TABULA_DEVICE(sabertooth_v2_controller_t,
+REGISTER_TABULA_DEVICE(sabertooth2, "S",
 	Stream *saber=src.read_serial(9600);
 	delay(2000); // datasheet: wait 2 seconds after startup
 	saber->write(0xAA); // send the "bauding character"
@@ -133,7 +133,7 @@ REGISTER_TABULA_DEVICE(sabertooth_v2_controller_t,
 	actions_10ms.add(new sabertooth_v2_controller_t(*saber));
 )
 
-REGISTER_TABULA_DEVICE(create2_controller_t,
+REGISTER_TABULA_DEVICE(create2, "S",
 	Stream *roomba_serial=src.read_serial(115200);
 	roomba_t* roomba=new roomba_t (*roomba_serial);
 	Serial.println("Resetting roomba (push CLEAN if this step hangs!)");

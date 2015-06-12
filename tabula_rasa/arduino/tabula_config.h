@@ -183,8 +183,15 @@ public:
 	//   By convention, it's also the name of the class.
 	const char *device_name;
 	
-	tabula_factory(const char *device_name_)
-		:device_name(device_name_) 
+	// This string is stuff like:
+	//   P for a pin
+	//   S for a serial port
+	// For example, "SP" for one serial port, then one pin;
+	//  "PPPP" for four pins.
+	const char *arg_types;
+	
+	tabula_factory(const char *device_name_,const char *arg_types_)
+		:device_name(device_name_), arg_types(arg_types_) 
 	{
 		register_factory(this);
 	}
@@ -207,17 +214,17 @@ public:
   This macro is used to register your device with tabula_setup.
   Use this pattern at file scope:
 
-REGISTER_TABULA_DEVICE(my_motor_controller,
+REGISTER_TABULA_DEVICE(my_motor_controller,"P",
 	// This code can use src, a tabula_configure_source
 	int outputPin=src.read_pin();
 	actions_10ms.add(new my_motor_controller(outputPin));
 )
 */
-#define REGISTER_TABULA_DEVICE(name, createCode) \
+#define REGISTER_TABULA_DEVICE(name, arg_types, create_code) \
 	class name##_factory : public tabula_factory { \
 	public: \
-		name##_factory() :tabula_factory(#name) {} \
-		virtual void create(tabula_configure_source &src) { createCode ; } \
+		name##_factory() :tabula_factory(#name,arg_types) {} \
+		virtual void create(tabula_configure_source &src) { create_code ; } \
 	}; \
 	const static name##_factory name##_factory_singleton;
 
