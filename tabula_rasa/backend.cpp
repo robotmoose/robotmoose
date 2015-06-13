@@ -422,29 +422,42 @@ std::string getline_serial(SerialPort &port) {
 
 void robot_backend::setup_devices(std::string robot_config)
 {
+	int analogs=0;
+	int servos=0;
+	int pwms=0;
+	commands.erase(commands.begin(),commands.end());
+	sensors.erase(sensors.begin(),sensors.end());
+	
 	// Parse lines of the configuration outselves, to 
 	//   find the command and sensor fields and match them to JSON
 	std::istringstream robot_config_stream( robot_config );
 	while (robot_config_stream) {
-		std::string device=""; robot_config_stream>>device;
-		std::string pins_etc="";
-		if (!std::getline(robot_config_stream,pins_etc)) break;
+		std::string device="", args=""; 
+		std::ws(robot_config_stream); std::getline(robot_config_stream,device,'(');
+		std::ws(robot_config_stream); std::getline(robot_config_stream,args,')');
+		char last=0; robot_config_stream>>last;
+		printf("Config: device '%s', args '%s', ends with %c\n",
+			device.c_str(), args.c_str(), last);
+		if (last!=';') {
+			std::cout<<"Configuring backend: missing terminating semicolon on "<<device<<"!\n";
+			robot_config_stream.unget(); // put char back
+		}
 		
 		
 		// This fixed table could be replaced with registration from tabula_config.h
 		if (device=="serial_controller") { 
 			break; // end of configuration file
 		}
-		else if (device=="sabertooth_v1_controller_t" 
-			|| device=="sabertooth_v2_controller_t" 
-			|| device=="bts_controller_t" 
-			|| device=="create2_controller_t")
+		else if (device=="sabertooth1" 
+			|| device=="sabertooth2" 
+			|| device=="bts" 
+			|| device=="create2")
 		{
 			// Virtually all motor controllers just need motor power, left and right:
 			commands.push_back(new json_command<float,int16_t>(json_path("power","L")));
 			commands.push_back(new json_command<float,int16_t>(json_path("power","R"),LRtrim));
 			
-			if (device=="create2_controller_t") 
+			if (device=="create2") 
 			{ // Add all the Roomba's onboard sensors
 			//  These MUST match arduino/roomba.h roomba_t::sensor_t in size and order!
 				sensors.push_back(new json_sensor<int,uint8_t>(json_path("mode")));
@@ -466,25 +479,22 @@ void robot_backend::setup_devices(std::string robot_config)
 				sensors.push_back(new json_sensor<int,uint8_t>(json_path("buttons")));
 			}
 		}
+		else if (device=="neato") {
+			sensors.push_back(new json_sensor<float,NeatoLDSbatch>(json_path("lidar")));
+		}
 		else if (device=="cmd") {
 			continue; // skip over configuration commands
 		}
 		else if (device=="latency") {
 			sensors.push_back(new json_sensor<int,uint8_t>(json_path("latency")));
 		}
-		else if (device=="analog_sensor") {
-			static int analogs=0;
+		else if (device=="analog") {
 			sensors.push_back(new json_sensor<int,uint16_t>(json_path("analog",analogs++)));
 		}
 		else if (device=="servo") {
-			static int servos=0;
 			commands.push_back(new json_command<float,uint8_t>(json_path("servo",servos++)));
 		}
-		else if (device=="neato") {
-			sensors.push_back(new json_sensor<float,NeatoLDSbatch>(json_path("lidar")));
-		}
-		else if (device=="pwm_pin") {
-			static int pwms=0;
+		else if (device=="pwm") {
 			commands.push_back(new json_command<float,uint8_t>(json_path("pwm",pwms++)));
 		}
 		else std::cout<<"Arduino backend: ignoring unknown device '"<<device<<"'\n";
@@ -722,7 +732,7 @@ int main(int argc, char *argv[])
 	double LRtrim=1.0;
 	std::string superstarURL = "http://robotmoose.com/"; // superstar server
 	std::string robotName = "demo"; // superstar robot name
-	std::string configMotor = "create2_controller_t X3"; // Arduino firmware device name
+	std::string configMotor = "create2(X3);"; // Arduino firmware device name
 	std::string markerFile=""; // computer vision marker file
 	std::string sensors=""; // All our sensors
 	int baudrate = 57600;  // serial comms to Arduino
@@ -730,7 +740,7 @@ int main(int argc, char *argv[])
 		if (0 == strcmp(argv[argi], "--robot")) robotName = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--superstar")) superstarURL = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--baudrate")) baudrate = atoi(argv[++argi]);
-		else if (0 == strcmp(argv[argi], "--config")) configMotor = argv[++argi];
+		else if (0 == strcmp(argv[argi], "--motor")) configMotor = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--marker")) markerFile = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--sensor")) sensors += argv[++argi]+std::string("\n");
 		else if (0 == strcmp(argv[argi], "--trim")) LRtrim = atof(argv[++argi]);
@@ -753,18 +763,18 @@ int main(int argc, char *argv[])
 	
 	// FIXME: should pull robot configuration from superstar robotName/+"config"
 	std::string robot_config=
-"analog_sensor A0\n"
-"analog_sensor A1\n"
+"analog(A0);\n"
+"analog(A1);\n"
 +sensors
 +configMotor+"\n"
 
 #if 0 // need smarter web front end here
-"servo 10\n"
-"servo 9\n"
-"pwm_pin 3\n"
+"servo(10);\n"
+"servo(9);\n"
+"pwm(3);\n"
 "cmd 0 200\n"
 #endif
-"serial_controller\n"
+"serial_controller();\n"
 ;
 	backend->setup_devices(robot_config);
 	
