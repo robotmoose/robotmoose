@@ -11,11 +11,21 @@
 // First element of list:
 tabula_factory *tabula_factory::head=0;
 
+int tabula_factory_count() {
+	int count=0;
+	for (tabula_factory *cur=tabula_factory::head;cur!=NULL;cur=cur->next) {
+		count++;
+	}
+	return count;
+}
 
 // Print all devices
 void tabula_factory_list() {
-	for (tabula_factory *cur=tabula_factory::head;cur!=NULL;cur=cur->next)
-		Serial.println(cur->device_name);
+	for (tabula_factory *cur=tabula_factory::head;cur!=NULL;cur=cur->next) {
+		Serial.print(cur->device_name);
+		Serial.print(" ");
+		Serial.println(cur->arg_types);
+	}
 }
 
 // Find the factory with this name
@@ -26,6 +36,17 @@ tabula_factory *tabula_factory_find(const String &device_name) {
 	return NULL;
 }
 
+// Expect this character
+void expect_char(tabula_configure_source &src,char expected) {
+	char c=src.read();
+	if (c!=expected) { // not the character we wanted
+		String err="Expected ";
+		err+=expected;
+		err+=" but got ";
+		err+=c;
+		src.failed(" ",err);
+	}
+}
 
 // Configure one device
 bool tabula_configure() {
@@ -35,19 +56,28 @@ bool tabula_configure() {
 	tabula_factory *factory=tabula_factory_find(cmd);
 	
 	if (factory) { 	// a normal user device
-		factory->create(src);
+		expect_char(src,'(');
 		if (!src.failure) {
+		  factory->create(src);
+		  if (!src.failure) {
+		    expect_char(src,')');
+		    if (!src.failure) {
+		      expect_char(src,';');
+		      if (!src.failure) {
 			Serial.print(F("1 Added device "));
 			Serial.println(cmd);
 			if (cmd=="serial_controller") 
 				return false; // stop configuration and read binary packets from here.
+		      }
+		    }
+		  }
 		}
 	}
 	else if (cmd=="devices?") { 
 		tabula_factory_list();
 	}
 	else if (cmd=="version?") { 
-		Serial.println(F("1 2015-03-18 Anchorage"));
+		Serial.println(F("1 2015-06-12 Bethel"));
 	}
 	else if (cmd=="sensors?") { 
 		Serial.print(F("1  ")); tabula_sensor_storage.print<unsigned char>();
@@ -86,9 +116,14 @@ bool tabula_configure() {
 		Serial.print(bytes);
 		Serial.println(F(" bytes free"));
 	}
+	else if (cmd=="list") { // list devices (clean version)
+		Serial.println(tabula_factory_count());
+		tabula_factory_list();
+	}
 	else if (cmd[0]=='?' || cmd[0]=='h') { // help/hello/howto
 		Serial.println(F("This is how you configure your Arduino at runtime.  Registered devices:"));
 		tabula_factory_list();
+		Serial.println(F("Argument format: S is a Serial port, like X3 for TX3/RX3.  P is a Pin, like pin 13, or A3."));
 	}
 	else if (cmd=="print!") { // echo one string to screen
 		Serial.println(src.read_string());

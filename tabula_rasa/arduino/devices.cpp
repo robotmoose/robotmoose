@@ -77,6 +77,12 @@ public:
 	tabula_sensor<unsigned char> state; // current charge state
 	enum { bms_addr = 2 }; // Address of BMS on I2C
 	enum { numbytes = 2 }; // # of bytes to request from BMS
+
+	BMS() {
+		charge=50;
+		state=0; // 0: BMS not connected
+	}
+
 	virtual void loop() {
 		Wire.requestFrom(bms_addr, numbytes);
 		while(Wire.available() <= 2 && Wire.available() >= 1)    // slave may send less than requested

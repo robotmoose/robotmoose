@@ -24,8 +24,34 @@ REGISTER_TABULA_DEVICE macro, and the tabula_configure_source object.
 class tabula_configure_source {
 	Stream &s; // serial input stream
 public:
-	tabula_configure_source(Stream &s_) :s(s_), failure(NULL)
-	{}
+	char ungot; // the "ungotten" character, put back in the stream (or 0)
+	tabula_configure_source(Stream &s_) :s(s_), ungot(0), failure(NULL)
+	{ }
+
+	/**
+	  Read the next real char from this device.
+	*/
+	char read(void) {
+		// Try unget buffer
+		if (ungot!=0) {
+			char c=ungot;
+			ungot=0;
+			return c;
+		}
+		// Try serial port
+		while (true) {
+			int c=s.read(); // read one char
+			if (c<=0) 
+			{ // no char to read right now--run actions in the meantime.
+				action_loop();
+			}
+			else {
+//Serial.print("Returning char ");
+//Serial.println((char)c);
+				return c;
+			}
+		}
+	}
 
 	/**
 	 This flag is used for error reporting.
@@ -51,17 +77,17 @@ public:
 	String read_string() {
 		String ret="";
 		while (true) {
-			int c=s.read(); // read one char
-			if (c==-1) 
-			{ // no char to read right now--run actions in the meantime.
-				action_loop();
-			}
-			else if (c=='"' || c=='\'') 
+			char c=read(); // read one char
+			if (c=='"' || c=='\'') 
 			{ /* ignore quotes (optional in CSV) */ }
-			else if (c==',' || c==' ' || c=='\n' || c=='\r') 
+			else if (c==' ' || c=='\n' || c=='\r' || c=='(' || c==',' || c==')' || c==';') 
 			{ /* delimiter */
-				if (ret!="")
+				if (c=='(' || c==')' || c==';') ungot=c; // put back delimeters
+				if (ret!="") {
+//Serial.print("Returning string ");
+//Serial.println(ret);
 					return ret; // done with string
+				}
 				/* else ignore spare delimiters */
 			}
 			else ret+=(char)c; // add to string
