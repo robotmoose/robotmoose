@@ -1,5 +1,13 @@
 The idea here is a fully dynamically configurable Arduino firmware.
 
+For example, to use a pair of BTS motor controllers on pins 8,9,10, and 11,
+	./backend --robot "tester"  --motor "bts(8,9,10,11);"
+
+You can then go to http://robotmoose.com/pilot/ and enter a Robot Name of "tester" to drive these pins.
+
+
+
+Inside the firmware:
 "action" is used for scheduling object polling.
     For example:  actions_10ms.add(new mySensor);
     (mySensor inherits from action)
@@ -30,6 +38,8 @@ Bring up Create 2, on a Mega's TX3/RX3 lines:
 	- Top light MUST turn red, or it hasn't started properly.
 	- Press clean again to power off so it can charge (forget this, and the battery will slowly die!)
 
+
+Old Spring 2015 instructions:
 reset!
 create2_controller_t X3
 sensors16

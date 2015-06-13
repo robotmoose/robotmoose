@@ -368,8 +368,12 @@ private:
 	
 	std::string robotName;
 	A_packet_formatter<SerialPort> *pkt;
+	
+	// All supported tabula devices, with their argument list.
+	json::Array all_dev_types;
 
 	// These are the central magic that lets us convert data to/from JSON:
+	//   an array of configure types.
 	std::vector<json_target *> sensors;
 	std::vector<json_target *> commands;
 public:
@@ -422,11 +426,16 @@ std::string getline_serial(SerialPort &port) {
 
 void robot_backend::setup_devices(std::string robot_config)
 {
+	// Clear existing lists of sensors and actuators
+	for (unsigned int i=0;i<commands.size();i++) delete commands[i];
+	commands.erase(commands.begin(),commands.end());
+	for (unsigned int i=0;i<sensors.size();i++) delete sensors[i];
+	sensors.erase(sensors.begin(),sensors.end());
+	
+	// Counters for various devices:
 	int analogs=0;
 	int servos=0;
 	int pwms=0;
-	commands.erase(commands.begin(),commands.end());
-	sensors.erase(sensors.begin(),sensors.end());
 	
 	// Parse lines of the configuration outselves, to 
 	//   find the command and sensor fields and match them to JSON
@@ -442,7 +451,6 @@ void robot_backend::setup_devices(std::string robot_config)
 			std::cout<<"Configuring backend: missing terminating semicolon on "<<device<<"!\n";
 			robot_config_stream.unget(); // put char back
 		}
-		
 		
 		// This fixed table could be replaced with registration from tabula_config.h
 		if (device=="serial_controller") { 
@@ -512,7 +520,24 @@ void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 		std::cout<<start<<"\n";
 		if (start[0]=='9') break;
 	}
-	port.write(&robot_config[0],robot_config.size()); // dump to Arduino
+	
+	// Pull Arduino's current device list
+	port.write("list\n",5);
+	std::string count_str=getline_serial(port);
+	int count=atoi(count_str.c_str());
+	if (count_str.size()<1 || count<1) {
+		std::cerr<<"Expected device count, got '"<<count<<"'.\n";
+		std::cerr<<"Invalid Arduino device list--do you need to flash the latest tabula_rasa firmware?\n";
+	}
+	json::Array all_dev_types=json::Array();
+	for (int dev=0;dev<count;dev++) {
+		std::string dev_types=getline_serial(port);
+		std::cout<<"  Arduino device supported: "<<dev_types<<"\n";
+		all_dev_types.push_back(new json::Value(dev_types));
+	}
+	
+	// Now dump configuration to Arduino
+	port.write(&robot_config[0],robot_config.size());
 	while (true) {
 		std::string status=getline_serial(port);
 		if (status=="-1") break;
