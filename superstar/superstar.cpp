@@ -145,7 +145,7 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
   	"I see you're using source IP "+std::string(conn->remote_ip)+" and port "+my_itos(conn->remote_port)+"\n";
   content+="<P>Superstar path: "+starpath+"\n";
   
-  enum {NBUF=8192}; // maximum length for JSON data being set
+  enum {NBUF=32767}; // maximum length for JSON data being set
   char buf[NBUF];
   if (0<=mg_get_var(conn,"set",buf,NBUF)) { /* writing new value */
   	std::string newval(buf);
@@ -161,6 +161,12 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 		content+="AUTHENTICATION MISMATCH";
 		printf("  Authentication mismatch: write to '%s' not authorized by '%s'\n",
 			starpath.c_str(), sentauth);
+	}
+	
+	// New optional syntax: /superstar/path1?set=newval1&get=path2
+	if (0<=mg_get_var(conn,"get",buf,NBUF))
+	{
+		return send_json(conn,superstar_db.get(buf));
 	}
   }
   else { /* Not writing a new value */
