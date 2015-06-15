@@ -9,5 +9,5 @@ backend: backend.cpp
 	$(CXX) $(CFLAGS) $< -o $@ $(LIBS)
 
 clean:
-	- rm backend
+	- rm -rf backend
 

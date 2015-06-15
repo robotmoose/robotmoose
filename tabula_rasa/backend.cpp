@@ -56,9 +56,13 @@ std::string char_to_hex(const char byte)
 
 std::string uri_encode(std::string str)
 {
+	const static std::string dont_encode="._\":,{}[]";
+
 	for(size_t ii=0;ii<str.size();++ii)
 	{
-		if(!((str[ii]>='a'&&str[ii]<='z')||(str[ii]>='A'&&str[ii]<='Z')||(str[ii]>='0'&&str[ii]<='9')))
+		bool found=dont_encode.find(str[ii],0)!=std::string::npos;
+
+		if(!found&&!isdigit(str[ii])!=0&&!isalpha(str[ii])!=0)
 		{
 			str.replace(ii,1,"%"+char_to_hex(str[ii]));
 			ii+=2;
@@ -571,6 +575,7 @@ void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 	pkt=new A_packet_formatter<SerialPort>(port);
 	send_serial();
 	read_serial();
+	send_config();
 }
 
 void robot_backend::read_sensors(const A_packet& current_p)
@@ -857,7 +862,6 @@ int main(int argc, char *argv[])
 		backend->read_serial();
 		if (markerFile!="") backend->location.update_vision(markerFile.c_str());
 		backend->send_network();
-		backend->send_config();
 #ifdef __unix__
 		usleep(10*1000); // limit rate to 100Hz, to be kind to serial port and network
 #endif
