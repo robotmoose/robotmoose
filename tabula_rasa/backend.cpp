@@ -421,8 +421,9 @@ public:
 	void read_sensors(const A_packet& current_p);
 
 	/** Update pilot commands from network */
-	void read_network(void);
-	void send_network(void);
+	void do_network(void);
+	void read_network(const std::string &read_json);
+	std::string send_network(void);
 	void send_config(void);
 
 	// Configure these devices
@@ -646,16 +647,34 @@ std::string robot_backend::superstar_send_get(const std::string &path)
 	// return "";
 }
 
-/** Read pilot data from superstar, and store into ourselves */
-void robot_backend::read_network()
+/**
+ Do our network roundtrip to superstar.
+*/
+void robot_backend::do_network()
 {
-	std::string path="/superstar/"+robotName+"/pilot?get";
 	double start=time_in_seconds();
-	std::string json_data=superstar_send_get(path);
+	
+	std::string send_json=send_network();
+	std::cout<<"Outgoing sensors: "<<send_json<<"\n";
 
+	std::string send_path=robotName+"/sensors";
+	std::string read_path=robotName+"/pilot";
+	std::string request=send_path+"?set="+send_json+"&get="+read_path;
+	std::string read_json=superstar_send_get("/superstar/"+request);
+	
+	std::cout<<"Incoming pilot commands: "<<read_json<<"\n";
+	read_network(read_json);
+	
+	double elapsed=time_in_seconds()-start;
+	double per=elapsed;
+	std::cout<<"Superstar:	"<<std::setprecision(1)<<per*1.0e3<<" ms/request, "<<1.0/per<<" req/sec\n\n";
+}
+
+/** Read this pilot data from superstar, and store into ourselves */
+void robot_backend::read_network(const std::string &read_json)
+{
 	try {
-		std::cout<<"Received pilot commands: "+json_data+"\n";
-		json::Value v=json::Deserialize(json_data);
+		json::Value v=json::Deserialize(read_json);
 
 		// Pull registered commands from JSON
 		for (unsigned int i=0;i< commands.size();i++) commands[i]->modify(v);
@@ -703,79 +722,33 @@ void robot_backend::read_network()
 				delR*distance_per_power,
 				wheelbase);
 		}
-/*
-// Unported:
-		L=limit_power(v["power"]["L"]);
-		R=limit_power(LRtrim*float(v["power"]["R"]));
-		S1 = v["power"]["arms"];
-		S2 = v["power"]["mine"];
-		S3 = v["power"]["dump"];
-		ledOn = v["LED"]["On"];
-		ledDemo = v["LED"]["Demo"];
-		double tempRBG = 0;
-		tempRBG = v["LED"]["R"];
-		led_red = (int16_t)(tempRBG * 255);
-		tempRBG = v["LED"]["G"];
-		led_green = (int16_t)(tempRBG * 255);
-		tempRBG = v["LED"]["B"];
-		led_blue = (int16_t)(tempRBG * 255);
-
-		if (debug)
-		{
-			printf("Power commands: %.2f L  %.2f R  %.2f S1  %.2f S2 %.2f S3\nLED on/demo : ", L, R, S1, S2, S3);
-			printf(ledOn ? "true/" : "false/");
-			printf(ledDemo ? "true\n" : "false\n");
-			printf("RGB Values: %d R %d G %d B \n", led_red, led_blue, led_green);
-
-			//printf("   Network data: %ld bytes, '%s'\n", (long)json_data.size(), json_data.c_str());
-		}
-*/
 
 	} catch (std::exception &e) {
 
 		printf("Exception while processing network JSON: %s\n",e.what());
-		printf("   Network data: %ld bytes, '%s'\n", (long)json_data.size(),json_data.c_str());
+		printf("   Network data: %ld bytes, '%s'\n", (long)read_json.size(),read_json.c_str());
 		// stop();
 	}
-	double elapsed=time_in_seconds()-start;
-	double per=elapsed;
-	printf("\nRead Time:	%.1f ms/request, %.1f req/sec\n",per*1.0e3, 1.0/per);
 }
 
-void robot_backend::send_network(void)
+/** Get the sensor reports to send across the network */
+std::string robot_backend::send_network(void)
 {
-	double start = time_in_seconds();
-	std::string path = "/superstar/" + robotName + "/sensors?set="; //data from robot
+	std::string send_json="";
 	try
 	{ // send all registered sensor values
 		json::Value root=json::Object();
 		location.copy_to_json(root);
 		for (unsigned int i=0;i< sensors.size();i++) sensors[i]->modify(root);
 
-		std::string str = json::Serialize(root);
-		str=uri_encode(str);
-		std::string response = superstar_send_get(path+str);
-		std::cout<<"Sent sensor JSON: "<<str<<"\n";
+		send_json = json::Serialize(root);
+		send_json=uri_encode(send_json);
 	} catch (std::exception &e) {
-		printf("Exception while sending network JSON: %s\n",e.what());
+		printf("Exception while preparing network JSON to send: %s\n",e.what());
 		// stop();
 	}
-/*
-	std::string path = "/superstar/" + robotName + "/data?set="; //data from robot
-	//uggly will fix this so that its not converting so much
-	json::Object temp;
-	temp["uSound1"] = current_sensors.uSound1;
-	temp["uSound2"] = current_sensors.uSound2;
-	temp["uSound3"] = current_sensors.uSound3;
-	temp["uSound4"] = current_sensors.uSound4;
-	temp["uSound5"] = current_sensors.uSound5;
-	//end uggly
-	std::string data = json::Serialize(temp);
-	superstar.send_get(path+data);
-*/
-	double elapsed = time_in_seconds() - start;
-	double per = elapsed;
-	printf("Send Time:	%.1f ms/request, %.1f req/sec\n", per*1.0e3, 1.0 / per);
+	
+	return send_json;
 }
 
 void robot_backend::send_config(void)
@@ -857,14 +830,13 @@ int main(int argc, char *argv[])
 	}
 
 	while (1) { // talk to robot via backend
-		backend->read_network();
+		backend->do_network();
 		backend->send_serial();
-		backend->read_serial();
-		if (markerFile!="") backend->location.update_vision(markerFile.c_str());
-		backend->send_network();
 #ifdef __unix__
 		usleep(10*1000); // limit rate to 100Hz, to be kind to serial port and network
 #endif
+		backend->read_serial();
+		if (markerFile!="") backend->location.update_vision(markerFile.c_str());
 	}
 
 	return 0;
