@@ -1,0 +1,19 @@
+<html>
+	<head>
+		<script src="/js/config_editor.js"></script>
+		<script>
+			var configurator;
+
+			function setup()
+			{
+				configurator=new config_editor_t(document.getElementById("test"),"demo");
+
+				if(!configurator)
+					alert("Invalid div!");
+			}
+		</script>
+	</head>
+	<body onload="setup();">
+		<div id="test"></div>
+	</body>
+</html>
