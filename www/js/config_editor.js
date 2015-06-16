@@ -12,12 +12,14 @@ function load_dependencies()
 
 (function(){load_dependencies()})();
 
-function config_editor_t(div)
+function config_editor_t(div,robot_name)
 {
 	if(!div)
 		return null;
 
 	this.div=div;
+	this.tabula_options=new Array();
+	this.robot_name=robot_name;
 	this.div.innerHTML="";
 
 	this.title=document.createElement("text");
@@ -28,8 +30,8 @@ function config_editor_t(div)
 	this.div.appendChild(this.break0);
 
 	this.textarea=document.createElement("textarea");
+	this.textarea.innerHTML="bts(1,2,3,4);";
 	this.div.appendChild(this.textarea);
-	console.log(this.textarea);
 
 	this.break1=document.createElement("br");
 	this.div.appendChild(this.break1);
@@ -42,23 +44,83 @@ function config_editor_t(div)
 	this.button.onclick=function(){myself.configure();};
 
 	this.div.appendChild(this.button);
+
+	this.get_tabula_options();
+}
+
+config_editor_t.prototype.get_tabula_options=function()
+{
+	var myself=this;
+
+	send_request("GET","/superstar/"+this.robot_name,"options","?get",
+		function(response)
+		{
+			try
+			{
+				var json=JSON.parse(response);
+
+				for(var ii=0;ii<json.length;++ii)
+				{
+					var parts=json[ii].split(" ");
+
+					if(parts.length!=2)
+						throw "Invalid tabula option \""+json[ii]+"\".";
+
+					var tabula={};
+					tabula.type=parts[0];
+					tabula.args=new Array();
+
+					for(var jj=0;jj<parts[1].length;++jj)
+						tabula.args[jj]=parts[1][jj];
+
+					myself.tabula_options.push(tabula);
+				}
+			}
+			catch(error)
+			{
+				console.log("config_editor_t::get_tabula_options() - "+error);
+				setInterval(1000,function(){myself.get_tabula_options();});
+			}
+		},
+		function(error)
+		{
+			console.log("config_editor_t::get_tabula_options() - "+error);
+			setInterval(1000,function(){myself.get_tabula_options();});
+		},
+		"application/json");
 }
 
 config_editor_t.prototype.configure=function()
 {
-	console.log("Configure!");
 	var config_text=this.textarea.value;
 
 	try
 	{
-		var configs=this.lex(config_text);
-		this.validate(configs);
-		console.log(JSON.stringify(configs));
-		//send_request("POST","path","request","uri",this.onreply,this.onerror,data,content_type);
+		if(config_text.length>0)
+		{
+			var configs=this.lex(config_text);
+			this.validate(configs);
+
+			var validated_configs=new Array();
+
+			for(var ii=0;ii<configs.length;++ii)
+				validated_configs.push(configs[ii].type+"("+configs[ii].args+");");
+
+			send_request("GET","/superstar/"+this.robot_name,"config","?set="+JSON.stringify(validated_configs),
+				function(response)
+				{
+					console.log("SUCCESS!!!!");
+				},
+				function(error)
+				{
+					throw "config_editor_t::configure() - "+error;
+				},
+				"application/json");
+		}
 	}
 	catch(e)
 	{
-		console.log("Error! - "+e);
+		console.log(e);
 	}
 }
 
@@ -135,14 +197,14 @@ config_editor_t.prototype.lex=function(config)
 		col=temp.col;
 		line=temp.line;
 
-		var name=parse_identifier(copy);
+		var type=parse_identifier(copy);
 		var args=new Array();
 
-		if(name.length==0)
-			throw "Line: "+line+" Col: "+col+" - Invalid device name!";
+		if(type.length==0)
+			throw "Line: "+line+" Col: "+col+" - Invalid device type!";
 
-		copy=copy.substring(name.length,copy.length);
-		col+=name.length;
+		copy=copy.substring(type.length,copy.length);
+		col+=type.length;
 
 		temp=skip_whitespace(copy,col,line);
 		copy=temp.str;
@@ -165,7 +227,10 @@ config_editor_t.prototype.lex=function(config)
 			line=temp.line;
 
 			arg=parse_argument(copy);
-			args.push(arg);
+
+			if(arg.length>0)
+				args.push(arg);
+
 			copy=copy.substring(arg.length,copy.length);
 			col+=arg.length;
 
@@ -219,25 +284,106 @@ config_editor_t.prototype.lex=function(config)
 		col=temp.col;
 		line=temp.line;
 
-		configs.push({"name":name,"args":args});
+		configs.push({"type":type,"args":args});
 	}
 
 	return configs;
 }
 
-config_editor_t.prototype.validate=function(config)
+config_editor_t.prototype.is_int=function(str)
 {
-	//actually check args...
+	for(var ii=0;ii<str.length;++ii)
+		if(str[ii]<'0'||str[ii]>'9')
+			return false;
+
+	return true;
 }
 
-config_editor_t.prototype.onreply=function(response)
+config_editor_t.prototype.is_pin=function(arg)
 {
-	console.log("Success! - "+response);
+	return ((arg.length>0&&this.is_int(arg))||
+		(arg.length>0&&arg[0]=='a'&&this.is_int(arg.substr(1,arg.length-1))));
 }
 
-config_editor_t.prototype.onerror=function(error)
+config_editor_t.prototype.is_serial=function(arg)
 {
-	console.log("Failure! - "+error);
+	if(arg.length>0&&arg[0]=='x'&&this.is_int(arg.substr(1,arg.length-1)))
+	{
+		var port=parseInt(arg.substr(1,arg.length-1));
+		return (port>=0&&port<=3);
+	}
+
+	return false;
 }
 
+config_editor_t.prototype.arrays_equal=function(lhs,rhs)
+{
+	if(!lhs||!rhs||lhs.length!=rhs.length)
+		return false;
 
+	for(var ii=0;ii<lhs.length;++ii)
+		if(lhs[ii]!=rhs[ii])
+			return false;
+
+	return true;
+}
+
+config_editor_t.prototype.validate=function(configs)
+{
+	for(var ii=0;ii<configs.length;++ii)
+	{
+		var arg_types=new Array();
+
+		for(var jj=0;jj<configs[ii].args.length;++jj)
+		{
+			if(this.is_pin(configs[ii].args[jj]))
+				arg_types.push("P");
+			else if(this.is_serial(configs[ii].args[jj]))
+				arg_types.push("X");
+			else
+				throw "config_editor_t::validate - Invalid Argument type \""+configs[ii].args[jj]+"\".";
+		}
+
+		var matched_name=false;
+		var matched=false;
+		var possible_args=new Array();
+
+		for(var jj=0;jj<this.tabula_options.length;++jj)
+		{
+			if(configs[ii].type==this.tabula_options[jj].type)
+			{
+				matched_name=true;
+				possible_args.push(this.tabula_options[jj].args);
+			}
+
+			if(matched_name&&this.arrays_equal(arg_types,this.tabula_options[jj].args))
+			{
+				matched=true;
+				break;
+			}
+		}
+
+		if(!matched)
+		{
+			if(matched_name)
+			{
+				var error="config_editor_t::validate - Invalid argument list for device "+
+					configs[ii].type+", got ";
+
+				if(arg_types.length==0)
+					error+="null";
+				else
+					error+=arg_types;
+
+				error+="; expected:\n";
+
+				for(var jj=0;jj<possible_args.length;++jj)
+					error+="    "+possible_args[jj]+"\n";
+
+				throw error;
+			}
+
+			throw "config_editor_t::validate - Invalid device type "+configs[ii].type+".";
+		}
+	}
+}

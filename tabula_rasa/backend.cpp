@@ -653,7 +653,7 @@ std::string robot_backend::superstar_send_get(const std::string &path)
 void robot_backend::do_network()
 {
 	double start=time_in_seconds();
-	
+
 	std::string send_json=send_network();
 	std::cout<<"Outgoing sensors: "<<send_json<<"\n";
 
@@ -661,10 +661,10 @@ void robot_backend::do_network()
 	std::string read_path=robotName+"/pilot";
 	std::string request=send_path+"?set="+send_json+"&get="+read_path;
 	std::string read_json=superstar_send_get("/superstar/"+request);
-	
+
 	std::cout<<"Incoming pilot commands: "<<read_json<<"\n";
 	read_network(read_json);
-	
+
 	double elapsed=time_in_seconds()-start;
 	double per=elapsed;
 	std::cout<<"Superstar:	"<<std::setprecision(1)<<per*1.0e3<<" ms/request, "<<1.0/per<<" req/sec\n\n";
@@ -747,14 +747,14 @@ std::string robot_backend::send_network(void)
 		printf("Exception while preparing network JSON to send: %s\n",e.what());
 		// stop();
 	}
-	
+
 	return send_json;
 }
 
 void robot_backend::send_config(void)
 {
 	double start = time_in_seconds();
-	std::string path = "/superstar/" + robotName + "/config?set=";
+	std::string path = "/superstar/" + robotName + "/options?set=";
 	try
 	{ // send all registered tabula devices
 		std::string str = json::Serialize(all_dev_types);
