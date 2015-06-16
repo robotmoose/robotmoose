@@ -19,6 +19,7 @@ function config_editor_t(div,robot_name)
 
 	this.div=div;
 	this.tabula_options=new Array();
+	this.tabula_counter=0;
 	this.robot_name=robot_name;
 	this.div.innerHTML="";
 
@@ -109,7 +110,9 @@ config_editor_t.prototype.configure=function()
 		for(var ii=0;ii<configs.length;++ii)
 			validated_configs.push(configs[ii].type+"("+configs[ii].args+");");
 
-		send_request("GET","/superstar/"+this.robot_name,"config","?set="+JSON.stringify(validated_configs),
+		var config_json={counter:this.tabula_counter++,configs:validated_configs};
+
+		send_request("GET","/superstar/"+this.robot_name,"config","?set="+JSON.stringify(config_json),
 			function(response)
 			{
 			},
