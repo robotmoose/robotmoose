@@ -168,27 +168,53 @@ size_t Value::size() const
 	return mValueType == ObjectVal ? mObjectVal.size() : mArrayVal.size();
 }
 
+const char *name_of_ValueType(json::ValueType vt)
+{
+	const static char *names[]={
+		"NULLVal",
+                "StringVal",
+                "IntVal",
+                "FloatVal",
+                "DoubleVal",
+                "ObjectVal",
+                "ArrayVal",
+                "BoolVal"
+	};
+	if (vt<0) return "invalidNegativeValueType";
+	else if (vt>=sizeof(names)/sizeof(names[0])) return "invalidTooBigValueType";
+	else return names[vt];
+}
+
+void types_not_equal_throw(json::ValueType actual,json::ValueType expected) {
+	std::string error="expected "+
+		std::string(name_of_ValueType(expected))+
+		" but got "+
+		std::string(name_of_ValueType(actual));
+	throw std::runtime_error("json error: "+error);
+}
+
+inline void expect_type_equal(json::ValueType actual,json::ValueType expected) {
+	if (actual!=expected) types_not_equal_throw(actual,expected);
+}
+
 bool Value::HasKey(const std::string &key) const
 {
-	if (mValueType != ObjectVal)
-		throw std::runtime_error("json mValueType==ObjectVal required");
+	expect_type_equal(mValueType, ObjectVal);
 
 	return mObjectVal.HasKey(key);
 }
 
 int Value::HasKeys(const std::vector<std::string> &keys) const
 {
-	if (mValueType != ObjectVal)
-		throw std::runtime_error("json mValueType==ObjectVal required");
+	expect_type_equal(mValueType, ObjectVal);
 
 	return mObjectVal.HasKeys(keys);
 }
 
 int Value::HasKeys(const char **keys, int key_count) const
 {
-	if (mValueType != ObjectVal)
-		throw std::runtime_error("json mValueType==ObjectVal required");
-
+	expect_type_equal(mValueType, ObjectVal);
+	
 	return mObjectVal.HasKeys(keys, key_count);
 }
 
@@ -218,15 +244,14 @@ double Value::ToDouble() const
 
 bool Value::ToBool() const		
 {
-	if (mValueType != BoolVal)
-		throw std::runtime_error("json mValueType==BoolVal required");
+	expect_type_equal(mValueType, BoolVal);
 	
 	return mBoolVal;
 }
 
 const std::string& Value::ToString() const	
 {
-	if (mValueType != StringVal)
+	expect_type_equal(mValueType,StringVal);
 		throw std::runtime_error("json mValueType==StringVal required");
 	
 	return mStringVal;
@@ -234,32 +259,28 @@ const std::string& Value::ToString() const
 
 const Object &Value::ToObject() const	
 {
-	if (mValueType != ObjectVal)
-		throw std::runtime_error("json mValueType==ObjectVal required");
+	expect_type_equal(mValueType, ObjectVal);
 
 	return mObjectVal;
 }
 
 const Array &Value::ToArray() const		
 {
-	if (mValueType != ArrayVal)
-		throw std::runtime_error("json mValueType==ArrayVal required");
+	expect_type_equal(mValueType, ArrayVal);
 
 	return mArrayVal;
 }
 
 Object &Value::ToObject()	
 {
-	if (mValueType != ObjectVal)
-		throw std::runtime_error("json mValueType==ObjectVal required");
+	expect_type_equal(mValueType, ObjectVal);
 
 	return mObjectVal;
 }
 
 Array &Value::ToArray()		
 {
-	if (mValueType != ArrayVal)
-		throw std::runtime_error("json mValueType==ArrayVal required");
+	expect_type_equal(mValueType, ArrayVal);
 
 	return mArrayVal;
 }
@@ -291,32 +312,28 @@ Value::operator double() const
 
 Value::operator bool() const 			
 {
-	if (mValueType != BoolVal)
-		throw std::runtime_error("json mValueType==BoolVal required");
+	expect_type_equal(mValueType, BoolVal);
 
 	return mBoolVal;
 }
 
 Value::operator std::string() const 	
 {
-	if (mValueType != StringVal)
-		throw std::runtime_error("json mValueType==StringVal required");
+	expect_type_equal(mValueType, StringVal);
 
 	return mStringVal;
 }
 
 Value::operator Object() const 		
 {
-	if (mValueType != ObjectVal)
-		throw std::runtime_error("json mValueType==ObjectVal required");
+	expect_type_equal(mValueType, ObjectVal);
 
 	return mObjectVal;
 }
 
 Value::operator Array() const 			
 {
-	if (mValueType != ArrayVal)
-		throw std::runtime_error("json mValueType==ArrayVal required");
+	expect_type_equal(mValueType, ArrayVal);
 
 	return mArrayVal;
 }
@@ -971,7 +988,7 @@ static Value DeserializeArray(std::string& str, std::stack<StackDepthType>& dept
 		for (; i < str.length(); i++)
 		{
 			// If we get to an object or array, parse it:
-			if ((str[i] == '{') || (str[i] == '['))
+			if ((str[i] == '{') || (str[i] == '[') || (str[i] == '\"'))
 			{
 				Value v = DeserializeValue(str, &had_error, depth_stack);
 				if (had_error)
