@@ -252,7 +252,6 @@ bool Value::ToBool() const
 const std::string& Value::ToString() const	
 {
 	expect_type_equal(mValueType,StringVal);
-		throw std::runtime_error("json mValueType==StringVal required");
 	
 	return mStringVal;
 }
