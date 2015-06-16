@@ -30,7 +30,7 @@ function config_editor_t(div,robot_name)
 	this.div.appendChild(this.break0);
 
 	this.textarea=document.createElement("textarea");
-	this.textarea.innerHTML="bts(1,2,3,4);";
+	this.textarea.innerHTML="";
 	this.div.appendChild(this.textarea);
 
 	this.break1=document.createElement("br");
@@ -96,27 +96,28 @@ config_editor_t.prototype.configure=function()
 
 	try
 	{
+		var configs=new Array();
+
 		if(config_text.length>0)
 		{
-			var configs=this.lex(config_text);
+			configs=this.lex(config_text);
 			this.validate(configs);
-
-			var validated_configs=new Array();
-
-			for(var ii=0;ii<configs.length;++ii)
-				validated_configs.push(configs[ii].type+"("+configs[ii].args+");");
-
-			send_request("GET","/superstar/"+this.robot_name,"config","?set="+JSON.stringify(validated_configs),
-				function(response)
-				{
-					console.log("SUCCESS!!!!");
-				},
-				function(error)
-				{
-					throw "config_editor_t::configure() - "+error;
-				},
-				"application/json");
 		}
+
+		var validated_configs=new Array();
+
+		for(var ii=0;ii<configs.length;++ii)
+			validated_configs.push(configs[ii].type+"("+configs[ii].args+");");
+
+		send_request("GET","/superstar/"+this.robot_name,"config","?set="+JSON.stringify(validated_configs),
+			function(response)
+			{
+			},
+			function(error)
+			{
+				throw "config_editor_t::configure() - "+error;
+			},
+			"application/json");
 	}
 	catch(e)
 	{
