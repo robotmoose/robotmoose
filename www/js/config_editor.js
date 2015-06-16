@@ -18,38 +18,48 @@ function config_editor_t(div,robot_name)
 		return null;
 
 	this.div=div;
-	this.tabula_options=new Array();
-	this.tabula_counter=0;
+	this.config="";
+	this.options=new Array();
+	this.nonce=0;
 	this.robot_name=robot_name;
-	this.div.innerHTML="";
 
-	this.title=document.createElement("text");
-	this.title.innerHTML="Firmware Configuration";
-	this.div.appendChild(this.title);
-
-	this.break0=document.createElement("br");
-	this.div.appendChild(this.break0);
-
-	this.textarea=document.createElement("textarea");
-	this.textarea.innerHTML="";
-	this.div.appendChild(this.textarea);
-
-	this.break1=document.createElement("br");
-	this.div.appendChild(this.break1);
-
-	this.button=document.createElement("input");
-	this.button.type="button";
-	this.button.value="Configure";
-
-	var myself=this;
-	this.button.onclick=function(){myself.configure();};
-
-	this.div.appendChild(this.button);
-
-	this.get_tabula_options();
+	this.get_config();
+	this.get_options();
 }
 
-config_editor_t.prototype.get_tabula_options=function()
+config_editor_t.prototype.get_config=function()
+{
+	var myself=this;
+
+	send_request("GET","/superstar/"+this.robot_name,"config","?get",
+		function(response)
+		{
+			try
+			{
+				var json=JSON.parse(response);
+				myself.config="";
+
+				for(var ii=0;ii<json.configs.length;++ii)
+					myself.config+=json.configs[ii]+"\n";
+
+				if(myself.onconfigchange)
+					myself.onconfigchange(myself.config);
+			}
+			catch(error)
+			{
+				console.log("config_editor_t::get_config() - "+error);
+				setInterval(1000,function(){myself.get_config();});
+			}
+		},
+		function(error)
+		{
+			console.log("config_editor_t::get_config() - "+error);
+			setInterval(1000,function(){myself.get_config();});
+		},
+		"application/json");
+}
+
+config_editor_t.prototype.get_options=function()
 {
 	var myself=this;
 
@@ -74,27 +84,25 @@ config_editor_t.prototype.get_tabula_options=function()
 					for(var jj=0;jj<parts[1].length;++jj)
 						tabula.args[jj]=parts[1][jj];
 
-					myself.tabula_options.push(tabula);
+					myself.options.push(tabula);
 				}
 			}
 			catch(error)
 			{
-				console.log("config_editor_t::get_tabula_options() - "+error);
-				setInterval(1000,function(){myself.get_tabula_options();});
+				console.log("config_editor_t::get_options() - "+error);
+				setInterval(1000,function(){myself.get_options();});
 			}
 		},
 		function(error)
 		{
-			console.log("config_editor_t::get_tabula_options() - "+error);
-			setInterval(1000,function(){myself.get_tabula_options();});
+			console.log("config_editor_t::get_options() - "+error);
+			setInterval(1000,function(){myself.get_options();});
 		},
 		"application/json");
 }
 
-config_editor_t.prototype.configure=function()
+config_editor_t.prototype.configure=function(config_text)
 {
-	var config_text=this.textarea.value;
-
 	try
 	{
 		var configs=new Array();
@@ -110,11 +118,14 @@ config_editor_t.prototype.configure=function()
 		for(var ii=0;ii<configs.length;++ii)
 			validated_configs.push(configs[ii].type+"("+configs[ii].args+");");
 
-		var config_json={counter:this.tabula_counter++,configs:validated_configs};
+		var config_json={counter:this.nonce++,configs:validated_configs};
+
+		var myself=this;
 
 		send_request("GET","/superstar/"+this.robot_name,"config","?set="+JSON.stringify(config_json),
 			function(response)
 			{
+				myself.config=config_text;
 			},
 			function(error)
 			{
@@ -352,15 +363,15 @@ config_editor_t.prototype.validate=function(configs)
 		var matched=false;
 		var possible_args=new Array();
 
-		for(var jj=0;jj<this.tabula_options.length;++jj)
+		for(var jj=0;jj<this.options.length;++jj)
 		{
-			if(configs[ii].type==this.tabula_options[jj].type)
+			if(configs[ii].type==this.options[jj].type)
 			{
 				matched_name=true;
-				possible_args.push(this.tabula_options[jj].args);
+				possible_args.push(this.options[jj].args);
 			}
 
-			if(matched_name&&this.arrays_equal(arg_types,this.tabula_options[jj].args))
+			if(matched_name&&this.arrays_equal(arg_types,this.options[jj].args))
 			{
 				matched=true;
 				break;
@@ -391,3 +402,36 @@ config_editor_t.prototype.validate=function(configs)
 		}
 	}
 }
+
+function config_textarea_t(div,robot_name)
+{
+	this.editor=new config_editor_t(div,robot_name);
+
+	if(!this.editor)
+		return null;
+
+	this.textarea=document.createElement("textarea");
+	this.textarea.innerHTML=this.editor.config;
+	this.editor.div.appendChild(this.textarea);
+
+	this.break1=document.createElement("br");
+	this.editor.div.appendChild(this.break1);
+
+	this.button=document.createElement("input");
+	this.button.type="button";
+	this.button.value="Configure";
+
+	var myself=this;
+	this.button.onclick=function(){myself.editor.configure(myself.textarea.value);};
+
+	this.editor.div.appendChild(this.button);
+	this.editor.onconfigchange=function(config_text){myself.textarea.value=config_text;};
+}
+
+/*function config_dropdown_t(div,robot_name)
+{
+	this.editor=new config_editor_t(div,robot_name);
+
+	if(!this.editor)
+		return null;
+}*/
