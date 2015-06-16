@@ -424,7 +424,9 @@ public:
 	void do_network(void);
 	void read_network(const std::string &read_json);
 	std::string send_network(void);
-	void send_config(void);
+
+	std::string read_config(void);
+	void send_options(void);
 
 	// Configure these devices
 	void setup_devices(std::string robot_config);
@@ -542,6 +544,7 @@ void robot_backend::setup_devices(std::string robot_config)
 void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 {
 	std::cout.flush();
+
 	while (true) { // wait for Arduino to boot
 		(std::cout<<"Arduino startup: ").flush();
 		std::string start=getline_serial(port);
@@ -576,7 +579,7 @@ void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 	pkt=new A_packet_formatter<SerialPort>(port);
 	send_serial();
 	read_serial();
-	send_config();
+	send_options();
 }
 
 void robot_backend::read_sensors(const A_packet& current_p)
@@ -751,7 +754,36 @@ std::string robot_backend::send_network(void)
 	return send_json;
 }
 
-void robot_backend::send_config(void)
+std::string robot_backend::read_config(void)
+{
+	std::string return_config;
+
+	std::string path = "/superstar/" + robotName + "/config?get";
+	try
+	{ // send all registered tabula devices
+		std::string response=superstar_send_get(path);
+		json::Value config_json=json::Deserialize(response);
+
+		std::cout<<"Read config JSON from "<<path<<"\n\tgot:  ";
+		std::cout<<json::Serialize(config_json)<<std::endl;
+
+		json::Array& configs=config_json["configs"].ToArray();
+		std::cout<<"foo!"<<std::endl;
+
+		for(size_t ii=0;ii<configs.size();++ii)
+			return_config+=configs[ii].ToString()+"\n";
+
+	} catch (std::exception &e) {
+		printf("Exception while sending network JSON: %s\n",e.what());
+		// stop();
+	}
+
+	std::cout<<"config:  \n"<<return_config<<std::endl;
+
+	return return_config;
+}
+
+void robot_backend::send_options(void)
 {
 	double start = time_in_seconds();
 	std::string path = "/superstar/" + robotName + "/options?set=";
@@ -760,7 +792,7 @@ void robot_backend::send_config(void)
 		std::string str = json::Serialize(all_dev_types);
 		str=uri_encode(str);
 		std::string response = superstar_send_get(path+str);
-		std::cout<<"Sent config JSON: "<<str<<"\n";
+		std::cout<<"Sent options JSON: "<<str<<"\n";
 	} catch (std::exception &e) {
 		printf("Exception while sending network JSON: %s\n",e.what());
 		// stop();
@@ -813,15 +845,8 @@ int main(int argc, char *argv[])
 "analog(A1);\n"
 +sensors
 +configMotor+"\n"
-
-#if 0 // need smarter web front end here
-"servo(10);\n"
-"servo(9);\n"
-"pwm(3);\n"
-"cmd 0 200\n"
-#endif
-"serial_controller();\n"
-;
++backend->read_config()+
+"serial_controller();\n";
 	backend->setup_devices(robot_config);
 
 	if (!sim) {
