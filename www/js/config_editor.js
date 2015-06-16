@@ -340,7 +340,7 @@ config_editor_t.prototype.validate=function(configs)
 			if(this.is_pin(configs[ii].args[jj]))
 				arg_types.push("P");
 			else if(this.is_serial(configs[ii].args[jj]))
-				arg_types.push("X");
+				arg_types.push("S");
 			else
 				throw "config_editor_t::validate - Invalid Argument type \""+configs[ii].args[jj]+"\".";
 		}
