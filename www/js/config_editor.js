@@ -233,6 +233,7 @@ config_editor_t.prototype.lex=function(config)
 		++col;
 
 		var arg="";
+		var saw_comma=false;
 
 		while(true)
 		{
@@ -255,7 +256,12 @@ config_editor_t.prototype.lex=function(config)
 			line=temp.line;
 
 			if(parse_symbol(copy,')'))
-				break;
+			{
+				if(saw_comma&&arg.length<=0)
+					throw "Line: "+line+" Col: "+col+" - Unexpected ','.";
+				else
+					break;
+			}
 
 			temp=skip_whitespace(copy,col,line);
 			copy=temp.str;
@@ -272,6 +278,8 @@ config_editor_t.prototype.lex=function(config)
 
 			if(!parse_symbol(copy,','))
 				throw "Line: "+line+" Col: "+col+" - Expected ',' or ')'!";
+			else
+				saw_comma=true;
 
 			copy=copy.substring(1,copy.length);
 			++col;
