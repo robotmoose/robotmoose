@@ -624,6 +624,7 @@ void robot_backend::send_serial(void) {
 	pkt->write_packet(0xC,
 		tabula_command_storage.count,
 		tabula_command_storage.array);
+	//FIXME!:  pkt->write_packet(0xB,0,NULL);
 }
 
 /** Send this HTTP get request for this path, and return the resulting string. */
