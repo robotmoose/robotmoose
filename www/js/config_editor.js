@@ -5,9 +5,37 @@ function load_js(js)
 	document.head.appendChild(scr);
 };
 
+function load_link(link)
+{
+	var ln=document.createElement("link");
+	ln.rel="stylesheet";
+	ln.href=link;
+	document.head.appendChild(ln);
+};
+
+function load_style(style)
+{
+	var sty=document.createElement("style");
+	sty.appendChild(document.createTextNode(style));
+	document.head.appendChild(sty);
+};
+
 function load_dependencies()
 {
 	load_js("/js/xmlhttp.js");
+	load_js("/js/jquery/jquery.min.js");
+	load_js("js/codemirror/codemirror.js");
+	load_js("/js/bootstrap/bootstrap.min.js");
+	load_link("/css/bootstrap.min.css");
+	load_js("js/codemirror/clike_arduino_nxt.js");
+	load_js("js/codemirror/addon/edit/matchbrackets.js");
+	load_js("js/codemirror/addon/dialog/dialog.js");
+	load_js("js/codemirror/addon/search/search.js");
+	load_js("js/codemirror/addon/search/searchcursor.js");
+	load_link("js/codemirror/codemirror.css");
+	load_link("js/codemirror/addon/dialog/dialog.css");
+	load_style(".CodeMirror{border:1px solid #000000;}");
+	load_style(".lint-error{background:#ff8888;color:#a00000;padding:1px}\r\n.lint-error-icon{background:#ff0000;color:#ffffff;border-radius:50%;margin-right:7px;}");
 };
 
 (function(){load_dependencies()})();
@@ -422,18 +450,23 @@ function config_textarea_t(div,robot_name)
 	this.textarea.innerHTML=this.editor.config;
 	this.editor.div.appendChild(this.textarea);
 
-	this.break1=document.createElement("br");
-	this.editor.div.appendChild(this.break1);
+	this.code_editor=CodeMirror.fromTextArea(this.textarea,
+		{indentUnit:4,indentWithTabs:true,lineNumbers:true,matchBrackets:true,mode:"text/x-arduino"});
+	this.code_editor.setSize(320,240);
+
+	this.break0=document.createElement("br");
+	this.editor.div.appendChild(this.break0);
 
 	this.button=document.createElement("input");
 	this.button.type="button";
 	this.button.value="Configure";
+	this.button.className="btn btn-sm btn-primary";
 
 	var myself=this;
-	this.button.onclick=function(){myself.editor.configure(myself.textarea.value);};
+	this.button.onclick=function(){myself.editor.configure(myself.code_editor.getValue());};
 
 	this.editor.div.appendChild(this.button);
-	this.editor.onconfigchange=function(config_text){myself.textarea.value=config_text;};
+	this.editor.onconfigchange=function(config_text){myself.code_editor.setValue(config_text);};
 }
 
 /*function config_dropdown_t(div,robot_name)
