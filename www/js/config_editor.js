@@ -613,35 +613,31 @@ config_gui_t.prototype.update=function(config_text)
 
 			for(var ii=0;ii<configs.length;++ii)
 			{
-				var li=document.createElement("li");
-				li.className="list-group-item";
-				li.tabula={type:configs[ii].type,args:new Array()};
-
-				var button=document.createElement("img");
-				button.src="js/jquery/close.png";
-				button.onmouseover=function(){this.src="js/jquery/close_rollover.png";};
-				button.onmouseout=function(){this.src="js/jquery/close.png";};
-				button.onclick=function(){alert(myself.editor.config);};//FIXME
-				li.appendChild(button);
-
-				var text=document.createTextNode(configs[ii].type);
-				li.appendChild(text);
-
-				for(var jj=0;jj<configs[ii].args.length;++jj)
+				(function()
 				{
-					if(this.editor.is_pin(configs[ii].args[jj]))
-					{
-						li.appendChild(this.create_pin_drop(configs[ii].args[jj]));
-						li.tabula.args.push("P");
-					}
-					else if(this.editor.is_serial(configs[ii].args[jj]))
-					{
-						li.appendChild(this.create_serial_drop(configs[ii].args[jj]));
-						li.tabula.args.push("S");
-					}
-				}
+					var li=document.createElement("li");
+					li.className="list-group-item";
+					li.tabula={type:configs[ii].type,args:new Array()};
 
-				this.list.appendChild(li);
+					var button=document.createElement("img");
+					button.src="js/jquery/close.png";
+					button.li=li;
+					button.onmouseover=function(){this.src="js/jquery/close_rollover.png";};
+					button.onmouseout=function(){this.src="js/jquery/close.png";};
+					button.onclick=function(){myself.list.removeChild(li);};
+					li.appendChild(button);
+
+					var text=document.createTextNode(configs[ii].type);
+					li.appendChild(text);
+
+					for(var jj=0;jj<configs[ii].args.length;++jj)
+						if(myself.editor.is_pin(configs[ii].args[jj]))
+							li.appendChild(myself.create_pin_drop(configs[ii].args[jj]));
+						else if(myself.editor.is_serial(configs[ii].args[jj]))
+							li.appendChild(myself.create_serial_drop(configs[ii].args[jj]));
+
+					myself.list.appendChild(li);
+				})();
 			}
 		}
 	}
