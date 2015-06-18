@@ -388,6 +388,7 @@ public:
 */
 class robot_backend {
 private:
+	std::string tabula_config;
 	osl::url_parser parseURL;
 	osl::http_connection superstar; // HTTP keepalive connection
 	std::string superstar_send_get(const std::string &path); // HTTP request
@@ -409,8 +410,8 @@ public:
 	int myCounter;
 
 	robot_backend(std::string superstarURL, std::string robotName_)
-		:parseURL(superstarURL), superstar(parseURL.host,0,parseURL.port),
-		robotName(robotName_), pkt(0), LRtrim(1.0),myCounter(-1)
+		:tabula_config(""),parseURL(superstarURL), superstar(parseURL.host,0,parseURL.port),
+		robotName(robotName_), pkt(0), LRtrim(1.0),myCounter(1)
 	{
 		//stop();
 	}
@@ -427,6 +428,8 @@ public:
 	std::string send_network(void);
 
 	void read_config(const std::string& cli);
+	void send_config();
+	
 	void send_options(void);
 
 	// Configure these devices
@@ -757,7 +760,7 @@ std::string robot_backend::send_network(void)
 
 void robot_backend::read_config(const std::string& cli)
 {
-	std::string robot_config=cli+"\n";
+	tabula_config=cli+"\n";
 
 	std::string path = "/superstar/" + robotName + "/config?get";
 	try
@@ -772,29 +775,77 @@ void robot_backend::read_config(const std::string& cli)
 		std::cout<<"foo!"<<std::endl;
 
 		for(size_t ii=0;ii<configs.size();++ii)
-			robot_config+=configs[ii].ToString()+"\n";
+			tabula_config+=configs[ii].ToString()+"\n";
 		
 		if(myCounter!=config_json["counter"].ToInt())
 		{
 			myCounter=config_json["counter"].ToInt();
-			std::cout<<"TESTING123!!!"<<std::endl;
 			
-			setup_devices(robot_config);
+			setup_devices(tabula_config);
 
 			if(!sim&&pkt!=NULL)
 			{
 				Serial.Close();
 				Serial.begin(Serial.Get_baud());
-				setup_arduino(Serial,robot_config);
+				setup_arduino(Serial,tabula_config);
 			}
 		}
 
+	} catch (std::exception &e) {
+		printf("Exception while sending netwdork JSON: %s\n",e.what());
+		// stop();
+	}
+
+	std::cout<<"config:  \n"<<tabula_config<<std::endl;
+}
+
+void robot_backend::send_config()
+{
+	double start = time_in_seconds();
+	std::string path = "/superstar/" + robotName + "/config?set=";
+	try
+	{ // send all registered tabula devices
+		json::Object json;
+		json["counter"]=myCounter;
+		json["configs"]=json::Array();
+		
+		std::string temp="";
+		
+		if(tabula_config.size()>0||tabula_config[tabula_config.size()-1]!='\n')
+			tabula_config+="\n";
+		
+		for(size_t ii=0;ii<tabula_config.size();++ii)
+		{
+			if(tabula_config[ii]=='\n')
+			{
+				while(temp.size()>0&&isspace(temp[0])!=0)
+					temp=temp.substr(1,temp.size());
+				
+				while(temp.size()>0&&isspace(temp[temp.size()-1])!=0)
+					temp=temp.substr(0,temp.size()-1);
+					
+				if(temp.size()>0)
+					json["configs"].ToArray().push_back(temp);
+					
+				temp="";
+				continue;
+			}
+			
+			temp+=tabula_config[ii];
+		}
+		
+		std::string str = json::Serialize(json);
+		str=uri_encode(str);
+		std::string response = superstar_send_get(path+str);
+		std::cout<<"Sent options JSON: "<<str<<"\n";
 	} catch (std::exception &e) {
 		printf("Exception while sending network JSON: %s\n",e.what());
 		// stop();
 	}
 
-	std::cout<<"config:  \n"<<robot_config<<std::endl;
+	double elapsed = time_in_seconds() - start;
+	double per = elapsed;
+	printf("Send Time:	%.1f ms/request, %.1f req/sec\n", per*1.0e3, 1.0 / per);
 }
 
 void robot_backend::send_options(void)
@@ -867,6 +918,9 @@ int main(int argc, char *argv[])
 		Serial.begin(baudrate);
 		backend->setup_arduino(Serial,robot_config);
 	}
+	
+	backend->read_config(robot_config);
+	backend->send_config();
 
 	while (1) { // talk to robot via backend
 		backend->read_config(robot_config);
