@@ -507,11 +507,13 @@ function config_gui_t(div,robot_name)
 	this.editor.div.appendChild(this.button);
 
 	this.editor.onconfigchange=function(config_text){myself.update(config_text);};
-	console.log(this.editor);
 }
 
 config_gui_t.prototype.get_value=function()
 {
+	for(var ii=0;ii<this.editor.options.length;++ii)
+		console.log(this.editor.options[ii]);
+
 	var config_text="";
 
 	try

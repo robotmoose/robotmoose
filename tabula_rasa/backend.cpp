@@ -429,7 +429,7 @@ public:
 
 	void read_config(const std::string& cli);
 	void send_config();
-	
+
 	void send_options(void);
 
 	// Configure these devices
@@ -460,11 +460,13 @@ std::string getline_serial(SerialPort &port) {
 
 void robot_backend::setup_devices(std::string robot_config)
 {
+	all_dev_types.Clear();
+
 	// Clear existing lists of sensors and actuators
 	for (unsigned int i=0;i<commands.size();i++) delete commands[i];
-	commands.erase(commands.begin(),commands.end());
+	commands.clear();
 	for (unsigned int i=0;i<sensors.size();i++) delete sensors[i];
-	sensors.erase(sensors.begin(),sensors.end());
+	sensors.clear();
 
 	// Counters for various devices:
 	int analogs=0;
@@ -547,6 +549,7 @@ void robot_backend::setup_devices(std::string robot_config)
 
 void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 {
+	tabula_config=robot_config+"\n";
 	std::cout.flush();
 
 	while (true) { // wait for Arduino to boot
@@ -776,11 +779,11 @@ void robot_backend::read_config(const std::string& cli)
 
 		for(size_t ii=0;ii<configs.size();++ii)
 			tabula_config+=configs[ii].ToString()+"\n";
-		
+
 		if(myCounter!=config_json["counter"].ToInt())
 		{
 			myCounter=config_json["counter"].ToInt();
-			
+
 			setup_devices(tabula_config);
 
 			if(!sim&&pkt!=NULL)
@@ -808,32 +811,32 @@ void robot_backend::send_config()
 		json::Object json;
 		json["counter"]=myCounter;
 		json["configs"]=json::Array();
-		
+
 		std::string temp="";
-		
+
 		if(tabula_config.size()>0||tabula_config[tabula_config.size()-1]!='\n')
 			tabula_config+="\n";
-		
+
 		for(size_t ii=0;ii<tabula_config.size();++ii)
 		{
 			if(tabula_config[ii]=='\n')
 			{
 				while(temp.size()>0&&isspace(temp[0])!=0)
 					temp=temp.substr(1,temp.size());
-				
+
 				while(temp.size()>0&&isspace(temp[temp.size()-1])!=0)
 					temp=temp.substr(0,temp.size()-1);
-					
+
 				if(temp.size()>0)
 					json["configs"].ToArray().push_back(temp);
-					
+
 				temp="";
 				continue;
 			}
-			
+
 			temp+=tabula_config[ii];
 		}
-		
+
 		std::string str = json::Serialize(json);
 		str=uri_encode(str);
 		std::string response = superstar_send_get(path+str);
@@ -911,15 +914,15 @@ int main(int argc, char *argv[])
 		+sensors
 		+configMotor+"\n"
 		+"serial_controller();\n";
-		
+
 	backend->setup_devices(robot_config);
 
-	if (!sim) {
+	if (!sim)
+	{
 		Serial.begin(baudrate);
 		backend->setup_arduino(Serial,robot_config);
 	}
-	
-	backend->read_config(robot_config);
+
 	backend->send_config();
 
 	while (1) { // talk to robot via backend
