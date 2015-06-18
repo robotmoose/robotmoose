@@ -24,18 +24,20 @@ function load_dependencies()
 {
 	load_js("/js/xmlhttp.js");
 	load_js("/js/jquery/jquery.min.js");
-	load_js("js/codemirror/codemirror.js");
+	load_js("/js/codemirror/codemirror.js");
 	load_js("/js/bootstrap/bootstrap.min.js");
 	load_link("/css/bootstrap.min.css");
-	load_js("js/codemirror/clike_arduino_nxt.js");
-	load_js("js/codemirror/addon/edit/matchbrackets.js");
-	load_js("js/codemirror/addon/dialog/dialog.js");
-	load_js("js/codemirror/addon/search/search.js");
-	load_js("js/codemirror/addon/search/searchcursor.js");
-	load_link("js/codemirror/codemirror.css");
-	load_link("js/codemirror/addon/dialog/dialog.css");
+	load_js("/js/codemirror/clike_arduino_nxt.js");
+	load_js("/js/codemirror/addon/edit/matchbrackets.js");
+	load_js("/js/codemirror/addon/dialog/dialog.js");
+	load_js("/js/codemirror/addon/search/search.js");
+	load_js("/js/codemirror/addon/search/searchcursor.js");
+	load_link("/js/codemirror/codemirror.css");
+	load_link("/js/codemirror/addon/dialog/dialog.css");
 	load_style(".CodeMirror{border:1px solid #000000;}");
 	load_style(".lint-error{background:#ff8888;color:#a00000;padding:1px}\r\n.lint-error-icon{background:#ff0000;color:#ffffff;border-radius:50%;margin-right:7px;}");
+	load_link("/js/jquery/jquery.sortable.css");
+	load_js("/js/jquery/jquery.sortable.min.js");
 };
 
 (function(){load_dependencies()})();
@@ -142,11 +144,10 @@ config_editor_t.prototype.configure=function(config_text)
 		}
 
 		var validated_configs=new Array();
+		var config_json={counter:this.nonce++,configs:new Array()};
 
 		for(var ii=0;ii<configs.length;++ii)
-			validated_configs.push(configs[ii].type+"("+configs[ii].args+");");
-
-		var config_json={counter:this.nonce++,configs:validated_configs};
+			config_json.configs.push(configs[ii].type+"("+configs[ii].args+");");
 
 		var myself=this;
 
@@ -352,12 +353,16 @@ config_editor_t.prototype.is_int=function(str)
 
 config_editor_t.prototype.is_pin=function(arg)
 {
+	arg=arg.toLowerCase();
+
 	return ((arg.length>0&&this.is_int(arg))||
 		(arg.length>0&&arg[0]=='a'&&this.is_int(arg.substr(1,arg.length-1))));
 }
 
 config_editor_t.prototype.is_serial=function(arg)
 {
+	arg=arg.toLowerCase();
+
 	if(arg.length>0&&arg[0]=='x'&&this.is_int(arg.substr(1,arg.length-1)))
 	{
 		var port=parseInt(arg.substr(1,arg.length-1));
@@ -439,7 +444,7 @@ config_editor_t.prototype.validate=function(configs)
 	}
 }
 
-function config_textarea_t(div,robot_name)
+function config_cli_t(div,robot_name)
 {
 	this.editor=new config_editor_t(div,robot_name);
 
@@ -464,15 +469,184 @@ function config_textarea_t(div,robot_name)
 
 	var myself=this;
 	this.button.onclick=function(){myself.editor.configure(myself.code_editor.getValue());};
-
 	this.editor.div.appendChild(this.button);
-	this.editor.onconfigchange=function(config_text){myself.code_editor.setValue(config_text);};
+
+	this.editor.onconfigchange=function(config_text){myself.update(config_text);};
 }
 
-/*function config_dropdown_t(div,robot_name)
+config_cli_t.prototype.update=function(config_text)
+{
+	this.code_editor.setValue(config_text);
+}
+
+function config_gui_t(div,robot_name)
 {
 	this.editor=new config_editor_t(div,robot_name);
 
 	if(!this.editor)
 		return null;
-}*/
+
+	this.list=document.createElement("ul");
+	this.list.className="sortable";
+	this.editor.div.appendChild(this.list);
+
+	$("ul.sortable").sortable();
+
+	this.break0=document.createElement("br");
+	this.editor.div.appendChild(this.break0);
+
+	this.button=document.createElement("input");
+	this.button.type="button";
+	this.button.value="Configure";
+	this.button.className="btn btn-sm btn-primary";
+
+	var myself=this;
+	this.button.onclick=function(){myself.editor.configure(myself.get_value());};
+	this.editor.div.appendChild(this.button);
+
+	this.editor.onconfigchange=function(config_text){myself.update(config_text);};
+}
+
+config_gui_t.prototype.get_value=function()
+{
+	var config_text="";
+
+	try
+	{
+		for(var ii=0;ii<this.list.children.length;++ii)
+		{
+			var arg_count=0;
+			var child=this.list.children[ii];
+			config_text+=child.tabula.type+"(";
+
+			for(var jj=0;jj<child.children.length;++jj)
+			{
+				if(child.children[jj].tagName=="SELECT")
+				{
+					var select=child.children[jj];
+					var value=select.options[select.selectedIndex].value;
+
+					if(child.tabula.args[arg_count]=='P'&&!this.editor.is_pin(select.options[select.selectedIndex].value))
+						throw select.options[select.selectedIndex].value+" is not a pin!";
+					if(child.tabula.args[arg_count]=='S'&&!this.editor.is_serial(select.options[select.selectedIndex].value))
+						throw select.options[select.selectedIndex].value+" is not a serial port!";
+
+					config_text+=select.options[select.selectedIndex].value+",";
+					++arg_count;
+				}
+			}
+
+			if(arg_count!=child.tabula.args.length)
+				throw "Could not decode gui row to a valid tabula device.";
+
+			if(config_text.length>0&&config_text[config_text.length-1]==',')
+				config_text=config_text.substring(0,config_text.length-1);
+
+			config_text+=");\n";
+		}
+	}
+	catch(e)
+	{
+		console.log("config_gui_t::get_value() - "+e);
+	}
+
+	return config_text;
+}
+
+config_gui_t.prototype.create_pin_drop=function(value)
+{
+	var drop=document.createElement("select");
+
+	for(var ii=0;ii<=21;++ii)
+	{
+		var option=document.createElement("option");
+		option.text=""+ii;
+
+		if(value&&option.text.toLowerCase()==value+"")
+			option.selected=true;
+
+		drop.add(option);
+	}
+
+	for(var ii=0;ii<=15;++ii)
+	{
+		var option=document.createElement("option");
+		option.text="A"+ii;
+
+		if(value&&option.text.toLowerCase()==value+"")
+			option.selected=true;
+
+		drop.add(option);
+	}
+
+	return drop;
+}
+
+config_gui_t.prototype.create_serial_drop=function(value)
+{
+	var drop=document.createElement("select");
+
+	for(var ii=0;ii<=3;++ii)
+	{
+		var option=document.createElement("option");
+		option.text="X"+ii;
+
+		if(value&&option.text.toLowerCase()==value+"")
+			option.selected=true;
+
+		drop.add(option);
+	}
+
+	return drop;
+}
+
+config_gui_t.prototype.update=function(config_text)
+{
+	try
+	{
+		var myself=this;
+		var configs=new Array();
+
+		if(config_text.length>0)
+		{
+			configs=this.editor.lex(config_text);
+
+			for(var ii=0;ii<configs.length;++ii)
+			{
+				var li=document.createElement("li");
+				li.className="list-group-item";
+				li.tabula={type:configs[ii].type,args:new Array()};
+
+				var button=document.createElement("img");
+				button.src="js/jquery/close.png";
+				button.onmouseover=function(){this.src="js/jquery/close_rollover.png";};
+				button.onmouseout=function(){this.src="js/jquery/close.png";};
+				button.onclick=function(){alert(myself.editor.config);};//FIXME
+				li.appendChild(button);
+
+				var text=document.createTextNode(configs[ii].type);
+				li.appendChild(text);
+
+				for(var jj=0;jj<configs[ii].args.length;++jj)
+				{
+					if(this.editor.is_pin(configs[ii].args[jj]))
+					{
+						li.appendChild(this.create_pin_drop(configs[ii].args[jj]));
+						li.tabula.args.push("P");
+					}
+					else if(this.editor.is_serial(configs[ii].args[jj]))
+					{
+						li.appendChild(this.create_serial_drop(configs[ii].args[jj]));
+						li.tabula.args.push("S");
+					}
+				}
+
+				this.list.appendChild(li);
+			}
+		}
+	}
+	catch(e)
+	{
+		console.log("config_gui_t::update() - "+e);
+	}
+}
