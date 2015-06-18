@@ -50,7 +50,7 @@ function config_editor_t(div,robot_name)
 	this.div=div;
 	this.config="";
 	this.options=new Array();
-	this.nonce=0;
+	this.counter=0;
 	this.robot_name=robot_name;
 
 	this.get_config();
@@ -146,7 +146,7 @@ config_editor_t.prototype.configure=function(config_text)
 		}
 
 		var validated_configs=new Array();
-		var config_json={counter:this.nonce++,configs:new Array()};
+		var config_json={counter:this.counter++,configs:new Array()};
 
 		for(var ii=0;ii<configs.length;++ii)
 			config_json.configs.push(configs[ii].type+"("+configs[ii].args+");");
@@ -507,6 +507,7 @@ function config_gui_t(div,robot_name)
 	this.editor.div.appendChild(this.button);
 
 	this.editor.onconfigchange=function(config_text){myself.update(config_text);};
+	console.log(this.editor);
 }
 
 config_gui_t.prototype.get_value=function()
