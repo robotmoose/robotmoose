@@ -72,6 +72,8 @@ config_editor_t.prototype.get_config=function()
 				for(var ii=0;ii<json.configs.length;++ii)
 					myself.config+=json.configs[ii]+"\n";
 
+				myself.counter=json.counter+1;
+
 				if(myself.onconfigchange)
 					myself.onconfigchange(myself.config);
 			}
@@ -556,6 +558,7 @@ config_gui_t.prototype.get_value=function()
 config_gui_t.prototype.create_pin_drop=function(value)
 {
 	var drop=document.createElement("select");
+	drop.style.width=48;
 
 	for(var ii=0;ii<=21;++ii)
 	{
@@ -585,6 +588,7 @@ config_gui_t.prototype.create_pin_drop=function(value)
 config_gui_t.prototype.create_serial_drop=function(value)
 {
 	var drop=document.createElement("select");
+	drop.style.width=48;
 
 	for(var ii=0;ii<=3;++ii)
 	{
@@ -627,7 +631,7 @@ config_gui_t.prototype.update=function(config_text)
 					button.onclick=function(){myself.list.removeChild(li);};
 					li.appendChild(button);
 
-					var text=document.createTextNode(configs[ii].type);
+					var text=document.createTextNode(configs[ii].type+" ");
 					li.appendChild(text);
 
 					for(var jj=0;jj<configs[ii].args.length;++jj)
