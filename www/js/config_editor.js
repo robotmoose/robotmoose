@@ -631,10 +631,18 @@ config_gui_t.prototype.update=function(config_text)
 					li.appendChild(text);
 
 					for(var jj=0;jj<configs[ii].args.length;++jj)
+					{
 						if(myself.editor.is_pin(configs[ii].args[jj]))
+						{
 							li.appendChild(myself.create_pin_drop(configs[ii].args[jj]));
+							li.tabula.args.push("P");
+						}
 						else if(myself.editor.is_serial(configs[ii].args[jj]))
+						{
 							li.appendChild(myself.create_serial_drop(configs[ii].args[jj]));
+							li.tabula.args.push("S");
+						}
+					}
 
 					myself.list.appendChild(li);
 				})();
