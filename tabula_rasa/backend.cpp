@@ -406,7 +406,8 @@ public:
 	robot_location location;
 	double LRtrim;
 	bool debug;
-	int myCounter ; // Backend's copy of the config counter 
+	int myCounter;
+
 	robot_backend(std::string superstarURL, std::string robotName_)
 		:parseURL(superstarURL), superstar(parseURL.host,0,parseURL.port),
 		robotName(robotName_), pkt(0), LRtrim(1.0),myCounter(-1)
@@ -425,7 +426,7 @@ public:
 	void read_network(const std::string &read_json);
 	std::string send_network(void);
 
-	std::string read_config(void);
+	void read_config(const std::string& cli);
 	void send_options(void);
 
 	// Configure these devices
@@ -440,7 +441,7 @@ public:
 	/** Read anything the robot wants to send to us. */
 	void read_serial(void);
 };
- 
+
 // Read a line of ASCII from this serial port.
 std::string getline_serial(SerialPort &port) {
 	std::string ret="";
@@ -624,7 +625,6 @@ void robot_backend::send_serial(void) {
 	pkt->write_packet(0xC,
 		tabula_command_storage.count,
 		tabula_command_storage.array);
-	//FIXME!:  pkt->write_packet(0xB,0,NULL);
 }
 
 /** Send this HTTP get request for this path, and return the resulting string. */
@@ -755,37 +755,46 @@ std::string robot_backend::send_network(void)
 	return send_json;
 }
 
-std::string robot_backend::read_config(void)
+void robot_backend::read_config(const std::string& cli)
 {
-	std::string robot_config;
-     
+	std::string robot_config=cli+"\n";
 
 	std::string path = "/superstar/" + robotName + "/config?get";
 	try
 	{ // send all registered tabula devices
 		std::string response=superstar_send_get(path);
-		json::Value config_json=json::Deserialize(response); 
+		json::Value config_json=json::Deserialize(response);
+
 		std::cout<<"Read config JSON from "<<path<<"\n\tgot:  ";
 		std::cout<<json::Serialize(config_json)<<std::endl;
-		int currentCounter = config_json["counter"].ToInt();
-		if(currentCounter != myCounter )
-		{
-			json::Array& configs=config_json["configs"].ToArray();
-			std::cout<<"foo!"<<std::endl;
 
-			for(size_t ii=0;ii<configs.size();++ii)
-				robot_config+=configs[ii].ToString()+"\n";
+		json::Array& configs=config_json["configs"].ToArray();
+		std::cout<<"foo!"<<std::endl;
+
+		for(size_t ii=0;ii<configs.size();++ii)
+			robot_config+=configs[ii].ToString()+"\n";
+		
+		if(myCounter!=config_json["counter"].ToInt())
+		{
+			myCounter=config_json["counter"].ToInt();
+			std::cout<<"TESTING123!!!"<<std::endl;
+			
 			setup_devices(robot_config);
+
+			if(!sim&&pkt!=NULL)
+			{
+				Serial.Close();
+				Serial.begin(Serial.Get_baud());
+				setup_arduino(Serial,robot_config);
+			}
 		}
+
 	} catch (std::exception &e) {
-		printf("Exception while reading config: %s\n",e.what());
+		printf("Exception while sending network JSON: %s\n",e.what());
 		// stop();
 	}
 
 	std::cout<<"config:  \n"<<robot_config<<std::endl;
-
-
-	return robot_config;
 }
 
 void robot_backend::send_options(void)
@@ -846,21 +855,21 @@ int main(int argc, char *argv[])
 
 	// FIXME: should pull robot configuration from superstar robotName/+"config"
 	std::string robot_config=
-"analog(A0);\n"
-"analog(A1);\n"
-+sensors
-+configMotor+"\n"
-+backend->read_config()+
-"serial_controller();\n";
-
+		"analog(A0);\n"
+		"analog(A1);\n"
+		+sensors
+		+configMotor+"\n"
+		+"serial_controller();\n";
+		
+	backend->setup_devices(robot_config);
 
 	if (!sim) {
 		Serial.begin(baudrate);
-		backend->read_config();
+		backend->setup_arduino(Serial,robot_config);
 	}
 
 	while (1) { // talk to robot via backend
-		backend->read_config();
+		backend->read_config(robot_config);
 		backend->do_network();
 		backend->send_serial();
 #ifdef __unix__

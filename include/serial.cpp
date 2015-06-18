@@ -887,6 +887,10 @@ std::vector<std::string> SerialPort::port_list()
 	return list;
 }
 
+int SerialPort::Get_baud() const
+{
+	return baud_rate;
+}
 
 
 
