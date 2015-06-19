@@ -543,12 +543,12 @@ function config_gui_t(div,robot_name)
 	this.button.className="btn btn-sm btn-primary";
 	this.button.onclick=function(){myself.editor.configure(myself.get_value());};
 
-	this.adder=document.createElement("select");
+	//this.adder=document.createElement("select");
 
 	this.editor.div.appendChild(this.config_list);
 	this.editor.div.appendChild(this.break0);
 	this.editor.div.appendChild(this.button);
-	this.editor.div.appendChild(this.adder);
+	//this.editor.div.appendChild(this.adder);
 
 	$("ul.sortable").sortable();
 }
@@ -704,7 +704,7 @@ config_gui_t.prototype.update_configs=function(config_text)
 
 config_gui_t.prototype.update_options=function(options)
 {
-	try
+	/*try
 	{
 		var myself=this;
 
@@ -721,5 +721,5 @@ config_gui_t.prototype.update_options=function(options)
 	catch(e)
 	{
 		console.log("config_gui_t::update_options() - "+e);
-	}
+	}*/
 }
