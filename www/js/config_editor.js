@@ -360,7 +360,7 @@ config_editor_t.prototype.is_pin=function(arg)
 {
 	arg=arg.toLowerCase();
 
-	return ((arg.length>0&&this.is_int(arg))||
+	return ((arg.length>0&&this.is_int(arg)&&arg>1)||
 		(arg.length>0&&arg[0]=='a'&&this.is_int(arg.substr(1,arg.length-1))));
 }
 
@@ -484,14 +484,14 @@ function config_cli_t(div,robot_name)
 	this.break0=document.createElement("br");
 	this.editor.div.appendChild(this.break0);
 
-	this.button=document.createElement("input");
-	this.button.type="button";
-	this.button.value="Configure";
-	this.button.className="btn btn-med btn-primary";
+	this.configure_button=document.createElement("input");
+	this.configure_button.type="button";
+	this.configure_button.value="Configure";
+	this.configure_button.className="btn btn-primary";
 
 	var myself=this;
-	this.button.onclick=function(){myself.editor.configure(myself.code_editor.getValue());};
-	this.editor.div.appendChild(this.button);
+	this.configure_button.onclick=function(){myself.editor.configure(myself.code_editor.getValue());};
+	this.editor.div.appendChild(this.configure_button);
 
 	this.editor.onconfigschange=function(config_text){myself.update_configs(config_text);};
 }
@@ -532,29 +532,55 @@ function config_gui_t(div,robot_name)
 
 	this.editor.onconfigschange=function(config_text){myself.update_configs(config_text);};
 	this.editor.onoptionschange=function(options){myself.update_options(options);};
-	this.editor.div.style.width=320;
+	this.editor.div.style.width=480;
 
-	this.config_list_prettifier=document.createElement("div");
-	div.className="form-inline";
+	this.configs_list_prettifier=document.createElement("div");
+	this.configs_list_prettifier.className="form-inline";
 
-	this.config_list=document.createElement("ul");
-	this.config_list.className="sortable";
+	this.configs_list=document.createElement("ul");
+	this.configs_list.className="sortable";
 
 	this.break0=document.createElement("br");
 
-	this.button=document.createElement("input");
-	this.button.type="button";
-	this.button.value="Configure";
-	this.button.className="btn btn-med btn-primary";
-	this.button.onclick=function(){myself.configure()};
+	this.configure_button=document.createElement("input");
+	this.configure_button.type="button";
+	this.configure_button.value="Configure";
+	this.configure_button.className="btn btn-primary";
+	this.configure_button.onclick=function(){myself.configure()};
 
-	//this.adder=document.createElement("select");
+	this.break1=document.createElement("br");
 
-	this.config_list_prettifier.appendChild(this.config_list);
-	this.editor.div.appendChild(this.config_list_prettifier);
+	this.adder_prettifier=document.createElement("div");
+	this.adder_prettifier.className="form-inline";
+
+	this.adder_select=document.createElement("select");
+	this.adder_select.className="form-control";
+	this.adder_select.onchange=function(){myself.adder_button_update();};
+
+	var adder_title_option=document.createElement("option");
+	adder_title_option.text="Add Device";
+	this.adder_select.appendChild(adder_title_option);
+
+	this.adder_button=document.createElement("input");
+	this.adder_button.type="button";
+	this.adder_button.value="Add";
+	this.adder_button.disabled=true;
+	this.adder_button.className="btn btn-primary";
+	this.adder_button.style.marginLeft=10;
+	this.adder_button.onclick=function()
+	{
+		var option=myself.adder_select.options[myself.adder_select.selectedIndex];
+		myself.create_row(option.text,option.args,true);
+	};
+
+	this.configs_list_prettifier.appendChild(this.configs_list);
+	this.adder_prettifier.appendChild(this.adder_select);
+	this.adder_prettifier.appendChild(this.adder_button);
+	this.editor.div.appendChild(this.configs_list_prettifier);
 	this.editor.div.appendChild(this.break0);
-	this.editor.div.appendChild(this.button);
-	//this.editor.div.appendChild(this.adder);
+	this.editor.div.appendChild(this.adder_prettifier);
+	this.editor.div.appendChild(this.break1);
+	this.editor.div.appendChild(this.configure_button);
 
 	$("ul.sortable").sortable();
 }
@@ -564,13 +590,13 @@ config_gui_t.prototype.configure=function()
 	this.editor.configure(this.get_value());
 }
 
-config_gui_t.prototype.select_update=function()
+config_gui_t.prototype.configure_button_update=function()
 {
 	var ok=true;
 
-	for(var ii=0;ii<this.config_list.children.length;++ii)
+	for(var ii=0;ii<this.configs_list.children.length;++ii)
 	{
-		var child=this.config_list.children[ii];
+		var child=this.configs_list.children[ii];
 
 		for(var jj=0;jj<child.children.length;++jj)
 		{
@@ -587,7 +613,12 @@ config_gui_t.prototype.select_update=function()
 			break;
 	}
 
-	this.button.disabled=!ok;
+	this.configure_button.disabled=!ok;
+}
+
+config_gui_t.prototype.adder_button_update=function()
+{
+	this.adder_button.disabled=this.adder_select.selectedIndex==0;
 }
 
 config_gui_t.prototype.get_value=function()
@@ -596,10 +627,10 @@ config_gui_t.prototype.get_value=function()
 
 	try
 	{
-		for(var ii=0;ii<this.config_list.children.length;++ii)
+		for(var ii=0;ii<this.configs_list.children.length;++ii)
 		{
 			var arg_count=0;
-			var child=this.config_list.children[ii];
+			var child=this.configs_list.children[ii];
 			config_text+=child.tabula.type+"(";
 
 			for(var jj=0;jj<child.children.length;++jj)
@@ -644,9 +675,10 @@ config_gui_t.prototype.create_pin_drop=function(value)
 
 	var title_option=document.createElement("option");
 	title_option.text="Pin";
+	title_option.selected=true;
 	drop.add(title_option);
 
-	for(var ii=0;ii<=21;++ii)
+	for(var ii=2;ii<=21;++ii)
 	{
 		var option=document.createElement("option");
 		option.text=""+ii;
@@ -663,13 +695,16 @@ config_gui_t.prototype.create_pin_drop=function(value)
 		option.text="A"+ii;
 
 		if(value&&option.text.toLowerCase()==value+"")
+		{
+			title_option.selected=false;
 			option.selected=true;
+		}
 
 		drop.add(option);
 	}
 
 	var myself=this;
-	drop.onchange=function(){myself.select_update();};
+	drop.onchange=function(){myself.configure_button_update();};
 
 	return drop;
 }
@@ -682,6 +717,7 @@ config_gui_t.prototype.create_serial_drop=function(value)
 
 	var title_option=document.createElement("option");
 	title_option.text="Port";
+	title_option.selected=true;
 	drop.add(title_option);
 
 	for(var ii=0;ii<=3;++ii)
@@ -690,22 +726,75 @@ config_gui_t.prototype.create_serial_drop=function(value)
 		option.text="X"+ii;
 
 		if(value&&option.text.toLowerCase()==value+"")
+		{
+			title_option.selected=false;
 			option.selected=true;
+		}
 
 		drop.add(option);
 	}
 
 	var myself=this;
-	drop.onchange=function(){myself.select_update();};
+	drop.onchange=function(){myself.configure_button_update();};
 
 	return drop;
+}
+
+config_gui_t.prototype.create_row=function(type,args,create_new)
+{
+	var myself=this;
+
+	(function()
+	{
+		var li=document.createElement("li");
+		li.className="list-group-item";
+		li.tabula={type:type,args:new Array()};
+
+		var text=document.createTextNode(type+" ");
+		li.appendChild(text);
+
+		for(var jj=0;jj<args.length;++jj)
+		{
+			if(create_new)
+			{
+				li.tabula.args.push(args[jj]);
+
+				if(args[jj]=="P")
+					li.appendChild(myself.create_pin_drop());
+				else if(args[jj]=="S")
+					li.appendChild(myself.create_serial_drop());
+			}
+			else
+			{
+				if(myself.editor.is_pin(args[jj]))
+				{
+					li.appendChild(myself.create_pin_drop(args[jj]));
+					li.tabula.args.push("P");
+				}
+				else if(myself.editor.is_serial(args[jj]))
+				{
+					li.appendChild(myself.create_serial_drop(args[jj]));
+					li.tabula.args.push("S");
+				}
+			}
+		}
+
+		var button=document.createElement("span");
+		button.className="close";
+		button.innerHTML="x";
+		button.li=li;
+		button.onclick=function(){myself.configs_list.removeChild(li);myself.configure_button_update();};
+		li.appendChild(button);
+
+		myself.configs_list.appendChild(li);
+		myself.configure_button_update();
+	})();
 }
 
 config_gui_t.prototype.update_configs=function(config_text)
 {
 	try
 	{
-		var myself=this;
 		var configs=new Array();
 
 		if(config_text.length>0)
@@ -713,40 +802,7 @@ config_gui_t.prototype.update_configs=function(config_text)
 			configs=this.editor.lex(config_text);
 
 			for(var ii=0;ii<configs.length;++ii)
-			{
-				(function()
-				{
-					var li=document.createElement("li");
-					li.className="list-group-item";
-					li.tabula={type:configs[ii].type,args:new Array()};
-
-					var text=document.createTextNode(configs[ii].type+" ");
-					li.appendChild(text);
-
-					for(var jj=0;jj<configs[ii].args.length;++jj)
-					{
-						if(myself.editor.is_pin(configs[ii].args[jj]))
-						{
-							li.appendChild(myself.create_pin_drop(configs[ii].args[jj]));
-							li.tabula.args.push("P");
-						}
-						else if(myself.editor.is_serial(configs[ii].args[jj]))
-						{
-							li.appendChild(myself.create_serial_drop(configs[ii].args[jj]));
-							li.tabula.args.push("S");
-						}
-					}
-
-					var button=document.createElement("span");
-					button.className="close";
-					button.innerHTML="x";
-					button.li=li;
-					button.onclick=function(){myself.config_list.removeChild(li);};
-					li.appendChild(button);
-
-					myself.config_list.appendChild(li);
-				})();
-			}
+				this.create_row(configs[ii].type,configs[ii].args,false);
 		}
 	}
 	catch(error)
@@ -757,9 +813,11 @@ config_gui_t.prototype.update_configs=function(config_text)
 
 config_gui_t.prototype.update_options=function(options)
 {
-	/*try
+	try
 	{
 		var myself=this;
+		myself.adder_select.selectedIndex=0;
+		myself.adder_select.options.length=1;
 
 		for(var ii=0;ii<options.length;++ii)
 		{
@@ -767,12 +825,15 @@ config_gui_t.prototype.update_options=function(options)
 			{
 				var option=document.createElement("option");
 				option.text=options[ii].type;
-				myself.adder.appendChild(option);
+				option.args=options[ii].args;
+				option.args.length=options[ii].args.length;
+				myself.adder_select.appendChild(option);
 			})();
 		}
+
 	}
 	catch(error)
 	{
 		console.log("config_gui_t::update_options() - "+error);
-	}*/
+	}
 }
