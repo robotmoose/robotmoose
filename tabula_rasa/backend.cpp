@@ -406,10 +406,11 @@ public:
 	robot_location location;
 	double LRtrim;
 	bool debug;
+	int myCounter;
 
 	robot_backend(std::string superstarURL, std::string robotName_)
 		:parseURL(superstarURL), superstar(parseURL.host,0,parseURL.port),
-		robotName(robotName_), pkt(0), LRtrim(1.0)
+		robotName(robotName_), pkt(0), LRtrim(1.0),myCounter(1)
 	{
 		//stop();
 	}
@@ -425,7 +426,10 @@ public:
 	void read_network(const std::string &read_json);
 	std::string send_network(void);
 
-	std::string read_config(void);
+	void tabula_setup(std::string config);
+	void read_config(std::string config);
+	void send_config(std::string config);
+
 	void send_options(void);
 
 	// Configure these devices
@@ -456,11 +460,13 @@ std::string getline_serial(SerialPort &port) {
 
 void robot_backend::setup_devices(std::string robot_config)
 {
+	all_dev_types.Clear();
+
 	// Clear existing lists of sensors and actuators
 	for (unsigned int i=0;i<commands.size();i++) delete commands[i];
-	commands.erase(commands.begin(),commands.end());
+	commands.clear();
 	for (unsigned int i=0;i<sensors.size();i++) delete sensors[i];
-	sensors.erase(sensors.begin(),sensors.end());
+	sensors.clear();
 
 	// Counters for various devices:
 	int analogs=0;
@@ -754,10 +760,23 @@ std::string robot_backend::send_network(void)
 	return send_json;
 }
 
-std::string robot_backend::read_config(void)
+void robot_backend::tabula_setup(std::string config)
 {
-	std::string return_config;
+	config+="\nserial_controller();\n";
+	setup_devices(config);
 
+	if(!sim)
+	{
+		std::cout<<"Uploading new config to arduino!"<<std::endl;
+		Serial.Close();
+		sleep(1);
+		Serial.begin(Serial.Get_baud());
+		setup_arduino(Serial,config);
+	}
+}
+
+void robot_backend::read_config(std::string config)
+{
 	std::string path = "/superstar/" + robotName + "/config?get";
 	try
 	{ // send all registered tabula devices
@@ -771,16 +790,69 @@ std::string robot_backend::read_config(void)
 		std::cout<<"foo!"<<std::endl;
 
 		for(size_t ii=0;ii<configs.size();++ii)
-			return_config+=configs[ii].ToString()+"\n";
+			config+=configs[ii].ToString()+"\n";
 
+		if(myCounter!=config_json["counter"].ToInt())
+		{
+			myCounter=config_json["counter"].ToInt();
+			tabula_setup(config);
+		}
+
+	} catch (std::exception &e) {
+		printf("Exception while sending netwdork JSON: %s\n",e.what());
+		// stop();
+	}
+
+	std::cout<<"config:  \n"<<config<<std::endl;
+}
+
+void robot_backend::send_config(std::string config)
+{
+	double start = time_in_seconds();
+	std::string path = "/superstar/" + robotName + "/config?set=";
+	try
+	{ // send all registered tabula devices
+		json::Object json;
+		json["counter"]=myCounter;
+		json["configs"]=json::Array();
+
+		std::string temp="";
+
+		if(config.size()>0||config[config.size()-1]!='\n')
+			config+="\n";
+
+		for(size_t ii=0;ii<config.size();++ii)
+		{
+			if(config[ii]=='\n')
+			{
+				while(temp.size()>0&&isspace(temp[0])!=0)
+					temp=temp.substr(1,temp.size());
+
+				while(temp.size()>0&&isspace(temp[temp.size()-1])!=0)
+					temp=temp.substr(0,temp.size()-1);
+
+				if(temp.size()>0)
+					json["configs"].ToArray().push_back(temp);
+
+				temp="";
+				continue;
+			}
+
+			temp+=config[ii];
+		}
+
+		std::string str = json::Serialize(json);
+		str=uri_encode(str);
+		std::string response = superstar_send_get(path+str);
+		std::cout<<"Sent options JSON: "<<str<<"\n";
 	} catch (std::exception &e) {
 		printf("Exception while sending network JSON: %s\n",e.what());
 		// stop();
 	}
 
-	std::cout<<"config:  \n"<<return_config<<std::endl;
-
-	return return_config;
+	double elapsed = time_in_seconds() - start;
+	double per = elapsed;
+	printf("Send Time:	%.1f ms/request, %.1f req/sec\n", per*1.0e3, 1.0 / per);
 }
 
 void robot_backend::send_options(void)
@@ -813,7 +885,7 @@ int main(int argc, char *argv[])
 	std::string configMotor = "create2(X3);"; // Arduino firmware device name
 	std::string markerFile=""; // computer vision marker file
 	std::string sensors=""; // All our sensors
-	int baudrate = 57600;  // serial comms to Arduino
+	int baudrate=57600;  // serial comms to Arduino
 	for (int argi = 1; argi<argc; argi++) {
 		if (0 == strcmp(argv[argi], "--robot")) robotName = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--superstar")) superstarURL = argv[++argi];
@@ -834,6 +906,7 @@ int main(int argc, char *argv[])
 	}
 
 	std::cout<<"Connecting to superstar at "<<superstarURL<<std::endl;
+	Serial.Set_baud(baudrate);
 	backend=new robot_backend(superstarURL, robotName);
 	backend->LRtrim=LRtrim;
 	backend->debug = debug; // more output, more mess, but more data
@@ -841,20 +914,17 @@ int main(int argc, char *argv[])
 
 	// FIXME: should pull robot configuration from superstar robotName/+"config"
 	std::string robot_config=
-"analog(A0);\n"
-"analog(A1);\n"
-+sensors
-+configMotor+"\n"
-+backend->read_config()+
-"serial_controller();\n";
-	backend->setup_devices(robot_config);
+		"analog(A0);\n"
+		"analog(A1);\n"
+		+sensors
+		+configMotor;
 
-	if (!sim) {
-		Serial.begin(baudrate);
-		backend->setup_arduino(Serial,robot_config);
-	}
+	backend->tabula_setup(robot_config);
+
+	backend->send_config(robot_config);
 
 	while (1) { // talk to robot via backend
+		backend->read_config("");
 		backend->do_network();
 		backend->send_serial();
 #ifdef __unix__

@@ -1,0 +1,27 @@
+body.dragging, body.dragging *
+{
+	cursor:move !important;
+}
+
+.dragged
+{
+	position:absolute;
+	opacity:0.5;
+	z-index:2000;
+}
+
+ul.sortable li.placeholder
+{
+	position: relative;
+}
+
+ul.sortable li.placeholder:before
+{
+	position: absolute;
+}
+
+ul.sortable
+{
+	list-style-image:url("/js/jquery/invisible.png");
+	padding-left:0;
+}

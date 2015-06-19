@@ -1,8 +1,8 @@
 /*
   Send and receive tabula_control command and sensor values,
   using A-packet serial comms.
- 
-  Dr. Orion Lawlor, lawlor@alaska.edu, 2015-03-19 (Public Domain) 
+
+  Dr. Orion Lawlor, lawlor@alaska.edu, 2015-03-19 (Public Domain)
 */
 #include "action.h"
 #include "tabula_config.h"
@@ -27,7 +27,7 @@ public:
 	uint32_t last_read; // millis() the last time we got data back
 	uint32_t next_send; // millis() the next time we should send off data
 
-	serial_channel(HardwareSerial &serial_) 
+	serial_channel(HardwareSerial &serial_)
 		:serial(serial_), pkt(serial)
 	{
 		pc_connected=false;
@@ -66,19 +66,23 @@ class serial_controller : public action {
 public:
 	serial_channel channel;
 	serial_controller(HardwareSerial &serial) :channel(serial) {}
-	
+
 	virtual void loop() {
-		if (channel.read_packet()) 
+		if (channel.read_packet())
 		{ // Respond to packet request
 			if (channel.p.command==0xC) {
 				handle_command_packet(channel.p);
+			}
+			else if (channel.p.command==0xB) {
+				void(*reset)()=0;
+				reset();
 			}
 			else { // unknown request type
 				channel.pkt.write_packet(0xE,1,"?");
 			}
 		}
 	}
-	
+
 	// The PC has command data for us.  Send back sensor data.
 	void handle_command_packet(A_packet &p) {
 		if (p.length!=tabula_command_storage.count) {

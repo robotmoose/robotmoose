@@ -83,6 +83,7 @@ public:
 	int Open(const std::string& name);
 	std::string error_message();
 	int Set_baud(int baud);
+	int Get_baud() const;
 	int Read(void *ptr, int count);
 	int Write(const void *ptr, int len);
 	int Input_wait(int msec);

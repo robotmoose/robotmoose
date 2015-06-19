@@ -2,14 +2,15 @@
   Superstar: the "star" in the center of our network topology.
   This is an HTTP server on a public IP, used to connect the pilot
   and robot, who both may live behind firewalls.
-  
-  
-  
+
+
+
   Dr. Orion Lawlor, lawlor@alaska.edu, 2014-10-02 (Public Domain)
 */
 #include <stdio.h>
 #include <string.h>
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <map>
 #include "mongoose/mongoose.h" /* central webserver library */
@@ -47,7 +48,7 @@ int send_json(struct mg_connection *conn,std::string json)
 
 /**
   This is the key-value "database" of everything stored by superstar.
-  Eventually it would be nice to persist this to disk, and keep history, although 
+  Eventually it would be nice to persist this to disk, and keep history, although
   that's probably not needed for robotics piloting, which tends to be same-day.
 */
 class superstar_db_t {
@@ -56,37 +57,50 @@ private:
 	db_t db;
 public:
 	superstar_db_t() {}
-	
+
 	/**
 	  Overwrite the current value in the database with this new value.
 	*/
-	void set(const std::string &path,const std::string &new_value) {
+	void set(std::string path,const std::string &new_value)
+	{
+		if(path.size()>0&&path[path.size()-1]!='/')
+			path+="/";
+
 		db[path]=new_value;
 	}
-	
+
 	/**
 	  Read the latest value from the database.
 	*/
-	const std::string &get(const std::string &path) {
+	const std::string& get(std::string path)
+	{
+		if(path.size()>0&&path[path.size()-1]!='/')
+			path+="/";
+
 		return db[path];
 	}
-	
+
 	/**
-	  Return a comma-separated JSON array of quoted substrings 
-	  in the database matching this prefix. 
+	  Return a comma-separated JSON array of quoted substrings
+	  in the database matching this prefix.
 	*/
-	std::string substrings(const std::string &path_prefix) {
+	std::string substrings(std::string path_prefix)
+	{
+		if(path_prefix.size()>0&&path_prefix[path_prefix.size()-1]!='/')
+			path_prefix+="/";
+
 		std::string list="";
 		std::string last="";
-		for (db_t::const_iterator c=db.begin();c!=db.end();++c) {
+		for (db_t::const_iterator c=db.begin();c!=db.end();++c)
+		{
 			std::string path=(*c).first;
-			if (0==path.compare(0,path_prefix.size(),path_prefix)) 
+			if (0==path.compare(0,path_prefix.size(),path_prefix))
 			{ // path matches prefix
 				path=path.substr(path_prefix.size()); // trim prefix
 				// trim beyond forward slash
 				size_t slash=path.find('/');
 				if (slash!=std::string::npos) path.resize(slash);
-				
+
 				if (last!=path) {
 					if (list.size()==0) list+="[\""+path;
 					else list+="\",\""+path;
@@ -111,10 +125,10 @@ bool write_is_authorized(const std::string &starpath,
 	std::ifstream f(("auth/"+starpath).c_str());
 	if (!f.good()) return true; // no such auth file exists.
 	std::string pass; std::getline(f,pass);
-	
+
 // If we get here, there is a password.  Verify there is an authentication code.
 	if (new_auth.size()<=0) return false; // need authentication code
-	
+
 	// FIXME: extract sequence number (read JSON in new_data?)
 	int seq=0;
 	std::string alldata=pass+":"+starpath+":"+new_data+":"+my_itos(seq);
@@ -130,21 +144,21 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
   if (ev==MG_AUTH) return true; // everybody's authorized
   if (ev!=MG_REQUEST) return false; // not a request? not our problem
   // else it's a request
-  
+
   printf("Incoming request: client %s:%d, URI %s\n",conn->remote_ip,conn->remote_port,conn->uri);
-  
+
   const char *prefix="/superstar/";
-  if (strncmp(conn->uri,prefix,strlen(prefix))!=0) 
+  if (strncmp(conn->uri,prefix,strlen(prefix))!=0)
   	return MG_FALSE; // file fallback
   std::string starpath(&conn->uri[strlen(prefix)]);
 
   std::string query="";
   if (conn->query_string) query=conn->query_string;
-  
+
   std::string content="<HTML><BODY>Hello from mongoose!  "
   	"I see you're using source IP "+std::string(conn->remote_ip)+" and port "+my_itos(conn->remote_port)+"\n";
   content+="<P>Superstar path: "+starpath+"\n";
-  
+
   enum {NBUF=32767}; // maximum length for JSON data being set
   char buf[NBUF];
   if (0<=mg_get_var(conn,"set",buf,NBUF)) { /* writing new value */
@@ -183,16 +197,16 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 	}
   }
   else { /* Not writing a new value */
-  	if (query=="get") 
+  	if (query=="get")
   	{ /* getting raw JSON */
 		return send_json(conn,superstar_db.get(starpath));
   	}
   	if (query=="sub") { /* substring search */
   		return send_json(conn,superstar_db.substrings(starpath));
   	}
-  	
+
   	// fixme: "after" type query (requires thread suspend)
-  	
+
   	std::string value=superstar_db.get(starpath);
   	if (value.size()>0)
 		content+="<P>Current value: '"+value+"'";
@@ -205,7 +219,7 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 	}
   }
 
-  
+
   content+="</BODY></HTML>";
 
   // Send human-readable HTTP reply to the client
@@ -235,7 +249,7 @@ void *thread_code(void *) {
 
   printf("OK, listening!  Visit http://localhost:%s to see the site!\n",
   	mg_get_option(server, "listening_port"));
- 
+
   while (1) {
   	mg_poll_server(server,1000);
   }

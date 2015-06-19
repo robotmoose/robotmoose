@@ -1,19 +1,33 @@
 <html>
 	<head>
+		<!--#include virtual="/sources.html"-->
 		<script src="/js/config_editor.js"></script>
 		<script>
-			var configurator;
+			var configurator_cli;
+			var configurator_gui;
 
 			function setup()
 			{
-				configurator=new config_editor_t(document.getElementById("test"),"demo");
+				configurator_cli=new config_cli_t(document.getElementById("cli"),"demo");
+				configurator_gui=new config_gui_t(document.getElementById("gui"),"demo");
 
-				if(!configurator)
+				if(!configurator_cli||!configurator_gui)
 					alert("Invalid div!");
 			}
 		</script>
 	</head>
 	<body onload="setup();">
-		<div id="test"></div>
+		<table>
+			<tr style="vertical-align:top;">
+				<td style="padding:20px;">
+					<h1>CLI</h1>
+					<div id="cli"></div>
+				</td>
+				<td style="padding:20px;">
+					<h1>GUI</h1>
+					<div id="gui"></div>
+				</td>
+			</tr>
+		</table>
 	</body>
 </html>
