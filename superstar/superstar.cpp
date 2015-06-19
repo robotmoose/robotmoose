@@ -163,10 +163,23 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 			starpath.c_str(), sentauth);
 	}
 	
-	// New optional syntax: /superstar/path1?set=newval1&get=path2
+	// New optional syntax: /superstar/path1?set=newval1&get=path2,path3,path4
 	if (0<=mg_get_var(conn,"get",buf,NBUF))
 	{
-		return send_json(conn,superstar_db.get(buf));
+		std::string retArray="[";
+		char *bufLoc=buf;
+		while (0!=*bufLoc) {
+			char *nextComma=strchr(bufLoc,','); // Find next comma
+			if (nextComma!=0) *nextComma=0; // nul terminate at comma
+			
+			if (retArray.size()>1) retArray+=","; // add separator to output
+			retArray+=superstar_db.get(bufLoc); // add path to output
+
+			if (nextComma==0) break; // done with this path
+			else bufLoc=nextComma+1; // move down string
+		}
+		retArray+="]";
+		return send_json(conn,retArray);
 	}
   }
   else { /* Not writing a new value */
