@@ -388,7 +388,6 @@ public:
 */
 class robot_backend {
 private:
-	std::string tabula_config;
 	osl::url_parser parseURL;
 	osl::http_connection superstar; // HTTP keepalive connection
 	std::string superstar_send_get(const std::string &path); // HTTP request
@@ -410,7 +409,7 @@ public:
 	int myCounter;
 
 	robot_backend(std::string superstarURL, std::string robotName_)
-		:tabula_config(""),parseURL(superstarURL), superstar(parseURL.host,0,parseURL.port),
+		:parseURL(superstarURL), superstar(parseURL.host,0,parseURL.port),
 		robotName(robotName_), pkt(0), LRtrim(1.0),myCounter(1)
 	{
 		//stop();
@@ -427,8 +426,9 @@ public:
 	void read_network(const std::string &read_json);
 	std::string send_network(void);
 
-	void read_config(const std::string& cli);
-	void send_config();
+	void tabula_setup(std::string config);
+	void read_config(std::string config);
+	void send_config(std::string config);
 
 	void send_options(void);
 
@@ -549,7 +549,6 @@ void robot_backend::setup_devices(std::string robot_config)
 
 void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 {
-	tabula_config=robot_config+"\n";
 	std::cout.flush();
 
 	while (true) { // wait for Arduino to boot
@@ -761,10 +760,23 @@ std::string robot_backend::send_network(void)
 	return send_json;
 }
 
-void robot_backend::read_config(const std::string& cli)
+void robot_backend::tabula_setup(std::string config)
 {
-	tabula_config=cli+"\n";
+	config+="\nserial_controller();\n";
+	setup_devices(config);
 
+	if(!sim)
+	{
+		std::cout<<"Uploading new config to arduino!"<<std::endl;
+		Serial.Close();
+		sleep(1);
+		Serial.begin(Serial.Get_baud());
+		setup_arduino(Serial,config);
+	}
+}
+
+void robot_backend::read_config(std::string config)
+{
 	std::string path = "/superstar/" + robotName + "/config?get";
 	try
 	{ // send all registered tabula devices
@@ -778,20 +790,12 @@ void robot_backend::read_config(const std::string& cli)
 		std::cout<<"foo!"<<std::endl;
 
 		for(size_t ii=0;ii<configs.size();++ii)
-			tabula_config+=configs[ii].ToString()+"\n";
+			config+=configs[ii].ToString()+"\n";
 
 		if(myCounter!=config_json["counter"].ToInt())
 		{
 			myCounter=config_json["counter"].ToInt();
-
-			setup_devices(tabula_config);
-
-			if(!sim&&pkt!=NULL)
-			{
-				Serial.Close();
-				Serial.begin(Serial.Get_baud());
-				setup_arduino(Serial,tabula_config);
-			}
+			tabula_setup(config);
 		}
 
 	} catch (std::exception &e) {
@@ -799,10 +803,10 @@ void robot_backend::read_config(const std::string& cli)
 		// stop();
 	}
 
-	std::cout<<"config:  \n"<<tabula_config<<std::endl;
+	std::cout<<"config:  \n"<<config<<std::endl;
 }
 
-void robot_backend::send_config()
+void robot_backend::send_config(std::string config)
 {
 	double start = time_in_seconds();
 	std::string path = "/superstar/" + robotName + "/config?set=";
@@ -814,12 +818,12 @@ void robot_backend::send_config()
 
 		std::string temp="";
 
-		if(tabula_config.size()>0||tabula_config[tabula_config.size()-1]!='\n')
-			tabula_config+="\n";
+		if(config.size()>0||config[config.size()-1]!='\n')
+			config+="\n";
 
-		for(size_t ii=0;ii<tabula_config.size();++ii)
+		for(size_t ii=0;ii<config.size();++ii)
 		{
-			if(tabula_config[ii]=='\n')
+			if(config[ii]=='\n')
 			{
 				while(temp.size()>0&&isspace(temp[0])!=0)
 					temp=temp.substr(1,temp.size());
@@ -834,7 +838,7 @@ void robot_backend::send_config()
 				continue;
 			}
 
-			temp+=tabula_config[ii];
+			temp+=config[ii];
 		}
 
 		std::string str = json::Serialize(json);
@@ -881,7 +885,7 @@ int main(int argc, char *argv[])
 	std::string configMotor = "create2(X3);"; // Arduino firmware device name
 	std::string markerFile=""; // computer vision marker file
 	std::string sensors=""; // All our sensors
-	int baudrate = 57600;  // serial comms to Arduino
+	int baudrate=57600;  // serial comms to Arduino
 	for (int argi = 1; argi<argc; argi++) {
 		if (0 == strcmp(argv[argi], "--robot")) robotName = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--superstar")) superstarURL = argv[++argi];
@@ -902,6 +906,7 @@ int main(int argc, char *argv[])
 	}
 
 	std::cout<<"Connecting to superstar at "<<superstarURL<<std::endl;
+	Serial.Set_baud(baudrate);
 	backend=new robot_backend(superstarURL, robotName);
 	backend->LRtrim=LRtrim;
 	backend->debug = debug; // more output, more mess, but more data
@@ -912,21 +917,14 @@ int main(int argc, char *argv[])
 		"analog(A0);\n"
 		"analog(A1);\n"
 		+sensors
-		+configMotor+"\n"
-		+"serial_controller();\n";
+		+configMotor;
 
-	backend->setup_devices(robot_config);
+	backend->tabula_setup(robot_config);
 
-	if (!sim)
-	{
-		Serial.begin(baudrate);
-		backend->setup_arduino(Serial,robot_config);
-	}
-
-	backend->send_config();
+	backend->send_config(robot_config);
 
 	while (1) { // talk to robot via backend
-		backend->read_config(robot_config);
+		backend->read_config("");
 		backend->do_network();
 		backend->send_serial();
 #ifdef __unix__
