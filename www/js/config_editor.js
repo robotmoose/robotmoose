@@ -74,8 +74,8 @@ config_editor_t.prototype.get_config=function()
 
 				myself.counter=json.counter+1;
 
-				if(myself.onconfigchange)
-					myself.onconfigchange(myself.config);
+				if(myself.onconfigschange)
+					myself.onconfigschange(myself.config);
 			}
 			catch(error)
 			{
@@ -118,6 +118,9 @@ config_editor_t.prototype.get_options=function()
 
 					myself.options.push(tabula);
 				}
+
+				if(myself.onoptionschange)
+					myself.onoptionschange(myself.options);
 			}
 			catch(error)
 			{
@@ -446,6 +449,23 @@ config_editor_t.prototype.validate=function(configs)
 	}
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function config_cli_t(div,robot_name)
 {
 	this.editor=new config_editor_t(div,robot_name);
@@ -473,55 +493,76 @@ function config_cli_t(div,robot_name)
 	this.button.onclick=function(){myself.editor.configure(myself.code_editor.getValue());};
 	this.editor.div.appendChild(this.button);
 
-	this.editor.onconfigchange=function(config_text){myself.update(config_text);};
+	this.editor.onconfigschange=function(config_text){myself.update_configs(config_text);};
 }
 
-config_cli_t.prototype.update=function(config_text)
+config_cli_t.prototype.update_configs=function(config_text)
 {
 	this.code_editor.setValue(config_text);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function config_gui_t(div,robot_name)
 {
+	var myself=this;
 	this.editor=new config_editor_t(div,robot_name);
+	this.editor.onconfigschange=function(config_text){myself.update_configs(config_text);};
+	this.editor.onoptionschange=function(options){myself.update_options(options);};
 
 	if(!this.editor)
 		return null;
 
-	this.list=document.createElement("ul");
-	this.list.className="sortable";
-	this.editor.div.appendChild(this.list);
-
-	$("ul.sortable").sortable();
+	this.config_list=document.createElement("ul");
+	this.config_list.className="sortable";
 
 	this.break0=document.createElement("br");
-	this.editor.div.appendChild(this.break0);
 
 	this.button=document.createElement("input");
 	this.button.type="button";
 	this.button.value="Configure";
 	this.button.className="btn btn-sm btn-primary";
-
-	var myself=this;
 	this.button.onclick=function(){myself.editor.configure(myself.get_value());};
-	this.editor.div.appendChild(this.button);
 
-	this.editor.onconfigchange=function(config_text){myself.update(config_text);};
+	this.adder=document.createElement("select");
+
+	this.editor.div.appendChild(this.config_list);
+	this.editor.div.appendChild(this.break0);
+	this.editor.div.appendChild(this.button);
+	this.editor.div.appendChild(this.adder);
+
+	$("ul.sortable").sortable();
 }
 
 config_gui_t.prototype.get_value=function()
 {
-	for(var ii=0;ii<this.editor.options.length;++ii)
-		console.log(this.editor.options[ii]);
-
 	var config_text="";
 
 	try
 	{
-		for(var ii=0;ii<this.list.children.length;++ii)
+		for(var ii=0;ii<this.config_list.children.length;++ii)
 		{
 			var arg_count=0;
-			var child=this.list.children[ii];
+			var child=this.config_list.children[ii];
 			config_text+=child.tabula.type+"(";
 
 			for(var jj=0;jj<child.children.length;++jj)
@@ -607,7 +648,7 @@ config_gui_t.prototype.create_serial_drop=function(value)
 	return drop;
 }
 
-config_gui_t.prototype.update=function(config_text)
+config_gui_t.prototype.update_configs=function(config_text)
 {
 	try
 	{
@@ -626,12 +667,11 @@ config_gui_t.prototype.update=function(config_text)
 					li.className="list-group-item";
 					li.tabula={type:configs[ii].type,args:new Array()};
 
-					var button=document.createElement("img");
-					button.src="js/jquery/close.png";
+					var button=document.createElement("span");
+					button.className="close";
+					button.innerHTML="x";
 					button.li=li;
-					button.onmouseover=function(){this.src="js/jquery/close_rollover.png";};
-					button.onmouseout=function(){this.src="js/jquery/close.png";};
-					button.onclick=function(){myself.list.removeChild(li);};
+					button.onclick=function(){myself.config_list.removeChild(li);};
 					li.appendChild(button);
 
 					var text=document.createTextNode(configs[ii].type+" ");
@@ -651,13 +691,35 @@ config_gui_t.prototype.update=function(config_text)
 						}
 					}
 
-					myself.list.appendChild(li);
+					myself.config_list.appendChild(li);
 				})();
 			}
 		}
 	}
 	catch(e)
 	{
-		console.log("config_gui_t::update() - "+e);
+		console.log("config_gui_t::update_configs() - "+e);
+	}
+}
+
+config_gui_t.prototype.update_options=function(options)
+{
+	try
+	{
+		var myself=this;
+
+		for(var ii=0;ii<options.length;++ii)
+		{
+			(function()
+			{
+				var option=document.createElement("option");
+				option.text=options[ii].type;
+				myself.adder.appendChild(option);
+			})();
+		}
+	}
+	catch(e)
+	{
+		console.log("config_gui_t::update_options() - "+e);
 	}
 }
