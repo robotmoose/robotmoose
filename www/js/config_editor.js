@@ -526,11 +526,13 @@ function config_gui_t(div,robot_name)
 {
 	var myself=this;
 	this.editor=new config_editor_t(div,robot_name);
-	this.editor.onconfigschange=function(config_text){myself.update_configs(config_text);};
-	this.editor.onoptionschange=function(options){myself.update_options(options);};
 
 	if(!this.editor)
 		return null;
+
+	this.editor.onconfigschange=function(config_text){myself.update_configs(config_text);};
+	this.editor.onoptionschange=function(options){myself.update_options(options);};
+	this.editor.div.style.width=320;
 
 	this.config_list=document.createElement("ul");
 	this.config_list.className="sortable";
@@ -667,13 +669,6 @@ config_gui_t.prototype.update_configs=function(config_text)
 					li.className="list-group-item";
 					li.tabula={type:configs[ii].type,args:new Array()};
 
-					var button=document.createElement("span");
-					button.className="close";
-					button.innerHTML="x";
-					button.li=li;
-					button.onclick=function(){myself.config_list.removeChild(li);};
-					li.appendChild(button);
-
 					var text=document.createTextNode(configs[ii].type+" ");
 					li.appendChild(text);
 
@@ -690,6 +685,13 @@ config_gui_t.prototype.update_configs=function(config_text)
 							li.tabula.args.push("S");
 						}
 					}
+
+					var button=document.createElement("span");
+					button.className="close";
+					button.innerHTML="x";
+					button.li=li;
+					button.onclick=function(){myself.config_list.removeChild(li);};
+					li.appendChild(button);
 
 					myself.config_list.appendChild(li);
 				})();
