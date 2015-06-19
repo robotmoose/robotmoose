@@ -167,9 +167,9 @@ config_editor_t.prototype.configure=function(config_text)
 			},
 			"application/json");
 	}
-	catch(e)
+	catch(error)
 	{
-		console.log(e);
+		console.log(error);
 	}
 }
 
@@ -487,7 +487,7 @@ function config_cli_t(div,robot_name)
 	this.button=document.createElement("input");
 	this.button.type="button";
 	this.button.value="Configure";
-	this.button.className="btn btn-sm btn-primary";
+	this.button.className="btn btn-med btn-primary";
 
 	var myself=this;
 	this.button.onclick=function(){myself.editor.configure(myself.code_editor.getValue());};
@@ -534,6 +534,9 @@ function config_gui_t(div,robot_name)
 	this.editor.onoptionschange=function(options){myself.update_options(options);};
 	this.editor.div.style.width=320;
 
+	this.config_list_prettifier=document.createElement("div");
+	div.className="form-inline";
+
 	this.config_list=document.createElement("ul");
 	this.config_list.className="sortable";
 
@@ -542,17 +545,49 @@ function config_gui_t(div,robot_name)
 	this.button=document.createElement("input");
 	this.button.type="button";
 	this.button.value="Configure";
-	this.button.className="btn btn-sm btn-primary";
-	this.button.onclick=function(){myself.editor.configure(myself.get_value());};
+	this.button.className="btn btn-med btn-primary";
+	this.button.onclick=function(){myself.configure()};
 
 	//this.adder=document.createElement("select");
 
-	this.editor.div.appendChild(this.config_list);
+	this.config_list_prettifier.appendChild(this.config_list);
+	this.editor.div.appendChild(this.config_list_prettifier);
 	this.editor.div.appendChild(this.break0);
 	this.editor.div.appendChild(this.button);
 	//this.editor.div.appendChild(this.adder);
 
 	$("ul.sortable").sortable();
+}
+
+config_gui_t.prototype.configure=function()
+{
+	this.editor.configure(this.get_value());
+}
+
+config_gui_t.prototype.select_update=function()
+{
+	var ok=true;
+
+	for(var ii=0;ii<this.config_list.children.length;++ii)
+	{
+		var child=this.config_list.children[ii];
+
+		for(var jj=0;jj<child.children.length;++jj)
+		{
+			var grandchild=child.children[jj];
+
+			if(grandchild.tagName=="SELECT"&&grandchild.selectedIndex==0)
+			{
+				ok=false;
+				break;
+			}
+		}
+
+		if(!ok)
+			break;
+	}
+
+	this.button.disabled=!ok;
 }
 
 config_gui_t.prototype.get_value=function()
@@ -593,9 +628,9 @@ config_gui_t.prototype.get_value=function()
 			config_text+=");\n";
 		}
 	}
-	catch(e)
+	catch(error)
 	{
-		console.log("config_gui_t::get_value() - "+e);
+		console.log("config_gui_t::get_value() - "+error);
 	}
 
 	return config_text;
@@ -604,7 +639,12 @@ config_gui_t.prototype.get_value=function()
 config_gui_t.prototype.create_pin_drop=function(value)
 {
 	var drop=document.createElement("select");
-	drop.style.width=48;
+	drop.style.width=80;
+	drop.className="form-control"
+
+	var title_option=document.createElement("option");
+	title_option.text="Pin";
+	drop.add(title_option);
 
 	for(var ii=0;ii<=21;++ii)
 	{
@@ -628,13 +668,21 @@ config_gui_t.prototype.create_pin_drop=function(value)
 		drop.add(option);
 	}
 
+	var myself=this;
+	drop.onchange=function(){myself.select_update();};
+
 	return drop;
 }
 
 config_gui_t.prototype.create_serial_drop=function(value)
 {
 	var drop=document.createElement("select");
-	drop.style.width=48;
+	drop.style.width=80;
+	drop.className="form-control"
+
+	var title_option=document.createElement("option");
+	title_option.text="Port";
+	drop.add(title_option);
 
 	for(var ii=0;ii<=3;++ii)
 	{
@@ -646,6 +694,9 @@ config_gui_t.prototype.create_serial_drop=function(value)
 
 		drop.add(option);
 	}
+
+	var myself=this;
+	drop.onchange=function(){myself.select_update();};
 
 	return drop;
 }
@@ -698,9 +749,9 @@ config_gui_t.prototype.update_configs=function(config_text)
 			}
 		}
 	}
-	catch(e)
+	catch(error)
 	{
-		console.log("config_gui_t::update_configs() - "+e);
+		console.log("config_gui_t::update_configs() - "+error);
 	}
 }
 
@@ -720,8 +771,8 @@ config_gui_t.prototype.update_options=function(options)
 			})();
 		}
 	}
-	catch(e)
+	catch(error)
 	{
-		console.log("config_gui_t::update_options() - "+e);
+		console.log("config_gui_t::update_options() - "+error);
 	}*/
 }
