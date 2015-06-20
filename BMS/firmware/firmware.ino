@@ -228,9 +228,9 @@ void setCFGR1( float cellVoltage[], byte & CFGR1 )
 void Charge()    // Function to turn on charging and cell balancing
 { 
   // Artificially set to test if statements:
-  //cellVoltage[0] = 4.3;
-  //cellVoltage[1] = 4.1;
-  //cellVoltage[2]=4.19;                   
+  //cellVoltage[0] = 3.3;
+  //cellVoltage[1] = 3.1;
+  //cellVoltage[2]=  3.2;                   
   //digitalWrite(CHARGE_INPUT, HIGH);
   
   
@@ -263,6 +263,10 @@ void Charge()    // Function to turn on charging and cell balancing
 
 void BatteryCritical()
 {
+  // Artificially set to test if statements:
+  //cellVoltage[0] = 3.3;
+  //cellVoltage[1] = 3.1;
+  //cellVoltage[2]=  3.2; 
   if ((cellVoltage[0] + cellVoltage[1] + cellVoltage[2]) == 0)
   {
     digitalWrite(OK, LOW);
@@ -279,7 +283,7 @@ void BatteryCritical()
     }
     else if (digitalRead(CHARGE_INPUT == HIGH))
     {
-      digitalWrite(OK, HIGH);
+      digitalWrite(OK, LOW);
       Serial.println("Battery is AT OR BELOW MINIMUM VOLTAGE!\nSYSTEM OK pin set to LOW.");
     }
   }
