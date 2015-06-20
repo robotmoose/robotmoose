@@ -188,6 +188,7 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 			
 			if (retArray.size()>1) retArray+=","; // add separator to output
 			std::string value=superstar_db.get(bufLoc); // add path to output
+			if (value=="") value="{}"; // mark empty JSON objects
 			printf("   mget path: %s -> %s\n",bufLoc,value.c_str());
 			retArray+=value;
 
