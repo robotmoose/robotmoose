@@ -77,7 +77,7 @@ void sabertooth_v2_controller_t::send_motor_m(const uint8_t address,const uint8_
 
 	serial_m->write(data,4);
 }
-create2_controller_t::create2_controller_t(roomba_t& roomba): roomba_m(&roomba)
+create2_controller_t::create2_controller_t(roomba_t& roomba): roomba_m(&roomba),floorPresent(true)
 {}
 
 void create2_controller_t::loop()
@@ -104,12 +104,28 @@ void create2_controller_t::loop()
 		roomba_m->set_led_clean(255,0xff); // orange == 128
 		roomba_m->led_update();
 	}
+        floorPresent = true;
+	for(int i=0; i<4; ++i)
+	{
+		if(roomba_m->get_sensors().floor[i] == 0)
+		{
+			floorPresent = false;
+		}
+	}
+	
+	
+	
 	motor_controller_t::loop();
 }
 
 void create2_controller_t::drive(const int16_t left,const int16_t right)
 {
-	roomba_m->drive(left<<1,right<<1); // multiply commands by 2, to go from +-256 to +-512
+	int l = left;
+	int r = right;
+	if(!floorPresent &&( left > 0 || right >0))
+	l=r=0;
+
+	roomba_m->drive(l<<1,r<<1); // multiply commands by 2, to go from +-256 to +-512
 }
 
 /// Register our devices with tabula_setup
