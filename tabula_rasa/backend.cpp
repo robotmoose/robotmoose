@@ -427,7 +427,7 @@ public:
 	std::string send_network(void);
 
 	void tabula_setup(std::string config);
-	void read_config(std::string config);
+	void read_config(std::string config,const json::Value& configs,const int counter);
 	void send_config(std::string config);
 
 	void send_options(void);
@@ -670,7 +670,7 @@ void robot_backend::do_network()
 	std::cout<<"Outgoing sensors: "<<send_json<<"\n";
 
 	std::string send_path=robotName+"/sensors";
-	std::string read_path=robotName+"/pilot";
+	std::string read_path=robotName+"/pilot,"+robotName+"/config";
 	std::string request=send_path+"?set="+send_json+"&get="+read_path;
 	std::string read_json=superstar_send_get("/superstar/"+request);
 
@@ -686,16 +686,24 @@ void robot_backend::do_network()
 void robot_backend::read_network(const std::string &read_json)
 {
 	try {
-		json::Value v=json::Deserialize(read_json);
+		json::Array return_json=json::Deserialize(read_json);
+
+		if(return_json.size()!=2)
+			throw std::runtime_error("Invalid json received (expected 2 arguments) - "+read_json);
+
+		json::Value pilot=return_json[0];
+		json::Object config=return_json[1];
 
 		// Pull registered commands from JSON
-		for (unsigned int i=0;i< commands.size();i++) commands[i]->modify(v);
+		for (unsigned int i=0;i< commands.size();i++) commands[i]->modify(pilot);
 
 #ifndef	_WIN32
 		// Script execution magic
 		static std::string last_cmd_arg="";
-		std::string run=v["cmd"]["run"];
-		std::string arg=v["cmd"]["arg"];
+		std::string run=pilot["cmd"]["run"];
+		std::string arg=pilot["cmd"]["arg"];
+
+		read_config("",config["configs"].ToArray(),config["counter"].ToInt());
 
 		if (run.find_first_of("./\\\"")==std::string::npos) { // looks clean
 			std::string cmd_arg=run+arg;
@@ -727,8 +735,8 @@ void robot_backend::read_network(const std::string &read_json)
 		if (sim) {
 			double distance_per_power=0.02; // meters per timestep
 			double wheelbase=0.3; // meters
-			double delL=v["power"]["L"];
-			double delR=v["power"]["R"];
+			double delL=pilot["power"]["L"];
+			double delR=pilot["power"]["R"];
 			location.move_wheels(
 				delL*distance_per_power,
 				delR*distance_per_power,
@@ -778,26 +786,17 @@ void robot_backend::tabula_setup(std::string config)
 	}
 }
 
-void robot_backend::read_config(std::string config)
+void robot_backend::read_config(std::string config,const json::Value& configs,const int counter)
 {
 	std::string path = "/superstar/" + robotName + "/config?get";
 	try
-	{ // send all registered tabula devices
-		std::string response=superstar_send_get(path);
-		json::Value config_json=json::Deserialize(response);
+	{
+		for(size_t ii=0;ii<configs.ToArray().size();++ii)
+			config+=configs.ToArray()[ii].ToString()+"\n";
 
-		std::cout<<"Read config JSON from "<<path<<"\n\tgot:  ";
-		std::cout<<json::Serialize(config_json)<<std::endl;
-
-		json::Array& configs=config_json["configs"].ToArray();
-		std::cout<<"foo!"<<std::endl;
-
-		for(size_t ii=0;ii<configs.size();++ii)
-			config+=configs[ii].ToString()+"\n";
-
-		if(myCounter!=config_json["counter"].ToInt())
+		if(myCounter!=counter)
 		{
-			myCounter=config_json["counter"].ToInt();
+			myCounter=counter;
 			tabula_setup(config);
 		}
 
@@ -927,7 +926,6 @@ int main(int argc, char *argv[])
 	backend->send_config(robot_config);
 
 	while (1) { // talk to robot via backend
-		backend->read_config("");
 		backend->do_network();
 		backend->send_serial();
 #ifdef __unix__
