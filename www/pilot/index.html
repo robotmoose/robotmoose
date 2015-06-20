@@ -35,13 +35,14 @@
 					<li role="presentation"><a href="#interaction" aria-controls="interaction" role="tab" data-toggle="tab">Interaction</a></li>
 					<li role="presentation"><a href="#sensors" aria-controls="sensors" role="tab" data-toggle="tab">Sensors</a></li>
 					<li role="presentation"><a href="#robot_health" aria-controls="robot_health" role="tab" data-toggle="tab">Robot Health</a></li>
+					<li role="presentation"><a href="#configuration" aria-controls="configuration" role="tab" data-toggle="tab">Configuration</a></li>
 				</ul>
 
 				<div class="tab-content">
 					<div role="tabpanel" class="tab-pane active" id="setup">
 						<!--Robot Name:<input type="text" id="robot_name" rows="1" cols="30" value="layla/uaf"/>!-->
 						Robot Name: <input type="text" id="robot_name" rows="1" cols="30" value="demo"/>
-									
+
 						<input value="Video - Gruveo" type="button" onClick="runCmd('video','r'+((new Date()).getTime())); openGruveoVideo()"/><br/>
 
 						RTC video name: <input type="text" id="robot_videoname" rows="1" cols="30" onChange="updateRTCVideo()" value="layla/uaf"/>
@@ -97,6 +98,9 @@
 							</tr>
 						</table>
 					</div>
+					<div role="tabpanel" class="tab-pane" id="configuration">
+						<div id="tabula_config_gui"></div>
+					</div>
 				</div>
 
 				<div id="status_area" style="font-style:italic;">
@@ -105,10 +109,28 @@
 			</div>
 		</div>
 
-		<!--Color Picker Source-->
-		<script type="text/javascript" src="/js/jscolor/jscolor.js"></script>
-		<script type="text/javascript" src="/js/input.js"></script>
-		<script type="text/javascript" src="/js/pilot.js"></script>
+		<script src="/js/jscolor/jscolor.js"></script>
+		<script src="/js/three/three.min.js"></script>
+		<script src="/js/3d.js"></script>
+		<script src="/js/input.js"></script>
+		<script src="/js/pilot.js"></script>
 		<script src="/js/auth/sha2_auth.js"></script>
+		<script src="/js/robot_2wd.js"></script>
+		<script src="/js/roomba_sim.js"></script>
+		<script src="/js/config_editor.js"></script>
+
+		<script>
+			var configurator_gui;
+
+			function setup()
+			{
+				configurator_gui=new config_gui_t(document.getElementById("tabula_config_gui"),"demo");
+
+				if(!configurator_gui)
+					alert("Could not create tabula configurer!");
+			}
+
+			setup();
+		</script>
 	</body>
 </html>
