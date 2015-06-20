@@ -187,7 +187,9 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 			if (nextComma!=0) *nextComma=0; // nul terminate at comma
 			
 			if (retArray.size()>1) retArray+=","; // add separator to output
-			retArray+=superstar_db.get(bufLoc); // add path to output
+			std::string value=superstar_db.get(bufLoc); // add path to output
+			printf("   mget path: %s -> %s\n",bufLoc,value.c_str());
+			retArray+=value;
 
 			if (nextComma==0) break; // done with this path
 			else bufLoc=nextComma+1; // move down string
