@@ -40,7 +40,7 @@
 				<div class="tab-content">
 					<div role="tabpanel" class="tab-pane active" id="setup">
 						<!--Robot Name:<input type="text" id="robot_name" rows="1" cols="30" value="layla/uaf"/>!-->
-						Robot Name: <input type="text" id="robot_name" rows="1" cols="30" value="demo"/>
+						Robot Name: <input type="text" id="robot_name" rows="1" cols="30" value="demo" onchange="setup();"/>
 
 						<input value="Video - Gruveo" type="button" onClick="runCmd('video','r'+((new Date()).getTime())); openGruveoVideo()"/><br/>
 
@@ -123,7 +123,8 @@
 
 			function setup()
 			{
-				configurator_gui=new config_gui_t(document.getElementById("tabula_config_gui"),"demo");
+				document.getElementById("tabula_config_gui").innerHTML="";
+				configurator_gui=new config_gui_t(document.getElementById("tabula_config_gui"),document.getElementById("robot_name").value);
 
 				if(!configurator_gui)
 					alert("Could not create tabula configurer!");
