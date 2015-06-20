@@ -465,8 +465,11 @@ void robot_backend::setup_devices(std::string robot_config)
 	// Clear existing lists of sensors and actuators
 	for (unsigned int i=0;i<commands.size();i++) delete commands[i];
 	commands.clear();
+	tabula_command_storage.clear();
+
 	for (unsigned int i=0;i<sensors.size();i++) delete sensors[i];
 	sensors.clear();
+	tabula_sensor_storage.clear();
 
 	// Counters for various devices:
 	int analogs=0;

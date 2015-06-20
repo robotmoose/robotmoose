@@ -29,7 +29,12 @@ public:
 	int count; /// number of used entries in array
 	
 	tabula_control_storage() :array(0), count(0) {}
-	~tabula_control_storage() { free(array); array=0; count=0; }
+	~tabula_control_storage() { clear(); }
+
+	// Deallocate all space used in this storage object
+	void clear(void) {
+		free(array); array=0; count=0; 
+	}
 	
 	/// Return the index of a new allocation of this size
 	template <class T>
