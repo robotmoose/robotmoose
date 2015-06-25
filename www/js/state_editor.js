@@ -15,6 +15,8 @@ function state_editor_t(div)
 	this.div = div;
 	if(!div)
 		return null;
+		
+	this.states = [];
 	
 	this.table = document.createElement("table");
 		this.table.className = "table table-bordered";
@@ -31,14 +33,14 @@ function state_editor_t(div)
 		this.add_row.type = "button";
 		this.add_row.value = "Add State";
 		this.add_row.className = "btn btn-primary";
-		this.add_row.onclick = function(){myself.addRow(myself.table);};
+		this.add_row.onclick = function(){myself.addRow();};
 	
 	
 	this.submit_code = document.createElement("input");
 	this.submit_code.type = "button";
 		this.submit_code.value = "Submit Code";
 		this.submit_code.className = "btn btn-primary";
-	    this.submit_code.onclick = function(){console.log("Submit button pressed");myself.collectData("send");}; // TODO: Implement code submission 
+	    this.submit_code.onclick = function(){console.log("Submit button pressed");myself.collectData("send");}; 
 		this.submit_code.style.marginLeft = "1%";
 	
 	this.save_data = document.createElement("input");
@@ -70,14 +72,15 @@ function state_editor_t(div)
 	
 }
 
-state_editor_t.prototype.addRow = function(table)
+state_editor_t.prototype.addRow = function()
 {
 	var myself = this;
+	console.log(this.table.children);
 	var rows = document.getElementById("states_table").rows.length;
 	console.log("# of rows :"+rows);
 	//var rows = table.Rows.length;
 	
-	var row = table.insertRow(-1);
+	var row = this.table.insertRow(-1);
 	var cell1 = row.insertCell(0);
 	cell1.id = "state_cell";
 	document.getElementById("state_cell").style.width = '1%';
@@ -100,19 +103,42 @@ state_editor_t.prototype.addRow = function(table)
 
 state_editor_t.prototype.collectData = function(action)
 {
-	var table = document.getElementById("states_table");
-	console.log("In collectData()")
-	for (var i = 0,row ; row = table.rows[i]; i++)
+
+	 console.log("Action Requested: "+ action);
+	//var table = document.getElementById("states_table");
+	var myself = this;
+	
+	myself.states =[]; //Clear out the array so it doesnt make duplicate data on every update
+	
+	for(var i = 1; i<this.table.rows.length; i++)
 	{
-		{
-			
-		}
-		for(var j = 0,cell, cell = row.cells[i]; j++;)
-		{
-		}
+		
+		var row = this.table.rows[i];
+		
+		myself.states.push({name:row.cells[0].children[0].value,code:row.cells[1].children[0].value});
+		
 	}
-	console.log("action requested :"+ action);
+	console.log(myself.states);
+	console.log("In collectData()");
+	
+	// If action == save, then save to disk else send off to server 
+	if(action =="save")
+		myself.saveData();
+	else
+		myself.sendData();
+	
+}
+
+state_editor_t.prototype.saveData = function()
+{
+	console.log("In saveData()");
+	
 	
 }
 
 
+state_editor_t.prototype.sendData = function()
+{
+	console.log("In saveData()");
+	
+}
