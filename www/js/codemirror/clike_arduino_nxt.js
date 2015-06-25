@@ -329,4 +329,12 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
     atoms: words("motorA motorB motorC S1 S2 S3 S4 true false null"),
     hooks: {"#": cppHook}
   });
+
+  mimes(["text/x-javascript"], {
+    name: "clike",
+    keywords: words("var function try catch throw switch"),
+    blockKeywords: words(""),
+    atoms: words("null"),
+    hooks: {"#": cppHook}
+  });
 }());

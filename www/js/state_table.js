@@ -28,6 +28,7 @@ function load_dependencies()
 	load_js("/js/bootstrap/bootstrap.min.js");
 	load_link("/css/bootstrap.min.css");
 	load_js("/js/codemirror/clike_arduino_nxt.js");
+	load_js("/js/codemirror/clike_arduino_nxt.js");
 	load_js("/js/codemirror/addon/edit/matchbrackets.js");
 	load_js("/js/codemirror/addon/dialog/dialog.js");
 	load_js("/js/codemirror/addon/search/search.js");
@@ -42,21 +43,24 @@ function load_dependencies()
 
 (function(){load_dependencies()})();
 
-function state_table_t(div)
+function state_table_t(div,robot_name)
 {
 	var myself=this;
-	this.div=div;
 
-	if(!this.div)
+	this.div=div;
+	this.robot_name=robot_name;
+
+	if(!this.div||!this.robot_name)
 		return null;
 
-	this.div.style.width=480;
+	this.div.style.width=640;
 
 	this.state_list_prettifier=document.createElement("div");
 	this.state_list_prettifier.className="form-inline";
 
 	this.state_list=document.createElement("ul");
-	this.state_list.className="sortable";
+	this.state_list.className="sortable_handle";
+	this.state_list.style.paddingLeft=0;
 
 	this.break0=document.createElement("br");
 
@@ -86,47 +90,81 @@ function state_table_t(div)
 	this.div.appendChild(this.break0);
 	this.div.appendChild(this.adder_prettifier);
 
-	$("ul.sortable").sortable();
+	this.row_data=[];
+
+	$("ul.sortable_handle").sortable({handle:'.glyphicon'});
+
+	this.download();
+}
+
+state_table_t.prototype.download=function()
+{
+	var myself=this;
+
+	try
+	{
+		send_request("GET","/superstar/"+this.robot_name,"states","?get",
+			function(response)
+			{
+				var states_json=JSON.parse(response);
+				myself.state_list.length=0;
+
+				for(var ii=0;ii<states_json.length;++ii)
+				{
+					if(!states_json[ii].name)
+						throw "Could not find state name of json object.";
+
+					if(!states_json[ii].code)
+						throw "Could not find state code of json object.";
+
+					myself.create_row(states_json[ii].name,states_json[ii].code);
+				}
+			},
+			function(error)
+			{
+				throw error;
+			},
+			"application/json");
+	}
+	catch(error)
+	{
+		console.log("state_table_t::download() - "+error);
+	}
 }
 
 state_table_t.prototype.upload=function()
 {
-	this.get_value();
-}
-
-state_table_t.prototype.get_value=function()
-{
-	var states=[];
-
 	try
 	{
+		var states_json=[];
+
 		for(var ii=0;ii<this.state_list.children.length;++ii)
 		{
 			var child=this.state_list.children[ii];
 
-			if(child.children.length!=3)
-				throw "Row has more than 3 things in it!"
+			if(!child.state_name)
+				throw "Could not find state name of li.";
 
-			var input=child.children[0];
-			var textarea=child.children[1];
+			if(!child.state_code)
+				throw "Could not find state code of li.";
 
-			if(input.tagName!="INPUT")
-				throw "First element should be an input!"
-
-			if(textarea.tagName!="TEXTAREA")
-				throw "Second element should be a textarea!"
-
-			states.push({name:input.value,code:textarea.innerHTML});
+			states_json.push({name:child.state_name.value,code:child.state_code.getValue()});
 		}
+
+		send_request("GET","/superstar/"+this.robot_name,"states","?set="+JSON.stringify(states_json),
+			function(response)
+			{
+			},
+			function(error)
+			{
+				throw error;
+			},
+			"application/json");
 	}
 	catch(error)
 	{
-		console.log("state_table_t::get_value() - "+error);
+		console.log("state_table_t::upload() - "+error);
 	}
-
-	console.log(states);
-
-	return states;
 }
 
 state_table_t.prototype.create_row=function(name,code)
@@ -138,13 +176,33 @@ state_table_t.prototype.create_row=function(name,code)
 		var li=document.createElement("li");
 		li.className="list-group-item";
 
+		var table=document.createElement("table");
+		var tr=document.createElement("tr");
+		var td0=document.createElement("td");
+		var td1=document.createElement("td");
+		var td2=document.createElement("td");
+
+		tr.style.verticalAlign="top";
+
+		var handle=document.createElement("span");
+		handle.className="glyphicon glyphicon-move";
+		td0.appendChild(handle);
+
 		var input=document.createElement("input");
+		input.className="form-control";
 		input.value=name;
-		li.appendChild(input);
+		input.style.marginLeft=20;
+		input.style.marginRight=20;
+		td0.appendChild(input);
 
 		var textarea=document.createElement("textarea");
 		textarea.innerHTML=code;
-		li.appendChild(textarea);
+		td1.appendChild(textarea);
+
+		var code_editor=CodeMirror.fromTextArea(textarea,
+			{indentUnit:4,indentWithTabs:true,lineNumbers:true,
+				matchBrackets:true,mode:"text/x-javascript"});
+		code_editor.setSize(320,240);
 
 		var button=document.createElement("span");
 		button.className="close";
@@ -153,6 +211,16 @@ state_table_t.prototype.create_row=function(name,code)
 		button.onclick=function(){myself.state_list.removeChild(li);};
 		li.appendChild(button);
 
+		tr.appendChild(td0);
+		tr.appendChild(td1);
+		tr.appendChild(td2);
+		table.appendChild(tr);
+		li.appendChild(table);
+
+		li.state_name=input;
+		li.state_code=code_editor;
+
 		myself.state_list.appendChild(li);
+		code_editor.refresh();
 	})();
 }
