@@ -25,3 +25,19 @@ ul.sortable
 	list-style-image:url("/js/jquery/invisible.png");
 	padding-left:0;
 }
+
+ul.sortable_handle li.placeholder
+{
+	position: relative;
+}
+
+ul.sortable_handle li.placeholder:before
+{
+	position: absolute;
+}
+
+ul.sortable_handle
+{
+	list-style-image:url("/js/jquery/invisible.png");
+	padding-left:0;
+}
