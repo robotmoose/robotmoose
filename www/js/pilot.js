@@ -50,7 +50,7 @@ function emptyLED()
 }
 //Returns empty UltraSonic Sensors
 function emptyUSonic()
-{	
+{
 	return {USound1:0, USound2:0, USound3:0, USound4:0, USound5:0};
 }
 
@@ -72,13 +72,13 @@ var pilot={
 
 
 var Sensors={
-	USonic:emptyUSonic() 
+	USonic:emptyUSonic()
 };
 
 function LEDtoggle(){
 	pilot.LED.On = document.getElementById("LEDtoggle").checked;
 
-// If LED is Off, make LED Demo unclickable 
+// If LED is Off, make LED Demo unclickable
 	if(document.getElementById("LEDtoggle").checked) {document.getElementById("LEDdemo").disabled=false;}
 	else {document.getElementById("LEDdemo").disabled=true;}
 	pilot_send();
@@ -102,7 +102,7 @@ function robot_name() {
 function superstar_send(starpath,starcmd,callback) {
 	var url_start="/superstar/"; // absolute URL
 	var url=url_start+starpath+starcmd
-	
+
 	var xmlhttp=new XMLHttpRequest();
 	xmlhttp.onreadystatechange=function()
 	{ // this function is called when network progress happens
@@ -135,10 +135,10 @@ function pilot_send() {
 	var send_time=pilot.time=pilot_time();
 	var pilotStr=JSON.stringify(pilot);
 	//console.log(pilotStr);
-	
+
 	var starpath=robot_name()+"/pilot";
 	var starcmd="?set="+encodeURIComponent(pilotStr);
-	
+
 	var password=document.getElementById('robot_auth').value;
 	if (password) { // append authentication code
 		var seq="0"; //<- FIXME: get sequence number on first connection
@@ -164,7 +164,7 @@ function pilot_send() {
 			}
 		}
 	});
-	
+
 	sensor_receive(); // Read Sensor Data at every Send
 }
 
@@ -173,12 +173,12 @@ window.setInterval(function(){sensor_receive()},250);
 
 var sensors = {"error":"network not connected"};
 
-// Recieve Sensor Values sent by backend 
+// Recieve Sensor Values sent by backend
 function sensor_receive()
 {
 	var starpath=robot_name()+"/sensors";
 	var starcmd="?get";
-	
+
 	superstar_send(starpath,starcmd,function(xmlhttp) {
 		if (xmlhttp.status==200) {
 			var sensor_data=xmlhttp.responseText;
@@ -191,12 +191,12 @@ function sensor_receive()
 				sensors.data=sensor_data;
     			}
 		}
-		
+
 		var out=document.getElementById('p_outputSensors');
 		if (out) {
 			var prettySensors=JSON.stringify(sensors,null,4);
-			prettySensors=prettySensors.replace(/["]/g,"");
-			out.innerHTML="<pre>robot="+prettySensors+"</pre>";
+			//prettySensors=prettySensors.replace(/["]/g,"");
+			out.innerHTML=prettySensors;
 		}
 	});
 }
@@ -215,11 +215,11 @@ function get_pilot_power() {
 var keyInput;
 var keyboardIsDriving=false;
 
-document.addEventListener("visibilitychange",handleVisibilityChange); // Listens for any window visibilty change 
+document.addEventListener("visibilitychange",handleVisibilityChange); // Listens for any window visibilty change
 
 window.setInterval(focusCheck,100); // Check if window is in focus every 100 ms
 
-// If window/tab is hidden, stop the robot 
+// If window/tab is hidden, stop the robot
 function handleVisibilityChange()
 {
 	if(document.hidden)
@@ -230,11 +230,11 @@ function handleVisibilityChange()
 	}
 }
 
-//Stop robot if window is not in focus 
+//Stop robot if window is not in focus
 function focusCheck()
 {
 	    //console.log(document.hasFocus());
-		if(!document.hasFocus()) 
+		if(!document.hasFocus())
 		{
 			pilot.power = emptyPower();
 			pilot_send();
@@ -244,31 +244,31 @@ function focusCheck()
 function keyDown(key,alternateKey) {
 	var code=key.charCodeAt(0);
 	// console.log("Key code "+code+" : "+keyInput.keys_down[code]);
-	
+
 	if (keyInput.keys_down[code]) return true;
-	
+
 	if (alternateKey) return keyDown(alternateKey);  // hacky recursion
 	return false;
 }
 
 //This function is called at every keypress event
-// FIXME: Add proportional control 
+// FIXME: Add proportional control
 function keyboardDrive()
 {
 	// console.log("Keyboard activity");
 	var maxPower=get_pilot_power();
 
-	var forward=0.0, turn=0.0; 
-	
-	if(keyDown('a','A')) turn-=1.0; // 'a' is pressed, turn left 
-	if(keyDown('d','D')) turn+=1.0; //'d' is pressed, turn right 
-	if(keyDown('s','S')) forward-=1.0; //'s' is pressed, reverse 
+	var forward=0.0, turn=0.0;
+
+	if(keyDown('a','A')) turn-=1.0; // 'a' is pressed, turn left
+	if(keyDown('d','D')) turn+=1.0; //'d' is pressed, turn right
+	if(keyDown('s','S')) forward-=1.0; //'s' is pressed, reverse
 	if(keyDown('w','W')) forward+=1.0;
 	if(keyDown(' ')) turn=forward=0.0; // stop!
-	
+
 	if (turn==0.0 && forward==0.0) keyboardIsDriving=false;
 	else keyboardIsDriving=true;
-	
+
 	var newPower=emptyPower();
 	newPower.L=clamp(maxPower*(forward+turn),-maxPower,+maxPower);
 	newPower.R=clamp(maxPower*(forward-turn),-maxPower,+maxPower);
@@ -282,13 +282,13 @@ var mouse_down=0;
 function pilot_mouse(event,upState) {
 // Allow user to set maximum power
 	var maxPower=get_pilot_power();
-	
+
 	var arrowDiv=document.getElementById('pilot_arrows');
 	var frac=getMouseFraction(event,arrowDiv);
 	var str="";
 
 	var dir={ forward: pretty(0.5-frac.y), turn:pretty(frac.x-0.5) };
-	
+
 	str+="Move "+dir.forward+" forward, "+dir.turn+" turn<br>\n";
 
 //Proportional control.  The 2.0 is because mouse is from -0.5 to +0.5
@@ -349,7 +349,7 @@ function updateRTCVideo()
 function openGruveoVideo()
 {
   var robotVideo = robot_name().replace(/[/]/g,"");
- 
+
   var videoURL = "http://gruveo.com/#" + robotVideo;
 
   // On Firefox or Chrome, specifying a width and height opens a new window, not a tab.
@@ -364,7 +364,7 @@ function updateRGB()
   var the_color_picker=document.getElementById("color_picker");
   var rgb=the_color_picker.color.rgb;
 
-  
+
   pilot.LED.R=rgb[0];
   document.getElementById('LED_red').value=rgb[0];
 
@@ -397,14 +397,14 @@ function mapLoop(dt) {
 		var angle_rad=sensors.location.angle*Math.PI/180.0;
 		// Convert position from meters to mm (rendering units)
 		var P=new vec3(sensors.location.x,sensors.location.y,0.0).te(1000.0);
-		
+
 		// Move onscreen robot there
 		mapRobot.set_location(P,angle_rad);
-		
+
 		// Place the wheels (so wheel tracks work)
 		mapRobot.wheel[0]=mapRobot.world_from_robot(150,+Math.PI*0.5);
 		mapRobot.wheel[1]=mapRobot.world_from_robot(150,-Math.PI*0.5);
-		
+
 		// Check for obstacle sensors
 		if (sensors.lidar) {
 			if (sensors.lidar.change!=last_lidar_change) {
@@ -427,7 +427,7 @@ function pilotReady() {
 	if (map) {
 		var setup=function() {
 			renderer.set_size(map.offsetWidth,map.offsetWidth); // FIXME resize this
-		
+
 			// Add grid
 			var grid_cells=100;
 			var per_cell=1000; // one meter cells (in mm)
@@ -439,10 +439,10 @@ function pilotReady() {
 			var intensity=0.8;
 			var light=new renderer.create_light(intensity,
 				new THREE.Vector3(-size/2,-size/2,+size));
-			
+
 			// Add a robot
 			mapRobot=new roomba_t(renderer,null);
-		
+
 			// Set initial camera
 			renderer.controls.center.set(0,0,0); // robot?
 			renderer.controls.object.position.set(0,-1200,1400);
