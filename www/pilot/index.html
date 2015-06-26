@@ -1,12 +1,13 @@
-<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<!--#include virtual="/sources.html"-->
+		<script src="/js/pilot.js"></script>
 		<title>RobotMoose - Pilot</title>
 	</head>
 
 	<body role="document" onload="pilotReady();">
 		<!--#include virtual="/navbar.html"-->
+		<p id="p_outputSensors" style="display:none;"></p>
 
 		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
 			<div class="page-header">
@@ -17,14 +18,16 @@
 				<tr>
 					<td>
 						<div id="pilot_arrows" style="background-color:#808080;position:relative;width:400px;height:400px;" onmousedown="pilot_mouse(event,0)" ondblclick="pilot_mouse(event,2)" ondragstart="pilot_mouse(event,0)" onmouseout="pilot_mouse(event,1)"  onmouseup="pilot_mouse(event,1)" onmousemove="pilot_mouse(event,2)">
-							<img src="img/arrows_hard.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;"/>
-							<img id="glow" src="img/arrows_glow.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;"/>
+							<img src="/images/arrows_hard.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;"/>
+							<img id="glow" src="/images/arrows_glow.png" style="position:absolute;left:0px;top:0px;width:100%;height:100%;pointer-events:none;"/>
 						</div>
 					</td>
 					<td style="width:100%;height:100%">
 						<div id="video_area" style="width:100%;height:100%">
 							<iframe id="video_frame" style="width:100%;height:400px" src=""></iframe>
 						</div>
+						<!--<div id="map_area">
+						</div>-->
 					</td>
 				</tr>
 			</table>
@@ -82,7 +85,7 @@
 						</div>
 					</div>
 					<div role="tabpanel" class="tab-pane" id="sensors">
-						<p id="p_outputSensors"></p>
+						<div id="tabula_sensors_tree_viewer"></div>
 					</div>
 					<div role="tabpanel" class="tab-pane" id="robot_health">
 						<table>
@@ -119,17 +122,52 @@
 		<script src="/js/roomba_sim.js"></script>
 		<script src="/js/config_editor.js"></script>
 		<script src="/js/xmlhttp.js"></script>
+		<script src="/js/tree_viewer.js"></script>
+		<link rel="stylesheet" href="/css/bootstrap.min.css">
+		<script src="/js/jquery/jquery.min.js"></script>
+		<script src="/js/bootstrap/bootstrap.min.js"></script>
+		<script src="/js/codemirror/codemirror.js"></script>
+		<link rel="stylesheet" href="/js/jquery/jquery.sortable.css">
+		<script src="/js/jquery/jquery.sortable.min.js"></script>
+		<script src="/js/tree_viewer.js"></script>
 
 		<script>
 			var configurator_gui;
+			var sensors_tree_viewer;
 
 			function setup()
 			{
-				document.getElementById("tabula_config_gui").innerHTML="";
-				configurator_gui=new config_gui_t(document.getElementById("tabula_config_gui"),document.getElementById("robot_name").value);
+				var tabula_config_gui=document.getElementById("tabula_config_gui");
+				tabula_config_gui.innerHTML="";
+				configurator_gui=new config_gui_t(tabula_config_gui,document.getElementById("robot_name").value);
 
 				if(!configurator_gui)
 					alert("Could not create tabula configurer!");
+
+				var tabula_sensors_tree_viewer=document.getElementById("tabula_sensors_tree_viewer");
+				tabula_sensors_tree_viewer.innerHTML="";
+				sensors_tree_viewer=new tree_viewer_t(tabula_sensors_tree_viewer,null);
+
+				if(!sensors_tree_viewer)
+					alert("Could not create tabula sensor viewer!");
+
+				setInterval(function()
+				{
+					if(sensors_tree_viewer&&document.getElementById("p_outputSensors"))
+					{
+						var data=document.getElementById("p_outputSensors").innerHTML;
+
+						try
+						{
+							var json=JSON.parse(data);
+							sensors_tree_viewer.refresh({sensors:json});
+						}
+						catch(error)
+						{
+							console.log("Sensors Interval - "+error);
+						}
+					}
+				},1000);//Fixme:  Make an object for the sensors...instead of an interval...then fix this...
 			}
 
 			setup();

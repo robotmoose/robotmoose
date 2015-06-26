@@ -36,7 +36,23 @@ ul.sortable_handle li.placeholder:before
 	position: absolute;
 }
 
-ul.sortable_handle
+ul.sortable_nested
+{
+	list-style-image:url("/js/jquery/invisible.png");
+	padding-left:0;
+}
+
+ul.sortable_nested li.placeholder
+{
+	position: relative;
+}
+
+ul.sortable_nested li.placeholder:before
+{
+	position: absolute;
+}
+
+ul.sortable_nested
 {
 	list-style-image:url("/js/jquery/invisible.png");
 	padding-left:0;
