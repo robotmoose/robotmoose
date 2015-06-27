@@ -47,7 +47,7 @@ function state_editor_t(div)
 	this.save_data.type = "button";
 		this.save_data.value = "Save to disk";
 		this.save_data.className = "btn btn-primary";
-	    this.save_data.onclick = function(){console.log("Save button pressed");myself.collectData("save");}; // TODO: Implement saving to disk
+	    this.save_data.onclick = function(){console.log("Save button pressed");myself.collectData("save");};
 		this.save_data.style.marginLeft = "1%";
 	this.tbody = document.createElement("tbody");
 	
@@ -55,7 +55,7 @@ function state_editor_t(div)
 	this.load_data.type = "button";
 		this.load_data.value = "Load from disk";
 		this.load_data.className = "btn btn-primary";
-	    this.load_data.onclick = function(){console.log("Load button pressed");};//myself.collectData("save");}; // TODO: Implement loading from disk
+		this.load_data.onclick = function(){console.log("Load button pressed");myself.loadData();}; // TODO: Implement loading from disk
 		this.load_data.style.marginLeft = "1%";
 	this.tbody = document.createElement("tbody");
 	this.div.appendChild(this.table);
@@ -156,6 +156,53 @@ state_editor_t.prototype.saveData = function()
 	}
 	
 	
+}
+
+state_editor_t.prototype.loadData = function()
+{
+	var myself = this;
+	myself.states =[];
+	var validFile = false;
+	this.file = document.createElement('input');
+		this.file.type = "file";
+		this.file.className = "btn btn-primary";
+		this.file.id = "states_file";
+	this.div.appendChild(this.file);
+	
+	var statesFile = document.getElementById("states_file");
+	statesFile.addEventListener('change',updateFile,false);
+	
+	function updateFile()
+	{
+		
+		var fileName = statesFile.value;
+		//for(var i in fileName)
+		console.log(fileName);
+		var extension = fileName.split(".")[1];
+		console.log(extension);
+		if(extension != "json")
+			alert("Please select a json file");
+		else
+			validFile = true;
+	
+	
+		if(validFile) // Read file only if its a JSON file 
+		{
+			var loadedData = new FileReader(statesFile);
+			loadedData.readAsText();
+			loadedData.onerror = function (){ console.log("Error loading file" + loadData.error.name);}
+			loadedData.onload = function ()
+			{
+				console.log("load successfull");
+				myself.states = loadedData.result;
+				console.log(myself.states);
+			}
+		}
+   }
+	
+	//statesFile.onchange = function (){ statesFile = document.getElementById("states_file").value;console.log(statesFile);}
+	
+		
 }
 
 
