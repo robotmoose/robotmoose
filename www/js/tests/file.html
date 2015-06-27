@@ -1,0 +1,54 @@
+<html>
+	<head>
+		<!--#include virtual="/sources.html"-->
+	</head>
+	<body>
+		<div id="filediv"></div>
+
+		<style>
+		.btn-file {
+  position: relative;
+  overflow: hidden;
+}
+.btn-file input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 100%;
+  min-height: 100%;
+  font-size: 100px;
+  text-align: right;
+  filter: alpha(opacity=0);
+  opacity: 0;
+  background: red;
+  cursor: inherit;
+  display: block;
+}
+input[readonly] {
+  background-color: white !important;
+  cursor: text !important;
+}
+		</style>
+
+		<script>
+			function load(filename,data)
+			{
+				alert("loaded "+filename+"\n"+data);
+			}
+
+			function save(filename,data)
+			{
+				alert("saved "+filename+"\n"+data);
+			}
+
+			var file_div=document.getElementById("filediv");
+			var file_manager=new file_manager_t(file_div);
+
+			if(!file_manager)
+				alert("Could not create file manager!");
+
+			file_manager.onload=load;
+			file_manager.onsave=save;
+		</script>
+	</body>
+</html>
