@@ -131,7 +131,29 @@ state_editor_t.prototype.collectData = function(action)
 
 state_editor_t.prototype.saveData = function()
 {
+	var myself = this;
 	console.log("In saveData()");
+	var blobData = new Blob([JSON.stringify(myself.states)], {type: "application/json"});
+	var downloadURL = window.URL.createObjectURL(blobData);
+	console.log(downloadURL);
+	
+	var a = window.document.createElement('a');
+	a.href = downloadURL;
+	a.download = 'states.json';
+	
+	document.body.appendChild(a);
+	a.click();
+	
+	document.body.removeChild(a);
+	
+	this.div.addEventListener('focus',divFocus,false);
+	
+	// Destroy URL object once download is complete 
+	function divFocus()
+	{	
+		this.div.addEventListener('focus',divFocus,false);
+		window.URL.revokeObjectURL(downloadURL);
+	}
 	
 	
 }
@@ -139,6 +161,6 @@ state_editor_t.prototype.saveData = function()
 
 state_editor_t.prototype.sendData = function()
 {
-	console.log("In saveData()");
+	console.log("In sendData()");
 	
 }
