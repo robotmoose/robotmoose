@@ -1,19 +1,3 @@
-var url_path="/"; // "http://robotmoose.com/";
-
-function load_js(js)
-{
-	var scr=document.createElement("script");
-	scr.src=js;
-	document.head.appendChild(scr);
-};
-
-function load_dependencies()
-{
-	load_js(url_path+"js/processing/processing-1.4.1.min.js");
-};
-
-(function(){load_dependencies()})();
-
 function arduino_roomba_sensor_t()
 {
 	var myself=this;
@@ -292,8 +276,8 @@ arduino_roomba_t.prototype.set_receive_sensors=function(on)
 arduino_roomba_t.prototype.get_sensors=function()
 {
 	var myself=this;
-	
-	// HACK: return current sensor packet.  
+
+	// HACK: return current sensor packet.
 	//  This won't work in a loop, because the delays haven't happened yet
 	//  (could we run the sensor simulation forward through the delays perhaps?)
 	//  but might be semi-OK for simple sense-response processing.
@@ -349,7 +333,7 @@ function arduino_servo_t(controller)
 	};
 
 	myself.writeMicroseconds=function(us)
-	{	
+	{
 		myself.controller.add_command(
 			function (controller,data) {
 				myself.pos=Math.max(0,Math.min(180,myself.map(data.value,544,2400,0,180)));
@@ -491,22 +475,22 @@ function arduino_emulator_t()
 
 				myself.commands.length=0;
 				myself.json.setup();
-				
+
 				var call_loop=function(controller,data)
 				{
 					// flush any old commands (from setup, or last loop, etc)
 					myself.commands.length=0;
-					
+
 					// Run user's loop function
 					myself.json.loop();
 
 					// Call ourselves afterwards (weird recursive closure!)
 					myself.add_command(call_loop);
-					
+
 					// Start the delay chain:
 					myself.commands[0]();
 				}
-				
+
 				// Add function to run after setup, to run loop:
 				myself.add_command(call_loop);
 

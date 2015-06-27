@@ -4,7 +4,7 @@
 
 <script type=text/javascript>
 /*
-  
+
   Dr. Orion Lawlor, lawlor@alaska.edu, 2015-06-24
 */
 
@@ -19,7 +19,7 @@ function get_dom(ID,type) {
 
 /// Enumerate all existing state names/IDs
 function for_state_name_ID(callback)
-{  		
+{
 	for (var id=0;;id++) {
 		var ID={"id":id};
 		var dom=get_dom(ID,'name');
@@ -73,10 +73,10 @@ function run_code(code) {
 		// console.log("  Run adding state "+name+" as ID "+ID.id);
 		this[name]=ID;
 	});
-	
+
 	// Local variable "target":
 	var target=current_user_target;
-	
+
 	// User accessible robot object:
 	robot.drive=function(L,R) {
 		pilot.L=L; pilot.R=R;
@@ -96,7 +96,7 @@ function run_code(code) {
 	}
 
 	eval(code);
-	
+
   	// Clean state names out of our function object
   	//  (otherwise they build up!)
   	for_state_name_ID(function(name,ID) {
@@ -118,7 +118,7 @@ function run() {
   	current_user_output+="robot.location.x="+robot.location.x+"<br>";
   	current_user_output+="robot.location.y="+robot.location.y+"<br>";
   	current_user_output+="robot.location.angle="+robot.location.angle+"<br><br>";
-  	
+
   	// Control
   	var code=get_dom(current_user_state_ID,'code').value;
 	current_user_output+="Running code "+code+"<br>";

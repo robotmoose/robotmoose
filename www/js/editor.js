@@ -1,43 +1,4 @@
-var url_path="/"; // "http://robotmoose.com/";
 var editor_path="/editor/";
-
-function load_js(js)
-{
-	var scr=document.createElement("script");
-	scr.src=js;
-	document.head.appendChild(scr);
-};
-
-function load_link(link)
-{
-	var ln=document.createElement("link");
-	ln.rel="stylesheet";
-	ln.href=link;
-	document.head.appendChild(ln);
-};
-
-function load_style(style)
-{
-	var sty=document.createElement("style");
-	sty.appendChild(document.createTextNode(style));
-	document.head.appendChild(sty);
-};
-
-function load_dependencies()
-{
-	load_js(url_path+"js/xmlhttp.js");
-	load_js(url_path+"js/codemirror/clike_arduino_nxt.js");
-	load_js(url_path+"js/codemirror/addon/edit/matchbrackets.js");
-	load_js(url_path+"js/codemirror/addon/dialog/dialog.js");
-	load_js(url_path+"js/codemirror/addon/search/search.js");
-	load_js(url_path+"js/codemirror/addon/search/searchcursor.js");
-	load_link(url_path+"js/codemirror/codemirror.css");
-	load_link(url_path+"js/codemirror/addon/dialog/dialog.css");
-	load_style(".CodeMirror{border:1px solid #000000;}");
-	load_style(".lint-error{background:#ff8888;color:#a00000;padding:1px}\r\n.lint-error-icon{background:#ff0000;color:#ffffff;border-radius:50%;margin-right:7px;}");
-};
-
-(function(){load_dependencies()})();
 
 function editor_t()
 {

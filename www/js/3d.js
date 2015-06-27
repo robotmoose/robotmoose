@@ -1,5 +1,3 @@
-var url_path="/"; // "http://robotmoose.com/";
-
 // Dr. Lawlor's vector utilities:
 
 /* Rename vectors to be be more like GLSL: */
@@ -40,25 +38,6 @@ vec3.prototype.randSphere=function(scale) {
 	} while (this.length()>scale*0.5);
 	return this;
 }
-
-
-
-function load_js(js)
-{
-	var scr=document.createElement("script");
-	scr.src=js;
-	document.head.appendChild(scr);
-};
-
-function load_dependencies()
-{
-	load_js(url_path+"js/three/loaders/OBJLoader.js");
-	load_js(url_path+"js/three/loaders/STLLoader.js");
-	load_js(url_path+"js/three/loaders/STLLoader.js");
-	load_js(url_path+"js/three/controls/OrbitControls.js");
-};
-
-(function(){load_dependencies()})();
 
 function cube_t(scene)
 {
@@ -294,16 +273,16 @@ function renderer_t(div,setup_func,loop_func)
 		loader.load(filename,function(container)
 		{
 			var mesh=container.children[0];
-			
+
 			mesh.geometry.computeFaceNormals();
 			mesh.material=new THREE.MeshPhongMaterial({color:0xffffff});
-			
+
 			if(texture)
 			{
 				THREE.GeometryUtils.center(mesh.geometry);
 				mesh.material.map=texture;
 			}
-			
+
 			mesh.position.copy(model.position);
 			mesh.rotation.copy(model.rotation);
 			mesh.scale.copy(model.scale);

@@ -1,19 +1,3 @@
-var url_path="/"; // http://robotmoose.com/";
-
-function load_js(js)
-{
-	var scr=document.createElement("script");
-	scr.src=js;
-	document.head.appendChild(scr);
-};
-
-function load_dependencies()
-{
-	load_js(url_path+"js/3d.js");
-};
-
-(function(){load_dependencies()})();
-
 function aerobeam_t(renderer)
 {
 	var myself=this;

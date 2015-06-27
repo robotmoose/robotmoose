@@ -4,16 +4,6 @@
 		<!--#include virtual="/sources.html"-->
 		<title>RobotMoose - Lessons</title>
 
-		<script src="/js/arduino_emulator.js"></script>
-
-		<script src="/js/codemirror/codemirror.js"></script>
-		<script src="/js/editor.js"></script>
-
-		<script src="/js/three/three.min.js"></script>
-		<script src="/js/3d.js"></script>
-		<script src="/js/robot_2wd.js"></script>
-		<script src="/js/roomba_sim.js"></script>
-
 		<script type="text/javascript">
 			var verify_button;
 			var run_button;
@@ -144,7 +134,7 @@
 			{
 				roomba.reset();
 				document.getElementById("drive_left").value=0;
-				document.getElementById("drive_right").value=0;	
+				document.getElementById("drive_right").value=0;
 			}
 
 			function drive_update()
@@ -190,9 +180,9 @@
 					</tr>
 				</table>
 			</center>
-			
-			
-			
+
+
+
 			<div class="well">
 				How does this work?
 				<ul>
@@ -215,10 +205,10 @@
 				<ul>
 					<li>Change the numbers passed into the drive calls, and see where the robot moves.</li>
 					<li>You can animate a series of motions by making more drive calls inside loop.  For example, this drives forward, then turns:
-					<pre>	
+					<pre>
 	//Things written in here keep happening
 	roomba.drive(200,200); // drive forward
-	delay(1000);	
+	delay(1000);
 	roomba.drive(0,400); // turn left
 	delay(700);
 					</pre>

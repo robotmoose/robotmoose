@@ -39,7 +39,7 @@ roomba_t=function (renderer,obstacles)
 {
 	var wheelbase=250; // mm between wheels
 	robot_2wd.call(this,wheelbase); // superclass constructor
-	
+
 	var myself=this;
 
 	myself.model=new Array();
@@ -55,8 +55,8 @@ roomba_t=function (renderer,obstacles)
 		color: 0x8f00ff, linewidth:2 }); // purple left
 	myself.right_tracker=new wheel_tracker_t(renderer,{
 		color: 0xff0000, linewidth:2 }); // red right
-         
-	var model_path=url_path+"models/roomba/body.obj";
+
+	var model_path="/models/roomba/body.obj";
 	myself.model=null;
 	var model_color=0x404040;
 
@@ -69,7 +69,7 @@ roomba_t=function (renderer,obstacles)
 
 	myself.sensorObject3D=new THREE.Object3D(); // container object (OBJ isn't loaded yet)
 	renderer.scene.add(myself.sensorObject3D);
-	
+
 	this.reset();
 
 	myself.set_position=function(x,y,z)
@@ -107,7 +107,7 @@ roomba_t.prototype.reset=function()
 {
 	this.reset_wheels();
 	this.L=this.R=0.0; // motor speeds
-	
+
 	this.left_tracker.reset();
 	this.right_tracker.reset();
 
@@ -133,7 +133,7 @@ roomba_t.prototype.loop=function(dt)
 	var L=limit(this.left);
 	var R=limit(this.right);
 	this.L+=(L-this.L)*dt*20.0; // inertia
-	this.R+=(R-this.R)*dt*20.0; 
+	this.R+=(R-this.R)*dt*20.0;
 
 	var speed=mm*dt; // world units per step
 
@@ -144,7 +144,7 @@ roomba_t.prototype.loop=function(dt)
 		this.model.rotation.x=this.model.rotation.x-dt;
 		this.sensorObject3D.rotation.x=this.model.rotation.x;
 	}
-	
+
 	this.set_location(this.P,this.angle_rad);
 
 	this.sensor_check();
@@ -155,7 +155,7 @@ roomba_t.prototype.set_location=function(P,angle_rad)
 {
 	this.angle_rad=angle_rad;
 	this.P.copy(P);
-	
+
 	this.model.rotation.z=this.angle_rad-Math.PI/2;
 	this.sensorObject3D.rotation.z=this.angle_rad;
 
@@ -167,7 +167,7 @@ roomba_t.prototype.set_location=function(P,angle_rad)
 	renderer.controls.center.set(this.P.x,this.P.y,this.P.z);
 	renderer.controls.object.position.set(
 		this.P.x,this.P.y-1200,this.P.z+1400);
-	
+
 	// Update wheel trackers
 	this.left_tracker.add(this.wheel[0]);
 	this.right_tracker.add(this.wheel[1]);

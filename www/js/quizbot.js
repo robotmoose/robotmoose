@@ -1,19 +1,3 @@
-var url_path="/"; // http://robotmoose.com/";
-
-function load_js(js)
-{
-	var scr=document.createElement("script");
-	scr.src=js;
-	document.head.appendChild(scr);
-};
-
-function load_dependencies()
-{
-	load_js(url_path+"js/3d.js");
-};
-
-(function(){load_dependencies()})();
-
 function quizbot_t(renderer)
 {
 	var myself=this;
@@ -29,35 +13,35 @@ function quizbot_t(renderer)
 	for(var ii=0;ii<5;++ii)
 		myself.models[ii]=new Array();
 
-	myself.models[0][0]=url_path+"models/quizbot/base.obj";
+	myself.models[0][0]="/models/quizbot/base.obj";
 	myself.models[0][1]=0;
 	myself.models[0][2]=0;
 	myself.models[0][3]=0;
 	myself.models[0][4]=null;
 	myself.models[0][5]=0xcc0000;
 
-	myself.models[1][0]=url_path+"models/quizbot/base_servo.obj";
+	myself.models[1][0]="/models/quizbot/base_servo.obj";
 	myself.models[1][1]=0;
 	myself.models[1][2]=0;
 	myself.models[1][3]=0;
 	myself.models[1][4]=null;
 	myself.models[1][5]=0x00cc00;
 
-	myself.models[2][0]=url_path+"models/quizbot/middle.obj";
+	myself.models[2][0]="/models/quizbot/middle.obj";
 	myself.models[2][1]=0.38;
 	myself.models[2][2]=37;
 	myself.models[2][3]=-12.38;
 	myself.models[2][4]=null;
 	myself.models[2][5]=0xcc0000;
 
-	myself.models[3][0]=url_path+"models/quizbot/middle_servo.obj";
+	myself.models[3][0]="/models/quizbot/middle_servo.obj";
 	myself.models[3][1]=0.38;
 	myself.models[3][2]=37;
 	myself.models[3][3]=-12.38;
 	myself.models[3][4]=null;
 	myself.models[3][5]=0x00cc00;
 
-	myself.models[4][0]=url_path+"models/quizbot/head.obj";
+	myself.models[4][0]="/models/quizbot/head.obj";
 	myself.models[4][1]=-0.17;
 	myself.models[4][2]=68.5;
 	myself.models[4][3]=-12.5;
