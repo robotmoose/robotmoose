@@ -43,9 +43,9 @@ function state_table_t(div,robot_name)
 	this.adder_prettifier.appendChild(this.adder_button);
 	this.div.appendChild(this.state_list_prettifier);
 	this.div.appendChild(this.break0);
-	this.file_manager=new file_manager_t(this.div);
-	this.file_manager.onsave=function(filename){return myself.get_value();};
-	this.file_manager.onload=function(filename,data){myself.set_value(data);};
+	//this.file_manager=new file_manager_t(this.div);
+	//this.file_manager.onsave=function(filename){return myself.get_value();};
+	//this.file_manager.onload=function(filename,data){myself.set_value(data);};
 	this.div.appendChild(this.break1);
 	this.div.appendChild(this.adder_prettifier);
 
