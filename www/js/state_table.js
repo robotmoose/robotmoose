@@ -34,15 +34,19 @@ function state_table_t(div,robot_name)
 	this.adder_button.disabled=false;
 	this.adder_button.className="btn btn-primary";
 	this.adder_button.style.marginLeft=10;
+	this.adder_button.onclick=function(){myself.create_row("New State","//Code");};
 
-	this.adder_button.onclick=function()
-	{myself.create_row("New State","//Code");};
+	this.break1=document.createElement("br");
 
 	this.state_list_prettifier.appendChild(this.state_list);
 	this.adder_prettifier.appendChild(this.upload_button);
 	this.adder_prettifier.appendChild(this.adder_button);
 	this.div.appendChild(this.state_list_prettifier);
 	this.div.appendChild(this.break0);
+	this.file_manager=new file_manager_t(this.div);
+	this.file_manager.onsave=function(filename){return myself.get_value();};
+	this.file_manager.onload=function(filename,data){myself.set_value(data);};
+	this.div.appendChild(this.break1);
 	this.div.appendChild(this.adder_prettifier);
 
 	this.row_data=[];
@@ -50,6 +54,64 @@ function state_table_t(div,robot_name)
 	$("ul.sortable_handle").sortable({handle:'.glyphicon'});
 
 	this.download();
+}
+
+state_table_t.prototype.set_value=function(value)
+{
+	try
+	{
+		if(!value)
+			throw "Value is null.";
+
+		var states_json=JSON.parse(value);
+
+		while(this.state_list.firstChild)
+			this.state_list.removeChild(this.state_list.firstChild);
+
+		for(var ii=0;ii<states_json.length;++ii)
+		{
+			if(!states_json[ii].name)
+				throw "Could not find state name of json object.";
+
+			if(!states_json[ii].code)
+				throw "Could not find state code of json object.";
+
+			this.create_row(states_json[ii].name,states_json[ii].code);
+		}
+	}
+	catch(error)
+	{
+		console.log("state_table_t::set_value() - "+error);
+		states_json=[];
+	}
+}
+
+state_table_t.prototype.get_value=function()
+{
+	var states_json=[];
+
+	try
+	{
+		for(var ii=0;ii<this.state_list.children.length;++ii)
+		{
+			var child=this.state_list.children[ii];
+
+			if(!child.state_name)
+				throw "Could not find state name of li.";
+
+			if(!child.state_code)
+				throw "Could not find state code of li.";
+
+			states_json.push({name:child.state_name.value,code:child.state_code.getValue()});
+		}
+	}
+	catch(error)
+	{
+		console.log("state_table_t::get_value() - "+error);
+		states_json=[];
+	}
+
+	return JSON.stringify(states_json);
 }
 
 state_table_t.prototype.download=function()
@@ -61,19 +123,7 @@ state_table_t.prototype.download=function()
 		send_request("GET","/superstar/"+this.robot_name,"states","?get",
 			function(response)
 			{
-				var states_json=JSON.parse(response);
-				myself.state_list.length=0;
-
-				for(var ii=0;ii<states_json.length;++ii)
-				{
-					if(!states_json[ii].name)
-						throw "Could not find state name of json object.";
-
-					if(!states_json[ii].code)
-						throw "Could not find state code of json object.";
-
-					myself.create_row(states_json[ii].name,states_json[ii].code);
-				}
+				myself.set_value(response);
 			},
 			function(error)
 			{
@@ -91,22 +141,9 @@ state_table_t.prototype.upload=function()
 {
 	try
 	{
-		var states_json=[];
+		var states_data=this.get_value();
 
-		for(var ii=0;ii<this.state_list.children.length;++ii)
-		{
-			var child=this.state_list.children[ii];
-
-			if(!child.state_name)
-				throw "Could not find state name of li.";
-
-			if(!child.state_code)
-				throw "Could not find state code of li.";
-
-			states_json.push({name:child.state_name.value,code:child.state_code.getValue()});
-		}
-
-		send_request("GET","/superstar/"+this.robot_name,"states","?set="+JSON.stringify(states_json),
+		send_request("GET","/superstar/"+this.robot_name,"states","?set="+states_data,
 			function(response)
 			{
 			},
