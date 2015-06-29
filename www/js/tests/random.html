@@ -12,7 +12,7 @@
 
 				if(!window.crypto)
 					for(var ii=0;ii<size;++ii)
-						array[ii]=Math.random();
+						array[ii]=Math.floor(Math.random()*4294967296);
 				else
 					window.crypto.getRandomValues(array);
 
