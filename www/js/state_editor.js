@@ -47,12 +47,10 @@ function state_editor_t(div, robot_name)
 		
 	this.refresh = document.createElement("input");
 	this.refresh.type = "button";
-		this.refresh.value = "Refresh";
+		this.refresh.value = "Load from server";
 		this.refresh.className = "btn btn-primary";
 	    this.refresh.onclick = function(){console.log("Refresh button pressed");myself.refreshData();}; 
 		this.refresh.style.marginLeft = "1%";
-	
-	
 	
 	// Uncomment for loading and storing to disk functionality 
 	
@@ -76,7 +74,7 @@ function state_editor_t(div, robot_name)
 	
 	this.div.appendChild(this.table);
 	this.table.appendChild(this.thead);
-	this.thead.appendChild(this.trHeadings)
+	this.thead.appendChild(this.trHeadings);
 	this.trHeadings.appendChild(this.trHeadings.state);
 	this.trHeadings.appendChild(this.trHeadings.code);
 	this.div.appendChild(this.add_row);
@@ -125,10 +123,10 @@ state_editor_t.prototype.collectData = function(action)
 	
 	myself.states =[]; //Clear out the array so it doesnt make duplicate data on every update
 	
-	for(var i = 1; i<this.table.rows.length; i++)
+	for(var i = 1; i<myself.table.rows.length; i++)
 	{
 		
-		var row = this.table.rows[i];
+		var row = myself.table.rows[i];
 		
 		myself.states.push({name:row.cells[0].children[0].value,code:row.cells[1].children[0].value});
 		
@@ -144,21 +142,50 @@ state_editor_t.prototype.collectData = function(action)
 	
 }
 
+state_editor_t.prototype.deleteTable = function()
+{
+	var myself = this;
+	console.log("In deleteTable()");
+	console.log("rows.length as seen by deleteTable(): "+ myself.table.rows.length);
+	
+	var originalRows = myself.table.rows.length; // Save original number of rows so all of them are deleted 
+	
+	if(myself.table.rows.length > 1) // If size is 1, then row 1 does not exist so skip loop 
+	{ 
+		//Step through table rows bottom to top 
+		for(var i = originalRows-1; i>0; i--)
+		{
+			console.log("In deleteTable loop, i= :" + i);
+			myself.table.deleteRow(i);
+			console.log("Deleted row: " + i);
+		}
+	
+	}
+}
+
 state_editor_t.prototype.rebuildTable = function()
 {
-	console.log("In rebuildTable()");
+	//console.log("In rebuildTable()");
 	var myself = this;
+	myself.deleteTable();
+	
 	console.log("rebuildTable() see array as :");
+	
 	console.log(myself.states);
 	console.log("size of states: " + myself.states.length);
 	for (var i = 0; i < myself.states.length;i++)
 	{
 		console.log("In rebuld loop, i = "+ i);
 		console.log(myself.states[i]);
-		myself.addRow();
-		myself.state.setAttribute('value',myself.states[i].name);
-		myself.code.innerHTML = myself.states[i].code;
+		if(myself.states[i].name != "") // Does not add empty objects to table
+		{
+			myself.addRow();
+			myself.state.setAttribute('value',myself.states[i].name);
+			myself.code.innerHTML = myself.states[i].code;
+		}
 	}
+	console.log("rows.length as seen by rebuildTable(): "+ myself.table.rows.length);
+	
 }
 
 
@@ -206,12 +233,15 @@ state_editor_t.prototype.refreshData = function()
 					for(var ii=0;ii<states_json.length;++ii)
 					{
 						console.log("states_json of ii : "+ states_json[ii]);
-						if(!states_json[ii].name)
+						
+						// Ignore any empty objects
+						/*if(!states_json[ii].name)
 							throw "Could not find state name of json object.";
 
 						if(!states_json[ii].code)
 							throw "Could not find state code of json object.";
-
+						*/
+							
 						myself.states.push(states_json[ii]);
 					}
 				}
