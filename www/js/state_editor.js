@@ -148,11 +148,16 @@ state_editor_t.prototype.rebuildTable = function()
 {
 	console.log("In rebuildTable()");
 	var myself = this;
-	for (var i =0 ; i< myself.states.length ; i++)
+	console.log("rebuildTable() see array as :");
+	console.log(myself.states);
+	console.log("size of states: " + myself.states.length);
+	for (var i = 0; i < myself.states.length;i++)
 	{
-		myself.addRow()
+		console.log("In rebuld loop, i = "+ i);
+		console.log(myself.states[i]);
+		myself.addRow();
 		myself.state.setAttribute('value',myself.states[i].name);
-		myself.code.setAttribute('value',myself.states[i].code);
+		myself.code.innerHTML = myself.states[i].code;
 	}
 }
 
@@ -192,6 +197,7 @@ state_editor_t.prototype.refreshData = function()
 		send_request("GET","/superstar/"+myself.robotName,"states","?get",
 			function(response)
 			{
+				console.log("response is : "+ response);
 				if(response)
 				{
 					var states_json=JSON.parse(response);
@@ -199,15 +205,17 @@ state_editor_t.prototype.refreshData = function()
 
 					for(var ii=0;ii<states_json.length;++ii)
 					{
+						console.log("states_json of ii : "+ states_json[ii]);
 						if(!states_json[ii].name)
 							throw "Could not find state name of json object.";
 
 						if(!states_json[ii].code)
 							throw "Could not find state code of json object.";
 
-						myself.states.push(states_json[ii].name,states_json[ii].code);
+						myself.states.push(states_json[ii]);
 					}
 				}
+				myself.rebuildTable();
 			},
 			function(error)
 			{
@@ -220,7 +228,7 @@ state_editor_t.prototype.refreshData = function()
 		console.log("state_table_t::download() - "+error);
 	}
 	console.log(myself.states);
-	myself.rebuildTable();
+	
 }
 
 /*
