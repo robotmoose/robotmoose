@@ -1,0 +1,34 @@
+<html>
+	<head>
+		<script>
+			function generate()
+			{
+				var size=parseInt(document.getElementById("data_size").value,10);
+
+				if(!size)
+					size=1;
+
+				var array=new Uint32Array(size);
+
+				if(!window.crypto)
+					for(var ii=0;ii<size;++ii)
+						array[ii]=Math.floor(Math.random()*4294967296);
+				else
+					window.crypto.getRandomValues(array);
+
+				var textarea=document.getElementById("data");
+
+				textarea.value="";
+
+				for(var ii=0;ii<size;++ii)
+					textarea.value+=array[ii]+"\n";
+			}
+		</script>
+	</head>
+	<body onload="generate();">
+		<textarea id="data" rows="40" readonly></textarea>
+		<br/>
+		<input type="button" value="Generate" onclick="generate();"/>
+		<input type="text" id="data_size" value="1"/>
+	</body>
+</html

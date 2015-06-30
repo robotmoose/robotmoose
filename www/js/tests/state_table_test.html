@@ -6,14 +6,23 @@
 
 			function setup()
 			{
-				table=new state_table_t(document.getElementById("tabler"),"demo");
+				var div=document.getElementById("tabler");
+				var name=document.getElementById("robot_name").value;
+				table=new state_table_t(div,name);
 
 				if(!table)
 					alert("Could not create table!");
+			}
+
+			function set_robot_name()
+			{
+				var name=document.getElementById("robot_name").value;
+				table.set_robot_name(name);
 			}
 		</script>
 	</head>
 	<body onload="setup();">
 		<div id="tabler"></div>
+		<input type="text" id="robot_name" value="demo" onchange="set_robot_name();"/>
 	</body>
 </html>

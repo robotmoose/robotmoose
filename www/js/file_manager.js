@@ -7,10 +7,7 @@
 
 	//Callbacks when saved or loaded
 	file_manager.onload=function(filename,data){alert("loaded "+filename+"\n"+data);}
-	file_manager.onsave=function(filename,data){alert("saved "+filename+"\n"+data);}
-
-	//Set data to save:
-	file_manager.set_data("hello");
+	file_manager.onsave=function(filename){alert("saved "+filename);return "hello";}
 
 	//Set default filename to save as:
 	file_manager.set_save_filename("tester.txt");
@@ -61,11 +58,6 @@ function file_manager_t(div)
 	this.div.appendChild(this.element);
 }
 
-file_manager_t.prototype.set_data=function(data)
-{
-	this.data=data;
-}
-
 file_manager_t.prototype.get_data=function()
 {
 	return this.data;
@@ -103,6 +95,9 @@ file_manager_t.prototype.load=function()
 
 file_manager_t.prototype.save=function()
 {
+	if(this.onsave)
+		this.data=this.onsave(this.saver.input.value);
+
 	if(this.saver.input.value)
 	{
 		var blob=new Blob([this.data],{type:'text/plain'});
@@ -114,9 +109,6 @@ file_manager_t.prototype.save=function()
 		link.style.display="none";
 		document.body.appendChild(link);
 		link.click();
-
-		if(this.onsave)
-			this.onsave(this.saver.input.value,this.data);
 	}
 }
 

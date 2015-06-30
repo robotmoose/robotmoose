@@ -22,16 +22,19 @@ config_editor_t.prototype.get_config=function()
 		{
 			try
 			{
-				var json=JSON.parse(response);
-				myself.config="";
+				if(response)
+				{
+					var json=JSON.parse(response);
+					myself.config="";
 
-				for(var ii=0;ii<json.configs.length;++ii)
-					myself.config+=json.configs[ii]+"\n";
+					for(var ii=0;ii<json.configs.length;++ii)
+						myself.config+=json.configs[ii]+"\n";
 
-				myself.counter=json.counter+1;
+					myself.counter=json.counter+1;
 
-				if(myself.onconfigschange)
-					myself.onconfigschange(myself.config);
+					if(myself.onconfigschange)
+						myself.onconfigschange(myself.config);
+				}
 			}
 			catch(error)
 			{
@@ -56,27 +59,30 @@ config_editor_t.prototype.get_options=function()
 		{
 			try
 			{
-				var json=JSON.parse(response);
-
-				for(var ii=0;ii<json.length;++ii)
+				if(response)
 				{
-					var parts=json[ii].split(" ");
+					var json=JSON.parse(response);
 
-					if(parts.length!=2)
-						throw "Invalid tabula option \""+json[ii]+"\".";
+					for(var ii=0;ii<json.length;++ii)
+					{
+						var parts=json[ii].split(" ");
 
-					var tabula={};
-					tabula.type=parts[0];
-					tabula.args=new Array();
+						if(parts.length!=2)
+							throw "Invalid tabula option \""+json[ii]+"\".";
 
-					for(var jj=0;jj<parts[1].length;++jj)
-						tabula.args[jj]=parts[1][jj];
+						var tabula={};
+						tabula.type=parts[0];
+						tabula.args=new Array();
 
-					myself.options.push(tabula);
+						for(var jj=0;jj<parts[1].length;++jj)
+							tabula.args[jj]=parts[1][jj];
+
+						myself.options.push(tabula);
+					}
+
+					if(myself.onoptionschange)
+						myself.onoptionschange(myself.options);
 				}
-
-				if(myself.onoptionschange)
-					myself.onoptionschange(myself.options);
 			}
 			catch(error)
 			{
@@ -405,22 +411,22 @@ config_editor_t.prototype.validate=function(configs)
 	}
 }
 
+config_editor_t.prototype.set_robot_name=function(robot_name)
+{
+	try
+	{
+		if(!robot_name)
+			throw "config_editor_t::set_robot_name - Invalid robot name."
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		this.robot_name=robot_name;
+		this.get_config();
+		this.get_options();
+	}
+	catch(error)
+	{
+		console.log(error);
+	}
+}
 
 function config_cli_t(div,robot_name)
 {
@@ -457,26 +463,21 @@ config_cli_t.prototype.update_configs=function(config_text)
 	this.code_editor.setValue(config_text);
 }
 
+config_cli_t.prototype.set_robot_name=function(robot_name)
+{
+	try
+	{
+		if(!robot_name)
+			throw "config_cli_t::set_robot_name - Invalid robot name."
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		this.textarea.value="";
+		this.editor.set_robot_name(robot_name);
+	}
+	catch(error)
+	{
+		console.log(error);
+	}
+}
 
 function config_gui_t(div,robot_name)
 {
@@ -791,5 +792,24 @@ config_gui_t.prototype.update_options=function(options)
 	catch(error)
 	{
 		console.log("config_gui_t::update_options() - "+error);
+	}
+}
+
+config_gui_t.prototype.set_robot_name=function(robot_name)
+{
+	try
+	{
+		if(!robot_name)
+			throw "config_gui_t::set_robot_name - Invalid robot name."
+
+		while(this.configs_list.firstChild)
+			this.configs_list.removeChild(this.configs_list.firstChild);
+
+		this.adder_select.options.length=1;
+		this.editor.set_robot_name(robot_name);
+	}
+	catch(error)
+	{
+		console.log(error);
 	}
 }
