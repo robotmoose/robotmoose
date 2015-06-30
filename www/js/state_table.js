@@ -123,7 +123,8 @@ state_table_t.prototype.download=function()
 		send_request("GET","/superstar/"+this.robot_name,"states","?get",
 			function(response)
 			{
-				myself.set_value(response);
+				if(response)
+					myself.set_value(response);
 			},
 			function(error)
 			{
@@ -215,4 +216,24 @@ state_table_t.prototype.create_row=function(name,code)
 		myself.state_list.appendChild(li);
 		code_editor.refresh();
 	})();
+}
+
+state_table_t.prototype.set_robot_name=function(robot_name)
+{
+	try
+	{
+		if(!robot_name)
+			throw "config_gui_t::set_robot_name - Invalid robot name."
+
+		this.robot_name=robot_name;
+
+		while(this.state_list.firstChild)
+			this.state_list.removeChild(this.state_list.firstChild);
+
+		this.download();
+	}
+	catch(error)
+	{
+		console.log(error);
+	}
 }
