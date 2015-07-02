@@ -915,11 +915,7 @@ int main(int argc, char *argv[])
 
 
 	// FIXME: should pull robot configuration from superstar robotName/+"config"
-	std::string robot_config=
-		"analog(A0);\n"
-		"analog(A1);\n"
-		+sensors
-		+configMotor;
+	std::string robot_config=sensors+configMotor;
 
 	backend->tabula_setup(robot_config);
 
