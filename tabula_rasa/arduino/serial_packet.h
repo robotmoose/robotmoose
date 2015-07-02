@@ -48,14 +48,14 @@ public:
 	int command; ///< Command number.  Must be less than 16.
 	int length; ///< Command length.  Must be less than 250.
 	const unsigned char *data; ///< Command's associated data.
-	
+
 	A_packet() {
 		valid=0;
 		command=0;
 		length=0;
 		data=0;
 	}
-	
+
 	/// Copy the packet data into this object.
 	///   If the data size doesn't match, return false.
 	template <class T>
@@ -73,13 +73,13 @@ public:
 	enum {max_command=15};
 	enum {max_short_length=15};
 	serial_port &serial;
-	
+
 	/**
 	  Create an A-packet send/receive object for this serial device.
 	  The device must be ready to send/receive bytes.
 	*/
-	A_packet_formatter(serial_port &serial_) 
-		:serial(serial_) 
+	A_packet_formatter(serial_port &serial_)
+		:serial(serial_)
 	{
 		reset();
 		read_data_long=read_data=NULL;
@@ -91,7 +91,7 @@ public:
 	~A_packet_formatter() {
 		if (read_data_long) { free(read_data_long); read_data_long=NULL; }
 	}
-	
+
 /* Packet send */
 	void write_packet(int command,int length,const void *data) {
 		const unsigned char *cdata=(const unsigned char *)data;
@@ -100,10 +100,10 @@ public:
 		for (int i=0;i<length;i++) sumpay+=cdata[i];
 		int checksum=0xf&(length+command+sumpay+(sumpay>>4));
 		unsigned char end=(command<<4)+(checksum);
-		
-		if (length<max_short_length) 
+
+		if (length<max_short_length)
 		{ // send short packets in one big buffer
-			start+=length; 
+			start+=length;
 			write_data[0]=start;
 			for (int i=0;i<length;i++) write_data[1+i]=cdata[i];
 			write_data[1+length]=end;
@@ -117,7 +117,7 @@ public:
 			serial.write(&end,1);
 		}
 	}
-	
+
 /* Packet receive */
 
 	/**
@@ -125,11 +125,11 @@ public:
 	 Returns 0 if no data is available to read right now.
 	 Returns -1 if data was readable, but no packet is ready yet (call again).
 	 Fills out the packet and returns +1 if we received a correctly formatted packet.
-	 
+
 	 Idiomatic call code:
 	 	A_packet p;
 	 	while (-1==apak.read_packet(p)) {} // keep reading
-	 	if (p.valid) { // handle packet 
+	 	if (p.valid) { // handle packet
 	 	}
 	*/
 	int read_packet(A_packet &p) {
@@ -137,14 +137,14 @@ public:
 		int c=serial.read(); // else read next byte
 		if (c==-1) return 0; // (hmmm, why did available return true then?)
 		p.valid=0;
-		
+
 		enum {
 			STATE_START=0,
 			STATE_LENGTH,
 			STATE_PAYLOAD,
 			STATE_END
 		};
-		
+
 		switch (read_state) {
 		case 0: /* start byte */
 			if ((c&0xf0) == 0xa0) { // valid start code
@@ -168,6 +168,8 @@ public:
 			read_data_long=(unsigned char *)realloc(read_data_long,read_length);
 			read_data=read_data_long;
 			read_state=STATE_PAYLOAD;
+			if(read_length==0)
+				read_state=STATE_END;
 			break;
 		case STATE_PAYLOAD: /* payload data */
 			read_sumpay+=c;
@@ -191,7 +193,7 @@ public:
 			return +1; // let receiver know packet arrived (even if it's bad)
 			}
 			break;
-		default: /* only way to get here is memory corruption!  Reset. */ 
+		default: /* only way to get here is memory corruption!  Reset. */
 			read_state=0; break;
 		};
 		return -1; // no packet was received
@@ -199,7 +201,7 @@ public:
 private:
 	// Private send buffers:
 	unsigned char write_data[max_short_length+2]; // short outgoing packets are assembled here
-	
+
 	// Private receiver state:
 	unsigned char read_state; // part of message we next expect
 	int read_length; // length of payload bytes we expect
