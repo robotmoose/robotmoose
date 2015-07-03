@@ -111,6 +111,36 @@ public:
 		if (list.size()>0) return list+"\"]";
 		else return "[]";
 	}
+
+	std::string sublinks(std::string path_prefix)
+	{
+		if(path_prefix.size()>0&&path_prefix[path_prefix.size()-1]!='/')
+			path_prefix+="/";
+
+		std::string list="";
+		std::string last="";
+		for (db_t::const_iterator c=db.begin();c!=db.end();++c)
+		{
+			std::string path=(*c).first;
+			std::string prefix=path;
+			if (0==path.compare(0,path_prefix.size(),path_prefix))
+			{ // path matches prefix
+				path=path.substr(path_prefix.size()); // trim prefix
+				// trim beyond forward slash
+				size_t slash=path.find('/');
+				if (slash!=std::string::npos) path.resize(slash);
+
+				if(last!=path)
+				{
+					list+="<a href=\"/superstar/"+
+						path_prefix+path+"\">"+path+"</a> ";
+					last=path;
+				}
+			}
+		}
+
+		return list;
+	}
 };
 
 superstar_db_t superstar_db;
@@ -176,7 +206,7 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 		printf("  Authentication mismatch: write to '%s' not authorized by '%s'\n",
 			starpath.c_str(), sentauth);
 	}
-	
+
 	// New optional syntax: /superstar/path1?set=newval1&get=path2,path3,path4
 	if (0<=mg_get_var(conn,"get",buf,NBUF))
 	{
@@ -185,7 +215,7 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 		while (0!=*bufLoc) {
 			char *nextComma=strchr(bufLoc,','); // Find next comma
 			if (nextComma!=0) *nextComma=0; // nul terminate at comma
-			
+
 			if (retArray.size()>1) retArray+=","; // add separator to output
 			std::string value=superstar_db.get(bufLoc); // add path to output
 			if (value=="") value="{}"; // mark empty JSON objects
@@ -215,8 +245,10 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 		content+="<P>Current value: '"+value+"'";
 	else { // no value set.  Substrings?
 		std::string subs=superstar_db.substrings(starpath);
+		std::string links=superstar_db.sublinks(starpath);
+
 		if (subs.size()>2) // not just []
-			content+="<P>Sub directories: "+subs+"\n";
+			content+="<P>Sub directories: "+links+"\n";
 		else
 			content+="<P>No data found.\n";
 	}

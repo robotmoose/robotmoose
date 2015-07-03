@@ -20,7 +20,7 @@ netbench_keepalive: netbench_keepalive.cpp
 	$(CXX) $(CFLAGS) $< -o $@ $(LIBS)
 
 clean:
-	- rm superstar
+	- rm -f superstar
 
 
 # Windows make:
