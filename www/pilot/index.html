@@ -39,8 +39,8 @@
 					<li role="presentation"><a href="#sensors" aria-controls="sensors" role="tab" data-toggle="tab">Sensors</a></li>
 					<li role="presentation"><a href="#robot_health" aria-controls="robot_health" role="tab" data-toggle="tab">Robot Health</a></li>
 					<li role="presentation"><a href="#configuration" aria-controls="configuration" role="tab" data-toggle="tab">Configuration</a></li>
+					<li role="presentation"><a href="#state_editor" aria-controls="state_editor" role="tab" data-toggle="tab">State Editor</a></li>
 				</ul>
-
 				<div class="tab-content">
 					<div role="tabpanel" class="tab-pane active" id="setup">
 						<!--Robot Name:<input type="text" id="robot_name" rows="1" cols="30" value="layla/uaf"/>!-->
@@ -87,6 +87,8 @@
 					<div role="tabpanel" class="tab-pane" id="sensors">
 						<div id="tabula_sensors_tree_viewer"></div>
 					</div>
+					<div role="tabpanel" class="tab-pane" id="state_editor">
+					</div> 
 					<div role="tabpanel" class="tab-pane" id="robot_health">
 						<table>
 							<tr>
@@ -115,7 +117,7 @@
 		<script>
 			var configurator_gui;
 			var sensors_tree_viewer;
-
+			var state_editor;
 			function setup()
 			{
 				var tabula_config_gui=document.getElementById("tabula_config_gui");
@@ -149,13 +151,20 @@
 						}
 					}
 				},1000);//Fixme:  Make an object for the sensors...instead of an interval...then fix this...
+				var state_editor_div=document.getElementById("state_editor");
+				//state_editor.innerHTML="";
+				state_editor=new state_editor_t(state_editor_div,document.getElementById("robot_name").value);
+
+				if(!state_editor)
+					alert("Could not create state editor !");
 			}
+			
 
 			function set_robot_name()
 			{
 				configurator_gui.set_robot_name(document.getElementById("robot_name").value);
+				state_editor.setRobotName(document.getElementById("robot_name").value);
 			}
-
 			setup();
 		</script>
 	</body>
