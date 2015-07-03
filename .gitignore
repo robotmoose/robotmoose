@@ -15,6 +15,7 @@ superstar/netbench.exe
 superstar/superstar
 superstar/superstar.exe
 superstar/auth
+superstar/logs
 quizbot_reader/quizbot_reader
 quizbot_reader/quizbot_reader.exe
 roomba_testing/roomba
@@ -27,4 +28,3 @@ sensors/imu/show_IMU/main
 sensors/imu/show_IMU/main.exe
 sensors/imu/show_IMU/main.o
 sensors/imu/show_IMU/ogl/glew.o
-
