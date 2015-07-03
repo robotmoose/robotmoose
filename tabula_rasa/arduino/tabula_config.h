@@ -25,11 +25,11 @@ REGISTER_TABULA_DEVICE macro, and the tabula_configure_source object.
 #  define tabula_flash_string(str) F(str)
 
 // Compare strings with operator==, by reading each byte from program RAM
-bool operator==(const String &a,const __FlashStringHelper *b) {
+inline bool operator==(const String &a,const __FlashStringHelper *b) {
   const char *pa=a.c_str();
   const char PROGMEM *pb = (const char PROGMEM *)b;
   while (1) {
-    unsigned char ac=*pa;
+    unsigned char ac=*pa++;
     unsigned char bc=pgm_read_byte(pb++);
     if (ac!=bc) return false;
     if (ac==0) return true; 
@@ -236,7 +236,7 @@ class tabula_factory {
 public:
 	// The machine-readable string config name of this device, like "neato".
 	//   By convention, it's a shortened version of the name of the C++ class.
-	const char *device_name;
+	tabula_flash_string_ptr device_name;
 	
 	// This string describes our configuration arguments, like:
 	//   P for a pin
@@ -245,7 +245,7 @@ public:
 	//  "PPPP" for four pins.
 	tabula_flash_string_ptr arg_types;
 	
-	tabula_factory(const char *device_name_,tabula_flash_string_ptr arg_types_)
+	tabula_factory(tabula_flash_string_ptr device_name_,tabula_flash_string_ptr arg_types_)
 		:device_name(device_name_), arg_types(arg_types_) 
 	{
 		register_factory(this);
@@ -278,7 +278,7 @@ REGISTER_TABULA_DEVICE(my_motor_controller,"P",
 #define REGISTER_TABULA_DEVICE(name, arg_types, create_code) \
 	class name##_factory : public tabula_factory { \
 	public: \
-		name##_factory() :tabula_factory(#name,tabula_flash_string(arg_types)) {} \
+		name##_factory() :tabula_factory(tabula_flash_string(#name),tabula_flash_string(arg_types)) {} \
 		virtual void create(tabula_configure_source &src) { create_code ; } \
 	}; \
 	const static name##_factory name##_factory_singleton;
