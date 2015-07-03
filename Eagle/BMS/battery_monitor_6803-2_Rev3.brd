@@ -1782,7 +1782,6 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="26.289" y1="10.414" x2="26.416" y2="10.541" width="0.2032" layer="1"/>
 <via x="26.416" y="10.541" extent="1-16" drill="0.6"/>
 <wire x1="26.416" y1="10.541" x2="26.924" y2="10.541" width="0.2032" layer="16"/>
-<via x="3.048" y="8.763" extent="1-16" drill="0.6"/>
 <wire x1="15.367" y1="29.591" x2="11.342" y2="29.591" width="0.3048" layer="1"/>
 <wire x1="11.342" y1="29.591" x2="10.668" y2="30.265" width="0.3048" layer="1"/>
 <contactref element="U$7" pad="1"/>
@@ -2590,8 +2589,8 @@ Please make sure your boards conform to these design rules.</description>
 <approved hash="7,39,7a56a3efcd977356"/>
 <approved hash="19,1,4517f8b75af12b53"/>
 <approved hash="5,1,4e1dddc4dea04532"/>
-<approved hash="19,1,bfd71afef1c977c6"/>
 <approved hash="19,1,b4d6593b5753c8ae"/>
+<approved hash="19,1,bfd71afef1c977c6"/>
 <approved hash="5,1,4132e71bd792bf07"/>
 <approved hash="19,1,daccf3208d5516ad"/>
 <approved hash="19,1,3b5a23bbc0f73b10"/>
