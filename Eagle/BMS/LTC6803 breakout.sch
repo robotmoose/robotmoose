@@ -343,102 +343,462 @@
 </class>
 </classes>
 <parts>
-<part name="U$21" library="Isaac" deviceset="LTC6803-2" device=""/>
-<part name="P1" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P2" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P3" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P4" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P5" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P6" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P7" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P8" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P9" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P10" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P11" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P12" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P13" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P14" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P15" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P16" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P17" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P18" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P19" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P20" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P21" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P22" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P23" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P24" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P25" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P44" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P43" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P42" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P41" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P40" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P39" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P38" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P37" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P36" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P35" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P34" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P33" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P32" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P31" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P30" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P29" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P28" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P27" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
-<part name="P26" library="Isaac" deviceset="SINGLE_TERMINAL" device=""/>
+<part name="U$21" library="Isaac" deviceset="LTC6803-2" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P1" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P2" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P3" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P4" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P5" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P6" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P7" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P8" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P9" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P10" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P11" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P12" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P13" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P14" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P15" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P16" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P17" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P18" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P19" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P20" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P21" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P22" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P23" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P24" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P25" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P44" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P43" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P42" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P41" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P40" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P39" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P38" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P37" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P36" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P35" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P34" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P33" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P32" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P31" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P30" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P29" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P28" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P27" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
+<part name="P26" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value=""/>
+<attribute name="OC_NEWARK" value="unknown"/>
+</part>
 </parts>
 <sheets>
 <sheet>
 <plain>
 </plain>
 <instances>
-<instance part="U$21" gate="G$1" x="93.98" y="119.38"/>
-<instance part="P1" gate="G$1" x="33.02" y="203.2"/>
-<instance part="P2" gate="G$1" x="33.02" y="195.58"/>
-<instance part="P3" gate="G$1" x="33.02" y="187.96"/>
-<instance part="P4" gate="G$1" x="33.02" y="180.34"/>
-<instance part="P5" gate="G$1" x="33.02" y="172.72"/>
-<instance part="P6" gate="G$1" x="33.02" y="165.1"/>
-<instance part="P7" gate="G$1" x="33.02" y="157.48"/>
-<instance part="P8" gate="G$1" x="33.02" y="149.86"/>
-<instance part="P9" gate="G$1" x="33.02" y="142.24"/>
-<instance part="P10" gate="G$1" x="33.02" y="134.62"/>
-<instance part="P11" gate="G$1" x="33.02" y="127"/>
-<instance part="P12" gate="G$1" x="33.02" y="119.38"/>
-<instance part="P13" gate="G$1" x="33.02" y="111.76"/>
-<instance part="P14" gate="G$1" x="33.02" y="104.14"/>
-<instance part="P15" gate="G$1" x="33.02" y="96.52"/>
-<instance part="P16" gate="G$1" x="33.02" y="88.9"/>
-<instance part="P17" gate="G$1" x="33.02" y="81.28"/>
-<instance part="P18" gate="G$1" x="33.02" y="73.66"/>
-<instance part="P19" gate="G$1" x="33.02" y="66.04"/>
-<instance part="P20" gate="G$1" x="33.02" y="58.42"/>
-<instance part="P21" gate="G$1" x="33.02" y="50.8"/>
-<instance part="P22" gate="G$1" x="33.02" y="43.18"/>
-<instance part="P23" gate="G$1" x="33.02" y="35.56"/>
-<instance part="P24" gate="G$1" x="33.02" y="27.94"/>
-<instance part="P25" gate="G$1" x="33.02" y="20.32"/>
-<instance part="P44" gate="G$1" x="142.24" y="177.8"/>
-<instance part="P43" gate="G$1" x="142.24" y="170.18"/>
-<instance part="P42" gate="G$1" x="142.24" y="162.56"/>
-<instance part="P41" gate="G$1" x="142.24" y="154.94"/>
-<instance part="P40" gate="G$1" x="142.24" y="147.32"/>
-<instance part="P39" gate="G$1" x="142.24" y="139.7"/>
-<instance part="P38" gate="G$1" x="142.24" y="132.08"/>
-<instance part="P37" gate="G$1" x="142.24" y="124.46"/>
-<instance part="P36" gate="G$1" x="142.24" y="116.84"/>
-<instance part="P35" gate="G$1" x="142.24" y="109.22"/>
-<instance part="P34" gate="G$1" x="142.24" y="101.6"/>
-<instance part="P33" gate="G$1" x="142.24" y="93.98"/>
-<instance part="P32" gate="G$1" x="142.24" y="86.36"/>
-<instance part="P31" gate="G$1" x="142.24" y="78.74"/>
-<instance part="P30" gate="G$1" x="142.24" y="71.12"/>
-<instance part="P29" gate="G$1" x="142.24" y="63.5"/>
-<instance part="P28" gate="G$1" x="142.24" y="55.88"/>
-<instance part="P27" gate="G$1" x="142.24" y="48.26"/>
-<instance part="P26" gate="G$1" x="142.24" y="40.64"/>
+<instance part="U$21" gate="G$1" x="93.98" y="119.38">
+<attribute name="OC_NEWARK" x="93.98" y="119.38" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="93.98" y="119.38" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="93.98" y="119.38" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P1" gate="G$1" x="33.02" y="203.2">
+<attribute name="OC_NEWARK" x="33.02" y="203.2" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="203.2" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="203.2" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P2" gate="G$1" x="33.02" y="195.58">
+<attribute name="OC_NEWARK" x="33.02" y="195.58" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="195.58" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="195.58" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P3" gate="G$1" x="33.02" y="187.96">
+<attribute name="OC_NEWARK" x="33.02" y="187.96" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="187.96" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="187.96" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P4" gate="G$1" x="33.02" y="180.34">
+<attribute name="OC_NEWARK" x="33.02" y="180.34" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="180.34" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="180.34" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P5" gate="G$1" x="33.02" y="172.72">
+<attribute name="OC_NEWARK" x="33.02" y="172.72" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="172.72" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="172.72" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P6" gate="G$1" x="33.02" y="165.1">
+<attribute name="OC_NEWARK" x="33.02" y="165.1" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="165.1" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="165.1" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P7" gate="G$1" x="33.02" y="157.48">
+<attribute name="OC_NEWARK" x="33.02" y="157.48" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="157.48" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="157.48" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P8" gate="G$1" x="33.02" y="149.86">
+<attribute name="OC_NEWARK" x="33.02" y="149.86" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="149.86" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="149.86" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P9" gate="G$1" x="33.02" y="142.24">
+<attribute name="OC_NEWARK" x="33.02" y="142.24" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="142.24" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="142.24" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P10" gate="G$1" x="33.02" y="134.62">
+<attribute name="OC_NEWARK" x="33.02" y="134.62" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="134.62" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="134.62" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P11" gate="G$1" x="33.02" y="127">
+<attribute name="OC_NEWARK" x="33.02" y="127" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="127" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="127" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P12" gate="G$1" x="33.02" y="119.38">
+<attribute name="OC_NEWARK" x="33.02" y="119.38" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="119.38" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="119.38" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P13" gate="G$1" x="33.02" y="111.76">
+<attribute name="OC_NEWARK" x="33.02" y="111.76" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="111.76" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="111.76" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P14" gate="G$1" x="33.02" y="104.14">
+<attribute name="OC_NEWARK" x="33.02" y="104.14" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="104.14" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="104.14" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P15" gate="G$1" x="33.02" y="96.52">
+<attribute name="OC_NEWARK" x="33.02" y="96.52" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="96.52" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="96.52" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P16" gate="G$1" x="33.02" y="88.9">
+<attribute name="OC_NEWARK" x="33.02" y="88.9" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="88.9" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="88.9" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P17" gate="G$1" x="33.02" y="81.28">
+<attribute name="OC_NEWARK" x="33.02" y="81.28" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="81.28" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="81.28" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P18" gate="G$1" x="33.02" y="73.66">
+<attribute name="OC_NEWARK" x="33.02" y="73.66" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="73.66" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="73.66" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P19" gate="G$1" x="33.02" y="66.04">
+<attribute name="OC_NEWARK" x="33.02" y="66.04" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="66.04" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="66.04" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P20" gate="G$1" x="33.02" y="58.42">
+<attribute name="OC_NEWARK" x="33.02" y="58.42" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="58.42" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="58.42" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P21" gate="G$1" x="33.02" y="50.8">
+<attribute name="OC_NEWARK" x="33.02" y="50.8" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="50.8" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="50.8" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P22" gate="G$1" x="33.02" y="43.18">
+<attribute name="OC_NEWARK" x="33.02" y="43.18" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="43.18" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="43.18" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P23" gate="G$1" x="33.02" y="35.56">
+<attribute name="OC_NEWARK" x="33.02" y="35.56" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="35.56" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="35.56" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P24" gate="G$1" x="33.02" y="27.94">
+<attribute name="OC_NEWARK" x="33.02" y="27.94" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="27.94" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="27.94" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P25" gate="G$1" x="33.02" y="20.32">
+<attribute name="OC_NEWARK" x="33.02" y="20.32" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="33.02" y="20.32" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="33.02" y="20.32" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P44" gate="G$1" x="142.24" y="177.8">
+<attribute name="OC_NEWARK" x="142.24" y="177.8" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="177.8" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="177.8" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P43" gate="G$1" x="142.24" y="170.18">
+<attribute name="OC_NEWARK" x="142.24" y="170.18" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="170.18" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="170.18" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P42" gate="G$1" x="142.24" y="162.56">
+<attribute name="OC_NEWARK" x="142.24" y="162.56" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="162.56" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="162.56" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P41" gate="G$1" x="142.24" y="154.94">
+<attribute name="OC_NEWARK" x="142.24" y="154.94" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="154.94" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="154.94" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P40" gate="G$1" x="142.24" y="147.32">
+<attribute name="OC_NEWARK" x="142.24" y="147.32" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="147.32" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="147.32" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P39" gate="G$1" x="142.24" y="139.7">
+<attribute name="OC_NEWARK" x="142.24" y="139.7" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="139.7" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="139.7" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P38" gate="G$1" x="142.24" y="132.08">
+<attribute name="OC_NEWARK" x="142.24" y="132.08" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="132.08" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="132.08" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P37" gate="G$1" x="142.24" y="124.46">
+<attribute name="OC_NEWARK" x="142.24" y="124.46" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="124.46" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="124.46" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P36" gate="G$1" x="142.24" y="116.84">
+<attribute name="OC_NEWARK" x="142.24" y="116.84" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="116.84" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="116.84" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P35" gate="G$1" x="142.24" y="109.22">
+<attribute name="OC_NEWARK" x="142.24" y="109.22" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="109.22" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="109.22" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P34" gate="G$1" x="142.24" y="101.6">
+<attribute name="OC_NEWARK" x="142.24" y="101.6" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="101.6" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="101.6" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P33" gate="G$1" x="142.24" y="93.98">
+<attribute name="OC_NEWARK" x="142.24" y="93.98" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="93.98" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="93.98" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P32" gate="G$1" x="142.24" y="86.36">
+<attribute name="OC_NEWARK" x="142.24" y="86.36" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="86.36" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="86.36" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P31" gate="G$1" x="142.24" y="78.74">
+<attribute name="OC_NEWARK" x="142.24" y="78.74" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="78.74" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="78.74" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P30" gate="G$1" x="142.24" y="71.12">
+<attribute name="OC_NEWARK" x="142.24" y="71.12" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="71.12" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="71.12" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P29" gate="G$1" x="142.24" y="63.5">
+<attribute name="OC_NEWARK" x="142.24" y="63.5" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="63.5" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="63.5" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P28" gate="G$1" x="142.24" y="55.88">
+<attribute name="OC_NEWARK" x="142.24" y="55.88" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="55.88" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="55.88" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P27" gate="G$1" x="142.24" y="48.26">
+<attribute name="OC_NEWARK" x="142.24" y="48.26" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="48.26" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="48.26" size="1.778" layer="96" display="off"/>
+</instance>
+<instance part="P26" gate="G$1" x="142.24" y="40.64">
+<attribute name="OC_NEWARK" x="142.24" y="40.64" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="142.24" y="40.64" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="142.24" y="40.64" size="1.778" layer="96" display="off"/>
+</instance>
 </instances>
 <busses>
 </busses>

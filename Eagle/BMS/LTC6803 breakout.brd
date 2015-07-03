@@ -391,51 +391,231 @@ Please make sure your boards conform to these design rules.</description>
 </pass>
 </autorouter>
 <elements>
-<element name="P1" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="9.5885" y="19.2405"/>
-<element name="P7" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="16.7005"/>
-<element name="P41" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="14.6685" y="16.7005"/>
-<element name="P8" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="19.2405"/>
-<element name="P40" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="19.2405"/>
-<element name="P9" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="14.1605"/>
-<element name="P39" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="16.7005"/>
-<element name="P10" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="14.1605"/>
-<element name="P38" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="19.2405"/>
-<element name="P11" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="11.6205"/>
-<element name="P37" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="16.7005"/>
-<element name="P2" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="9.5885" y="16.7005"/>
-<element name="P12" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="11.6205"/>
-<element name="U$21" library="Isaac" package="FSOP-44" value="LTC6803-2" x="10.8585" y="9.0805" smashed="yes" rot="R270"/>
-<element name="P36" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="14.1605"/>
-<element name="P13" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="9.0805"/>
-<element name="P35" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="14.1605"/>
-<element name="P14" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="9.0805"/>
-<element name="P34" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="11.6205"/>
-<element name="P15" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="6.5405"/>
-<element name="P33" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="11.6205"/>
-<element name="P16" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="6.5405"/>
-<element name="P3" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="7.0485" y="19.2405"/>
-<element name="P32" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="9.0805"/>
-<element name="P17" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="4.0005"/>
-<element name="P31" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="9.0805"/>
-<element name="P18" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="4.0005"/>
-<element name="P30" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="6.5405"/>
-<element name="P19" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="1.4605"/>
-<element name="P29" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="6.5405"/>
-<element name="P20" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="1.4605"/>
-<element name="P28" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="4.0005"/>
-<element name="P21" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="7.0485" y="1.4605"/>
-<element name="P4" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="7.0485" y="16.7005"/>
-<element name="P27" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="4.0005"/>
-<element name="P22" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="9.5885" y="1.4605"/>
-<element name="P26" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="1.4605"/>
-<element name="P23" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="12.1285" y="1.4605"/>
-<element name="P24" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="14.6685" y="1.4605"/>
-<element name="P25" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="1.4605"/>
-<element name="P44" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="12.1285" y="19.2405"/>
-<element name="P5" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="19.2405"/>
-<element name="P43" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="12.1285" y="16.7005"/>
-<element name="P6" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="16.7005"/>
-<element name="P42" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="14.6685" y="19.2405"/>
+<element name="P1" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="9.5885" y="19.2405">
+<attribute name="OC_NEWARK" value="unknown" x="9.5885" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="9.5885" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="9.5885" y="19.2405" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P7" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="16.7005">
+<attribute name="OC_NEWARK" value="unknown" x="1.9685" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="1.9685" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="1.9685" y="16.7005" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P41" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="14.6685" y="16.7005">
+<attribute name="OC_NEWARK" value="unknown" x="14.6685" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="14.6685" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="14.6685" y="16.7005" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P8" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="19.2405">
+<attribute name="OC_NEWARK" value="unknown" x="1.9685" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="1.9685" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="1.9685" y="19.2405" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P40" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="19.2405">
+<attribute name="OC_NEWARK" value="unknown" x="17.2085" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="17.2085" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="17.2085" y="19.2405" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P9" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="14.1605">
+<attribute name="OC_NEWARK" value="unknown" x="4.5085" y="14.1605" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="4.5085" y="14.1605" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="4.5085" y="14.1605" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P39" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="16.7005">
+<attribute name="OC_NEWARK" value="unknown" x="17.2085" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="17.2085" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="17.2085" y="16.7005" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P10" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="14.1605">
+<attribute name="OC_NEWARK" value="unknown" x="1.9685" y="14.1605" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="1.9685" y="14.1605" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="1.9685" y="14.1605" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P38" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="19.2405">
+<attribute name="OC_NEWARK" value="unknown" x="19.7485" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="19.7485" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="19.7485" y="19.2405" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P11" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="11.6205">
+<attribute name="OC_NEWARK" value="unknown" x="4.5085" y="11.6205" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="4.5085" y="11.6205" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="4.5085" y="11.6205" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P37" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="16.7005">
+<attribute name="OC_NEWARK" value="unknown" x="19.7485" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="19.7485" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="19.7485" y="16.7005" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P2" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="9.5885" y="16.7005">
+<attribute name="OC_NEWARK" value="unknown" x="9.5885" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="9.5885" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="9.5885" y="16.7005" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P12" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="11.6205">
+<attribute name="OC_NEWARK" value="unknown" x="1.9685" y="11.6205" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="1.9685" y="11.6205" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="1.9685" y="11.6205" size="1.778" layer="27" display="off"/>
+</element>
+<element name="U$21" library="Isaac" package="FSOP-44" value="LTC6803-2" x="10.8585" y="9.0805" smashed="yes" rot="R270">
+<attribute name="OC_NEWARK" value="unknown" x="10.8585" y="9.0805" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="MF" value="" x="10.8585" y="9.0805" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="MPN" value="" x="10.8585" y="9.0805" size="1.778" layer="27" rot="R270" display="off"/>
+</element>
+<element name="P36" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="14.1605">
+<attribute name="OC_NEWARK" value="unknown" x="17.2085" y="14.1605" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="17.2085" y="14.1605" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="17.2085" y="14.1605" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P13" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="9.0805">
+<attribute name="OC_NEWARK" value="unknown" x="4.5085" y="9.0805" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="4.5085" y="9.0805" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="4.5085" y="9.0805" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P35" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="14.1605">
+<attribute name="OC_NEWARK" value="unknown" x="19.7485" y="14.1605" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="19.7485" y="14.1605" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="19.7485" y="14.1605" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P14" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="9.0805">
+<attribute name="OC_NEWARK" value="unknown" x="1.9685" y="9.0805" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="1.9685" y="9.0805" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="1.9685" y="9.0805" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P34" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="11.6205">
+<attribute name="OC_NEWARK" value="unknown" x="17.2085" y="11.6205" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="17.2085" y="11.6205" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="17.2085" y="11.6205" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P15" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="6.5405">
+<attribute name="OC_NEWARK" value="unknown" x="1.9685" y="6.5405" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="1.9685" y="6.5405" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="1.9685" y="6.5405" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P33" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="11.6205">
+<attribute name="OC_NEWARK" value="unknown" x="19.7485" y="11.6205" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="19.7485" y="11.6205" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="19.7485" y="11.6205" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P16" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="6.5405">
+<attribute name="OC_NEWARK" value="unknown" x="4.5085" y="6.5405" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="4.5085" y="6.5405" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="4.5085" y="6.5405" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P3" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="7.0485" y="19.2405">
+<attribute name="OC_NEWARK" value="unknown" x="7.0485" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="7.0485" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="7.0485" y="19.2405" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P32" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="9.0805">
+<attribute name="OC_NEWARK" value="unknown" x="17.2085" y="9.0805" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="17.2085" y="9.0805" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="17.2085" y="9.0805" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P17" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="4.0005">
+<attribute name="OC_NEWARK" value="unknown" x="1.9685" y="4.0005" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="1.9685" y="4.0005" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="1.9685" y="4.0005" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P31" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="9.0805">
+<attribute name="OC_NEWARK" value="unknown" x="19.7485" y="9.0805" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="19.7485" y="9.0805" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="19.7485" y="9.0805" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P18" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="4.0005">
+<attribute name="OC_NEWARK" value="unknown" x="4.5085" y="4.0005" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="4.5085" y="4.0005" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="4.5085" y="4.0005" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P30" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="6.5405">
+<attribute name="OC_NEWARK" value="unknown" x="17.2085" y="6.5405" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="17.2085" y="6.5405" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="17.2085" y="6.5405" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P19" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="1.4605">
+<attribute name="OC_NEWARK" value="unknown" x="1.9685" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="1.9685" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="1.9685" y="1.4605" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P29" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="6.5405">
+<attribute name="OC_NEWARK" value="unknown" x="19.7485" y="6.5405" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="19.7485" y="6.5405" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="19.7485" y="6.5405" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P20" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="1.4605">
+<attribute name="OC_NEWARK" value="unknown" x="4.5085" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="4.5085" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="4.5085" y="1.4605" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P28" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="4.0005">
+<attribute name="OC_NEWARK" value="unknown" x="19.7485" y="4.0005" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="19.7485" y="4.0005" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="19.7485" y="4.0005" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P21" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="7.0485" y="1.4605">
+<attribute name="OC_NEWARK" value="unknown" x="7.0485" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="7.0485" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="7.0485" y="1.4605" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P4" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="7.0485" y="16.7005">
+<attribute name="OC_NEWARK" value="unknown" x="7.0485" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="7.0485" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="7.0485" y="16.7005" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P27" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="4.0005">
+<attribute name="OC_NEWARK" value="unknown" x="17.2085" y="4.0005" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="17.2085" y="4.0005" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="17.2085" y="4.0005" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P22" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="9.5885" y="1.4605">
+<attribute name="OC_NEWARK" value="unknown" x="9.5885" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="9.5885" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="9.5885" y="1.4605" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P26" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="1.4605">
+<attribute name="OC_NEWARK" value="unknown" x="19.7485" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="19.7485" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="19.7485" y="1.4605" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P23" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="12.1285" y="1.4605">
+<attribute name="OC_NEWARK" value="unknown" x="12.1285" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="12.1285" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="12.1285" y="1.4605" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P24" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="14.6685" y="1.4605">
+<attribute name="OC_NEWARK" value="unknown" x="14.6685" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="14.6685" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="14.6685" y="1.4605" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P25" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="1.4605">
+<attribute name="OC_NEWARK" value="unknown" x="17.2085" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="17.2085" y="1.4605" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="17.2085" y="1.4605" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P44" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="12.1285" y="19.2405">
+<attribute name="OC_NEWARK" value="unknown" x="12.1285" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="12.1285" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="12.1285" y="19.2405" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P5" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="19.2405">
+<attribute name="OC_NEWARK" value="unknown" x="4.5085" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="4.5085" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="4.5085" y="19.2405" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P43" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="12.1285" y="16.7005">
+<attribute name="OC_NEWARK" value="unknown" x="12.1285" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="12.1285" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="12.1285" y="16.7005" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P6" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="16.7005">
+<attribute name="OC_NEWARK" value="unknown" x="4.5085" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="4.5085" y="16.7005" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="4.5085" y="16.7005" size="1.778" layer="27" display="off"/>
+</element>
+<element name="P42" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="14.6685" y="19.2405">
+<attribute name="OC_NEWARK" value="unknown" x="14.6685" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MF" value="" x="14.6685" y="19.2405" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="" x="14.6685" y="19.2405" size="1.778" layer="27" display="off"/>
+</element>
 </elements>
 <signals>
 <signal name="1">

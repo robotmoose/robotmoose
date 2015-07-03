@@ -2701,7 +2701,11 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 <attribute name="OC_NEWARK" value="05B2757"/>
 </part>
 <part name="SUPPLY19" library="supply2" deviceset="GND" device=""/>
-<part name="U$9" library="Clayton" deviceset="LTC6803_BREAKOUT" device="" value="LTC6803"/>
+<part name="U$9" library="Clayton" deviceset="LTC6803_BREAKOUT" device="" value="LTC6803">
+<attribute name="MF" value=""/>
+<attribute name="MPN" value="LTC6803IG-2#PBF"/>
+<attribute name="OC_NEWARK" value="27T5837"/>
+</part>
 </parts>
 <sheets>
 <sheet>
@@ -3058,7 +3062,11 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 <attribute name="MPN" x="182.88" y="78.74" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="SUPPLY19" gate="GND" x="170.18" y="66.04"/>
-<instance part="U$9" gate="G$1" x="165.1" y="-86.36"/>
+<instance part="U$9" gate="G$1" x="165.1" y="-86.36">
+<attribute name="OC_NEWARK" x="165.1" y="-86.36" size="1.778" layer="96" display="off"/>
+<attribute name="MF" x="165.1" y="-86.36" size="1.778" layer="96" display="off"/>
+<attribute name="MPN" x="165.1" y="-86.36" size="1.778" layer="96" display="off"/>
+</instance>
 </instances>
 <busses>
 </busses>
