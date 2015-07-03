@@ -43,11 +43,12 @@ public:
 			int c=s.read(); // read one char
 			if (c<=0) 
 			{ // no char to read right now--run actions in the meantime.
+//Serial.println(F("wait"));
 				action_loop();
 			}
 			else {
-//Serial.print("Returning char ");
-//Serial.println((char)c);
+// Serial.print(F("Returning char "));
+// Serial.println((char)c);
 				return c;
 			}
 		}
@@ -84,8 +85,8 @@ public:
 			{ /* delimiter */
 				if (c=='(' || c==')' || c==';') ungot=c; // put back delimeters
 				if (ret!="") {
-//Serial.print("Returning string ");
-//Serial.println(ret);
+// Serial.print(F("Returning string "));
+// Serial.println(ret);
 					return ret; // done with string
 				}
 				/* else ignore spare delimiters */
@@ -101,7 +102,7 @@ public:
 	long read_int() {
 		String str=read_string();
 		long ret=str.toInt();
-		if (ret==0 && str[0]!='0') failed("Error reading integer",str);
+		if (ret==0 && str[0]!='0') failed("bad int",str);
 		return ret;
 	}
 
@@ -126,9 +127,9 @@ public:
 	#endif
 		if (is_analog) {
 			if (pin<=maxAnalog) pin+=A0;
-			else {failed("Invalid analog pin number",str); return 0;}
+			else {failed("bad analog pin ",str); return 0;}
 		}
-		else if (pin<=0 || pin>maxPin) {failed("Invalid pin number",str); return 0;}
+		else if (pin<=0 || pin>maxPin) {failed("bad pin ",str); return 0;}
 
 		return pin;
 	}
@@ -151,7 +152,7 @@ public:
 			default: break;
 			}
 		}
-		if (ret==NULL) failed("Error reading Arduino Mega serial port (like X1)",str);
+		if (ret==NULL) failed("bad Mega serial ",str);
 	#else 
 	/* Arduino UNO?	Use software serial, like "pins 8 9" (pin 8 RX, pin 9 TX) */
 		SoftwareSerial *ret=NULL;
@@ -161,7 +162,7 @@ public:
 			if (rx!=0 && tx!=0)
 				 ret=new SoftwareSerial(rx,tx); // FIXME: how can we ever delete this object?
 		}
-		else failed("Error reading Arduino Uno software serial port (like 'pins 8 9')",str);
+		else failed("bad sw serial ",str);
 	#endif
 
 		if (ret!=NULL && baud>0)

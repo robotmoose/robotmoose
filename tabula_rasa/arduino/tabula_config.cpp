@@ -51,6 +51,7 @@ void expect_char(tabula_configure_source &src,char expected) {
 // Configure one device
 bool tabula_configure() {
 	tabula_configure_source src(Serial);
+	// Serial.println("reading user string");
 	String cmd=src.read_string();
 
 	tabula_factory *factory=tabula_factory_find(cmd);
@@ -77,7 +78,7 @@ bool tabula_configure() {
 		tabula_factory_list();
 	}
 	else if (cmd=="version?") { 
-		Serial.println(F("1 2015-06-12 Bethel"));
+		Serial.println(F("1 2015-07-03 Chugiak"));
 	}
 	else if (cmd=="sensors?") { 
 		Serial.print(F("1  ")); tabula_sensor_storage.print<unsigned char>();
@@ -125,9 +126,6 @@ bool tabula_configure() {
 		tabula_factory_list();
 		Serial.println(F("Argument format: S is a Serial port, like X3 for TX3/RX3.  P is a Pin, like pin 13, or A3."));
 	}
-	else if (cmd=="print!") { // echo one string to screen
-		Serial.println(src.read_string());
-	}
 	else if (cmd=="reset!") { // soft reboot
 		void (*reset_vector)() = 0; // fn ptr to address 0
 		reset_vector();
@@ -138,7 +136,7 @@ bool tabula_configure() {
 		return false; // we're done!
 	}
 	else {
-		src.failed("no such device or command",cmd);
+		src.failed("bad command",cmd);
 	}
 
 /* Report errors back over serial */
@@ -162,7 +160,7 @@ void tabula_setup() {
 	Serial.begin(57600);
 	Serial.println(F("9 Enter your tabula device names now:"));
 	
-	while (tabula_configure()) {}
+	while (tabula_configure()) { }
 }
 
 
