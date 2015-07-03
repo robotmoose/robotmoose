@@ -1,6 +1,6 @@
 CXX=g++
 OPTS=-O
-CFLAGS=$(OPTS) -Wall -I../include
+CFLAGS=$(OPTS) -Wall -I../include -std=c++11
 # CFLAGS+=-DLISTEN80
 LIBS=-lpthread
 

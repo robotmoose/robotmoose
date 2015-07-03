@@ -7,18 +7,31 @@
 
   Dr. Orion Lawlor, lawlor@alaska.edu, 2014-10-02 (Public Domain)
 */
-#include <stdio.h>
-#include <string.h>
+#include <stdexcept>
+#include <cstdio>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <map>
 #include "mongoose/mongoose.h" /* central webserver library */
+#include <cstdint>
+#include <chrono>
+#include <thread>
 
 #include "osl/sha2_auth.h" /* for authentication */
 #include "osl/sha2.cpp" /* for easier linking */
 
- std::string ADDRESS="0.0.0.0:8081";
+int64_t millis()
+{
+	auto system_time=std::chrono::system_clock::now().time_since_epoch();
+	return std::chrono::duration_cast<std::chrono::milliseconds>(system_time).count();
+}
+
+std::string ADDRESS="0.0.0.0:8081";
+const std::string backup_filename="db.bak";
+const int64_t backup_time=5000;
+int64_t old_time=millis();
 
 /// Utility: integer to string
 std::string my_itos(int i) {
@@ -57,6 +70,84 @@ private:
 	db_t db;
 public:
 	superstar_db_t() {}
+
+	void save(const std::string& filename)
+	{
+		std::ofstream ostr(filename.c_str(),std::ios_base::out|std::ios_base::binary);
+		ostr.unsetf(std::ios_base::skipws);
+
+		if(!ostr)
+			throw std::runtime_error("superstar_db_t::save() - Could not open file named \""+
+				filename+"\" for saving.");
+
+		uint64_t array_length=db.size();
+		ostr.write((char*)&array_length,sizeof(uint64_t));
+
+		for(db_t::const_iterator entry=db.begin();entry!=db.end();++entry)
+		{
+			uint64_t key_size=entry->first.size();
+			std::string key_str=entry->first;
+			if(!ostr.write((char*)&key_size,sizeof(uint64_t)))
+				throw std::runtime_error("superstar_db_t::save() - Error writeing key size from file named \""+
+					filename+"\".");
+			if(!ostr.write(&key_str[0],key_size))
+				throw std::runtime_error("superstar_db_t::save() - Error writeing key from file named \""+
+					filename+"\".");
+
+			uint64_t data_size=entry->second.size();
+			std::string data_str=entry->second;
+			if(!ostr.write((char*)&data_size,sizeof(uint64_t)))
+				throw std::runtime_error("superstar_db_t::save() - Error writeing data size from file named \""+
+					filename+"\" for loading.");
+			if(!ostr.write(&data_str[0],data_size))
+				throw std::runtime_error("superstar_db_t::save() - Error writeing data from file named \""+
+					filename+"\".");
+		}
+
+		ostr.close();
+	}
+
+	void load(const std::string& filename)
+	{
+		std::ifstream istr(filename.c_str(),std::ios_base::in|std::ios_base::binary);
+		istr.unsetf(std::ios_base::skipws);
+
+		if(!istr)
+			throw std::runtime_error("superstar_db_t::load() - Could not open file named \""+
+				filename+"\" for loading.");
+
+		uint64_t array_length=0;
+		istr.read((char*)&array_length,sizeof(uint64_t));
+		db_t db_temp;
+
+		for(size_t ii=0;ii<array_length;++ii)
+		{
+			uint64_t key_size=0;
+			std::string key_str;
+			if(!istr.read((char*)&key_size,sizeof(uint64_t)))
+				throw std::runtime_error("superstar_db_t::load() - Error reading key size from file named \""+
+					filename+"\".");
+			key_str.resize(key_size);
+			if(!istr.read(&key_str[0],key_size))
+				throw std::runtime_error("superstar_db_t::load() - Error reading key from file named \""+
+					filename+"\".");
+
+			uint64_t data_size=0;
+			std::string data_str;
+			if(!istr.read((char*)&data_size,sizeof(uint64_t)))
+				throw std::runtime_error("superstar_db_t::load() - Error reading data size from file named \""+
+					filename+"\" for loading.");
+			data_str.resize(data_size);
+			if(!istr.read(&data_str[0],data_size))
+				throw std::runtime_error("superstar_db_t::load() - Error reading data from file named \""+
+					filename+"\".");
+
+			db_temp[key_str]=data_str;
+		}
+
+		istr.close();
+		db=db_temp;
+	}
 
 	/**
 	  Overwrite the current value in the database with this new value.
@@ -276,35 +367,68 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
   They're all listening on the same port, so the OS will
   hopefully distribute the load among threads.
 */
-void *thread_code(void *) {
-  struct mg_server *server= mg_create_server(NULL, http_handler);
-  mg_set_option(server, "listening_port", ADDRESS.c_str());
-  mg_set_option(server, "ssi_pattern", "**.html$");
-  mg_set_option(server, "document_root", "../www"); // files served from here
+void *thread_code(void* data)
+{
+	struct mg_server *server= mg_create_server(NULL, http_handler);
+	mg_set_option(server, "listening_port", ADDRESS.c_str());
+	mg_set_option(server, "ssi_pattern", "**.html$");
+	mg_set_option(server, "document_root", "../www"); // files served from here
 
-  printf("OK, listening!  Visit http://localhost:%s to see the site!\n",
-  	mg_get_option(server, "listening_port"));
+	printf("OK, listening!  Visit http://localhost:%s to see the site!\n",
+	mg_get_option(server, "listening_port"));
 
-  while (1) {
-  	mg_poll_server(server,1000);
-  }
-  return 0;
+	while(true)
+	{
+		mg_poll_server(server,1000);
+
+		if(data!=NULL)
+		{
+			int64_t new_time=millis();
+
+			if((new_time-old_time)>=backup_time)
+			{
+				try
+				{
+					superstar_db.save(backup_filename);
+					std::cout<<"Saved backup file \""+backup_filename+"\"."<<std::endl;
+				}
+				catch(std::exception& error)
+				{
+					std::cout<<error.what()<<std::endl;
+				}
+
+				old_time=new_time;
+			}
+		}
+	}
+
+	return 0;
 }
 
 
 int main(int argc, char *argv[])
 {
+	try
+	{
+		superstar_db.load(backup_filename);
+		std::cout<<"Loaded backup file \""+backup_filename+"\"."<<std::endl;
+	}
+	catch(std::exception& error)
+	{
+		std::cout<<error.what()<<std::endl;
+	}
+
 	for (int argi = 1; argi < argc; argi++) {
 		if (0 == strcmp(argv[argi], "--address")) ADDRESS = argv[++argi];
 		else {
 			printf("Unrecognized command line argument '%s'\n", argv[argi]);
 		}
 	}
-  /* Start threads to be redundant servers.  This seems to do nothing. */
-  for (int thread=0;thread<0;thread++)
-  {
-	mg_start_thread(thread_code,0);
-  }
-  thread_code(0); // devote main thread to listening as well
-  return 0;
+
+	/* Start threads to be redundant servers.  This seems to do nothing. */
+	for (int thread=0;thread<0;thread++)
+		mg_start_thread(thread_code,NULL);
+
+	thread_code((void*)1); // devote main thread to listening as well as saving
+	return 0;
 }
