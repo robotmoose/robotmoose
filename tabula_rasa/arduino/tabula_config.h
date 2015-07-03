@@ -15,6 +15,34 @@ REGISTER_TABULA_DEVICE macro, and the tabula_configure_source object.
 #include <Arduino.h>
 #include "action.h"
 
+
+/**
+ On low-RAM microcontrollers like the Arduino Uno, we store strings
+ using a special __FlashStringHelper* 
+*/
+#ifdef __AVR__
+#  define tabula_flash_string_ptr const __FlashStringHelper *
+#  define tabula_flash_string(str) F(str)
+
+// Compare strings with operator==, by reading each byte from program RAM
+inline bool operator==(const String &a,const __FlashStringHelper *b) {
+  const char *pa=a.c_str();
+  const char PROGMEM *pb = (const char PROGMEM *)b;
+  while (1) {
+    unsigned char ac=*pa++;
+    unsigned char bc=pgm_read_byte(pb++);
+    if (ac!=bc) return false;
+    if (ac==0) return true; 
+  }
+}
+
+#else
+#  define tabula_flash_string_ptr const char *
+#  define tabula_flash_string(str) str
+#endif
+
+
+
 /**
  This class supplies configuration data such as strings, ints, etc
  to create devices.
@@ -43,11 +71,12 @@ public:
 			int c=s.read(); // read one char
 			if (c<=0) 
 			{ // no char to read right now--run actions in the meantime.
+//Serial.println(F("wait"));
 				action_loop();
 			}
 			else {
-//Serial.print("Returning char ");
-//Serial.println((char)c);
+// Serial.print(F("Returning char "));
+// Serial.println((char)c);
 				return c;
 			}
 		}
@@ -58,13 +87,13 @@ public:
 	 If it's not NULL, it's a human-readable string
 	 describing what went wrong.
 	*/
-	const char *failure;
+	tabula_flash_string_ptr failure;
 	
 	// This is the string we were parsing before the error.
 	String failed_value;
 	
 	/* A parse error happened--store the error internally */
-	void failed(const char *failure_,const String &failed_value_) {
+	void failed(tabula_flash_string_ptr failure_,const String &failed_value_) {
 		failure=failure_; failed_value=failed_value_;
 	}
 
@@ -84,8 +113,8 @@ public:
 			{ /* delimiter */
 				if (c=='(' || c==')' || c==';') ungot=c; // put back delimeters
 				if (ret!="") {
-//Serial.print("Returning string ");
-//Serial.println(ret);
+// Serial.print(F("Returning string "));
+// Serial.println(ret);
 					return ret; // done with string
 				}
 				/* else ignore spare delimiters */
@@ -101,7 +130,7 @@ public:
 	long read_int() {
 		String str=read_string();
 		long ret=str.toInt();
-		if (ret==0 && str[0]!='0') failed("Error reading integer",str);
+		if (ret==0 && str[0]!='0') failed(tabula_flash_string("bad int"),str);
 		return ret;
 	}
 
@@ -126,9 +155,9 @@ public:
 	#endif
 		if (is_analog) {
 			if (pin<=maxAnalog) pin+=A0;
-			else {failed("Invalid analog pin number",str); return 0;}
+			else {failed(tabula_flash_string("bad analog pin "),str); return 0;}
 		}
-		else if (pin<=0 || pin>maxPin) {failed("Invalid pin number",str); return 0;}
+		else if (pin<=0 || pin>maxPin) {failed(tabula_flash_string("bad pin "),str); return 0;}
 
 		return pin;
 	}
@@ -151,7 +180,7 @@ public:
 			default: break;
 			}
 		}
-		if (ret==NULL) failed("Error reading Arduino Mega serial port (like X1)",str);
+		if (ret==NULL) failed(tabula_flash_string("bad Mega serial "),str);
 	#else 
 	/* Arduino UNO?	Use software serial, like "pins 8 9" (pin 8 RX, pin 9 TX) */
 		SoftwareSerial *ret=NULL;
@@ -161,7 +190,7 @@ public:
 			if (rx!=0 && tx!=0)
 				 ret=new SoftwareSerial(rx,tx); // FIXME: how can we ever delete this object?
 		}
-		else failed("Error reading Arduino Uno software serial port (like 'pins 8 9')",str);
+		else failed(tabula_flash_string("bad sw serial "),str);
 	#endif
 
 		if (ret!=NULL && baud>0)
@@ -205,18 +234,18 @@ Use REGISTER_TABULA_DEVICE to create your factory.
 */
 class tabula_factory {
 public:
-	// The machine-readable string name of this device, like "bts_controller_t"
-	//   By convention, it's also the name of the class.
-	const char *device_name;
+	// The machine-readable string config name of this device, like "neato".
+	//   By convention, it's a shortened version of the name of the C++ class.
+	tabula_flash_string_ptr device_name;
 	
-	// This string is stuff like:
+	// This string describes our configuration arguments, like:
 	//   P for a pin
 	//   S for a serial port
 	// For example, "SP" for one serial port, then one pin;
 	//  "PPPP" for four pins.
-	const char *arg_types;
+	tabula_flash_string_ptr arg_types;
 	
-	tabula_factory(const char *device_name_,const char *arg_types_)
+	tabula_factory(tabula_flash_string_ptr device_name_,tabula_flash_string_ptr arg_types_)
 		:device_name(device_name_), arg_types(arg_types_) 
 	{
 		register_factory(this);
@@ -249,7 +278,7 @@ REGISTER_TABULA_DEVICE(my_motor_controller,"P",
 #define REGISTER_TABULA_DEVICE(name, arg_types, create_code) \
 	class name##_factory : public tabula_factory { \
 	public: \
-		name##_factory() :tabula_factory(#name,arg_types) {} \
+		name##_factory() :tabula_factory(tabula_flash_string(#name),tabula_flash_string(arg_types)) {} \
 		virtual void create(tabula_configure_source &src) { create_code ; } \
 	}; \
 	const static name##_factory name##_factory_singleton;

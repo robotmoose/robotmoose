@@ -261,6 +261,12 @@ state_editor_t.prototype.refreshData = function()
 	
 }
 
+state_editor_t.prototype.setRobotName = function(robot_name)
+{
+	var myself = this;
+	this.robotName = robot_name;
+}
+
 /*
  * Uncommment for Load and save to disk functionality 
  * 
