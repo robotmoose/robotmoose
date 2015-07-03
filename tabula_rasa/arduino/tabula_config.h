@@ -15,6 +15,21 @@ REGISTER_TABULA_DEVICE macro, and the tabula_configure_source object.
 #include <Arduino.h>
 #include "action.h"
 
+
+/**
+ On low-RAM microcontrollers like the Arduino Uno, we store strings
+ using a special __FlashStringHelper* 
+*/
+#ifdef __AVR__
+#  define tabula_flash_string_ptr __FlashStringHelper*
+#  define tabula_flash_string(str) F(str)
+#else
+#  define tabula_flash_string_ptr const char *
+#  define tabula_flash_string(str) str
+#endif
+
+
+
 /**
  This class supplies configuration data such as strings, ints, etc
  to create devices.
@@ -59,13 +74,13 @@ public:
 	 If it's not NULL, it's a human-readable string
 	 describing what went wrong.
 	*/
-	const char *failure;
+	tabula_flash_string_ptr failure;
 	
 	// This is the string we were parsing before the error.
 	String failed_value;
 	
 	/* A parse error happened--store the error internally */
-	void failed(const char *failure_,const String &failed_value_) {
+	void failed(tabula_flash_string_ptr failure_,const String &failed_value_) {
 		failure=failure_; failed_value=failed_value_;
 	}
 
@@ -102,7 +117,7 @@ public:
 	long read_int() {
 		String str=read_string();
 		long ret=str.toInt();
-		if (ret==0 && str[0]!='0') failed("bad int",str);
+		if (ret==0 && str[0]!='0') failed(tabula_flash_string("bad int"),str);
 		return ret;
 	}
 
@@ -127,9 +142,9 @@ public:
 	#endif
 		if (is_analog) {
 			if (pin<=maxAnalog) pin+=A0;
-			else {failed("bad analog pin ",str); return 0;}
+			else {failed(tabula_flash_string("bad analog pin "),str); return 0;}
 		}
-		else if (pin<=0 || pin>maxPin) {failed("bad pin ",str); return 0;}
+		else if (pin<=0 || pin>maxPin) {failed(tabula_flash_string("bad pin "),str); return 0;}
 
 		return pin;
 	}
@@ -152,7 +167,7 @@ public:
 			default: break;
 			}
 		}
-		if (ret==NULL) failed("bad Mega serial ",str);
+		if (ret==NULL) failed(tabula_flash_string("bad Mega serial "),str);
 	#else 
 	/* Arduino UNO?	Use software serial, like "pins 8 9" (pin 8 RX, pin 9 TX) */
 		SoftwareSerial *ret=NULL;
@@ -162,7 +177,7 @@ public:
 			if (rx!=0 && tx!=0)
 				 ret=new SoftwareSerial(rx,tx); // FIXME: how can we ever delete this object?
 		}
-		else failed("bad sw serial ",str);
+		else failed(tabula_flash_string("bad sw serial "),str);
 	#endif
 
 		if (ret!=NULL && baud>0)

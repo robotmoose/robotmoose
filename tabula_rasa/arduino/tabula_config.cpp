@@ -40,11 +40,11 @@ tabula_factory *tabula_factory_find(const String &device_name) {
 void expect_char(tabula_configure_source &src,char expected) {
 	char c=src.read();
 	if (c!=expected) { // not the character we wanted
-		String err="Expected ";
+		String err="";
 		err+=expected;
 		err+=" but got ";
 		err+=c;
-		src.failed(" ",err);
+		src.failed(tabula_flash_string("Expected "),err);
 	}
 }
 
@@ -136,7 +136,7 @@ bool tabula_configure() {
 		return false; // we're done!
 	}
 	else {
-		src.failed("bad command",cmd);
+		src.failed(tabula_flash_string("bad command"),cmd);
 	}
 
 /* Report errors back over serial */
