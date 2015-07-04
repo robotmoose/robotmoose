@@ -677,7 +677,7 @@ config_gui_t.prototype.create_serial_drop=function(value)
 	title_option.selected=true;
 	drop.add(title_option);
 
-	for(var ii=0;ii<=3;++ii)
+	for(var ii=1;ii<=3;++ii)
 	{
 		var option=document.createElement("option");
 		option.text="X"+ii;
