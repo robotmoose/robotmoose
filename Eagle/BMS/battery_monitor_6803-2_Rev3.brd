@@ -171,8 +171,6 @@ IN</text>
 <text x="3.937" y="29.337" size="1.778" layer="25" rot="R90">ITEST BMS Rev 3</text>
 <text x="8.509" y="20.574" size="0.508" layer="21">ESTOP1</text>
 <text x="8.509" y="17.907" size="0.508" layer="21">ESTOP2</text>
-<text x="9.779" y="13.843" size="0.508" layer="21" rot="R90">CHGR
-OUT</text>
 <text x="9.652" y="2.667" size="0.508" layer="21" rot="R90">CHGR
 OUT</text>
 </plain>
