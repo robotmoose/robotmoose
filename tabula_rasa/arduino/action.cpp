@@ -10,12 +10,13 @@ long action_time_ms;
 
 /* A "meta device" that runs this action_list every N milliseconds.
    These are used to make the faster rungs call the slower rungs. */
-template <long every_N_ms>
 class timer_device : public action {
+  long every_N_ms; // how often we should run
   long time_last_ms; // the last time we ran
   action_list &devices;
 public:
-  timer_device(action_list &devices_) :time_last_ms(-1),devices(devices_) {}
+  timer_device(long every_N_ms_,action_list &devices_) 
+    :every_N_ms(every_N_ms_),time_last_ms(-5),devices(devices_)  {}
   void loop() {
     if (action_time_ms-time_last_ms>=every_N_ms) 
     {
@@ -31,25 +32,15 @@ public:
   You add your action to the appropriate rung, like
       actions_10ms.add(new my_crazy_device(A3));
 */
-action_list actions_always; // run every loop()
-action_list actions_1ms; // run at most every 1 ms
-action_list actions_10ms; // every 10ms
-action_list actions_100ms; // every 100ms
-action_list actions_1s; // every 1 second
-action_list actions_10s; // every 10 seconds
-action_list actions_100s; // every 100 seconds
-action_list actions_1000s; // every 1000 seconds
-
+action_list action_lists[action_lists_count];
 
 void action_setup() {
+  long every_N_ms=1;
   // Link a timer into each faster list, to run the next-slower list
-  actions_always.set(new timer_device<1>(actions_1ms));
-  actions_1ms.set(new timer_device<10>(actions_10ms));
-  actions_10ms.set(new timer_device<100>(actions_100ms));
-  actions_100ms.set(new timer_device<1000>(actions_1s));
-  actions_1s.set(new timer_device<10000>(actions_10s));
-  actions_10s.set(new timer_device<100000>(actions_100s));
-  actions_100s.set(new timer_device<1000000>(actions_1000s));
+  for (int i=1;i<action_lists_count;i++) {
+  	action_lists[i-i].add(new timer_device(every_N_ms,action_lists[i]));
+  	every_N_ms*=10; // each level is 10x slower than the last
+  }
 }
 
 void action_loop() {

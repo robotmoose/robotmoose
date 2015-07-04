@@ -131,7 +131,7 @@ REGISTER_TABULA_DEVICE(commands16,"", actions_1s.add(new command_watcher<int16_t
 // Simple ASCII serial heartbeat
 class heartbeat : public action {
 public:
-   void loop() { Serial.println("Heartbeat!"); }
+   void loop() { Serial.println(F("Heartbeat!")); }
 };
 
 REGISTER_TABULA_DEVICE(heartbeat,"",
