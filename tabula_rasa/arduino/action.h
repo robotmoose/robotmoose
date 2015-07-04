@@ -55,15 +55,9 @@ public:
     {
       action *doomed=cur;
       cur=cur->next;
-      delete cur;
+      delete doomed;
     }
     head=0;
-  }
-  
-  /// Assign this as our new sole action,
-  ///  removing all other actions.
-  void set(action *a) {
-    reset(); add(a);
   }
 };
 
@@ -87,14 +81,17 @@ extern bool pc_connected;
   You add your action to the appropriate rung, like
       actions_10ms.add(new my_crazy_device(A3));
 */
-extern action_list actions_always; // run every loop()
-extern action_list actions_1ms; // run at most every 1 ms
-extern action_list actions_10ms; // every 10ms
-extern action_list actions_100ms; // every 100ms
-extern action_list actions_1s; // every 1 second
-extern action_list actions_10s; // every 10 seconds
-extern action_list actions_100s; // every 100 seconds
-extern action_list actions_1000s; // every 1000 seconds
+enum {action_lists_count=8};
+extern action_list action_lists[action_lists_count];
+
+#define actions_always action_lists[0] // run every loop()
+#define actions_1ms action_lists[1] // run at most every 1 ms
+#define actions_10ms action_lists[2] // every 10ms
+#define actions_100ms action_lists[3] // every 100ms
+#define actions_1s action_lists[4] // every 1 second
+#define actions_10s action_lists[5] // every 10 seconds
+#define actions_100s action_lists[6] // every 100 seconds
+#define actions_1000s action_lists[7] // every 1000 seconds
 
 extern void action_setup();
 extern void action_loop();
