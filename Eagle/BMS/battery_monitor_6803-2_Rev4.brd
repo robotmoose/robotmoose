@@ -920,9 +920,9 @@ Please make sure your boards conform to these design rules.</description>
 <element name="Q3" library="SparkFun-DiscreteSemi" package="SOT23-3" value="MOSFET-PCHANNELIRLML2244" x="46.482" y="42.926" smashed="yes" rot="R270">
 <attribute name="PROD_ID" value="TRANS-11153" x="-74.168" y="-48.514" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="NAME" x="47.625" y="41.9735" size="0.4064" layer="25" rot="R270"/>
-<attribute name="OC_NEWARK" value="40X8697" x="46.482" y="42.926" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="OC_NEWARK" value="40T7448" x="46.482" y="42.926" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MF" value="" x="46.482" y="42.926" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MPN" value="SI2369DS-T1-GE3" x="46.482" y="42.926" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="MPN" value="IRLML2244TRPBF" x="46.482" y="42.926" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="DZ1" library="SparkFun-DiscreteSemi" package="SOD-323" value="PDZ7.5B" x="34.798" y="46.482" smashed="yes" rot="R90">
 <attribute name="NAME" x="33.782" y="45.593" size="0.4064" layer="25" rot="R90"/>
@@ -966,16 +966,16 @@ Please make sure your boards conform to these design rules.</description>
 <element name="Q4" library="SparkFun-DiscreteSemi" package="SOT23-3" value="MOSFET-PCHANNELIRLML2244" x="39.37" y="42.799" smashed="yes" rot="R270">
 <attribute name="PROD_ID" value="TRANS-11153" x="-87.63" y="21.209" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="NAME" x="40.513" y="42.1005" size="0.4064" layer="25" rot="R270"/>
-<attribute name="OC_NEWARK" value="40X8697" x="39.37" y="42.799" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="OC_NEWARK" value="40T7448" x="39.37" y="42.799" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MF" value="" x="39.37" y="42.799" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MPN" value="SI2369DS-T1-GE3" x="39.37" y="42.799" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="MPN" value="IRLML2244TRPBF" x="39.37" y="42.799" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="Q5" library="SparkFun-DiscreteSemi" package="SOT23-3" value="MOSFET-PCHANNELIRLML2244" x="39.37" y="46.482" smashed="yes" rot="R270">
 <attribute name="PROD_ID" value="TRANS-11153" x="-87.63" y="14.732" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="NAME" x="40.386" y="45.6565" size="0.4064" layer="25" rot="R270"/>
-<attribute name="OC_NEWARK" value="40X8697" x="39.37" y="46.482" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="OC_NEWARK" value="40T7448" x="39.37" y="46.482" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MF" value="" x="39.37" y="46.482" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MPN" value="SI2369DS-T1-GE3" x="39.37" y="46.482" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="MPN" value="IRLML2244TRPBF" x="39.37" y="46.482" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="R4" library="SparkFun-Resistors" package="0603-RES" value="100" x="22.352" y="38.862">
 <attribute name="PROD_ID" value="RES-07851" x="92.202" y="-88.138" size="1.778" layer="27" display="off"/>
@@ -1005,9 +1005,9 @@ Please make sure your boards conform to these design rules.</description>
 <element name="Q1" library="SparkFun-DiscreteSemi" package="SOT23-3" value="MOSFET-PCHANNELIRLML2244" x="27.813" y="15.875" smashed="yes">
 <attribute name="PROD_ID" value="TRANS-11153" x="109.093" y="-104.775" size="1.778" layer="27" display="off"/>
 <attribute name="NAME" x="28.5115" y="16.891" size="0.4064" layer="25"/>
-<attribute name="OC_NEWARK" value="40X8697" x="27.813" y="15.875" size="1.778" layer="27" display="off"/>
+<attribute name="OC_NEWARK" value="40T7448" x="27.813" y="15.875" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="27.813" y="15.875" size="1.778" layer="27" display="off"/>
-<attribute name="MPN" value="SI2369DS-T1-GE3" x="27.813" y="15.875" size="1.778" layer="27" display="off"/>
+<attribute name="MPN" value="IRLML2244TRPBF" x="27.813" y="15.875" size="1.778" layer="27" display="off"/>
 </element>
 <element name="R8" library="SparkFun-Resistors" package="0603-RES" value="100" x="22.606" y="35.687" smashed="yes" rot="R180">
 <attribute name="PROD_ID" value="RES-07851" x="-62.484" y="162.687" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1329,7 +1329,7 @@ Please make sure your boards conform to these design rules.</description>
 <attribute name="MF" value="TYCO ELECTRONICS" x="5.08" y="19.558" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="282834-2" x="5.08" y="19.558" size="1.778" layer="27" display="off"/>
 </element>
-<element name="R26" library="SparkFun-Resistors" package="0603-RES" value="1MEG" x="17.272" y="16.637" rot="R90">
+<element name="R26" library="SparkFun-Resistors" package="0603-RES" value="1Meg" x="17.272" y="16.637" rot="R90">
 <attribute name="PROD_ID" value="RES-07851" x="17.272" y="16.637" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="OC_NEWARK" value="64R5311" x="17.272" y="16.637" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="MF" value="" x="17.272" y="16.637" size="1.778" layer="27" rot="R90" display="off"/>

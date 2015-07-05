@@ -2345,8 +2345,8 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 </part>
 <part name="Q3" library="SparkFun-DiscreteSemi" deviceset="MOSFET-PCHANNEL" device="IRLML2244">
 <attribute name="MF" value=""/>
-<attribute name="MPN" value="SI2369DS-T1-GE3"/>
-<attribute name="OC_NEWARK" value="40X8697"/>
+<attribute name="MPN" value="IRLML2244TRPBF"/>
+<attribute name="OC_NEWARK" value="40T7448"/>
 </part>
 <part name="DZ1" library="SparkFun-DiscreteSemi" deviceset="DIODE-ZENER" device="-BZT52" value="PDZ7.5B">
 <attribute name="MF" value=""/>
@@ -2380,13 +2380,13 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 </part>
 <part name="Q4" library="SparkFun-DiscreteSemi" deviceset="MOSFET-PCHANNEL" device="IRLML2244">
 <attribute name="MF" value=""/>
-<attribute name="MPN" value="SI2369DS-T1-GE3"/>
-<attribute name="OC_NEWARK" value="40X8697"/>
+<attribute name="MPN" value="IRLML2244TRPBF"/>
+<attribute name="OC_NEWARK" value="40T7448"/>
 </part>
 <part name="Q5" library="SparkFun-DiscreteSemi" deviceset="MOSFET-PCHANNEL" device="IRLML2244">
 <attribute name="MF" value=""/>
-<attribute name="MPN" value="SI2369DS-T1-GE3"/>
-<attribute name="OC_NEWARK" value="40X8697"/>
+<attribute name="MPN" value="IRLML2244TRPBF"/>
+<attribute name="OC_NEWARK" value="40T7448"/>
 </part>
 <part name="R4" library="SparkFun-Resistors" deviceset="3.3KOHM1/10W1%(0603)" device="" value="100">
 <attribute name="MF" value=""/>
@@ -2410,8 +2410,8 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 </part>
 <part name="Q1" library="SparkFun-DiscreteSemi" deviceset="MOSFET-PCHANNEL" device="IRLML2244">
 <attribute name="MF" value=""/>
-<attribute name="MPN" value="SI2369DS-T1-GE3"/>
-<attribute name="OC_NEWARK" value="40X8697"/>
+<attribute name="MPN" value="IRLML2244TRPBF"/>
+<attribute name="OC_NEWARK" value="40T7448"/>
 </part>
 <part name="R8" library="SparkFun-Resistors" deviceset="3.3KOHM1/10W1%(0603)" device="" value="100">
 <attribute name="MF" value=""/>
@@ -2690,7 +2690,7 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 <attribute name="MPN" value="282834-2"/>
 <attribute name="OC_NEWARK" value="12H8386"/>
 </part>
-<part name="R26" library="SparkFun-Resistors" deviceset="3.3KOHM1/10W1%(0603)" device="" value="1MEG">
+<part name="R26" library="SparkFun-Resistors" deviceset="3.3KOHM1/10W1%(0603)" device="" value="1Meg">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value="ERJ-3EKF1004V"/>
 <attribute name="OC_NEWARK" value="64R5311"/>
