@@ -884,13 +884,14 @@ int main(int argc, char *argv[])
 	double LRtrim=1.0;
 	std::string superstarURL = "http://robotmoose.com/"; // superstar server
 	std::string robotName = "demo"; // superstar robot name
-	std::string configMotor = "create2(X3);"; // Arduino firmware device name
+	std::string configMotor; // Arduino firmware device name
 	std::string markerFile=""; // computer vision marker file
 	std::string sensors=""; // All our sensors
 	int baudrate=57600;  // serial comms to Arduino
 	for (int argi = 1; argi<argc; argi++) {
 		if (0 == strcmp(argv[argi], "--robot")) robotName = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--superstar")) superstarURL = argv[++argi];
+		else if (0 == strcmp(argv[argi], "--local")) superstarURL = "http://localhost:8081";
 		else if (0 == strcmp(argv[argi], "--baudrate")) baudrate = atoi(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--motor")) configMotor = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--marker")) markerFile = argv[++argi];
