@@ -1,0 +1,62 @@
+<html>
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<script>
+var table;
+
+function setup()
+{
+	var div=document.getElementById("tabler");
+	var name=document.getElementById("robot_name").value;
+	table=new state_table_t(div,name);
+	table.create_row("drive","// Drive forward:\nconsole.log('in state drive'); \nif (robot.location.x<-10) \n  robot.drive(100,100); \nelse \n  robot.state=turn; \n");
+	table.create_row("turn","// Turn left:\nif (robot.location.angle<90)\n  robot.drive(-100,100); \nelse  \n  robot.state=forward; \n");
+
+	table.run=run; // makes "Run" button work
+	
+	run();
+}
+
+function run() {
+	console.log("Running robot control code");
+
+	// Fabricate simple hardcoded robot:
+	var pilot={
+		L:0.0,
+		R:0.0
+	};
+
+	var robot={
+		pilot:pilot,
+		drive:function(L,R) {
+			robot.pilot.L=L; 
+			robot.pilot.R=R;
+		},
+		location: {
+			x:0,
+			y:0,
+			z:0,
+			angle:0
+		}
+	};
+
+	var states=table.get_value_array();
+	var runnable_code=new code_execution_t(states,robot);
+	runnable_code.verbose=true;
+	runnable_code.run(); // <- should be from setInterval
+	runnable_code.run();
+	runnable_code.run();
+}
+
+function set_robot_name()
+{
+	var name=document.getElementById("robot_name").value;
+	table.set_robot_name(name);
+}
+		</script>
+	</head>
+	<body onload="setup();">
+		<div id="tabler"></div>
+		<input type="text" id="robot_name" value="demo" onchange="set_robot_name();"/>
+	</body>
+</html>

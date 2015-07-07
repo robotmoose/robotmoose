@@ -1,3 +1,19 @@
+/*
+ Draggable state table editor class
+ 
+ By Mike Moss, 2015-06 (Public Domain)
+*/
+
+function make_button(name,onclick,margin) {
+	var b=document.createElement("input");
+	b.type="button";
+	b.value=name;
+	b.className="btn btn-primary";
+	b.style.marginRight=(margin===undefined)?10:margin;
+	b.onclick=onclick;
+	return b;
+}
+
 function state_table_t(div,robot_name)
 {
 	var myself=this;
@@ -8,7 +24,7 @@ function state_table_t(div,robot_name)
 	if(!this.div||!this.robot_name)
 		return null;
 
-	this.div.style.width=640;
+	//this.div.style.width=640;
 
 	this.state_list_prettifier=document.createElement("div");
 	this.state_list_prettifier.className="form-inline";
@@ -17,43 +33,38 @@ function state_table_t(div,robot_name)
 	this.state_list.className="sortable_handle";
 	this.state_list.style.paddingLeft=0;
 
-	this.break0=document.createElement("br");
-
-	this.upload_button=document.createElement("input");
-	this.upload_button.type="button";
-	this.upload_button.value="Upload";
-	this.upload_button.className="btn btn-primary";
-	this.upload_button.onclick=function(){myself.upload()};
-
-	this.adder_prettifier=document.createElement("div");
-	this.adder_prettifier.className="form-inline";
-
-	this.adder_button=document.createElement("input");
-	this.adder_button.type="button";
-	this.adder_button.value="Add";
-	this.adder_button.disabled=false;
-	this.adder_button.className="btn btn-primary";
-	this.adder_button.style.marginLeft=10;
-	this.adder_button.onclick=function(){myself.create_row("New State","//Code");};
-
-	this.break1=document.createElement("br");
+	this.action_buttons=document.createElement("div");
+	this.action_buttons.className="form-inline";
+	this.action_buttons.appendChild(make_button("Run",
+		function(){if (myself.run) myself.run();}
+	));
+	this.action_buttons.appendChild(make_button("Upload",
+		function(){myself.upload();}
+	,0));
+	this.action_buttons.appendChild(make_button("Download",
+		function(){myself.download();}
+	));
+	this.action_buttons.appendChild(make_button("Add a State",
+		function(){myself.create_row("newState","// JavaScript code\n\n");}
+	));
 
 	this.state_list_prettifier.appendChild(this.state_list);
-	this.adder_prettifier.appendChild(this.upload_button);
-	this.adder_prettifier.appendChild(this.adder_button);
 	this.div.appendChild(this.state_list_prettifier);
-	this.div.appendChild(this.break0);
+
+	//this.break0=document.createElement("br");
+	//this.div.appendChild(this.break0);
 	//this.file_manager=new file_manager_t(this.div);
-	//this.file_manager.onsave=function(filename){return myself.get_value();};
+	//this.file_manager.onsave=function(filename){return myself.get_value_string();};
 	//this.file_manager.onload=function(filename,data){myself.set_value(data);};
-	this.div.appendChild(this.break1);
-	this.div.appendChild(this.adder_prettifier);
+	//this.break1=document.createElement("br");
+	//this.div.appendChild(this.break1);
+	this.div.appendChild(this.action_buttons);
 
 	this.row_data=[];
 
 	$("ul.sortable_handle").sortable({handle:'.glyphicon'});
 
-	this.download();
+	// this.download();
 }
 
 state_table_t.prototype.set_value=function(value)
@@ -86,9 +97,11 @@ state_table_t.prototype.set_value=function(value)
 	}
 }
 
-state_table_t.prototype.get_value=function()
+
+
+state_table_t.prototype.get_value_array=function()
 {
-	var states_json=[];
+	var states_array=[];
 
 	try
 	{
@@ -102,16 +115,21 @@ state_table_t.prototype.get_value=function()
 			if(!child.state_code)
 				throw "Could not find state code of li.";
 
-			states_json.push({name:child.state_name.value,code:child.state_code.getValue()});
+			 states_array.push({name:child.state_name.value,code:child.state_code.getValue()});
 		}
 	}
 	catch(error)
 	{
-		console.log("state_table_t::get_value() - "+error);
-		states_json=[];
+		console.log("state_table_t::get_value_array() - "+error);
+		states_array=[];
 	}
 
-	return JSON.stringify(states_json);
+	return states_array;
+}
+
+state_table_t.prototype.get_value_string=function()
+{
+	return JSON.stringify(this.get_value_array());
 }
 
 state_table_t.prototype.download=function()
@@ -123,8 +141,13 @@ state_table_t.prototype.download=function()
 		send_request("GET","/superstar/"+this.robot_name,"states","?get",
 			function(response)
 			{
-				if(response)
+				if(response) 
+				{ // clean out our current state, replace with server version
+					while(myself.state_list.firstChild)
+						myself.state_list.removeChild(myself.state_list.firstChild);
+
 					myself.set_value(response);
+				}
 			},
 			function(error)
 			{
@@ -142,9 +165,10 @@ state_table_t.prototype.upload=function()
 {
 	try
 	{
-		var states_data=this.get_value();
+		var states_data=this.get_value_string();
 
-		send_request("GET","/superstar/"+this.robot_name,"states","?set="+states_data,
+		send_request("GET","/superstar/"+this.robot_name,"states",
+			"?set="+encodeURIComponent(states_data),
 			function(response)
 			{
 			},
@@ -184,18 +208,19 @@ state_table_t.prototype.create_row=function(name,code)
 		var input=document.createElement("input");
 		input.className="form-control";
 		input.value=name;
-		input.style.marginLeft=20;
-		input.style.marginRight=20;
+		input.size=10;
+		input.style.marginLeft=input.style.marginRight=10;
 		td0.appendChild(input);
 
 		var textarea=document.createElement("textarea");
 		textarea.innerHTML=code;
+		textarea.width="100%";
 		td1.appendChild(textarea);
 
 		var code_editor=CodeMirror.fromTextArea(textarea,
 			{indentUnit:4,indentWithTabs:true,lineNumbers:true,
 				matchBrackets:true,mode:"text/x-javascript"});
-		code_editor.setSize(320,240);
+		code_editor.setSize(320,100);
 
 		var button=document.createElement("span");
 		button.className="close";
@@ -227,10 +252,7 @@ state_table_t.prototype.set_robot_name=function(robot_name)
 
 		this.robot_name=robot_name;
 
-		while(this.state_list.firstChild)
-			this.state_list.removeChild(this.state_list.firstChild);
-
-		this.download();
+		// this.download();
 	}
 	catch(error)
 	{
