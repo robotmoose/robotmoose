@@ -2,6 +2,8 @@ layla/backend/backend
 layla/backend/backend.exe
 quizbot/software/quizbot
 quizbot/software/quizbot.exe
+jpeg_video_test/client
+jpeg_video_test/client.exe
 jpeg_video_test/server
 jpeg_video_test/server.exe
 jpeg_video_test/forwarder
@@ -29,3 +31,5 @@ sensors/imu/show_IMU/main
 sensors/imu/show_IMU/main.exe
 sensors/imu/show_IMU/main.o
 sensors/imu/show_IMU/ogl/glew.o
+www/blog
+www/latest.tar.gz
