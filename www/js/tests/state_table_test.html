@@ -9,9 +9,8 @@
 				var div=document.getElementById("tabler");
 				var name=document.getElementById("robot_name").value;
 				table=new state_table_t(div,name);
-
-				if(!table)
-					alert("Could not create table!");
+				table.create_row("drive","// Drive forward:\nif (robot.location.x<10) \n  robot.drive(100,100); \nelse \n  robot.state=turn; \n");
+				table.create_row("turn","// Turn left:\nif (robot.location.angle<90)\n  robot.drive(-100,100); \nelse  \n  robot.state=forward; \n");
 			}
 
 			function set_robot_name()

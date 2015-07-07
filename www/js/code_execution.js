@@ -1,68 +1,65 @@
-
 /* code_execution.js
- * Run code written in the Web-browser 
- * Arsh Chauhan 
- * 07/06/15
- * 
- */
+ Run robot control code written in the Web-browser 
+ Dr. Orion Lawlor & Arsh Chauhan, 2015-07-06 (Public Domain) 
+*/
 
-
-function code_execution_t(statesArray)
+/**
+ Take an array of state objects:
+     statesArray:[ { "name": "state1name", "code":"// Javascript code for state 1" } , ...]
+*/
+function code_execution_t(states,robot)
 {
-	this.statesArray = statesArray;
-	this.states = [];
-	this.code =[];
-	this.stringCode = "";
-	this.currentState;
+	this.states = states;
+	this.robot=robot;
+	this.compiled=false;
+	this.compile();
 }
 
-code_execution_t.prototype.collectSubmission = function()
+code_execution_t.prototype.compile = function()
 {
-	var myself = this;
-	for (var i = 0; i < myself.statesArray.length; i++)
-	{
-		myself.states[i] = myself.statesArray[i].state;
-		myself.code[i] = myself.statesArray[i].code;
-	}
-	console.log( myself.states);
-	console.log( myself.code);
+	var states_array=this.states;
+	var robot=this.robot;
 	
-}
-
-code_execution_t.prototype.createFunction = function()
-{
-	var pilot={
-	L:0.0,
-	R:0.0
+	// Each compiled state looks like this sort of object:
+	robot.state={
+		index:-1,
+		name:"invalid_initial_state",
+		run:function() { console.log("Robot.state default: Eval failed (syntax error?)."); }
 	};
-
-var robot={
-	pilot:pilot,
-	location: {
-		x:0,
-		y:0,
-		z:0,
-		angle:0
-		}, state: null
-	};
-	var myself = this;
-	myself.robot = robot;
-	for (var i = 0; i < myself.statesArray.length; i++)
+	
+	this.compiled_states = [];
+	var compiled_states=this.compiled_states;
+	this.code="";
+	for (var i = 0; i < this.states.length; i++)
 	{
-		myself.stringCode += "var " + myself.states[i] + " = function() { "+ myself.code[i] + "};";
-		if(i == 0)
-			myself.stringCode += "robot.state = " + myself.states[i] + ";";
-		
+		var s=this.states[i];
+		this.compiled_states[i]={index:i, name:s.name, code:s.code};
+		this.code += "///////// state "+s.name+" ///////////\n";
+		this.code += "var " + s.name + " = compiled_states["+i+"];\n";
+		this.code += s.name+".run= function() { // user code:\n\n "+ s.code + ";\n\n};\n";
+		if (i == 0)
+			this.code += "robot.state = " + s.name + "; // set initial state\n";
 	}
-	eval(myself.stringCode);
-	console.log(myself.stringCode);
+	try {
+		if (this.verbose) console.log("Compiling code: "+this.code);
+		eval(this.code);
+		this.compiled=true;
+	} 
+	catch (err) {
+		console.log("Compile error "+err+" on user code "+this.code);
+	}
 }
 
-code_execution_t.prototype.runCode = function()
+code_execution_t.prototype.run = function()
 {
-	var myself = this;
-	myself.robot.state();
-
+	if (!this.compiled) return;
+	try {
+		if (this.verbose) console.log("State: "+this.robot.state.name);
+		this.robot.state.run();
+	} 
+	catch (err) {
+		console.log("Run error "+err+" on user code "+this.code);
+	}
 }
 
 
