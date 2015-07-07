@@ -1,0 +1,17 @@
+<html>
+	<head>
+		<!--#include virtual="/sources.html"-->
+	</head>
+	<body>
+		<div id="the_div"></div>
+
+		<script>
+			var div=document.getElementById("the_div");
+			var robot_name="demo";
+			var test=new config_gui_t(div,robot_name);
+
+			if(!test)
+				alert("Could not create object!");
+		</script>
+	</body>
+</html>

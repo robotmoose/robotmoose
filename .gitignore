@@ -16,6 +16,7 @@ superstar/superstar
 superstar/superstar.exe
 superstar/auth
 superstar/logs
+superstar/db.bak
 quizbot_reader/quizbot_reader
 quizbot_reader/quizbot_reader.exe
 roomba_testing/roomba
