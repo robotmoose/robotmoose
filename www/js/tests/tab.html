@@ -1,0 +1,26 @@
+<html>
+	<head>
+		<!--#include virtual="/sources.html"-->
+	</head>
+	<body>
+		<div id="filediv"></div>
+
+		<script>
+
+        var tabTest = new TabView(document.getElementById("filediv"), "THE\nNAME");
+        if(!tabTest)
+        alert("Could NoT DO IT!!!");
+
+        var div1 = tabTest.getTab("tab1");
+        div1.innerHTML = "test for 1";
+
+        var div2 = tabTest.getTab("tab2");
+        div2.innerHTML = "test for 2";
+
+        var div3 = tabTest.getTab("tab3");
+        div3.innerHTML = "test for 3";
+
+		</script>
+        
+	</body>
+</html>
