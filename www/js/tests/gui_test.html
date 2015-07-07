@@ -41,8 +41,10 @@
 			console.log(JSON.stringify(gui.save()));
 
 			var test=document.createElement("textarea");
-			test.rows=2;
-			test.cols=2;
+			test.style.width="100%";
+			test.style.height="100%";
+			test.style.boxSizing="border-box";
+			test.style.resize="none";
 			gui.get_widget("test1").appendChild(test);
 		</script>
 	</body>

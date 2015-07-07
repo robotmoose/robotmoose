@@ -14,7 +14,8 @@ function gui_t(div,widgets)
 	({
 		widget_base_dimensions:[100,55],
 		widget_margins:[5,5],
-		resize:{enabled:true}
+		resize:{enabled:true},
+		draggable:{handle:"header"}
 	}).data("gridster");
 
 	this.htmls={};
@@ -51,10 +52,22 @@ gui_t.prototype.create_widget=function(widget)
 		var new_index=Object.keys(this.widget_lookups).length;
 		this.widget_lookups[widget.name]=new_index;
 		this.widget_lookups_reverse[new_index]=widget.name;
+
 		this.htmls[widget.name]={};
+
 		this.htmls[widget.name].li=this.gridster.add_widget("<li>",
 			widget.size_x,widget.size_y,widget.col,widget.row)[0];
+		this.htmls[widget.name].li.style.paddingBottom=20;
+
 		this.htmls[widget.name].div=document.createElement("div");
+		this.htmls[widget.name].div.style.width="100%";
+		this.htmls[widget.name].div.style.height="100%";
+		this.htmls[widget.name].div.style.boxSizing="border-box";
+
+		this.htmls[widget.name].handle=document.createElement("header");
+		this.htmls[widget.name].handle.innerHTML=widget.name;
+
+		this.htmls[widget.name].li.appendChild(this.htmls[widget.name].handle);
 		this.htmls[widget.name].li.appendChild(this.htmls[widget.name].div);
 	}
 	else
@@ -63,6 +76,9 @@ gui_t.prototype.create_widget=function(widget)
 		this.gridster.mutate_widget_in_gridmap(old_widget,old_widget.coords().grid,widget);
 		this.htmls[widget.name].li.removeChild(this.htmls[widget.name].div);
 		this.htmls[widget.name].div=document.createElement("div");
+		this.htmls[widget.name].div.style.width="100%";
+		this.htmls[widget.name].div.style.height="100%";
+		this.htmls[widget.name].div.style.boxSizing="border-box";
 		this.htmls[widget.name].li.appendChild(this.htmls[widget.name].div);
 	}
 }
