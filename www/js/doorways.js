@@ -136,6 +136,9 @@ doorways_t.prototype.set_menu_item_active=function(title,value)
 	for(var key in this.windows)
 		this.set_menu_item_active_m(key,false);
 
+	if(value)
+		this.windows[title].window.style.zIndex=this.zindex_top_m();
+
 	this.set_menu_item_active_m(title,value);
 	this.minimize(title,!value);
 }
