@@ -30,12 +30,22 @@ doorways_t.prototype.save=function()
 	var data=[];
 
 	for(var key in this.windows)
-		data.push
-		({
-			title:key,
-			x:parseInt(this.windows[key].window.style.left),
-			y:parseInt(this.windows[key].window.style.top)
-		});
+	{
+		var obj={};
+		obj.title=key;
+		obj.x=parseInt(this.windows[key].window.style.left)-this.element.offsetLeft;
+		obj.y=parseInt(this.windows[key].window.style.top)-this.element.offsetTop-this.menu.offsetHeight;
+		obj.active=this.windows[key].active;
+		obj.minimized=this.windows[key].minimized;
+
+		if(!obj.x)
+			obj.x=0;
+
+		if(!obj.y)
+			obj.y=0;
+
+		data.push(obj);
+	}
 
 	return data;
 }
@@ -47,16 +57,16 @@ doorways_t.prototype.load=function(data)
 
 	if(data)
 		for(key in data)
-			this.create_window(data[key].title,data[key].x,data[key].y);
+			this.create_window(data[key].title,data[key].x,data[key].y,data[key].active,data[key].minimized);
 }
 
-doorways_t.prototype.create_window=function(title,x,y)
+doorways_t.prototype.create_window=function(title,x,y,active,minimized)
 {
 	if(!title)
 		return null;
 
 	if(!this.windows[title])
-		this.create_window_m(title,x,y);
+		this.create_window_m(title,x,y,active,minimized);
 }
 
 doorways_t.prototype.get_window=function(title)
@@ -78,11 +88,14 @@ doorways_t.prototype.move_window=function(title,x,y)
 	if(!this.windows[title])
 		return;
 
-	if(x<this.element.offsetLeft)
-			x=this.element.offsetLeft;
+	if(x<0)
+		x=0;
 
-	if(y<this.element.offsetTop+this.menu.offsetHeight)
-		y=this.element.offsetTop+this.menu.offsetHeight;
+	if(y<0)
+		y=0;
+
+	x+=this.element.offsetLeft;
+	y+=this.element.offsetTop+this.menu.offsetHeight;
 
 	if(x)
 		this.windows[title].window.style.left=x;
@@ -175,7 +188,7 @@ doorways_t.prototype.refresh_windows_m=function()
 	}
 }
 
-doorways_t.prototype.create_window_m=function(title,x,y)
+doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 {
 	if(!this.windows[title])
 	{
@@ -183,8 +196,17 @@ doorways_t.prototype.create_window_m=function(title,x,y)
 
 		this.windows[title]={};
 		this.windows[title].title=title;
-		this.windows[title].active=false;
-		this.windows[title].minimized=false;
+
+		if(active)
+			this.windows[title].active=true;
+		else
+			this.windows[title].active=false;
+
+		if(minimized)
+			this.windows[title].minimized=true;
+		else
+			this.windows[title].minimized=false;
+
 		this.windows[title].menu_li=document.createElement("li");
 		this.windows[title].menu_a=document.createElement("a");
 		this.windows[title].window=document.createElement("div");
@@ -277,6 +299,8 @@ doorways_t.prototype.create_window_m=function(title,x,y)
 		};
 		this.windows[title].body.appendChild(this.windows[title].body_content);
 	}
+
+	this.refresh_windows_m();
 
 	return this.windows[title];
 }

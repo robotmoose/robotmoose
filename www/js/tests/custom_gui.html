@@ -3,7 +3,7 @@
 		<!--#include virtual="/sources.html"-->
 	</head>
 	<body>
-		<input type="button" value="click"/>
+		<input type="button" value="Save GUI" onclick="console.log(JSON.stringify(gui.save()));"/>
 		<div id="gui"></div>
 
 		<script type="text/javascript">
@@ -14,13 +14,19 @@
 			if(!gui)
 				alert("Could not create gui!");
 
-			gui.create_window("Configuration",0,128);
+			gui.load([{"title":"Configuration","x":146,"y":240,"active":false,"minimized":true},{"title":"State Editor","x":200,"y":0,"active":true,"minimized":false}]);
+
+			if(!gui.get_window("Configuration"))
+				gui.create_window("Configuration",10,0);
+
 			var config_editor=new config_gui_t(gui.get_window("Configuration").body_content,robot_name);
 
 			if(!config_editor)
 				alert("Could not create config editor!");
 
-			gui.create_window("State Editor",300,128);
+			if(!gui.get_window("State Editor"))
+				gui.create_window("State Editor",0,0);
+
 			var state_editor=new state_table_t(gui.get_window("State Editor").body_content,robot_name);
 			state_editor.create_row("drive","// Drive forward:\nif (robot.location.x<10) \n  robot.drive(100,100); \nelse \n  robot.state=turn; \n");
 			state_editor.create_row("turn","// Turn left:\nif (robot.location.angle<90)\n  robot.drive(-100,100); \nelse  \n  robot.state=forward; \n");
@@ -28,7 +34,6 @@
 			if(!state_editor)
 				alert("Could not create state editor!");
 
-			gui.set_menu_item_active("State Editor",true);
 		</script>
 	</body>
 </html>
