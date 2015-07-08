@@ -1,15 +1,14 @@
-.gridster *
+.gridster ul
 {
 	margin:0;
 	padding:0;
-}
-.gridster ul
-{
 	list-style-type:none;
 }
 
 .gridster .preview-holder
 {
+	margin:0;
+	padding:0;
 	border:none!important;
 	background:#337ab7!important;
 }
@@ -17,22 +16,11 @@
 .gridster li header
 {
 	cursor:move;
-	font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
-	font-size:16px;
-	color:white;
-	font-weight:500;
-	line-height:1.1;
-	margin-top:0px;
-	margin-bottom:0px;
-	padding-top:10px;
-	padding-bottom:10px;
-	padding-right:15px;
-	padding-left:15px;
-	box-sizing:border-box;
-	background-image:linear-gradient(to bottom,#337ab7 0,#2e6da4 100%);
 }
 
 .gs-resize-handle-both
 {
+	margin:0;
+	padding:0;
 	background-image:none;
 }

@@ -4,6 +4,10 @@ function config_editor_t(div,robot_name)
 		return null;
 
 	this.div=div;
+	this.element=document.createElement("div");
+	this.element.style.width="100%";
+	this.element.style.height="100%";
+	this.div.appendChild(this.element);
 	this.config="";
 	this.options=new Array();
 	this.counter=0;
@@ -437,14 +441,14 @@ function config_cli_t(div,robot_name)
 
 	this.textarea=document.createElement("textarea");
 	this.textarea.innerHTML=this.editor.config;
-	this.editor.div.appendChild(this.textarea);
+	this.editor.element.appendChild(this.textarea);
 
 	this.code_editor=CodeMirror.fromTextArea(this.textarea,
 		{indentUnit:4,indentWithTabs:true,lineNumbers:true,matchBrackets:true,mode:"text/x-arduino"});
 	this.code_editor.setSize(320,240);
 
 	this.break0=document.createElement("br");
-	this.editor.div.appendChild(this.break0);
+	this.editor.element.appendChild(this.break0);
 
 	this.configure_button=document.createElement("input");
 	this.configure_button.type="button";
@@ -453,7 +457,7 @@ function config_cli_t(div,robot_name)
 
 	var myself=this;
 	this.configure_button.onclick=function(){myself.editor.configure(myself.code_editor.getValue());};
-	this.editor.div.appendChild(this.configure_button);
+	this.editor.element.appendChild(this.configure_button);
 
 	this.editor.onconfigschange=function(config_text){myself.update_configs(config_text);};
 }
@@ -489,7 +493,6 @@ function config_gui_t(div,robot_name)
 
 	this.editor.onconfigschange=function(config_text){myself.update_configs(config_text);};
 	this.editor.onoptionschange=function(options){myself.update_options(options);};
-	this.editor.div.style.width=480;
 
 	this.configs_list_prettifier=document.createElement("div");
 	this.configs_list_prettifier.className="form-inline";
@@ -533,11 +536,11 @@ function config_gui_t(div,robot_name)
 	this.configs_list_prettifier.appendChild(this.configs_list);
 	this.adder_prettifier.appendChild(this.adder_select);
 	this.adder_prettifier.appendChild(this.adder_button);
-	this.editor.div.appendChild(this.configs_list_prettifier);
-	this.editor.div.appendChild(this.break0);
-	this.editor.div.appendChild(this.adder_prettifier);
-	this.editor.div.appendChild(this.break1);
-	this.editor.div.appendChild(this.configure_button);
+	this.editor.element.appendChild(this.configs_list_prettifier);
+	this.editor.element.appendChild(this.break0);
+	this.editor.element.appendChild(this.adder_prettifier);
+	this.editor.element.appendChild(this.break1);
+	this.editor.element.appendChild(this.configure_button);
 
 	$("ul.sortable").sortable();
 }

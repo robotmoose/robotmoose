@@ -1,6 +1,6 @@
 /*
  Draggable state table editor class
- 
+
  By Mike Moss, 2015-06 (Public Domain)
 */
 
@@ -16,15 +16,18 @@ function make_button(name,onclick,margin) {
 
 function state_table_t(div,robot_name)
 {
+	if(!div||!robot_name)
+		return null;
+
 	var myself=this;
 
 	this.div=div;
 	this.robot_name=robot_name;
 
-	if(!this.div||!this.robot_name)
-		return null;
+	this.element=document.createElement("div");
+	this.div.appendChild(this.element);
 
-	//this.div.style.width=640;
+	//this.element.style.width=640;
 
 	this.state_list_prettifier=document.createElement("div");
 	this.state_list_prettifier.className="form-inline";
@@ -38,27 +41,27 @@ function state_table_t(div,robot_name)
 	this.action_buttons.appendChild(make_button("Run",
 		function(){if (myself.run) myself.run();}
 	));
-	this.action_buttons.appendChild(make_button("Upload",
+	/*this.action_buttons.appendChild(make_button("Upload",
 		function(){myself.upload();}
 	,0));
 	this.action_buttons.appendChild(make_button("Download",
 		function(){myself.download();}
-	));
-	this.action_buttons.appendChild(make_button("Add a State",
+	));*/
+	this.action_buttons.appendChild(make_button("Add State",
 		function(){myself.create_row("newState","// JavaScript code\n\n");}
 	));
 
 	this.state_list_prettifier.appendChild(this.state_list);
-	this.div.appendChild(this.state_list_prettifier);
+	this.element.appendChild(this.state_list_prettifier);
 
 	//this.break0=document.createElement("br");
-	//this.div.appendChild(this.break0);
-	//this.file_manager=new file_manager_t(this.div);
+	//this.element.appendChild(this.break0);
+	//this.file_manager=new file_manager_t(this.element);
 	//this.file_manager.onsave=function(filename){return myself.get_value_string();};
 	//this.file_manager.onload=function(filename,data){myself.set_value(data);};
-	//this.break1=document.createElement("br");
-	//this.div.appendChild(this.break1);
-	this.div.appendChild(this.action_buttons);
+	this.break1=document.createElement("br");
+	this.element.appendChild(this.break1);
+	this.element.appendChild(this.action_buttons);
 
 	this.row_data=[];
 
@@ -141,7 +144,7 @@ state_table_t.prototype.download=function()
 		send_request("GET","/superstar/"+this.robot_name,"states","?get",
 			function(response)
 			{
-				if(response) 
+				if(response)
 				{ // clean out our current state, replace with server version
 					while(myself.state_list.firstChild)
 						myself.state_list.removeChild(myself.state_list.firstChild);

@@ -6,28 +6,22 @@
 		<div id="gui"></div>
 
 		<script type="text/javascript">
+			var robot_name="demo";
 			var widgets=
 			[
 				{
-					name:"Text Area",
-					col:3,
-					row:3,
-					size_x:2,
-					size_y:1
-				},
-				{
-					name:"test2",
-					col:3,
-					row:1,
-					size_x:2,
-					size_y:2
-				},
-				{
-					name:"test3",
+					name:"Configuration",
 					col:1,
 					row:1,
-					size_x:2,
-					size_y:3
+					size_x:Math.ceil(480/gui_t_grid_size),
+					size_y:Math.ceil(320/gui_t_grid_size)
+				},
+				{
+					name:"State Editor",
+					col:1,
+					row:Math.ceil(320/gui_t_grid_size+2),
+					size_x:Math.ceil(512/gui_t_grid_size),
+					size_y:Math.ceil(320/gui_t_grid_size)
 				}
 			];
 
@@ -38,15 +32,15 @@
 				alert("Could not make gui!");
 
 			gui.load(widgets);
-			console.log(JSON.stringify(gui.save()));
 
-			var test=document.createElement("textarea");
-			test.placeholder="Type here...";
-			test.style.width="100%";
-			test.style.height="100%";
-			test.style.boxSizing="border-box";
-			test.style.resize="none";
-			gui.get_widget("Text Area").appendChild(test);
+			var config_editor=new config_gui_t(gui.get_widget("Configuration"),robot_name);
+
+			if(!config_editor)
+				alert("Could not config editor!");
+
+			var state_editor=new state_table_t(gui.get_widget("State Editor"),robot_name);
+			state_editor.create_row("drive","// Drive forward:\nif (robot.location.x<10) \n  robot.drive(100,100); \nelse \n  robot.state=turn; \n");
+			state_editor.create_row("turn","// Turn left:\nif (robot.location.angle<90)\n  robot.drive(-100,100); \nelse  \n  robot.state=forward; \n");
 		</script>
 	</body>
 </html>

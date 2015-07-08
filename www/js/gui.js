@@ -1,3 +1,5 @@
+var gui_t_grid_size=64;
+
 function gui_t(div,widgets)
 {
 	if(!div)
@@ -12,11 +14,11 @@ function gui_t(div,widgets)
 	this.element.appendChild(this.ul);
 	this.div.appendChild(this.element);
 
-	console.log($(window).width()+"  "+$(window).height());
-
 	var options=
 	{
-		widget_base_dimensions:[100,100],
+		widget_base_dimensions:[gui_t_grid_size,gui_t_grid_size],
+		min_cols:Math.ceil(2000/gui_t_grid_size),
+		min_rows:Math.ceil(3000/gui_t_grid_size),
 		widget_margins:[4,4],
 		resize:{enabled:true},
 		draggable:{handle:"header"},
@@ -52,17 +54,6 @@ gui_t.prototype.save=function()
 	return serialize;
 }
 
-
-
-/*<div class="panel panel-primary">
-	<div class="panel-heading">
-		<h3 class="panel-title">Panel title</h3>
-	</div>
-	<div class="panel-body">
-		Panel content
-	</div>
-</div>*/
-
 gui_t.prototype.create_widget=function(widget)
 {
 	if(this.widget_lookups[widget.name]==null)
@@ -79,8 +70,11 @@ gui_t.prototype.create_widget=function(widget)
 
 		this.htmls[widget.name].panel=document.createElement("div");
 		this.htmls[widget.name].panel.className="panel panel-primary";
+		this.htmls[widget.name].panel.style.margin=0;
+		this.htmls[widget.name].panel.style.padding=0;
 
 		this.htmls[widget.name].panel_heading=document.createElement("header");
+		this.htmls[widget.name].panel_heading.className="panel-heading primary";
 		this.htmls[widget.name].panel_heading.innerHTML=widget.name;
 
 		this.htmls[widget.name].li.appendChild(this.htmls[widget.name].panel);
@@ -108,6 +102,8 @@ gui_t.prototype.create_panel_body_m=function(name)
 		this.htmls[name].panel_body.style.width="100%";
 		this.htmls[name].panel_body.style.height="100%";
 		this.htmls[name].panel_body.style.boxSizing="border-box";
+		this.htmls[name].panel_body.style.margin=0;
+		this.htmls[name].panel_body.style.padding=0;
 		this.htmls[name].panel.appendChild(this.htmls[name].panel_body);
 	}
 }
