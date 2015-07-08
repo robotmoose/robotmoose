@@ -16,7 +16,7 @@ function doorways_t(div)
 
 	this.div.appendChild(this.element);
 
-	this.menu.className="nav nav-pills nav-justified";
+	this.menu.className="nav nav-tabs";
 	this.element.appendChild(this.menu);
 
 	var myself=this;
@@ -106,12 +106,13 @@ doorways_t.prototype.move_window=function(title,x,y)
 doorways_t.prototype.remove_window=function(title)
 {
 	if(!title)
-		return null;
+		return;
 
 	if(!this.windows[title])
 		return;
 
-	this.element.removeChild(this.windows[title]);
+	this.element.removeChild(this.windows[title].window);
+	this.menu.removeChild(this.windows[title].menu_li);
 	this.windows[title]=null;
 }
 
