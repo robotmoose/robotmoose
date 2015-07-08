@@ -110,13 +110,17 @@ doorways_t.prototype.minimize=function(title,value)
 	if(!this.windows[title])
 		return;
 
-	this.windows[title].window.style.display="";
-
 	if(value)
 	{
-		this.windows[title].window.style.display="none";
-		this.set_menu_item_active_m(title,false);
+		this.windows[title].minimized=true;
+		this.windows[title].active=false;
 	}
+	else
+	{
+		this.windows[title].minimized=false;
+	}
+
+	this.refresh_windows_m();
 }
 
 doorways_t.prototype.hide_all=function()
@@ -133,33 +137,41 @@ doorways_t.prototype.set_menu_item_active=function(title,value)
 	if(!this.windows[title])
 		return;
 
-	for(var key in this.windows)
-		this.set_menu_item_active_m(key,false);
+	this.windows[title].active=false;
 
 	if(value)
-		this.windows[title].window.style.zIndex=this.zindex_top_m();
+	{
+		for(var key in this.windows)
+			this.windows[key].active=false;
 
-	this.set_menu_item_active_m(title,value);
-	this.minimize(title,!value);
+		this.windows[title].active=true;
+		this.windows[title].minimized=false;
+	}
+
+	this.refresh_windows_m();
 }
 
-doorways_t.prototype.set_menu_item_active_m=function(title,value)
+doorways_t.prototype.refresh_windows_m=function()
 {
-	if(!title)
-		return;
-
-	if(!this.windows[title])
-		return;
-
-	if(value)
+	for(key in this.windows)
 	{
-		this.windows[title].menu_li.className="active";
-		this.windows[title].window.className="panel panel-primary";
-	}
-	else
-	{
-		this.windows[title].menu_li.className="";
-		this.windows[title].window.className="panel panel-default";
+		if(this.windows[key].active)
+		{
+			this.windows[key].window.style.zIndex=this.zindex_top_m();
+			this.windows[key].menu_li.className="active";
+			this.windows[key].window.className="panel panel-primary";
+			this.windows[key].minimized=false;
+		}
+		else
+		{
+			this.windows[key].menu_li.className="";
+			this.windows[key].window.className="panel panel-default";
+		}
+
+		if(this.windows[key].minimized)
+			this.windows[key].window.style.display="none";
+		else
+			this.windows[key].window.style.display="";
 	}
 }
 
@@ -171,12 +183,14 @@ doorways_t.prototype.create_window_m=function(title,x,y)
 
 		this.windows[title]={};
 		this.windows[title].title=title;
+		this.windows[title].active=false;
+		this.windows[title].minimized=false;
 		this.windows[title].menu_li=document.createElement("li");
 		this.windows[title].menu_a=document.createElement("a");
 		this.windows[title].window=document.createElement("div");
 		this.windows[title].title_bar=document.createElement("div");
 		this.windows[title].title_text=document.createElement("h3");
-		this.windows[title].minimize=document.createElement("span");
+		this.windows[title].minimize_button=document.createElement("span");
 		this.windows[title].body=document.createElement("div");
 		this.windows[title].body_content=document.createElement("div");
 
@@ -192,12 +206,12 @@ doorways_t.prototype.create_window_m=function(title,x,y)
 		this.windows[title].menu_a.onclick=function()
 		{
 			if(this.doorways_t)
-				myself.set_menu_item_active(this.doorways_t.title,true);
-		};
-		this.windows[title].menu_a.ondblclick=function()
-		{
-			if(this.doorways_t)
-				myself.set_menu_item_active(this.doorways_t.title,false);
+			{
+				if(this.doorways_t.active)
+					myself.minimize(this.doorways_t.title,true);
+				else
+					myself.set_menu_item_active(this.doorways_t.title,true);
+			}
 		};
 		this.windows[title].menu_a.innerHTML=title;
 
@@ -216,17 +230,22 @@ doorways_t.prototype.create_window_m=function(title,x,y)
 		{
 			return myself.mouse_down_m(event,this);
 		};
+		this.windows[title].title_bar.ondblclick=function(event)
+		{
+			if(this.doorways_t)
+				myself.minimize(this.doorways_t.title,true);
+		};
 		this.windows[title].title_bar.appendChild(this.windows[title].title_text);
 
 		this.windows[title].title_text.className="panel-title";
 		this.windows[title].title_text.innerHTML=title;
 
-		this.windows[title].minimize.className="glyphicon glyphicon-minus";
-		this.windows[title].minimize.style.cursor="pointer";
-		this.windows[title].minimize.style.float="right";
-		this.windows[title].minimize.style.marginLeft=16;
-		this.windows[title].minimize.doorways_t=this.windows[title];
-		this.windows[title].minimize.onclick=function(event)
+		this.windows[title].minimize_button.className="glyphicon glyphicon-minus";
+		this.windows[title].minimize_button.style.cursor="pointer";
+		this.windows[title].minimize_button.style.float="right";
+		this.windows[title].minimize_button.style.marginLeft=16;
+		this.windows[title].minimize_button.doorways_t=this.windows[title];
+		this.windows[title].minimize_button.onclick=function(event)
 		{
 			if(!myself.draggable)
 			{
@@ -234,12 +253,12 @@ doorways_t.prototype.create_window_m=function(title,x,y)
 				myself.draggable=true;
 			}
 		};
-		this.windows[title].minimize.onmousedown=function(event)
+		this.windows[title].minimize_button.onmousedown=function(event)
 		{
 			myself.mouse_up_m(event);
 			myself.draggable=false;
 		};
-		this.windows[title].minimize.onmouseleave=function(event)
+		this.windows[title].minimize_button.onmouseleave=function(event)
 		{
 			if(!myself.draggable)
 			{
@@ -247,7 +266,7 @@ doorways_t.prototype.create_window_m=function(title,x,y)
 				myself.draggable=true;
 			}
 		};
-		this.windows[title].title_text.appendChild(this.windows[title].minimize);
+		this.windows[title].title_text.appendChild(this.windows[title].minimize_button);
 
 		this.windows[title].body.doorways_t=this.windows[title];
 		this.windows[title].body.className="panel-body";
