@@ -22,7 +22,8 @@ function doorways_t(div)
 	this.menu.bar.className="nav nav-tabs";
 	this.element.appendChild(this.menu.bar);
 
-	this.menu.show_desktop.innerHTML="<a><span title='Show Desktop' class='glyphicon glyphicon-inbox' ></span></a>";
+	this.menu.show_desktop.innerHTML=
+		"<a><span title='Click here to hide all windows.' class='glyphicon glyphicon-unchecked' ></span></a>";
 	this.menu.show_desktop.onclick=function(event){myself.hide_all_windows()};
 	this.menu.show_desktop.style.cursor="pointer";
 	this.menu.bar.appendChild(this.menu.show_desktop);
@@ -148,6 +149,14 @@ doorways_t.prototype.hide_all_windows=function()
 {
 	for(var key in this.windows)
 		this.minimize(key,true);
+}
+
+doorways_t.prototype.deactivate_all_windows=function()
+{
+	for(var key in this.windows)
+		this.windows[key].active=false;
+
+	this.refresh_windows_m();
 }
 
 doorways_t.prototype.set_menu_item_active=function(title,value)
