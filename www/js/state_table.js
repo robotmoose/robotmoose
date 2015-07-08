@@ -230,7 +230,11 @@ state_table_t.prototype.create_row=function(name,code)
 		button.innerHTML="x";
 		button.li=li;
 		button.style.marginLeft=10;
-		button.onclick=function(){myself.state_list.removeChild(li);};
+		button.onclick=function()
+		{
+			document.removeEventListener("click",li.state_event_handler);
+			myself.state_list.removeChild(li);
+		};
 		li.appendChild(button);
 
 		tr.appendChild(td0);
@@ -241,6 +245,9 @@ state_table_t.prototype.create_row=function(name,code)
 
 		li.state_name=input;
 		li.state_code=code_editor;
+		li.state_event_handler=function(){li.state_code.refresh();};
+
+		document.addEventListener("click",li.state_event_handler);
 
 		myself.state_list.appendChild(li);
 		code_editor.refresh();
