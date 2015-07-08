@@ -3,6 +3,8 @@ function gui_t(div,widgets)
 	if(!div)
 		return null;
 
+	//document.html.padding=0;
+	//document.html.margin=0;
 	this.div=div;
 	this.element=document.createElement("div");
 	this.element.className="gridster";
@@ -10,13 +12,18 @@ function gui_t(div,widgets)
 	this.element.appendChild(this.ul);
 	this.div.appendChild(this.element);
 
-	this.gridster=$(".gridster ul").gridster
-	({
-		widget_base_dimensions:[100,55],
-		widget_margins:[5,5],
+	console.log($(window).width()+"  "+$(window).height());
+
+	var options=
+	{
+		widget_base_dimensions:[100,100],
+		widget_margins:[4,4],
 		resize:{enabled:true},
-		draggable:{handle:"header"}
-	}).data("gridster");
+		draggable:{handle:"header"},
+		avoid_overlapped_widgets:false
+	};
+
+	this.gridster=$(".gridster ul").gridster(options).data("gridster");
 
 	this.htmls={};
 	this.widget_lookups={};
@@ -45,6 +52,17 @@ gui_t.prototype.save=function()
 	return serialize;
 }
 
+
+
+/*<div class="panel panel-primary">
+	<div class="panel-heading">
+		<h3 class="panel-title">Panel title</h3>
+	</div>
+	<div class="panel-body">
+		Panel content
+	</div>
+</div>*/
+
 gui_t.prototype.create_widget=function(widget)
 {
 	if(this.widget_lookups[widget.name]==null)
@@ -57,29 +75,40 @@ gui_t.prototype.create_widget=function(widget)
 
 		this.htmls[widget.name].li=this.gridster.add_widget("<li>",
 			widget.size_x,widget.size_y,widget.col,widget.row)[0];
-		this.htmls[widget.name].li.style.paddingBottom=20;
+		this.htmls[widget.name].li.style.paddingBottom=40;
 
-		this.htmls[widget.name].div=document.createElement("div");
-		this.htmls[widget.name].div.style.width="100%";
-		this.htmls[widget.name].div.style.height="100%";
-		this.htmls[widget.name].div.style.boxSizing="border-box";
+		this.htmls[widget.name].panel=document.createElement("div");
+		this.htmls[widget.name].panel.className="panel panel-primary";
 
-		this.htmls[widget.name].handle=document.createElement("header");
-		this.htmls[widget.name].handle.innerHTML=widget.name;
+		this.htmls[widget.name].panel_heading=document.createElement("header");
+		this.htmls[widget.name].panel_heading.innerHTML=widget.name;
 
-		this.htmls[widget.name].li.appendChild(this.htmls[widget.name].handle);
-		this.htmls[widget.name].li.appendChild(this.htmls[widget.name].div);
+		this.htmls[widget.name].li.appendChild(this.htmls[widget.name].panel);
+		this.htmls[widget.name].panel.appendChild(this.htmls[widget.name].panel_heading);
+
+		this.create_panel_body_m(widget.name);
 	}
 	else
 	{
 		var old_widget=this.gridster.$widgets.eq(this.widget_lookups[widget.name]);
 		this.gridster.mutate_widget_in_gridmap(old_widget,old_widget.coords().grid,widget);
-		this.htmls[widget.name].li.removeChild(this.htmls[widget.name].div);
-		this.htmls[widget.name].div=document.createElement("div");
-		this.htmls[widget.name].div.style.width="100%";
-		this.htmls[widget.name].div.style.height="100%";
-		this.htmls[widget.name].div.style.boxSizing="border-box";
-		this.htmls[widget.name].li.appendChild(this.htmls[widget.name].div);
+		this.create_panel_body_m(widget.name);
+	}
+}
+
+gui_t.prototype.create_panel_body_m=function(name)
+{
+	if(name&&this.htmls[name])
+	{
+		if(this.htmls[name].panel&&this.htmls[name].panel_body)
+			this.htmls[name].panel.removeChild(this.htmls[name].panel_body);
+
+		this.htmls[name].panel_body=document.createElement("div");
+		this.htmls[name].panel_body.className="panel-body";
+		this.htmls[name].panel_body.style.width="100%";
+		this.htmls[name].panel_body.style.height="100%";
+		this.htmls[name].panel_body.style.boxSizing="border-box";
+		this.htmls[name].panel.appendChild(this.htmls[name].panel_body);
 	}
 }
 
@@ -88,5 +117,5 @@ gui_t.prototype.get_widget=function(name)
 	if(this.widget_lookups[name]==null)
 		return null;
 
-	return this.htmls[name].div
+	return this.htmls[name].panel_body;
 }

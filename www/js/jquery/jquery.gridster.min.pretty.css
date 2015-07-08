@@ -1,77 +1,38 @@
-.gridster * {
-margin:0;
-padding:0;
+.gridster *
+{
+	margin:0;
+	padding:0;
+}
+.gridster ul
+{
+	list-style-type:none;
 }
 
-ul {
-list-style-type: none;
+.gridster .preview-holder
+{
+	border:none!important;
+	background:#337ab7!important;
 }
 
-
-/*/
-/* demo
-/*/
-
-
-body {
-font-size: 16px;
-font-family: 'Helvetica Neue', Arial, sans-serif;
-color: #444;
-margin: 30px 40px;
+.gridster li header
+{
+	cursor:move;
+	font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size:16px;
+	color:white;
+	font-weight:500;
+	line-height:1.1;
+	margin-top:0px;
+	margin-bottom:0px;
+	padding-top:10px;
+	padding-bottom:10px;
+	padding-right:15px;
+	padding-left:15px;
+	box-sizing:border-box;
+	background-image:linear-gradient(to bottom,#337ab7 0,#2e6da4 100%);
 }
 
-.controls {
-margin-bottom: 20px;
-}
-
-/*/
-/* gridster
-/*/
-
-.gridster ul {
-background-color: #EFEFEF;
-}
-
-.gridster li {
-font-size: 1em;
-font-weight: bold;
-text-align: center;
-line-height: 100%;
-}
-
-
-.gridster {
-margin: 0 auto;
-
-opacity: .8;
-
--webkit-transition: opacity .6s;
--moz-transition: opacity .6s;
--o-transition: opacity .6s;
--ms-transition: opacity .6s;
-transition: opacity .6s;
-}
-
-.gridster .gs-w {
-background: #DDD;
-cursor: pointer;
-}
-
-.gridster .player {
-background: #BBB;
-}
-
-
-.gridster .preview-holder {
-border: none!important;
-background: red!important;
-}
-
-
-.gridster li header {
-background: #999;
-display: block;
-font-size: 20px;
-line-height: normal;
-cursor: move;
+.gs-resize-handle-both
+{
+	background-image:none;
 }

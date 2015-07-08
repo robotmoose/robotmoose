@@ -9,25 +9,25 @@
 			var widgets=
 			[
 				{
-					name:"test1",
-					col:1,
+					name:"Text Area",
+					col:3,
 					row:3,
-					size_x:5,
-					size_y:5
+					size_x:2,
+					size_y:1
 				},
 				{
 					name:"test2",
-					col:1,
+					col:3,
 					row:1,
 					size_x:2,
 					size_y:2
 				},
 				{
 					name:"test3",
-					col:4,
+					col:1,
 					row:1,
-					size_x:1,
-					size_y:1
+					size_x:2,
+					size_y:3
 				}
 			];
 
@@ -41,11 +41,12 @@
 			console.log(JSON.stringify(gui.save()));
 
 			var test=document.createElement("textarea");
+			test.placeholder="Type here...";
 			test.style.width="100%";
 			test.style.height="100%";
 			test.style.boxSizing="border-box";
 			test.style.resize="none";
-			gui.get_widget("test1").appendChild(test);
+			gui.get_widget("Text Area").appendChild(test);
 		</script>
 	</body>
 </html>
