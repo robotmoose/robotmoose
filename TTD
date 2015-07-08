@@ -1,0 +1,30 @@
+windows api (doorways)
+	need:
+		-more or less done???
+
+	do we want these at all?:
+		-Open new window interface (maybe start menu style?)?
+		-Close windows button?
+		-Window resize?
+		-Maximize?
+
+	completely optional at this point:
+		-Touch events...
+		-Fix smooshing of window contents when screen is super small...this needs to be done on the widgets themselves...
+
+webcam (webrtc)
+	need:
+		-start session
+		-stop session
+		-join session
+		-camera image div access
+			-position
+			-resize
+
+	things that would be nice:
+		-quality
+		-sound control
+
+sounds
+	need:
+		-ability to play sound effects
