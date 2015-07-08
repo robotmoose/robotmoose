@@ -15,18 +15,18 @@ function doorways_t(div)
 	this.windows={};
 	this.menu={};
 	this.menu.bar=document.createElement("ul");
-	this.menu.show_desktop=document.createElement("li");
+
+	this.menu.show_desktop=this.create_menu_button_m
+	(
+		"glyphicon glyphicon-unchecked",
+		function(event){myself.hide_all_windows();},
+		"Click here to hide all windows."
+	);
 
 	this.div.appendChild(this.element);
 
 	this.menu.bar.className="nav nav-tabs";
 	this.element.appendChild(this.menu.bar);
-
-	this.menu.show_desktop.innerHTML=
-		"<a><span title='Click here to hide all windows.' class='glyphicon glyphicon-unchecked' ></span></a>";
-	this.menu.show_desktop.onclick=function(event){myself.hide_all_windows()};
-	this.menu.show_desktop.style.cursor="pointer";
-	this.menu.bar.appendChild(this.menu.show_desktop);
 
 	document.onmousemove=function(event){return myself.mouse_move_m(event);};
 	document.onmouseup=function(event){return myself.mouse_up_m(event);};
@@ -181,6 +181,15 @@ doorways_t.prototype.set_menu_item_active=function(title,value)
 	this.refresh_windows_m();
 }
 
+doorways_t.prototype.create_menu_button_m=function(glyph,onclick,tooltip)
+{
+	var button=document.createElement("li");
+	button.innerHTML="<a><span title='"+tooltip+"' class='"+glyph+"'></span></a>";
+	button.onclick=onclick;
+	button.style.cursor="pointer";
+	this.menu.bar.appendChild(button);
+}
+
 doorways_t.prototype.refresh_windows_m=function()
 {
 	for(key in this.windows)
@@ -250,10 +259,10 @@ doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 		{
 			if(this.doorways_t)
 			{
-				if(this.doorways_t.active)
-					myself.minimize(this.doorways_t.title,true);
-				else
+				if(!this.doorways_t.active)
 					myself.set_menu_item_active(this.doorways_t.title,true);
+				//else
+					//myself.minimize(this.doorways_t.title,true);
 			}
 		};
 		this.windows[title].menu.a.innerHTML=title;
@@ -273,11 +282,11 @@ doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 		{
 			return myself.mouse_down_m(event,this);
 		};
-		this.windows[title].title_bar.ondblclick=function(event)
+		/*this.windows[title].title_bar.ondblclick=function(event)
 		{
 			if(this.doorways_t)
 				myself.minimize(this.doorways_t.title,true);
-		};
+		};*/
 		this.windows[title].title_bar.appendChild(this.windows[title].title_text);
 
 		this.windows[title].title_text.className="panel-title";

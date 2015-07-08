@@ -3,10 +3,9 @@ windows api (doorways)
 		-more or less done???
 
 	do we want these at all?:
-		-Open new window interface (maybe start menu style?)?
-		-Close windows button?
 		-Window resize?
-		-Maximize?
+		-Bounds on right and bottom.
+		-Ability to alert.
 
 	completely optional at this point:
 		-Touch events...
