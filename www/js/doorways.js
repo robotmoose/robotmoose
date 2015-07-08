@@ -249,7 +249,13 @@ doorways_t.prototype.create_window_m=function(title,x,y)
 		};
 		this.windows[title].title_text.appendChild(this.windows[title].minimize);
 
+		this.windows[title].body.doorways_t=this.windows[title];
 		this.windows[title].body.className="panel-body";
+		this.windows[title].body.onmousedown=function(event)
+		{
+			if(myself.draggable&&!myself.dragging&&this.doorways_t)
+				myself.set_menu_item_active(this.doorways_t.title,true);
+		};
 		this.windows[title].body.appendChild(this.windows[title].body_content);
 	}
 
