@@ -38,7 +38,7 @@
 			if(!config_editor)
 				alert("Could not config editor!");
 
-			var state_editor=new state_table_t(gui.get_window("State Editor"),robot_name);
+			var state_editor=new state_table_t(gui.get_window("State Editor",300),robot_name);
 			state_editor.create_row("drive","// Drive forward:\nif (robot.location.x<10) \n  robot.drive(100,100); \nelse \n  robot.state=turn; \n");
 			state_editor.create_row("turn","// Turn left:\nif (robot.location.angle<90)\n  robot.drive(-100,100); \nelse  \n  robot.state=forward; \n");
 		</script>
