@@ -3,6 +3,7 @@ function doorways_t(div)
 	if(!div)
 		return null;
 
+	var myself=this;
 	this.div=div;
 	this.element=document.createElement("div");
 	this.draggable=true;
@@ -13,16 +14,19 @@ function doorways_t(div)
 	this.offset_y=0;
 	this.windows={};
 	this.menu={};
-	this.menu.bar=document.createElement("div");
-	this.menu.window_list=document.createElement("ul");
+	this.menu.bar=document.createElement("ul");
+	this.menu.show_desktop=document.createElement("li");
 
 	this.div.appendChild(this.element);
+
+	this.menu.bar.className="nav nav-tabs";
 	this.element.appendChild(this.menu.bar);
 
-	this.menu.window_list.className="nav nav-tabs";
-	this.menu.bar.appendChild(this.menu.window_list);
+	this.menu.show_desktop.innerHTML="<a><span title='Show Desktop' class='glyphicon glyphicon-inbox' ></span></a>";
+	this.menu.show_desktop.onclick=function(event){myself.hide_all_windows()};
+	this.menu.show_desktop.style.cursor="pointer";
+	this.menu.bar.appendChild(this.menu.show_desktop);
 
-	var myself=this;
 	document.onmousemove=function(event){return myself.mouse_move_m(event);};
 	document.onmouseup=function(event){return myself.mouse_up_m(event);};
 	window.onblur=function(){myself.mouse_up_m(event);myself.draggable=true;};
@@ -115,7 +119,7 @@ doorways_t.prototype.remove_window=function(title)
 		return;
 
 	this.element.removeChild(this.windows[title].window);
-	this.menu.window_list.removeChild(this.windows[title].menu.li);
+	this.menu.bar.removeChild(this.windows[title].menu.li);
 	this.windows[title]=null;
 }
 
@@ -140,7 +144,7 @@ doorways_t.prototype.minimize=function(title,value)
 	this.refresh_windows_m();
 }
 
-doorways_t.prototype.hide_all=function()
+doorways_t.prototype.hide_all_windows=function()
 {
 	for(var key in this.windows)
 		this.minimize(key,true);
@@ -226,7 +230,7 @@ doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 
 		this.element.appendChild(this.windows[title].window);
 
-		this.menu.window_list.appendChild(this.windows[title].menu.li);
+		this.menu.bar.appendChild(this.windows[title].menu.li);
 
 		this.windows[title].menu.li.role="presentation";
 		this.windows[title].menu.li.appendChild(this.windows[title].menu.a);
@@ -274,7 +278,7 @@ doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 		this.windows[title].buttons.div.style.marginLeft=16;
 		this.windows[title].title_text.appendChild(this.windows[title].buttons.div);
 
-		this.windows[title].buttons.minimize.className="glyphicon glyphicon-minus";
+		this.windows[title].buttons.minimize.className="glyphicon glyphicon-minus-sign";
 		this.windows[title].buttons.minimize.style.cursor="pointer";
 		this.windows[title].buttons.minimize.doorways_t=this.windows[title];
 		this.windows[title].buttons.minimize.onclick=function(event)
