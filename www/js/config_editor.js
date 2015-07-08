@@ -491,6 +491,8 @@ function config_gui_t(div,robot_name)
 	if(!this.editor)
 		return null;
 
+	this.editor.element.style.width="480";
+
 	this.editor.onconfigschange=function(config_text){myself.update_configs(config_text);};
 	this.editor.onoptionschange=function(options){myself.update_options(options);};
 

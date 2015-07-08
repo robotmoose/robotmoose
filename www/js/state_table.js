@@ -27,7 +27,7 @@ function state_table_t(div,robot_name)
 	this.element=document.createElement("div");
 	this.div.appendChild(this.element);
 
-	//this.element.style.width=640;
+	this.element.style.width=640;
 
 	this.state_list_prettifier=document.createElement("div");
 	this.state_list_prettifier.className="form-inline";

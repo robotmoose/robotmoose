@@ -78,11 +78,11 @@ doorways_t.prototype.move_window=function(title,x,y)
 	if(!this.windows[title])
 		return;
 
-	if(x<0)
-		x=0;
+	if(x<this.element.offsetLeft)
+			x=this.element.offsetLeft;
 
-	if(y<0)
-		y=0;
+	if(y<this.element.offsetTop+this.menu.offsetHeight)
+		y=this.element.offsetTop+this.menu.offsetHeight;
 
 	if(x)
 		this.windows[title].window.style.left=x;
@@ -151,10 +151,16 @@ doorways_t.prototype.set_menu_item_active_m=function(title,value)
 	if(!this.windows[title])
 		return;
 
-	this.windows[title].menu_li.className="";
-
 	if(value)
+	{
 		this.windows[title].menu_li.className="active";
+		this.windows[title].window.className="panel panel-primary";
+	}
+	else
+	{
+		this.windows[title].menu_li.className="";
+		this.windows[title].window.className="panel panel-default";
+	}
 }
 
 doorways_t.prototype.create_window_m=function(title,x,y)
@@ -264,6 +270,7 @@ doorways_t.prototype.mouse_down_m=function(event,element)
 		this.dragging.style.zIndex=this.zindex_top_m();
 		this.offset_x=this.mouse_x-this.dragging.offsetLeft;
 		this.offset_y=this.mouse_y-this.dragging.offsetTop;
+		this.set_menu_item_active(element.doorways_t.title,true);
 	}
 
 	return false;
@@ -285,11 +292,11 @@ doorways_t.prototype.mouse_move_m=function(event)
 		var x=this.mouse_x-this.offset_x;
 		var y=this.mouse_y-this.offset_y;
 
-		if(x<0)
-			x=0;
+		if(x<this.element.offsetLeft)
+			x=this.element.offsetLeft;
 
-		if(y<0)
-			y=0;
+		if(y<this.element.offsetTop+this.menu.offsetHeight)
+			y=this.element.offsetTop+this.menu.offsetHeight;
 
 		this.dragging.style.left=x;
 		this.dragging.style.top=y;
