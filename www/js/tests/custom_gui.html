@@ -1,0 +1,30 @@
+<html>
+	<head>
+		<!--#include virtual="/sources.html"-->
+	</head>
+	<body>
+		<input type="button" value="Show 'New Window'" onclick="doorways.minimize('New Window',false);"/>
+		<input type="button" value="Show 'Loaded Window'" onclick="doorways.minimize('Loaded Window',false);"/>
+		<input type="button" value="Hide All" onclick="doorways.hide_all();"/>
+		<div id="gui"></div>
+		<script type="text/javascript">
+			var doorways=new doorways_t(document.getElementById("gui"));
+
+			if(!doorways)
+				alert("Could not create gui!");
+
+			doorways.load([{"title":"Loaded Window","x":"100px","y":"100px"}]);
+
+			var loaded_window=doorways.get_window("Loaded Window");
+			var textarea=document.createElement("textarea");
+			textarea.style.width="100%";
+			textarea.style.height="100%";
+			textarea.placeholder="Type here...";
+			loaded_window.appendChild(textarea);
+
+			var new_window=doorways.get_window("New Window",10,0);
+
+			console.log(JSON.stringify(doorways.save()));
+		</script>
+	</body>
+</html>
