@@ -348,222 +348,222 @@
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P1" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="V+" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P2" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="C15" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P3" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="S12" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P4" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="C11" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P5" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="S11" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P6" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="C10" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P7" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="S10" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P8" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="C9" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P9" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="S9" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P10" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="C8" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P11" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="S8" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P12" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="C7" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P13" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="S7" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P14" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="C6" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P15" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="S6" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P16" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="C5" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P17" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="S5" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P18" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="C4" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P19" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="S4" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P20" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="C3" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P21" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="S3" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P22" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="C2" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P23" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="S2" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P24" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="C1" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P25" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="S1" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P44" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="CSBI" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P43" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="SDO" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P42" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="SDI" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P41" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="SCKI" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P40" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="A3" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P39" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="A2" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P38" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="A1" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P37" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="A0" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P36" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="GPIO2" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P35" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="GPIO1" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P34" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="WDTB" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P33" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="NC1" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P32" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="TOS" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P31" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="VREG" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P30" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="VREF" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P29" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="VTEMP2" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P28" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="VTEMP1" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P27" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="NC" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
 </part>
-<part name="P26" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
+<part name="V-" library="Isaac" deviceset="SINGLE_TERMINAL" device="">
 <attribute name="MF" value=""/>
 <attribute name="MPN" value=""/>
 <attribute name="OC_NEWARK" value="unknown"/>
@@ -579,222 +579,222 @@
 <attribute name="MF" x="93.98" y="119.38" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="93.98" y="119.38" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P1" gate="G$1" x="33.02" y="203.2">
+<instance part="V+" gate="G$1" x="33.02" y="203.2">
 <attribute name="OC_NEWARK" x="33.02" y="203.2" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="203.2" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="203.2" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P2" gate="G$1" x="33.02" y="195.58">
+<instance part="C15" gate="G$1" x="33.02" y="195.58">
 <attribute name="OC_NEWARK" x="33.02" y="195.58" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="195.58" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="195.58" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P3" gate="G$1" x="33.02" y="187.96">
+<instance part="S12" gate="G$1" x="33.02" y="187.96">
 <attribute name="OC_NEWARK" x="33.02" y="187.96" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="187.96" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="187.96" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P4" gate="G$1" x="33.02" y="180.34">
+<instance part="C11" gate="G$1" x="33.02" y="180.34">
 <attribute name="OC_NEWARK" x="33.02" y="180.34" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="180.34" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="180.34" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P5" gate="G$1" x="33.02" y="172.72">
+<instance part="S11" gate="G$1" x="33.02" y="172.72">
 <attribute name="OC_NEWARK" x="33.02" y="172.72" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="172.72" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="172.72" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P6" gate="G$1" x="33.02" y="165.1">
+<instance part="C10" gate="G$1" x="33.02" y="165.1">
 <attribute name="OC_NEWARK" x="33.02" y="165.1" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="165.1" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="165.1" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P7" gate="G$1" x="33.02" y="157.48">
+<instance part="S10" gate="G$1" x="33.02" y="157.48">
 <attribute name="OC_NEWARK" x="33.02" y="157.48" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="157.48" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="157.48" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P8" gate="G$1" x="33.02" y="149.86">
+<instance part="C9" gate="G$1" x="33.02" y="149.86">
 <attribute name="OC_NEWARK" x="33.02" y="149.86" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="149.86" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="149.86" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P9" gate="G$1" x="33.02" y="142.24">
+<instance part="S9" gate="G$1" x="33.02" y="142.24">
 <attribute name="OC_NEWARK" x="33.02" y="142.24" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="142.24" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="142.24" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P10" gate="G$1" x="33.02" y="134.62">
+<instance part="C8" gate="G$1" x="33.02" y="134.62">
 <attribute name="OC_NEWARK" x="33.02" y="134.62" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="134.62" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="134.62" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P11" gate="G$1" x="33.02" y="127">
+<instance part="S8" gate="G$1" x="33.02" y="127">
 <attribute name="OC_NEWARK" x="33.02" y="127" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="127" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="127" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P12" gate="G$1" x="33.02" y="119.38">
+<instance part="C7" gate="G$1" x="33.02" y="119.38">
 <attribute name="OC_NEWARK" x="33.02" y="119.38" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="119.38" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="119.38" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P13" gate="G$1" x="33.02" y="111.76">
+<instance part="S7" gate="G$1" x="33.02" y="111.76">
 <attribute name="OC_NEWARK" x="33.02" y="111.76" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="111.76" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="111.76" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P14" gate="G$1" x="33.02" y="104.14">
+<instance part="C6" gate="G$1" x="33.02" y="104.14">
 <attribute name="OC_NEWARK" x="33.02" y="104.14" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="104.14" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="104.14" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P15" gate="G$1" x="33.02" y="96.52">
+<instance part="S6" gate="G$1" x="33.02" y="96.52">
 <attribute name="OC_NEWARK" x="33.02" y="96.52" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="96.52" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="96.52" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P16" gate="G$1" x="33.02" y="88.9">
+<instance part="C5" gate="G$1" x="33.02" y="88.9">
 <attribute name="OC_NEWARK" x="33.02" y="88.9" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="88.9" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="88.9" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P17" gate="G$1" x="33.02" y="81.28">
+<instance part="S5" gate="G$1" x="33.02" y="81.28">
 <attribute name="OC_NEWARK" x="33.02" y="81.28" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="81.28" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="81.28" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P18" gate="G$1" x="33.02" y="73.66">
+<instance part="C4" gate="G$1" x="33.02" y="73.66">
 <attribute name="OC_NEWARK" x="33.02" y="73.66" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="73.66" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="73.66" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P19" gate="G$1" x="33.02" y="66.04">
+<instance part="S4" gate="G$1" x="33.02" y="66.04">
 <attribute name="OC_NEWARK" x="33.02" y="66.04" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="66.04" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="66.04" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P20" gate="G$1" x="33.02" y="58.42">
+<instance part="C3" gate="G$1" x="33.02" y="58.42">
 <attribute name="OC_NEWARK" x="33.02" y="58.42" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="58.42" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="58.42" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P21" gate="G$1" x="33.02" y="50.8">
+<instance part="S3" gate="G$1" x="33.02" y="50.8">
 <attribute name="OC_NEWARK" x="33.02" y="50.8" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="50.8" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="50.8" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P22" gate="G$1" x="33.02" y="43.18">
+<instance part="C2" gate="G$1" x="33.02" y="43.18">
 <attribute name="OC_NEWARK" x="33.02" y="43.18" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="43.18" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="43.18" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P23" gate="G$1" x="33.02" y="35.56">
+<instance part="S2" gate="G$1" x="33.02" y="35.56">
 <attribute name="OC_NEWARK" x="33.02" y="35.56" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="35.56" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="35.56" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P24" gate="G$1" x="33.02" y="27.94">
+<instance part="C1" gate="G$1" x="33.02" y="27.94">
 <attribute name="OC_NEWARK" x="33.02" y="27.94" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="27.94" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="27.94" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P25" gate="G$1" x="33.02" y="20.32">
+<instance part="S1" gate="G$1" x="33.02" y="20.32">
 <attribute name="OC_NEWARK" x="33.02" y="20.32" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="33.02" y="20.32" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="33.02" y="20.32" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P44" gate="G$1" x="142.24" y="177.8">
+<instance part="CSBI" gate="G$1" x="142.24" y="177.8">
 <attribute name="OC_NEWARK" x="142.24" y="177.8" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="177.8" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="177.8" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P43" gate="G$1" x="142.24" y="170.18">
+<instance part="SDO" gate="G$1" x="142.24" y="170.18">
 <attribute name="OC_NEWARK" x="142.24" y="170.18" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="170.18" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="170.18" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P42" gate="G$1" x="142.24" y="162.56">
+<instance part="SDI" gate="G$1" x="142.24" y="162.56">
 <attribute name="OC_NEWARK" x="142.24" y="162.56" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="162.56" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="162.56" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P41" gate="G$1" x="142.24" y="154.94">
+<instance part="SCKI" gate="G$1" x="142.24" y="154.94">
 <attribute name="OC_NEWARK" x="142.24" y="154.94" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="154.94" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="154.94" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P40" gate="G$1" x="142.24" y="147.32">
+<instance part="A3" gate="G$1" x="142.24" y="147.32">
 <attribute name="OC_NEWARK" x="142.24" y="147.32" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="147.32" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="147.32" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P39" gate="G$1" x="142.24" y="139.7">
+<instance part="A2" gate="G$1" x="142.24" y="139.7">
 <attribute name="OC_NEWARK" x="142.24" y="139.7" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="139.7" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="139.7" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P38" gate="G$1" x="142.24" y="132.08">
+<instance part="A1" gate="G$1" x="142.24" y="132.08">
 <attribute name="OC_NEWARK" x="142.24" y="132.08" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="132.08" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="132.08" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P37" gate="G$1" x="142.24" y="124.46">
+<instance part="A0" gate="G$1" x="142.24" y="124.46">
 <attribute name="OC_NEWARK" x="142.24" y="124.46" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="124.46" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="124.46" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P36" gate="G$1" x="142.24" y="116.84">
+<instance part="GPIO2" gate="G$1" x="142.24" y="116.84">
 <attribute name="OC_NEWARK" x="142.24" y="116.84" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="116.84" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="116.84" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P35" gate="G$1" x="142.24" y="109.22">
+<instance part="GPIO1" gate="G$1" x="142.24" y="109.22">
 <attribute name="OC_NEWARK" x="142.24" y="109.22" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="109.22" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="109.22" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P34" gate="G$1" x="142.24" y="101.6">
+<instance part="WDTB" gate="G$1" x="142.24" y="101.6">
 <attribute name="OC_NEWARK" x="142.24" y="101.6" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="101.6" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="101.6" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P33" gate="G$1" x="142.24" y="93.98">
+<instance part="NC1" gate="G$1" x="142.24" y="93.98">
 <attribute name="OC_NEWARK" x="142.24" y="93.98" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="93.98" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="93.98" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P32" gate="G$1" x="142.24" y="86.36">
+<instance part="TOS" gate="G$1" x="142.24" y="86.36">
 <attribute name="OC_NEWARK" x="142.24" y="86.36" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="86.36" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="86.36" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P31" gate="G$1" x="142.24" y="78.74">
+<instance part="VREG" gate="G$1" x="142.24" y="78.74">
 <attribute name="OC_NEWARK" x="142.24" y="78.74" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="78.74" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="78.74" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P30" gate="G$1" x="142.24" y="71.12">
+<instance part="VREF" gate="G$1" x="142.24" y="71.12">
 <attribute name="OC_NEWARK" x="142.24" y="71.12" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="71.12" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="71.12" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P29" gate="G$1" x="142.24" y="63.5">
+<instance part="VTEMP2" gate="G$1" x="142.24" y="63.5">
 <attribute name="OC_NEWARK" x="142.24" y="63.5" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="63.5" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="63.5" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P28" gate="G$1" x="142.24" y="55.88">
+<instance part="VTEMP1" gate="G$1" x="142.24" y="55.88">
 <attribute name="OC_NEWARK" x="142.24" y="55.88" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="55.88" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="55.88" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P27" gate="G$1" x="142.24" y="48.26">
+<instance part="NC" gate="G$1" x="142.24" y="48.26">
 <attribute name="OC_NEWARK" x="142.24" y="48.26" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="48.26" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="48.26" size="1.778" layer="96" display="off"/>
 </instance>
-<instance part="P26" gate="G$1" x="142.24" y="40.64">
+<instance part="V-" gate="G$1" x="142.24" y="40.64">
 <attribute name="OC_NEWARK" x="142.24" y="40.64" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="142.24" y="40.64" size="1.778" layer="96" display="off"/>
 <attribute name="MPN" x="142.24" y="40.64" size="1.778" layer="96" display="off"/>
@@ -810,7 +810,7 @@
 <label x="71.12" y="175.26" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
 <segment>
-<pinref part="P1" gate="G$1" pin="P$1"/>
+<pinref part="V+" gate="G$1" pin="P$1"/>
 <wire x1="33.02" y1="203.2" x2="50.8" y2="203.2" width="0.1524" layer="91"/>
 <label x="50.8" y="203.2" size="1.778" layer="95" xref="yes"/>
 </segment>
@@ -824,7 +824,7 @@
 <segment>
 <wire x1="33.02" y1="195.58" x2="50.8" y2="195.58" width="0.1524" layer="91"/>
 <label x="50.8" y="195.58" size="1.778" layer="95" xref="yes"/>
-<pinref part="P2" gate="G$1" pin="P$1"/>
+<pinref part="C15" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="3" class="0">
@@ -836,7 +836,7 @@
 <segment>
 <wire x1="33.02" y1="187.96" x2="50.8" y2="187.96" width="0.1524" layer="91"/>
 <label x="50.8" y="187.96" size="1.778" layer="95" xref="yes"/>
-<pinref part="P3" gate="G$1" pin="P$1"/>
+<pinref part="S12" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="4" class="0">
@@ -848,7 +848,7 @@
 <segment>
 <wire x1="33.02" y1="180.34" x2="50.8" y2="180.34" width="0.1524" layer="91"/>
 <label x="50.8" y="180.34" size="1.778" layer="95" xref="yes"/>
-<pinref part="P4" gate="G$1" pin="P$1"/>
+<pinref part="C11" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="5" class="0">
@@ -860,7 +860,7 @@
 <segment>
 <wire x1="33.02" y1="172.72" x2="50.8" y2="172.72" width="0.1524" layer="91"/>
 <label x="50.8" y="172.72" size="1.778" layer="95" xref="yes"/>
-<pinref part="P5" gate="G$1" pin="P$1"/>
+<pinref part="S11" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="6" class="0">
@@ -872,7 +872,7 @@
 <segment>
 <wire x1="33.02" y1="165.1" x2="50.8" y2="165.1" width="0.1524" layer="91"/>
 <label x="50.8" y="165.1" size="1.778" layer="95" xref="yes"/>
-<pinref part="P6" gate="G$1" pin="P$1"/>
+<pinref part="C10" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="7" class="0">
@@ -884,7 +884,7 @@
 <segment>
 <wire x1="33.02" y1="157.48" x2="50.8" y2="157.48" width="0.1524" layer="91"/>
 <label x="50.8" y="157.48" size="1.778" layer="95" xref="yes"/>
-<pinref part="P7" gate="G$1" pin="P$1"/>
+<pinref part="S10" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="8" class="0">
@@ -896,7 +896,7 @@
 <segment>
 <wire x1="33.02" y1="149.86" x2="50.8" y2="149.86" width="0.1524" layer="91"/>
 <label x="50.8" y="149.86" size="1.778" layer="95" xref="yes"/>
-<pinref part="P8" gate="G$1" pin="P$1"/>
+<pinref part="C9" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="9" class="0">
@@ -908,7 +908,7 @@
 <segment>
 <wire x1="33.02" y1="142.24" x2="50.8" y2="142.24" width="0.1524" layer="91"/>
 <label x="50.8" y="142.24" size="1.778" layer="95" xref="yes"/>
-<pinref part="P9" gate="G$1" pin="P$1"/>
+<pinref part="S9" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="10" class="0">
@@ -920,7 +920,7 @@
 <segment>
 <wire x1="33.02" y1="134.62" x2="50.8" y2="134.62" width="0.1524" layer="91"/>
 <label x="50.8" y="134.62" size="1.778" layer="95" xref="yes"/>
-<pinref part="P10" gate="G$1" pin="P$1"/>
+<pinref part="C8" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="11" class="0">
@@ -932,7 +932,7 @@
 <segment>
 <wire x1="33.02" y1="127" x2="50.8" y2="127" width="0.1524" layer="91"/>
 <label x="50.8" y="127" size="1.778" layer="95" xref="yes"/>
-<pinref part="P11" gate="G$1" pin="P$1"/>
+<pinref part="S8" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="12" class="0">
@@ -944,7 +944,7 @@
 <segment>
 <wire x1="33.02" y1="119.38" x2="50.8" y2="119.38" width="0.1524" layer="91"/>
 <label x="50.8" y="119.38" size="1.778" layer="95" xref="yes"/>
-<pinref part="P12" gate="G$1" pin="P$1"/>
+<pinref part="C7" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="13" class="0">
@@ -956,7 +956,7 @@
 <segment>
 <wire x1="33.02" y1="111.76" x2="50.8" y2="111.76" width="0.1524" layer="91"/>
 <label x="50.8" y="111.76" size="1.778" layer="95" xref="yes"/>
-<pinref part="P13" gate="G$1" pin="P$1"/>
+<pinref part="S7" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="14" class="0">
@@ -968,7 +968,7 @@
 <segment>
 <wire x1="33.02" y1="104.14" x2="50.8" y2="104.14" width="0.1524" layer="91"/>
 <label x="50.8" y="104.14" size="1.778" layer="95" xref="yes"/>
-<pinref part="P14" gate="G$1" pin="P$1"/>
+<pinref part="C6" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="15" class="0">
@@ -980,7 +980,7 @@
 <segment>
 <wire x1="33.02" y1="96.52" x2="50.8" y2="96.52" width="0.1524" layer="91"/>
 <label x="50.8" y="96.52" size="1.778" layer="95" xref="yes"/>
-<pinref part="P15" gate="G$1" pin="P$1"/>
+<pinref part="S6" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="16" class="0">
@@ -992,7 +992,7 @@
 <segment>
 <wire x1="33.02" y1="88.9" x2="50.8" y2="88.9" width="0.1524" layer="91"/>
 <label x="50.8" y="88.9" size="1.778" layer="95" xref="yes"/>
-<pinref part="P16" gate="G$1" pin="P$1"/>
+<pinref part="C5" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="17" class="0">
@@ -1004,7 +1004,7 @@
 <segment>
 <wire x1="33.02" y1="81.28" x2="50.8" y2="81.28" width="0.1524" layer="91"/>
 <label x="50.8" y="81.28" size="1.778" layer="95" xref="yes"/>
-<pinref part="P17" gate="G$1" pin="P$1"/>
+<pinref part="S5" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="18" class="0">
@@ -1016,7 +1016,7 @@
 <segment>
 <wire x1="33.02" y1="73.66" x2="50.8" y2="73.66" width="0.1524" layer="91"/>
 <label x="50.8" y="73.66" size="1.778" layer="95" xref="yes"/>
-<pinref part="P18" gate="G$1" pin="P$1"/>
+<pinref part="C4" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="19" class="0">
@@ -1028,7 +1028,7 @@
 <segment>
 <wire x1="33.02" y1="66.04" x2="50.8" y2="66.04" width="0.1524" layer="91"/>
 <label x="50.8" y="66.04" size="1.778" layer="95" xref="yes"/>
-<pinref part="P19" gate="G$1" pin="P$1"/>
+<pinref part="S4" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="20" class="0">
@@ -1040,7 +1040,7 @@
 <segment>
 <wire x1="33.02" y1="58.42" x2="50.8" y2="58.42" width="0.1524" layer="91"/>
 <label x="50.8" y="58.42" size="1.778" layer="95" xref="yes"/>
-<pinref part="P20" gate="G$1" pin="P$1"/>
+<pinref part="C3" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="21" class="0">
@@ -1052,7 +1052,7 @@
 <segment>
 <wire x1="33.02" y1="50.8" x2="50.8" y2="50.8" width="0.1524" layer="91"/>
 <label x="50.8" y="50.8" size="1.778" layer="95" xref="yes"/>
-<pinref part="P21" gate="G$1" pin="P$1"/>
+<pinref part="S3" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="22" class="0">
@@ -1064,7 +1064,7 @@
 <segment>
 <wire x1="33.02" y1="43.18" x2="50.8" y2="43.18" width="0.1524" layer="91"/>
 <label x="50.8" y="43.18" size="1.778" layer="95" xref="yes"/>
-<pinref part="P22" gate="G$1" pin="P$1"/>
+<pinref part="C2" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="23" class="0">
@@ -1076,7 +1076,7 @@
 <segment>
 <wire x1="33.02" y1="35.56" x2="50.8" y2="35.56" width="0.1524" layer="91"/>
 <label x="50.8" y="35.56" size="1.778" layer="95" xref="yes"/>
-<pinref part="P23" gate="G$1" pin="P$1"/>
+<pinref part="S2" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="24" class="0">
@@ -1088,7 +1088,7 @@
 <segment>
 <wire x1="33.02" y1="27.94" x2="50.8" y2="27.94" width="0.1524" layer="91"/>
 <label x="50.8" y="27.94" size="1.778" layer="95" xref="yes"/>
-<pinref part="P24" gate="G$1" pin="P$1"/>
+<pinref part="C1" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="25" class="0">
@@ -1100,7 +1100,7 @@
 <segment>
 <wire x1="33.02" y1="20.32" x2="50.8" y2="20.32" width="0.1524" layer="91"/>
 <label x="50.8" y="20.32" size="1.778" layer="95" xref="yes"/>
-<pinref part="P25" gate="G$1" pin="P$1"/>
+<pinref part="S1" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="26" class="0">
@@ -1112,7 +1112,7 @@
 <segment>
 <wire x1="142.24" y1="40.64" x2="137.16" y2="40.64" width="0.1524" layer="91"/>
 <label x="137.16" y="40.64" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P26" gate="G$1" pin="P$1"/>
+<pinref part="V-" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="27" class="0">
@@ -1124,7 +1124,7 @@
 <segment>
 <wire x1="142.24" y1="48.26" x2="137.16" y2="48.26" width="0.1524" layer="91"/>
 <label x="137.16" y="48.26" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P27" gate="G$1" pin="P$1"/>
+<pinref part="NC" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="28" class="0">
@@ -1136,7 +1136,7 @@
 <segment>
 <wire x1="142.24" y1="55.88" x2="137.16" y2="55.88" width="0.1524" layer="91"/>
 <label x="137.16" y="55.88" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P28" gate="G$1" pin="P$1"/>
+<pinref part="VTEMP1" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="29" class="0">
@@ -1148,7 +1148,7 @@
 <segment>
 <wire x1="142.24" y1="63.5" x2="137.16" y2="63.5" width="0.1524" layer="91"/>
 <label x="137.16" y="63.5" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P29" gate="G$1" pin="P$1"/>
+<pinref part="VTEMP2" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="30" class="0">
@@ -1160,7 +1160,7 @@
 <segment>
 <wire x1="142.24" y1="71.12" x2="137.16" y2="71.12" width="0.1524" layer="91"/>
 <label x="137.16" y="71.12" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P30" gate="G$1" pin="P$1"/>
+<pinref part="VREF" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="31" class="0">
@@ -1172,7 +1172,7 @@
 <segment>
 <wire x1="142.24" y1="78.74" x2="137.16" y2="78.74" width="0.1524" layer="91"/>
 <label x="137.16" y="78.74" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P31" gate="G$1" pin="P$1"/>
+<pinref part="VREG" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="32" class="0">
@@ -1184,7 +1184,7 @@
 <segment>
 <wire x1="142.24" y1="86.36" x2="137.16" y2="86.36" width="0.1524" layer="91"/>
 <label x="137.16" y="86.36" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P32" gate="G$1" pin="P$1"/>
+<pinref part="TOS" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="33" class="0">
@@ -1196,7 +1196,7 @@
 <segment>
 <wire x1="142.24" y1="93.98" x2="137.16" y2="93.98" width="0.1524" layer="91"/>
 <label x="137.16" y="93.98" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P33" gate="G$1" pin="P$1"/>
+<pinref part="NC1" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="34" class="0">
@@ -1208,7 +1208,7 @@
 <segment>
 <wire x1="142.24" y1="101.6" x2="137.16" y2="101.6" width="0.1524" layer="91"/>
 <label x="137.16" y="101.6" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P34" gate="G$1" pin="P$1"/>
+<pinref part="WDTB" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="35" class="0">
@@ -1220,7 +1220,7 @@
 <segment>
 <wire x1="142.24" y1="109.22" x2="137.16" y2="109.22" width="0.1524" layer="91"/>
 <label x="137.16" y="109.22" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P35" gate="G$1" pin="P$1"/>
+<pinref part="GPIO1" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="36" class="0">
@@ -1232,7 +1232,7 @@
 <segment>
 <wire x1="142.24" y1="116.84" x2="137.16" y2="116.84" width="0.1524" layer="91"/>
 <label x="137.16" y="116.84" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P36" gate="G$1" pin="P$1"/>
+<pinref part="GPIO2" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="37" class="0">
@@ -1244,7 +1244,7 @@
 <segment>
 <wire x1="142.24" y1="124.46" x2="137.16" y2="124.46" width="0.1524" layer="91"/>
 <label x="137.16" y="124.46" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P37" gate="G$1" pin="P$1"/>
+<pinref part="A0" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="38" class="0">
@@ -1256,7 +1256,7 @@
 <segment>
 <wire x1="142.24" y1="132.08" x2="137.16" y2="132.08" width="0.1524" layer="91"/>
 <label x="137.16" y="132.08" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P38" gate="G$1" pin="P$1"/>
+<pinref part="A1" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="39" class="0">
@@ -1268,7 +1268,7 @@
 <segment>
 <wire x1="142.24" y1="139.7" x2="137.16" y2="139.7" width="0.1524" layer="91"/>
 <label x="137.16" y="139.7" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P39" gate="G$1" pin="P$1"/>
+<pinref part="A2" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="40" class="0">
@@ -1280,7 +1280,7 @@
 <segment>
 <wire x1="142.24" y1="147.32" x2="137.16" y2="147.32" width="0.1524" layer="91"/>
 <label x="137.16" y="147.32" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P40" gate="G$1" pin="P$1"/>
+<pinref part="A3" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="41" class="0">
@@ -1292,7 +1292,7 @@
 <segment>
 <wire x1="142.24" y1="154.94" x2="137.16" y2="154.94" width="0.1524" layer="91"/>
 <label x="137.16" y="154.94" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P41" gate="G$1" pin="P$1"/>
+<pinref part="SCKI" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="42" class="0">
@@ -1304,7 +1304,7 @@
 <segment>
 <wire x1="142.24" y1="162.56" x2="137.16" y2="162.56" width="0.1524" layer="91"/>
 <label x="137.16" y="162.56" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P42" gate="G$1" pin="P$1"/>
+<pinref part="SDI" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="43" class="0">
@@ -1316,7 +1316,7 @@
 <segment>
 <wire x1="142.24" y1="170.18" x2="137.16" y2="170.18" width="0.1524" layer="91"/>
 <label x="137.16" y="170.18" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="P43" gate="G$1" pin="P$1"/>
+<pinref part="SDO" gate="G$1" pin="P$1"/>
 </segment>
 </net>
 <net name="44" class="0">
@@ -1326,7 +1326,7 @@
 <label x="116.84" y="170.18" size="1.778" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="P44" gate="G$1" pin="P$1"/>
+<pinref part="CSBI" gate="G$1" pin="P$1"/>
 <wire x1="142.24" y1="177.8" x2="137.16" y2="177.8" width="0.1524" layer="91"/>
 <label x="137.16" y="177.8" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>

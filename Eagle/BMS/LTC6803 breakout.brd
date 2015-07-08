@@ -391,67 +391,67 @@ Please make sure your boards conform to these design rules.</description>
 </pass>
 </autorouter>
 <elements>
-<element name="P1" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="9.5885" y="19.2405">
+<element name="V+" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="9.5885" y="19.2405">
 <attribute name="OC_NEWARK" value="unknown" x="9.5885" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="9.5885" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="9.5885" y="19.2405" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P7" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="16.7005">
+<element name="S10" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="16.7005">
 <attribute name="OC_NEWARK" value="unknown" x="1.9685" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="1.9685" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="1.9685" y="16.7005" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P41" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="14.6685" y="16.7005">
+<element name="SCKI" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="14.6685" y="16.7005">
 <attribute name="OC_NEWARK" value="unknown" x="14.6685" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="14.6685" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="14.6685" y="16.7005" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P8" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="19.2405">
+<element name="C9" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="19.2405">
 <attribute name="OC_NEWARK" value="unknown" x="1.9685" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="1.9685" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="1.9685" y="19.2405" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P40" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="19.2405">
+<element name="A3" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="19.2405">
 <attribute name="OC_NEWARK" value="unknown" x="17.2085" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="17.2085" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="17.2085" y="19.2405" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P9" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="14.1605">
+<element name="S9" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="14.1605">
 <attribute name="OC_NEWARK" value="unknown" x="4.5085" y="14.1605" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="4.5085" y="14.1605" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="4.5085" y="14.1605" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P39" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="16.7005">
+<element name="A2" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="16.7005">
 <attribute name="OC_NEWARK" value="unknown" x="17.2085" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="17.2085" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="17.2085" y="16.7005" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P10" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="14.1605">
+<element name="C8" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="14.1605">
 <attribute name="OC_NEWARK" value="unknown" x="1.9685" y="14.1605" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="1.9685" y="14.1605" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="1.9685" y="14.1605" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P38" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="19.2405">
+<element name="A1" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="19.2405">
 <attribute name="OC_NEWARK" value="unknown" x="19.7485" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="19.7485" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="19.7485" y="19.2405" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P11" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="11.6205">
+<element name="S8" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="11.6205">
 <attribute name="OC_NEWARK" value="unknown" x="4.5085" y="11.6205" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="4.5085" y="11.6205" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="4.5085" y="11.6205" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P37" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="16.7005">
+<element name="A0" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="16.7005">
 <attribute name="OC_NEWARK" value="unknown" x="19.7485" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="19.7485" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="19.7485" y="16.7005" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P2" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="9.5885" y="16.7005">
+<element name="C15" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="9.5885" y="16.7005">
 <attribute name="OC_NEWARK" value="unknown" x="9.5885" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="9.5885" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="9.5885" y="16.7005" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P12" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="11.6205">
+<element name="C7" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="11.6205">
 <attribute name="OC_NEWARK" value="unknown" x="1.9685" y="11.6205" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="1.9685" y="11.6205" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="1.9685" y="11.6205" size="1.778" layer="27" display="off"/>
@@ -461,157 +461,157 @@ Please make sure your boards conform to these design rules.</description>
 <attribute name="MF" value="" x="10.8585" y="9.0805" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MPN" value="" x="10.8585" y="9.0805" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="P36" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="14.1605">
+<element name="GPIO2" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="14.1605">
 <attribute name="OC_NEWARK" value="unknown" x="17.2085" y="14.1605" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="17.2085" y="14.1605" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="17.2085" y="14.1605" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P13" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="9.0805">
+<element name="S7" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="9.0805">
 <attribute name="OC_NEWARK" value="unknown" x="4.5085" y="9.0805" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="4.5085" y="9.0805" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="4.5085" y="9.0805" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P35" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="14.1605">
+<element name="GPIO1" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="14.1605">
 <attribute name="OC_NEWARK" value="unknown" x="19.7485" y="14.1605" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="19.7485" y="14.1605" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="19.7485" y="14.1605" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P14" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="9.0805">
+<element name="C6" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="9.0805">
 <attribute name="OC_NEWARK" value="unknown" x="1.9685" y="9.0805" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="1.9685" y="9.0805" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="1.9685" y="9.0805" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P34" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="11.6205">
+<element name="WDTB" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="11.6205">
 <attribute name="OC_NEWARK" value="unknown" x="17.2085" y="11.6205" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="17.2085" y="11.6205" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="17.2085" y="11.6205" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P15" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="6.5405">
+<element name="S6" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="6.5405">
 <attribute name="OC_NEWARK" value="unknown" x="1.9685" y="6.5405" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="1.9685" y="6.5405" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="1.9685" y="6.5405" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P33" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="11.6205">
+<element name="NC1" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="11.6205">
 <attribute name="OC_NEWARK" value="unknown" x="19.7485" y="11.6205" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="19.7485" y="11.6205" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="19.7485" y="11.6205" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P16" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="6.5405">
+<element name="C5" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="6.5405">
 <attribute name="OC_NEWARK" value="unknown" x="4.5085" y="6.5405" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="4.5085" y="6.5405" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="4.5085" y="6.5405" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P3" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="7.0485" y="19.2405">
+<element name="S12" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="7.0485" y="19.2405">
 <attribute name="OC_NEWARK" value="unknown" x="7.0485" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="7.0485" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="7.0485" y="19.2405" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P32" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="9.0805">
+<element name="TOS" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="9.0805">
 <attribute name="OC_NEWARK" value="unknown" x="17.2085" y="9.0805" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="17.2085" y="9.0805" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="17.2085" y="9.0805" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P17" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="4.0005">
+<element name="S5" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="4.0005">
 <attribute name="OC_NEWARK" value="unknown" x="1.9685" y="4.0005" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="1.9685" y="4.0005" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="1.9685" y="4.0005" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P31" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="9.0805">
+<element name="VREG" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="9.0805">
 <attribute name="OC_NEWARK" value="unknown" x="19.7485" y="9.0805" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="19.7485" y="9.0805" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="19.7485" y="9.0805" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P18" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="4.0005">
+<element name="C4" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="4.0005">
 <attribute name="OC_NEWARK" value="unknown" x="4.5085" y="4.0005" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="4.5085" y="4.0005" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="4.5085" y="4.0005" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P30" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="6.5405">
+<element name="VREF" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="6.5405">
 <attribute name="OC_NEWARK" value="unknown" x="17.2085" y="6.5405" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="17.2085" y="6.5405" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="17.2085" y="6.5405" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P19" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="1.4605">
+<element name="S4" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="1.9685" y="1.4605">
 <attribute name="OC_NEWARK" value="unknown" x="1.9685" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="1.9685" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="1.9685" y="1.4605" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P29" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="6.5405">
+<element name="VTEMP2" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="6.5405">
 <attribute name="OC_NEWARK" value="unknown" x="19.7485" y="6.5405" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="19.7485" y="6.5405" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="19.7485" y="6.5405" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P20" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="1.4605">
+<element name="C3" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="1.4605">
 <attribute name="OC_NEWARK" value="unknown" x="4.5085" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="4.5085" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="4.5085" y="1.4605" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P28" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="4.0005">
+<element name="VTEMP1" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="4.0005">
 <attribute name="OC_NEWARK" value="unknown" x="19.7485" y="4.0005" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="19.7485" y="4.0005" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="19.7485" y="4.0005" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P21" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="7.0485" y="1.4605">
+<element name="S3" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="7.0485" y="1.4605">
 <attribute name="OC_NEWARK" value="unknown" x="7.0485" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="7.0485" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="7.0485" y="1.4605" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P4" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="7.0485" y="16.7005">
+<element name="C11" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="7.0485" y="16.7005">
 <attribute name="OC_NEWARK" value="unknown" x="7.0485" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="7.0485" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="7.0485" y="16.7005" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P27" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="4.0005">
+<element name="NC" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="4.0005">
 <attribute name="OC_NEWARK" value="unknown" x="17.2085" y="4.0005" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="17.2085" y="4.0005" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="17.2085" y="4.0005" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P22" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="9.5885" y="1.4605">
+<element name="C2" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="9.5885" y="1.4605">
 <attribute name="OC_NEWARK" value="unknown" x="9.5885" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="9.5885" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="9.5885" y="1.4605" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P26" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="1.4605">
+<element name="V-" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="19.7485" y="1.4605">
 <attribute name="OC_NEWARK" value="unknown" x="19.7485" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="19.7485" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="19.7485" y="1.4605" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P23" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="12.1285" y="1.4605">
+<element name="S2" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="12.1285" y="1.4605">
 <attribute name="OC_NEWARK" value="unknown" x="12.1285" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="12.1285" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="12.1285" y="1.4605" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P24" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="14.6685" y="1.4605">
+<element name="C1" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="14.6685" y="1.4605">
 <attribute name="OC_NEWARK" value="unknown" x="14.6685" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="14.6685" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="14.6685" y="1.4605" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P25" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="1.4605">
+<element name="S1" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="17.2085" y="1.4605">
 <attribute name="OC_NEWARK" value="unknown" x="17.2085" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="17.2085" y="1.4605" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="17.2085" y="1.4605" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P44" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="12.1285" y="19.2405">
+<element name="CSBI" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="12.1285" y="19.2405">
 <attribute name="OC_NEWARK" value="unknown" x="12.1285" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="12.1285" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="12.1285" y="19.2405" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P5" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="19.2405">
+<element name="S11" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="19.2405">
 <attribute name="OC_NEWARK" value="unknown" x="4.5085" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="4.5085" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="4.5085" y="19.2405" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P43" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="12.1285" y="16.7005">
+<element name="SDO" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="12.1285" y="16.7005">
 <attribute name="OC_NEWARK" value="unknown" x="12.1285" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="12.1285" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="12.1285" y="16.7005" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P6" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="16.7005">
+<element name="C10" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="4.5085" y="16.7005">
 <attribute name="OC_NEWARK" value="unknown" x="4.5085" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="4.5085" y="16.7005" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="4.5085" y="16.7005" size="1.778" layer="27" display="off"/>
 </element>
-<element name="P42" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="14.6685" y="19.2405">
+<element name="SDI" library="Isaac" package="PLATED_HOLE" value="SINGLE_TERMINAL" x="14.6685" y="19.2405">
 <attribute name="OC_NEWARK" value="unknown" x="14.6685" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MF" value="" x="14.6685" y="19.2405" size="1.778" layer="27" display="off"/>
 <attribute name="MPN" value="" x="14.6685" y="19.2405" size="1.778" layer="27" display="off"/>
@@ -620,7 +620,7 @@ Please make sure your boards conform to these design rules.</description>
 <signals>
 <signal name="1">
 <contactref element="U$21" pad="1"/>
-<contactref element="P1" pad="P$1"/>
+<contactref element="V+" pad="P$1"/>
 <wire x1="9.5885" y1="19.2405" x2="8.509" y2="18.288" width="0.254" layer="1"/>
 <wire x1="8.509" y1="18.288" x2="8.509" y2="14.6685" width="0.254" layer="1"/>
 <wire x1="8.509" y1="14.6685" x2="8.2345" y2="14.3305" width="0.254" layer="1"/>
@@ -628,7 +628,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="2">
 <contactref element="U$21" pad="2"/>
-<contactref element="P2" pad="P$1"/>
+<contactref element="C15" pad="P$1"/>
 <wire x1="7.3585" y1="13.8305" x2="7.371" y2="13.843" width="0.254" layer="1"/>
 <wire x1="9.5885" y1="14.6685" x2="9.5885" y2="16.7005" width="0.254" layer="1"/>
 <wire x1="7.371" y1="13.843" x2="8.763" y2="13.843" width="0.254" layer="1"/>
@@ -636,7 +636,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="3">
 <contactref element="U$21" pad="3"/>
-<contactref element="P3" pad="P$1"/>
+<contactref element="S12" pad="P$1"/>
 <wire x1="7.3585" y1="13.3305" x2="7.363" y2="13.335" width="0.254" layer="1"/>
 <wire x1="7.363" y1="13.335" x2="9.2075" y2="13.335" width="0.254" layer="1"/>
 <wire x1="9.2075" y1="13.335" x2="10.2235" y2="13.6525" width="0.254" layer="1"/>
@@ -652,7 +652,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="4">
 <contactref element="U$21" pad="4"/>
-<contactref element="P4" pad="P$1"/>
+<contactref element="C11" pad="P$1"/>
 <wire x1="7.3585" y1="12.8305" x2="7.355" y2="12.827" width="0.254" layer="1"/>
 <wire x1="7.355" y1="12.827" x2="6.5405" y2="12.827" width="0.254" layer="1"/>
 <wire x1="6.5405" y1="12.827" x2="6.4135" y2="12.954" width="0.254" layer="1"/>
@@ -661,7 +661,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="5">
 <contactref element="U$21" pad="5"/>
-<contactref element="P5" pad="P$1"/>
+<contactref element="S11" pad="P$1"/>
 <wire x1="7.3585" y1="12.3305" x2="8.584" y2="12.3305" width="0.254" layer="1"/>
 <wire x1="8.584" y1="12.3305" x2="8.8265" y2="12.573" width="0.254" layer="1"/>
 <wire x1="8.8265" y1="12.573" x2="10.0965" y2="12.573" width="0.254" layer="1"/>
@@ -681,7 +681,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="6">
 <contactref element="U$21" pad="6"/>
-<contactref element="P6" pad="P$1"/>
+<contactref element="C10" pad="P$1"/>
 <wire x1="7.3585" y1="11.8305" x2="6.394" y2="11.8305" width="0.254" layer="1"/>
 <wire x1="6.394" y1="11.8305" x2="6.2865" y2="11.938" width="0.254" layer="1"/>
 <wire x1="6.2865" y1="11.938" x2="6.2865" y2="12.3825" width="0.254" layer="1"/>
@@ -691,7 +691,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="7">
 <contactref element="U$21" pad="7"/>
-<contactref element="P7" pad="P$1"/>
+<contactref element="S10" pad="P$1"/>
 <wire x1="7.3585" y1="11.3305" x2="8.854" y2="11.3305" width="0.254" layer="1"/>
 <wire x1="8.854" y1="11.3305" x2="9.144" y2="11.6205" width="0.254" layer="1"/>
 <via x="9.144" y="11.6205" extent="1-16" drill="0.6"/>
@@ -710,7 +710,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="8">
 <contactref element="U$21" pad="8"/>
-<contactref element="P8" pad="P$1"/>
+<contactref element="C9" pad="P$1"/>
 <wire x1="7.3585" y1="10.8305" x2="9.553" y2="10.8305" width="0.254" layer="1"/>
 <wire x1="9.553" y1="10.8305" x2="10.6045" y2="9.779" width="0.254" layer="1"/>
 <via x="10.6045" y="9.779" extent="1-16" drill="0.6"/>
@@ -729,7 +729,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="9">
 <contactref element="U$21" pad="9"/>
-<contactref element="P9" pad="P$1"/>
+<contactref element="S9" pad="P$1"/>
 <wire x1="6.6875" y1="10.3305" x2="5.588" y2="11.3665" width="0.254" layer="1"/>
 <wire x1="5.588" y1="11.3665" x2="5.588" y2="12.192" width="0.254" layer="1"/>
 <wire x1="5.588" y1="12.192" x2="4.5085" y2="13.589" width="0.254" layer="1"/>
@@ -738,7 +738,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="10">
 <contactref element="U$21" pad="10"/>
-<contactref element="P10" pad="P$1"/>
+<contactref element="C8" pad="P$1"/>
 <wire x1="7.3585" y1="9.8305" x2="9.029" y2="9.8305" width="0.254" layer="1"/>
 <wire x1="9.029" y1="9.8305" x2="10.541" y2="8.3185" width="0.254" layer="1"/>
 <via x="10.541" y="8.3185" extent="1-16" drill="0.6"/>
@@ -753,7 +753,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="11">
 <contactref element="U$21" pad="11"/>
-<contactref element="P11" pad="P$1"/>
+<contactref element="S8" pad="P$1"/>
 <wire x1="6.4135" y1="9.3345" x2="7.3279" y2="9.3345" width="0.254" layer="1"/>
 <wire x1="4.5847" y1="11.1633" x2="6.4135" y2="9.3345" width="0.254" layer="1"/>
 <wire x1="4.5847" y1="11.6205" x2="4.5847" y2="11.1633" width="0.254" layer="1"/>
@@ -762,7 +762,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="12">
 <contactref element="U$21" pad="12"/>
-<contactref element="P12" pad="P$1"/>
+<contactref element="C7" pad="P$1"/>
 <wire x1="7.3585" y1="8.8305" x2="9.0765" y2="8.8305" width="0.254" layer="1"/>
 <wire x1="9.0765" y1="8.8305" x2="9.779" y2="8.128" width="0.254" layer="1"/>
 <wire x1="9.779" y1="8.128" x2="9.779" y2="7.239" width="0.254" layer="1"/>
@@ -777,13 +777,13 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="13">
 <contactref element="U$21" pad="13"/>
-<contactref element="P13" pad="P$1"/>
+<contactref element="S7" pad="P$1"/>
 <wire x1="7.3585" y1="8.3305" x2="5.2585" y2="8.3305" width="0.254" layer="1"/>
 <wire x1="5.2585" y1="8.3305" x2="4.5085" y2="9.0805" width="0.254" layer="1"/>
 </signal>
 <signal name="14">
 <contactref element="U$21" pad="14"/>
-<contactref element="P14" pad="P$1"/>
+<contactref element="C6" pad="P$1"/>
 <via x="8.9535" y="6.4135" extent="1-16" drill="0.6"/>
 <wire x1="3.2385" y1="7.8105" x2="1.9685" y2="9.0805" width="0.254" layer="16"/>
 <wire x1="7.3585" y1="7.8305" x2="8.87" y2="7.8305" width="0.254" layer="1"/>
@@ -797,7 +797,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="15">
 <contactref element="U$21" pad="15"/>
-<contactref element="P15" pad="P$1"/>
+<contactref element="S6" pad="P$1"/>
 <wire x1="7.3585" y1="7.3305" x2="5.3695" y2="7.3305" width="0.254" layer="1"/>
 <wire x1="5.3695" y1="7.3305" x2="5.08" y2="7.6835" width="0.254" layer="1"/>
 <wire x1="5.08" y1="7.6835" x2="2.9845" y2="7.6835" width="0.254" layer="1"/>
@@ -805,13 +805,13 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="16">
 <contactref element="U$21" pad="16"/>
-<contactref element="P16" pad="P$1"/>
+<contactref element="C5" pad="P$1"/>
 <wire x1="7.3585" y1="6.8305" x2="4.7985" y2="6.8305" width="0.254" layer="1"/>
 <wire x1="4.7985" y1="6.8305" x2="4.5085" y2="6.5405" width="0.254" layer="1"/>
 </signal>
 <signal name="17">
 <contactref element="U$21" pad="17"/>
-<contactref element="P17" pad="P$1"/>
+<contactref element="S5" pad="P$1"/>
 <wire x1="3.2131" y1="5.2197" x2="4.8133" y2="5.2197" width="0.254" layer="1"/>
 <wire x1="2.0701" y1="4.0767" x2="3.2131" y2="5.2197" width="0.254" layer="1"/>
 <wire x1="2.0701" y1="4.0767" x2="1.9685" y2="4.0005" width="0.254" layer="1"/>
@@ -820,13 +820,13 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="18">
 <contactref element="U$21" pad="18"/>
-<contactref element="P18" pad="P$1"/>
+<contactref element="C4" pad="P$1"/>
 <wire x1="7.3585" y1="5.8305" x2="6.3385" y2="5.8305" width="0.254" layer="1"/>
 <wire x1="6.3385" y1="5.8305" x2="4.5085" y2="4.0005" width="0.254" layer="1"/>
 </signal>
 <signal name="19">
 <contactref element="U$21" pad="19"/>
-<contactref element="P19" pad="P$1"/>
+<contactref element="S4" pad="P$1"/>
 <wire x1="7.3585" y1="5.3305" x2="7.362" y2="5.334" width="0.254" layer="1"/>
 <via x="8.8265" y="5.207" extent="1-16" drill="0.6"/>
 <wire x1="8.8265" y1="5.207" x2="5.9055" y2="2.54" width="0.254" layer="16"/>
@@ -838,7 +838,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="20">
 <contactref element="U$21" pad="20"/>
-<contactref element="P20" pad="P$1"/>
+<contactref element="C3" pad="P$1"/>
 <wire x1="4.5085" y1="1.4605" x2="5.715" y2="2.667" width="0.254" layer="1"/>
 <wire x1="5.715" y1="2.667" x2="5.715" y2="4.572" width="0.254" layer="1"/>
 <wire x1="5.715" y1="4.572" x2="5.9735" y2="4.8305" width="0.254" layer="1"/>
@@ -846,7 +846,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="21">
 <contactref element="U$21" pad="21"/>
-<contactref element="P21" pad="P$1"/>
+<contactref element="S3" pad="P$1"/>
 <wire x1="7.3585" y1="4.3305" x2="6.4895" y2="4.3305" width="0.254" layer="1"/>
 <wire x1="6.4895" y1="4.3305" x2="6.223" y2="4.064" width="0.254" layer="1"/>
 <wire x1="6.223" y1="4.064" x2="6.223" y2="2.286" width="0.254" layer="1"/>
@@ -854,7 +854,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="22">
 <contactref element="U$21" pad="22"/>
-<contactref element="P22" pad="P$1"/>
+<contactref element="C2" pad="P$1"/>
 <wire x1="7.5565" y1="3.3909" x2="7.5565" y2="3.7846" width="0.254" layer="1"/>
 <wire x1="9.3853" y1="1.5621" x2="7.5565" y2="3.3909" width="0.254" layer="1"/>
 <wire x1="7.5565" y1="3.7846" x2="7.3585" y2="3.8305" width="0.254" layer="1"/>
@@ -862,14 +862,14 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="23">
 <contactref element="U$21" pad="23"/>
-<contactref element="P23" pad="P$1"/>
+<contactref element="S2" pad="P$1"/>
 <wire x1="12.1285" y1="1.7907" x2="14.1859" y2="3.8481" width="0.254" layer="1"/>
 <wire x1="12.1285" y1="1.4605" x2="12.1285" y2="1.7907" width="0.254" layer="1"/>
 <wire x1="14.1859" y1="3.8481" x2="14.3585" y2="3.8305" width="0.254" layer="1"/>
 </signal>
 <signal name="24">
 <contactref element="U$21" pad="24"/>
-<contactref element="P24" pad="P$1"/>
+<contactref element="C1" pad="P$1"/>
 <wire x1="14.3585" y1="4.3305" x2="15.1005" y2="4.3305" width="0.254" layer="1"/>
 <wire x1="15.1005" y1="4.3305" x2="15.367" y2="4.064" width="0.254" layer="1"/>
 <wire x1="15.367" y1="4.064" x2="15.367" y2="2.159" width="0.254" layer="1"/>
@@ -877,7 +877,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="25">
 <contactref element="U$21" pad="25"/>
-<contactref element="P25" pad="P$1"/>
+<contactref element="S1" pad="P$1"/>
 <wire x1="15.9385" y1="4.3815" x2="15.9385" y2="2.7305" width="0.254" layer="1"/>
 <wire x1="15.9385" y1="2.7305" x2="17.2085" y2="1.4605" width="0.254" layer="1"/>
 <wire x1="15.9385" y1="4.3815" x2="15.4895" y2="4.8305" width="0.254" layer="1"/>
@@ -885,7 +885,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="26">
 <contactref element="U$21" pad="26"/>
-<contactref element="P26" pad="P$1"/>
+<contactref element="V-" pad="P$1"/>
 <wire x1="14.3585" y1="5.3305" x2="14.355" y2="5.334" width="0.254" layer="1"/>
 <wire x1="14.355" y1="5.334" x2="12.954" y2="5.334" width="0.254" layer="1"/>
 <via x="12.954" y="5.334" extent="1-16" drill="0.6"/>
@@ -896,7 +896,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="27">
 <contactref element="U$21" pad="27"/>
-<contactref element="P27" pad="P$1"/>
+<contactref element="NC" pad="P$1"/>
 <wire x1="14.3585" y1="5.8305" x2="14.37" y2="5.842" width="0.254" layer="1"/>
 <wire x1="14.37" y1="5.842" x2="15.3035" y2="5.842" width="0.254" layer="1"/>
 <wire x1="15.3035" y1="5.842" x2="17.145" y2="4.0005" width="0.254" layer="1"/>
@@ -904,7 +904,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="28">
 <contactref element="U$21" pad="28"/>
-<contactref element="P28" pad="P$1"/>
+<contactref element="VTEMP1" pad="P$1"/>
 <wire x1="14.3585" y1="6.3305" x2="15.831" y2="6.3305" width="0.254" layer="1"/>
 <wire x1="15.831" y1="6.3305" x2="16.764" y2="5.3975" width="0.254" layer="1"/>
 <wire x1="16.764" y1="5.3975" x2="18.3515" y2="5.3975" width="0.254" layer="1"/>
@@ -912,7 +912,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="29">
 <contactref element="U$21" pad="29"/>
-<contactref element="P29" pad="P$1"/>
+<contactref element="VTEMP2" pad="P$1"/>
 <wire x1="14.3585" y1="6.8305" x2="12.99" y2="6.8305" width="0.254" layer="1"/>
 <wire x1="12.99" y1="6.8305" x2="12.7" y2="6.7945" width="0.254" layer="1"/>
 <via x="12.7" y="6.7945" extent="1-16" drill="0.6"/>
@@ -925,25 +925,25 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="30">
 <contactref element="U$21" pad="30"/>
-<contactref element="P30" pad="P$1"/>
+<contactref element="VREF" pad="P$1"/>
 <wire x1="14.3585" y1="7.3305" x2="16.4185" y2="7.3305" width="0.254" layer="1"/>
 <wire x1="16.4185" y1="7.3305" x2="17.2085" y2="6.5405" width="0.254" layer="1"/>
 </signal>
 <signal name="31">
 <contactref element="U$21" pad="31"/>
-<contactref element="P31" pad="P$1"/>
+<contactref element="VREG" pad="P$1"/>
 <wire x1="14.3585" y1="7.8305" x2="18.4985" y2="7.8305" width="0.254" layer="1"/>
 <wire x1="18.4985" y1="7.8305" x2="19.7485" y2="9.0805" width="0.254" layer="1"/>
 </signal>
 <signal name="32">
 <contactref element="U$21" pad="32"/>
-<contactref element="P32" pad="P$1"/>
+<contactref element="TOS" pad="P$1"/>
 <wire x1="14.3585" y1="8.3305" x2="16.4585" y2="8.3305" width="0.254" layer="1"/>
 <wire x1="16.4585" y1="8.3305" x2="17.2085" y2="9.0805" width="0.254" layer="1"/>
 </signal>
 <signal name="33">
 <contactref element="U$21" pad="33"/>
-<contactref element="P33" pad="P$1"/>
+<contactref element="NC1" pad="P$1"/>
 <wire x1="14.3585" y1="8.8305" x2="15.4345" y2="8.8305" width="0.254" layer="1"/>
 <wire x1="15.4345" y1="8.8305" x2="16.764" y2="10.16" width="0.254" layer="1"/>
 <wire x1="16.764" y1="10.16" x2="18.288" y2="10.16" width="0.254" layer="1"/>
@@ -951,7 +951,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="34">
 <contactref element="U$21" pad="34"/>
-<contactref element="P34" pad="P$1"/>
+<contactref element="WDTB" pad="P$1"/>
 <wire x1="14.4145" y1="9.3345" x2="15.24" y2="9.3345" width="0.254" layer="1"/>
 <wire x1="15.24" y1="9.3345" x2="17.2085" y2="11.303" width="0.254" layer="1"/>
 <wire x1="17.2085" y1="11.303" x2="17.2085" y2="11.6205" width="0.254" layer="1"/>
@@ -959,7 +959,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="35">
 <contactref element="U$21" pad="35"/>
-<contactref element="P35" pad="P$1"/>
+<contactref element="GPIO1" pad="P$1"/>
 <wire x1="14.3585" y1="9.8305" x2="12.712" y2="9.8305" width="0.254" layer="1"/>
 <wire x1="12.712" y1="9.8305" x2="12.7" y2="9.8425" width="0.254" layer="1"/>
 <via x="12.7" y="9.8425" extent="1-16" drill="0.6"/>
@@ -972,7 +972,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="36">
 <contactref element="U$21" pad="36"/>
-<contactref element="P36" pad="P$1"/>
+<contactref element="GPIO2" pad="P$1"/>
 <wire x1="15.9385" y1="10.9855" x2="15.9385" y2="11.938" width="0.254" layer="1"/>
 <wire x1="15.9385" y1="11.938" x2="17.2085" y2="13.208" width="0.254" layer="1"/>
 <wire x1="17.2085" y1="13.208" x2="17.2085" y2="14.1605" width="0.254" layer="1"/>
@@ -981,7 +981,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="37">
 <contactref element="U$21" pad="37"/>
-<contactref element="P37" pad="P$1"/>
+<contactref element="A0" pad="P$1"/>
 <wire x1="14.3585" y1="10.8305" x2="14.323" y2="10.795" width="0.254" layer="1"/>
 <wire x1="14.323" y1="10.795" x2="11.557" y2="10.795" width="0.254" layer="1"/>
 <via x="11.557" y="10.795" extent="1-16" drill="0.6"/>
@@ -998,7 +998,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="38">
 <contactref element="U$21" pad="38"/>
-<contactref element="P38" pad="P$1"/>
+<contactref element="A1" pad="P$1"/>
 <wire x1="14.3585" y1="11.3305" x2="14.331" y2="11.303" width="0.254" layer="1"/>
 <wire x1="14.331" y1="11.303" x2="13.208" y2="11.303" width="0.254" layer="1"/>
 <wire x1="13.208" y1="11.303" x2="12.827" y2="11.684" width="0.254" layer="1"/>
@@ -1019,7 +1019,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="39">
 <contactref element="U$21" pad="39"/>
-<contactref element="P39" pad="P$1"/>
+<contactref element="A2" pad="P$1"/>
 <wire x1="14.3585" y1="11.8305" x2="15.196" y2="11.8305" width="0.254" layer="1"/>
 <wire x1="15.196" y1="11.8305" x2="15.367" y2="12.0015" width="0.254" layer="1"/>
 <wire x1="15.367" y1="12.0015" x2="15.367" y2="12.192" width="0.254" layer="1"/>
@@ -1031,7 +1031,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="40">
 <contactref element="U$21" pad="40"/>
-<contactref element="P40" pad="P$1"/>
+<contactref element="A3" pad="P$1"/>
 <wire x1="14.3585" y1="12.3305" x2="13.387" y2="12.3305" width="0.254" layer="1"/>
 <wire x1="13.387" y1="12.3305" x2="12.8905" y2="12.827" width="0.254" layer="1"/>
 <wire x1="12.8905" y1="12.827" x2="11.7475" y2="12.827" width="0.254" layer="1"/>
@@ -1045,7 +1045,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="41">
 <contactref element="U$21" pad="41"/>
-<contactref element="P41" pad="P$1"/>
+<contactref element="SCKI" pad="P$1"/>
 <wire x1="14.3585" y1="12.8305" x2="13.5855" y2="12.8305" width="0.254" layer="1"/>
 <wire x1="13.5855" y1="12.8305" x2="12.3825" y2="14.0335" width="0.254" layer="1"/>
 <via x="12.3825" y="14.0335" extent="1-16" drill="0.6"/>
@@ -1054,7 +1054,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="42">
 <contactref element="U$21" pad="42"/>
-<contactref element="P42" pad="P$1"/>
+<contactref element="SDI" pad="P$1"/>
 <wire x1="14.3585" y1="13.3305" x2="15.2355" y2="13.3305" width="0.254" layer="1"/>
 <wire x1="15.2355" y1="13.3305" x2="15.494" y2="13.589" width="0.254" layer="1"/>
 <wire x1="15.494" y1="13.589" x2="15.494" y2="15.0495" width="0.254" layer="1"/>
@@ -1064,7 +1064,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="43">
 <contactref element="U$21" pad="43"/>
-<contactref element="P43" pad="P$1"/>
+<contactref element="SDO" pad="P$1"/>
 <wire x1="14.3585" y1="13.8305" x2="14.346" y2="13.843" width="0.254" layer="1"/>
 <wire x1="14.346" y1="13.843" x2="13.462" y2="13.843" width="0.254" layer="1"/>
 <wire x1="13.462" y1="13.843" x2="13.208" y2="14.097" width="0.254" layer="1"/>
@@ -1074,7 +1074,7 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="44">
 <contactref element="U$21" pad="44"/>
-<contactref element="P44" pad="P$1"/>
+<contactref element="CSBI" pad="P$1"/>
 <wire x1="12.1285" y1="19.2405" x2="13.208" y2="18.2245" width="0.254" layer="1"/>
 <wire x1="14.3585" y1="14.3305" x2="14.3585" y2="14.661" width="0.254" layer="1"/>
 <wire x1="14.3585" y1="14.661" x2="13.208" y2="15.8115" width="0.254" layer="1"/>
