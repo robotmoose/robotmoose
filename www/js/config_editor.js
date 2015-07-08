@@ -743,6 +743,7 @@ config_gui_t.prototype.create_row=function(type,args,create_new)
 		button.className="close";
 		button.innerHTML="x";
 		button.li=li;
+		button.style.marginLeft=10;
 		button.onclick=function(){myself.configs_list.removeChild(li);myself.configure_button_update();};
 		li.appendChild(button);
 

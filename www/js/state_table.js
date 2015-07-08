@@ -229,6 +229,7 @@ state_table_t.prototype.create_row=function(name,code)
 		button.className="close";
 		button.innerHTML="x";
 		button.li=li;
+		button.style.marginLeft=10;
 		button.onclick=function(){myself.state_list.removeChild(li);};
 		li.appendChild(button);
 

@@ -3,28 +3,44 @@
 		<!--#include virtual="/sources.html"-->
 	</head>
 	<body>
-		<input type="button" value="Show 'New Window'" onclick="doorways.minimize('New Window',false);"/>
-		<input type="button" value="Show 'Loaded Window'" onclick="doorways.minimize('Loaded Window',false);"/>
-		<input type="button" value="Hide All" onclick="doorways.hide_all();"/>
 		<div id="gui"></div>
+
 		<script type="text/javascript">
-			var doorways=new doorways_t(document.getElementById("gui"));
+			var robot_name="demo";
+			var widgets=
+			[
+				{
+					name:"Configuration",
+					col:1,
+					row:1,
+					size_x:Math.ceil(480/gui_t_grid_size),
+					size_y:Math.ceil(320/gui_t_grid_size)
+				},
+				{
+					name:"State Editor",
+					col:1,
+					row:Math.ceil(320/gui_t_grid_size+2),
+					size_x:Math.ceil(512/gui_t_grid_size),
+					size_y:Math.ceil(320/gui_t_grid_size)
+				}
+			];
 
-			if(!doorways)
-				alert("Could not create gui!");
+			var div=document.getElementById("gui");
+			var gui=new doorways_t(div);
 
-			doorways.load([{"title":"Loaded Window","x":"100px","y":"100px"}]);
+			if(!gui)
+				alert("Could not make gui!");
 
-			var loaded_window=doorways.get_window("Loaded Window");
-			var textarea=document.createElement("textarea");
-			textarea.style.width="100%";
-			textarea.style.height="100%";
-			textarea.placeholder="Type here...";
-			loaded_window.appendChild(textarea);
+			gui.load(widgets);
 
-			var new_window=doorways.get_window("New Window",10,0);
+			var config_editor=new config_gui_t(gui.get_window("Configuration"),robot_name);
 
-			console.log(JSON.stringify(doorways.save()));
+			if(!config_editor)
+				alert("Could not config editor!");
+
+			var state_editor=new state_table_t(gui.get_window("State Editor"),robot_name);
+			state_editor.create_row("drive","// Drive forward:\nif (robot.location.x<10) \n  robot.drive(100,100); \nelse \n  robot.state=turn; \n");
+			state_editor.create_row("turn","// Turn left:\nif (robot.location.angle<90)\n  robot.drive(-100,100); \nelse  \n  robot.state=forward; \n");
 		</script>
 	</body>
 </html>
