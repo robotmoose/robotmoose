@@ -60,6 +60,26 @@ doorways_t.prototype.get_window=function(title,x,y)
 	return this.windows[title].body_content;
 }
 
+doorways_t.prototype.move_window=function(title,x,y)
+{
+	if(!title)
+		return null;
+
+	if(!this.windows[title])
+		return
+
+	if(x<0)
+		x=0;
+
+	if(y<0)
+		y=0;
+
+	if(x)
+		this.windows[title].window.style.left=x;
+	if(y)
+		this.windows[title].window.style.top=y;
+}
+
 doorways_t.prototype.minimize=function(title,value)
 {
 	if(!title)
@@ -86,12 +106,6 @@ doorways_t.prototype.create_window_m=function(title,x,y)
 	{
 		var myself=this;
 
-		if(x<0)
-			x=0;
-
-		if(y<0)
-			y=0;
-
 		this.windows[title]={};
 		this.windows[title].title=title;
 		this.windows[title].window=document.createElement("div");
@@ -107,10 +121,7 @@ doorways_t.prototype.create_window_m=function(title,x,y)
 		this.windows[title].window.style.position="absolute";
 		this.windows[title].window.style.zIndex=-1;
 		this.windows[title].window.style.zIndex=this.zindex_top_m();
-		if(x)
-			this.windows[title].window.style.left=x;
-		if(y)
-			this.windows[title].window.style.top=y;
+		this.move_window(title,x,y);
 		this.windows[title].window.appendChild(this.windows[title].title_bar);
 		this.windows[title].window.appendChild(this.windows[title].body);
 
