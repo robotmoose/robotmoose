@@ -11,13 +11,13 @@
 			var gui=new doorways_t(div);
 
 			if(!gui)
-				alert("Could not make gui!");
+				alert("Could not create gui!");
 
 			gui.create_window("Configuration",0,0);
 			var config_editor=new config_gui_t(gui.get_window("Configuration").body_content,robot_name);
 
 			if(!config_editor)
-				alert("Could not config editor!");
+				alert("Could not create config editor!");
 
 			gui.create_window("State Editor",300,0);
 			var state_editor=new state_table_t(gui.get_window("State Editor").body_content,robot_name);
@@ -25,7 +25,7 @@
 			state_editor.create_row("turn","// Turn left:\nif (robot.location.angle<90)\n  robot.drive(-100,100); \nelse  \n  robot.state=forward; \n");
 
 			if(!state_editor)
-				alert("Could not state editor!");
+				alert("Could not create state editor!");
 		</script>
 	</body>
 </html>

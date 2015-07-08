@@ -29,18 +29,21 @@
 			var gui=new gui_t(div);
 
 			if(!gui)
-				alert("Could not make gui!");
+				alert("Could not create gui!");
 
 			gui.load(widgets);
 
 			var config_editor=new config_gui_t(gui.get_widget("Configuration"),robot_name);
 
 			if(!config_editor)
-				alert("Could not config editor!");
+				alert("Could not create config editor!");
 
 			var state_editor=new state_table_t(gui.get_widget("State Editor"),robot_name);
 			state_editor.create_row("drive","// Drive forward:\nif (robot.location.x<10) \n  robot.drive(100,100); \nelse \n  robot.state=turn; \n");
 			state_editor.create_row("turn","// Turn left:\nif (robot.location.angle<90)\n  robot.drive(-100,100); \nelse  \n  robot.state=forward; \n");
+
+			if(!state_editor)
+				alert("Could not create state editor!");
 		</script>
 	</body>
 </html>
