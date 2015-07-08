@@ -39,34 +39,40 @@ doorways_t.prototype.save=function()
 doorways_t.prototype.load=function(data)
 {
 	for(var key in this.windows)
-	{
-		this.element.removeChild(this.windows[key].window);
-		this.windows[key]=null;
-	}
+		this.remove_window(key);
 
 	if(data)
 		for(key in data)
-			this.get_window(data[key].title,data[key].x,data[key].y);
+			this.create_window(data[key].title,data[key].x,data[key].y);
 }
 
-doorways_t.prototype.get_window=function(title,x,y)
+doorways_t.prototype.create_window=function(title,x,y)
 {
 	if(!title)
 		return null;
 
 	if(!this.windows[title])
-		return this.create_window_m(title,x,y).body_content;
+		this.create_window_m(title,x,y);
+}
 
-	return this.windows[title].body_content;
+doorways_t.prototype.get_window=function(title)
+{
+	if(!title)
+		return null;
+
+	if(!this.windows[title])
+		return null;
+
+	return this.windows[title];
 }
 
 doorways_t.prototype.move_window=function(title,x,y)
 {
 	if(!title)
-		return null;
+		return;
 
 	if(!this.windows[title])
-		return
+		return;
 
 	if(x<0)
 		x=0;
@@ -78,6 +84,18 @@ doorways_t.prototype.move_window=function(title,x,y)
 		this.windows[title].window.style.left=x;
 	if(y)
 		this.windows[title].window.style.top=y;
+}
+
+doorways_t.prototype.remove_window=function(title)
+{
+	if(!title)
+		return null;
+
+	if(!this.windows[title])
+		return;
+
+	this.element.removeChild(this.windows[title]);
+	this.windows[title]=null;
 }
 
 doorways_t.prototype.minimize=function(title,value)
