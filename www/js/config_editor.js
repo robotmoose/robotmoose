@@ -491,7 +491,7 @@ function config_gui_t(div,robot_name)
 	if(!this.editor)
 		return null;
 
-	this.editor.element.style.width="480";
+	this.editor.element.style.width=480;
 
 	this.editor.onconfigschange=function(config_text){myself.update_configs(config_text);};
 	this.editor.onoptionschange=function(options){myself.update_options(options);};
@@ -710,6 +710,10 @@ config_gui_t.prototype.create_row=function(type,args,create_new)
 	{
 		var li=document.createElement("li");
 		li.className="list-group-item";
+		li.style.width="100%";
+		li.style.height="100%";
+		li.style.display="inline-block";
+		li.style.whiteSpace="nowrap";
 		li.tabula={type:type,args:new Array()};
 
 		var text=document.createTextNode(type+" ");
@@ -746,6 +750,7 @@ config_gui_t.prototype.create_row=function(type,args,create_new)
 		button.innerHTML="x";
 		button.li=li;
 		button.style.marginLeft=10;
+		button.style.float="right";
 		button.onclick=function(){myself.configs_list.removeChild(li);myself.configure_button_update();};
 		li.appendChild(button);
 
