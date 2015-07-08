@@ -12,12 +12,15 @@ function doorways_t(div)
 	this.offset_x=0;
 	this.offset_y=0;
 	this.windows={};
-	this.menu=document.createElement("ul");
+	this.menu={};
+	this.menu.bar=document.createElement("div");
+	this.menu.window_list=document.createElement("ul");
 
 	this.div.appendChild(this.element);
+	this.element.appendChild(this.menu.bar);
 
-	this.menu.className="nav nav-tabs";
-	this.element.appendChild(this.menu);
+	this.menu.window_list.className="nav nav-tabs";
+	this.menu.bar.appendChild(this.menu.window_list);
 
 	var myself=this;
 	document.onmousemove=function(event){return myself.mouse_move_m(event);};
@@ -34,7 +37,7 @@ doorways_t.prototype.save=function()
 		var obj={};
 		obj.title=key;
 		obj.x=parseInt(this.windows[key].window.style.left)-this.element.offsetLeft;
-		obj.y=parseInt(this.windows[key].window.style.top)-this.element.offsetTop-this.menu.offsetHeight;
+		obj.y=parseInt(this.windows[key].window.style.top)-this.element.offsetTop-this.menu.bar.offsetHeight;
 		obj.active=this.windows[key].active;
 		obj.minimized=this.windows[key].minimized;
 
@@ -95,7 +98,7 @@ doorways_t.prototype.move_window=function(title,x,y)
 		y=0;
 
 	x+=this.element.offsetLeft;
-	y+=this.element.offsetTop+this.menu.offsetHeight;
+	y+=this.element.offsetTop+this.menu.bar.offsetHeight;
 
 	if(x)
 		this.windows[title].window.style.left=x;
@@ -112,7 +115,7 @@ doorways_t.prototype.remove_window=function(title)
 		return;
 
 	this.element.removeChild(this.windows[title].window);
-	this.menu.removeChild(this.windows[title].menu_li);
+	this.menu.window_list.removeChild(this.windows[title].menu.li);
 	this.windows[title]=null;
 }
 
@@ -172,13 +175,13 @@ doorways_t.prototype.refresh_windows_m=function()
 		if(this.windows[key].active)
 		{
 			this.windows[key].window.style.zIndex=this.zindex_top_m();
-			this.windows[key].menu_li.className="active";
+			this.windows[key].menu.li.className="active";
 			this.windows[key].window.className="panel panel-primary";
 			this.windows[key].minimized=false;
 		}
 		else
 		{
-			this.windows[key].menu_li.className="";
+			this.windows[key].menu.li.className="";
 			this.windows[key].window.className="panel panel-default";
 		}
 
@@ -208,25 +211,29 @@ doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 		else
 			this.windows[title].minimized=false;
 
-		this.windows[title].menu_li=document.createElement("li");
-		this.windows[title].menu_a=document.createElement("a");
+		this.windows[title].menu={};
+		this.windows[title].menu.li=document.createElement("li");
+		this.windows[title].menu.a=document.createElement("a");
 		this.windows[title].window=document.createElement("div");
 		this.windows[title].title_bar=document.createElement("div");
 		this.windows[title].title_text=document.createElement("h3");
-		this.windows[title].minimize_button=document.createElement("span");
-		this.windows[title].body=document.createElement("div");
-		this.windows[title].body_content=document.createElement("div");
+		this.windows[title].buttons={};
+		this.windows[title].buttons.div=document.createElement("div");
+		this.windows[title].buttons.minimize=document.createElement("span");
+		this.windows[title].body={};
+		this.windows[title].body.div=document.createElement("div");
+		this.windows[title].body.content=document.createElement("div");
 
 		this.element.appendChild(this.windows[title].window);
 
-		this.menu.appendChild(this.windows[title].menu_li);
+		this.menu.window_list.appendChild(this.windows[title].menu.li);
 
-		this.windows[title].menu_li.role="presentation";
-		this.windows[title].menu_li.appendChild(this.windows[title].menu_a);
+		this.windows[title].menu.li.role="presentation";
+		this.windows[title].menu.li.appendChild(this.windows[title].menu.a);
 
-		this.windows[title].menu_a.doorways_t=this.windows[title];
-		this.windows[title].menu_a.href="javascript:void(0);";
-		this.windows[title].menu_a.onclick=function()
+		this.windows[title].menu.a.doorways_t=this.windows[title];
+		this.windows[title].menu.a.href="javascript:void(0);";
+		this.windows[title].menu.a.onclick=function()
 		{
 			if(this.doorways_t)
 			{
@@ -236,7 +243,7 @@ doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 					myself.set_menu_item_active(this.doorways_t.title,true);
 			}
 		};
-		this.windows[title].menu_a.innerHTML=title;
+		this.windows[title].menu.a.innerHTML=title;
 
 		this.windows[title].window.className="panel panel-primary";
 		this.windows[title].window.style.position="absolute";
@@ -244,7 +251,7 @@ doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 		this.windows[title].window.style.zIndex=this.zindex_top_m();
 		this.move_window(title,x,y);
 		this.windows[title].window.appendChild(this.windows[title].title_bar);
-		this.windows[title].window.appendChild(this.windows[title].body);
+		this.windows[title].window.appendChild(this.windows[title].body.div);
 
 		this.windows[title].title_bar.className="panel-heading";
 		this.windows[title].title_bar.style.cursor="move";
@@ -263,12 +270,14 @@ doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 		this.windows[title].title_text.className="panel-title";
 		this.windows[title].title_text.innerHTML=title;
 
-		this.windows[title].minimize_button.className="glyphicon glyphicon-minus";
-		this.windows[title].minimize_button.style.cursor="pointer";
-		this.windows[title].minimize_button.style.float="right";
-		this.windows[title].minimize_button.style.marginLeft=16;
-		this.windows[title].minimize_button.doorways_t=this.windows[title];
-		this.windows[title].minimize_button.onclick=function(event)
+		this.windows[title].buttons.div.style.float="right";
+		this.windows[title].buttons.div.style.marginLeft=16;
+		this.windows[title].title_text.appendChild(this.windows[title].buttons.div);
+
+		this.windows[title].buttons.minimize.className="glyphicon glyphicon-minus";
+		this.windows[title].buttons.minimize.style.cursor="pointer";
+		this.windows[title].buttons.minimize.doorways_t=this.windows[title];
+		this.windows[title].buttons.minimize.onclick=function(event)
 		{
 			if(!myself.draggable)
 			{
@@ -276,12 +285,12 @@ doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 				myself.draggable=true;
 			}
 		};
-		this.windows[title].minimize_button.onmousedown=function(event)
+		this.windows[title].buttons.minimize.onmousedown=function(event)
 		{
 			myself.mouse_up_m(event);
 			myself.draggable=false;
 		};
-		this.windows[title].minimize_button.onmouseleave=function(event)
+		this.windows[title].buttons.minimize.onmouseleave=function(event)
 		{
 			if(!myself.draggable)
 			{
@@ -289,16 +298,16 @@ doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 				myself.draggable=true;
 			}
 		};
-		this.windows[title].title_text.appendChild(this.windows[title].minimize_button);
+		this.windows[title].buttons.div.appendChild(this.windows[title].buttons.minimize);
 
-		this.windows[title].body.doorways_t=this.windows[title];
-		this.windows[title].body.className="panel-body";
-		this.windows[title].body.onmousedown=function(event)
+		this.windows[title].body.div.doorways_t=this.windows[title];
+		this.windows[title].body.div.className="panel-body";
+		this.windows[title].body.div.onmousedown=function(event)
 		{
 			if(myself.draggable&&!myself.dragging&&this.doorways_t)
 				myself.set_menu_item_active(this.doorways_t.title,true);
 		};
-		this.windows[title].body.appendChild(this.windows[title].body_content);
+		this.windows[title].body.div.appendChild(this.windows[title].body.content);
 	}
 
 	this.refresh_windows_m();
@@ -345,8 +354,8 @@ doorways_t.prototype.mouse_move_m=function(event)
 		if(x<this.element.offsetLeft)
 			x=this.element.offsetLeft;
 
-		if(y<this.element.offsetTop+this.menu.offsetHeight)
-			y=this.element.offsetTop+this.menu.offsetHeight;
+		if(y<this.element.offsetTop+this.menu.bar.offsetHeight)
+			y=this.element.offsetTop+this.menu.bar.offsetHeight;
 
 		this.dragging.style.left=x;
 		this.dragging.style.top=y;
