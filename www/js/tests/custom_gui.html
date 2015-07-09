@@ -3,12 +3,17 @@
 		<!--#include virtual="/sources.html"-->
 	</head>
 	<body>
-		<input type="button" value="Save GUI" onclick="console.log(JSON.stringify(gui.save()));"/>
 		<div id="gui"></div>
 
 		<script type="text/javascript">
 			var robot_name="demo";
 			var div=document.getElementById("gui");
+
+			var menu=new robot_menu_t(div);
+
+			if(!menu)
+				alert("Could not create robot menu!");
+
 			var gui=new doorways_t(div);
 
 			if(!gui)

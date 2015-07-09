@@ -213,13 +213,14 @@ doorways_t.prototype.create_menu_button_m=function(glyph,onclick,tooltip)
 	var span=document.createElement("span");
 
 	button.className="btn btn-default btn-lg";
+	button.style.marginTop=1;
 	button.style.float="right";
-	button["aria-label"]="Left Align";
+	button.setAttribute("aria-label","Left Align");
 	button.onclick=onclick;
 	this.menu.bar.appendChild(button);
 
 	span.className=glyph;
-	span["aria-hidden"]="true"
+	span.setAttribute("aria-hidden","true");
 	button.appendChild(span);
 }
 
@@ -292,7 +293,7 @@ doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 
 		this.menu.bar.appendChild(this.windows[title].menu.li);
 
-		this.windows[title].menu.li.role="presentation";
+		this.windows[title].menu.li.setAttribute("role","presentation");
 		this.windows[title].menu.li.appendChild(this.windows[title].menu.a);
 
 		this.windows[title].menu.a.doorways_t=this.windows[title];
