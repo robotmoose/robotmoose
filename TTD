@@ -1,11 +1,20 @@
+robot menu
+	need:
+		-new robot
+		-open robot
+		-copy robot
+
+	other:
+		-come up with a common interface for all widgets...
+
 windows api (doorways)
 	need:
 		-Ability to alert.
 		-Window resize.
+		-Minimize/show all windows needs to save previous state and show windows...
 
 	completely optional at this point:
 		-Touch events...
-		-Fix smooshing of window contents when screen is super small...this needs to be done on the widgets themselves...
 
 webcam (webrtc)
 	need:

@@ -18,7 +18,7 @@ function doorways_t(div)
 
 	this.menu.show_desktop=this.create_menu_button_m
 	(
-		"glyphicon glyphicon-unchecked",
+		"glyphicon glyphicon-eye-close",
 		function(event){myself.hide_all_windows();},
 		"Click here to hide all windows."
 	);
@@ -208,12 +208,19 @@ doorways_t.prototype.set_menu_item_active=function(title,value)
 
 doorways_t.prototype.create_menu_button_m=function(glyph,onclick,tooltip)
 {
-	var button=document.createElement("li");
-	button.role="presentation";
-	button.innerHTML="<a href='javascript:void(0);' title='"+tooltip+"'><p class='"+glyph+"'></p></a>";
+	var myself=this;
+	var button=document.createElement("button");
+	var span=document.createElement("span");
+
+	button.className="btn btn-default btn-lg";
+	button.style.float="right";
+	button["aria-label"]="Left Align";
 	button.onclick=onclick;
-	button.style.cursor="pointer";
 	this.menu.bar.appendChild(button);
+
+	span.className=glyph;
+	span["aria-hidden"]="true"
+	button.appendChild(span);
 }
 
 doorways_t.prototype.refresh_windows_m=function()
