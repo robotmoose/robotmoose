@@ -4,6 +4,7 @@
 	</head>
 	<body>
 		<input type="button" value="Save GUI" onclick="console.log(JSON.stringify(gui.save()));"/>
+		<input type="text" id="FUCK"/>
 		<div id="gui"></div>
 
 		<script type="text/javascript">
@@ -14,7 +15,7 @@
 			if(!gui)
 				alert("Could not create gui!");
 
-			gui.load([{"title":"Configuration","x":146,"y":240,"active":true,"minimized":false},{"title":"State Editor","x":200,"y":0,"active":false,"minimized":true}]);
+			gui.load([{"title":"Configuration","x":460,"y":240,"active":true,"minimized":false},{"title":"State Editor","x":1000,"y":0,"active":false,"minimized":true}]);
 
 			if(!gui.get_window("Configuration"))
 				gui.create_window("Configuration",10,0);
@@ -33,7 +34,6 @@
 
 			if(!state_editor)
 				alert("Could not create state editor!");
-
 		</script>
 	</body>
 </html>

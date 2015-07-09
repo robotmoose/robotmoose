@@ -1,11 +1,7 @@
 windows api (doorways)
 	need:
-		-more or less done???
-
-	do we want these at all?:
-		-Window resize?
-		-Bounds on right and bottom.
 		-Ability to alert.
+		-Window resize.
 
 	completely optional at this point:
 		-Touch events...

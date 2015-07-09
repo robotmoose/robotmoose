@@ -30,7 +30,8 @@ function doorways_t(div)
 
 	document.onmousemove=function(event){return myself.mouse_move_m(event);};
 	document.onmouseup=function(event){return myself.mouse_up_m(event);};
-	window.onblur=function(){myself.mouse_up_m(event);myself.draggable=true;};
+	window.onblur=function(event){myself.mouse_up_m(event);myself.draggable=true;};
+	window.onresize=function(event){myself.refresh_windows_m();};
 }
 
 doorways_t.prototype.save=function()
@@ -66,6 +67,8 @@ doorways_t.prototype.load=function(data)
 	if(data)
 		for(key in data)
 			this.create_window(data[key].title,data[key].x,data[key].y,data[key].active,data[key].minimized);
+
+	this.refresh_windows_m();
 }
 
 doorways_t.prototype.create_window=function(title,x,y,active,minimized)
@@ -85,6 +88,8 @@ doorways_t.prototype.get_window=function(title)
 	if(!this.windows[title])
 		return null;
 
+	this.refresh_windows_m();
+
 	return this.windows[title];
 }
 
@@ -96,19 +101,39 @@ doorways_t.prototype.move_window=function(title,x,y)
 	if(!this.windows[title])
 		return;
 
-	if(x<0)
-		x=0;
-
-	if(y<0)
-		y=0;
-
-	x+=this.element.offsetLeft;
-	y+=this.element.offsetTop+this.menu.bar.offsetHeight;
+	var view_width=window.innerWidth;
+	var view_height=window.innerHeight;
+	var local_window=this.windows[title].window;
 
 	if(x)
-		this.windows[title].window.style.left=x;
+	{
+		x+=this.element.offsetLeft;
+		var width=local_window.offsetWidth;
+		var right=x+width;
+		var x_diff=view_width-right;
+
+		if(x_diff<0)
+			x+=x_diff;
+		if(x<this.element.offsetLeft)
+			x=this.element.offsetLeft;
+
+		local_window.style.left=x;
+	}
+
 	if(y)
-		this.windows[title].window.style.top=y;
+	{
+		y+=this.element.offsetTop;
+		var height=local_window.offsetHeight;
+		var bottom=y+height;
+		var y_diff=view_height-bottom;
+
+		if(y_diff<0)
+			y+=y_diff;
+		if(y<this.element.offsetTop+this.menu.bar.offsetHeight)
+			y=this.element.offsetTop+this.menu.bar.offsetHeight;
+
+		local_window.style.top=y;
+	}
 }
 
 doorways_t.prototype.remove_window=function(title)
@@ -184,7 +209,8 @@ doorways_t.prototype.set_menu_item_active=function(title,value)
 doorways_t.prototype.create_menu_button_m=function(glyph,onclick,tooltip)
 {
 	var button=document.createElement("li");
-	button.innerHTML="<a><span title='"+tooltip+"' class='"+glyph+"'></span></a>";
+	button.role="presentation";
+	button.innerHTML="<a href='javascript:void(0);' title='"+tooltip+"'><p class='"+glyph+"'></p></a>";
 	button.onclick=onclick;
 	button.style.cursor="pointer";
 	this.menu.bar.appendChild(button);
@@ -194,23 +220,29 @@ doorways_t.prototype.refresh_windows_m=function()
 {
 	for(key in this.windows)
 	{
-		if(this.windows[key].active)
+		var local_window=this.windows[key];
+
+		if(local_window.active)
 		{
-			this.windows[key].window.style.zIndex=this.zindex_top_m();
-			this.windows[key].menu.li.className="active";
-			this.windows[key].window.className="panel panel-primary";
-			this.windows[key].minimized=false;
+			local_window.window.style.zIndex=this.zindex_top_m();
+			local_window.menu.li.className="active";
+			local_window.window.className="panel panel-primary";
+			local_window.minimized=false;
 		}
 		else
 		{
-			this.windows[key].menu.li.className="";
-			this.windows[key].window.className="panel panel-default";
+			local_window.menu.li.className="";
+			local_window.window.className="panel panel-default";
 		}
 
-		if(this.windows[key].minimized)
-			this.windows[key].window.style.display="none";
+		if(local_window.minimized)
+			local_window.window.style.display="none";
 		else
-			this.windows[key].window.style.display="";
+			local_window.window.style.display="";
+
+		var x=local_window.window.offsetLeft-this.element.offsetLeft;
+		var y=local_window.window.offsetTop-this.element.offsetTop;
+		this.move_window(key,x,y);
 	}
 }
 
@@ -246,6 +278,7 @@ doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 		this.windows[title].body.div=document.createElement("div");
 		this.windows[title].body.content=document.createElement("div");
 
+		this.windows[title].window.style.marginBottom=0;
 		this.element.appendChild(this.windows[title].window);
 
 		this.menu.bar.appendChild(this.windows[title].menu.li);
@@ -347,10 +380,10 @@ doorways_t.prototype.mouse_down_m=function(event,element)
 {
 	if(this.draggable&&!this.dragging&&element.doorways_t)
 	{
-		this.dragging=element.doorways_t.window;
-		this.dragging.style.zIndex=this.zindex_top_m();
-		this.offset_x=this.mouse_x-this.dragging.offsetLeft;
-		this.offset_y=this.mouse_y-this.dragging.offsetTop;
+		this.dragging=element.doorways_t;
+		this.dragging.window.style.zIndex=this.zindex_top_m();
+		this.offset_x=this.mouse_x-this.dragging.window.offsetLeft;
+		this.offset_y=this.mouse_y-this.dragging.window.offsetTop;
 		this.set_menu_item_active(element.doorways_t.title,true);
 	}
 
@@ -371,16 +404,9 @@ doorways_t.prototype.mouse_move_m=function(event)
 	if(this.dragging)
 	{
 		var x=this.mouse_x-this.offset_x;
-		var y=this.mouse_y-this.offset_y;
+		var y=this.mouse_y-this.offset_y-this.element.offsetTop;
 
-		if(x<this.element.offsetLeft)
-			x=this.element.offsetLeft;
-
-		if(y<this.element.offsetTop+this.menu.bar.offsetHeight)
-			y=this.element.offsetTop+this.menu.bar.offsetHeight;
-
-		this.dragging.style.left=x;
-		this.dragging.style.top=y;
+		this.move_window(this.dragging.title,x,y);
 	}
 
 	return false;
