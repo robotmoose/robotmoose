@@ -242,7 +242,9 @@ doorways_t.prototype.refresh_windows_m=function()
 
 		var x=local_window.window.offsetLeft-this.element.offsetLeft;
 		var y=local_window.window.offsetTop-this.element.offsetTop;
-		this.move_window(key,x,y);
+
+		if(!local_window.minimized)
+			this.move_window(key,x,y);
 	}
 }
 
