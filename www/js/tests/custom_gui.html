@@ -9,6 +9,17 @@
 			var robot_name="demo";
 			var div=document.getElementById("gui");
 
+			var test=new modal_t(div);
+			test.set_title("TESTING123");
+			test.get_content().innerHTML="...2";
+			test.get_footer().innerHTML="foot2";
+			console.log(test);
+
+			function connect_to_robot()
+			{
+				test.show();
+			}
+
 			var menu=new robot_menu_t(div);
 
 			if(!menu)
@@ -24,7 +35,7 @@
 				{
 					"Connect":
 					{
-						onclick:function(){alert("Connect!");},
+						onclick:connect_to_robot,
 						glyph:"glyphicon glyphicon-off"
 					},
 					"Make a Copy":

@@ -747,7 +747,7 @@ config_gui_t.prototype.create_row=function(type,args,create_new)
 
 		var button=document.createElement("span");
 		button.className="close";
-		button.innerHTML="x";
+		button.innerHTML="&times;";
 		button.li=li;
 		button.style.marginLeft=10;
 		button.style.float="right";

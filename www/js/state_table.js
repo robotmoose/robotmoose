@@ -227,7 +227,7 @@ state_table_t.prototype.create_row=function(name,code)
 
 		var button=document.createElement("span");
 		button.className="close";
-		button.innerHTML="x";
+		button.innerHTML="&times;";
 		button.li=li;
 		button.style.marginLeft=10;
 		button.onclick=function()
