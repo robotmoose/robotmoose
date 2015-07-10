@@ -66,7 +66,7 @@
 			if(!gui.get_window("State Editor"))
 				gui.create_window("State Editor",0,0);
 
-			var state_editor=new state_table2_t(gui.get_window("State Editor").body.content);
+			var state_editor=new state_table_t(gui.get_window("State Editor").body.content);
 
 			if(!state_editor)
 				alert("Could not create state editor!");
