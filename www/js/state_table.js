@@ -206,6 +206,7 @@ state_table_t.prototype.create_row=function(name,code)
 
 		var handle=document.createElement("span");
 		handle.className="glyphicon glyphicon-move";
+		handle.style.cursor="move";
 		td0.appendChild(handle);
 
 		var input=document.createElement("input");
