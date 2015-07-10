@@ -53,7 +53,7 @@
 			if(!gui)
 				alert("Could not create gui!");
 
-			gui.load([{"title":"Configuration","x":460,"y":240,"active":true,"minimized":false},{"title":"State Editor","x":1000,"y":0,"active":false,"minimized":false}]);
+			gui.load([{"title":"Configuration","x":460,"y":240,"active":false,"minimized":true},{"title":"State Editor","x":1000,"y":0,"active":true,"minimized":false}]);
 
 			if(!gui.get_window("Configuration"))
 				gui.create_window("Configuration",10,0);
@@ -66,12 +66,13 @@
 			if(!gui.get_window("State Editor"))
 				gui.create_window("State Editor",0,0);
 
-			var state_editor=new state_table_t(gui.get_window("State Editor").body.content,robot_name);
-			state_editor.create_row("drive","// Drive forward:\nif (robot.location.x<10) \n  robot.drive(100,100); \nelse \n  robot.state=turn; \n");
-			state_editor.create_row("turn","// Turn left:\nif (robot.location.angle<90)\n  robot.drive(-100,100); \nelse  \n  robot.state=forward; \n");
+			var state_editor=new state_table2_t(gui.get_window("State Editor").body.content);
 
 			if(!state_editor)
 				alert("Could not create state editor!");
+
+			state_editor.create_entry("drive","// Drive forward:\nif (robot.location.x<10) \n  robot.drive(100,100); \nelse \n  robot.state=turn; \n");
+			state_editor.create_entry("turn","// Turn left:\nif (robot.location.angle<90)\n  robot.drive(-100,100); \nelse  \n  robot.state=forward; \n");
 		</script>
 	</body>
 </html>
