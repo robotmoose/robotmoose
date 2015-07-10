@@ -14,6 +14,27 @@
 			if(!menu)
 				alert("Could not create robot menu!");
 
+			menu.status_area().innerHTML="<font style='color:red;'>Disconnected</font>";
+
+			menu.create_button
+			(
+				"Robot",
+				null,
+				"glyphicon glyphicon-cog",
+				{
+					"Connect":
+					{
+						onclick:function(){alert("Connect!");},
+						glyph:"glyphicon glyphicon-off"
+					},
+					"Make a Copy":
+					{
+						onclick:function(){alert("Copy!");},
+						glyph:"glyphicon glyphicon-duplicate"
+					}
+				}
+			);
+
 			var gui=new doorways_t(div);
 
 			if(!gui)

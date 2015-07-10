@@ -220,6 +220,7 @@ doorways_t.prototype.create_menu_button_m=function(glyph,onclick,tooltip)
 	this.menu.bar.appendChild(button);
 
 	span.className=glyph;
+	span.style.color="#337ab7";
 	span.setAttribute("aria-hidden","true");
 	button.appendChild(span);
 }

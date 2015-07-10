@@ -11,6 +11,9 @@ function robot_menu_t(div)
 	this.menu.div_outer=document.createElement("div");
 	this.menu.div_inner=document.createElement("div");
 	this.menu.ul=document.createElement("ul");
+	this.menu.status={};
+	this.menu.status.li=document.createElement("li");
+	this.menu.status.a=document.createElement("a");
 
 	this.drops=[];
 
@@ -27,26 +30,17 @@ function robot_menu_t(div)
 	this.menu.div_outer.appendChild(this.menu.div_inner);
 
 	this.menu.ul.className="nav navbar-nav";
+	this.menu.ul.style.width="100%";
 	this.menu.div_inner.appendChild(this.menu.ul);
 
-	this.create_button
-	(
-		"Robot",
-		null,
-		"glyphicon glyphicon-cog",
-		{
-			"Connect":
-			{
-				onclick:function(){alert("Connect!");},
-				glyph:"glyphicon glyphicon-off"
-			},
-			"Make a Copy":
-			{
-				onclick:function(){alert("Copy!");},
-				glyph:"glyphicon glyphicon-duplicate"
-			}
-		}
-	);
+	this.menu.status.li.style.float="right";
+	this.menu.ul.appendChild(this.menu.status.li);
+
+	this.menu.status.a.innerHTML="";
+	this.menu.status.a.href="javascript:void(0);";
+	this.menu.status.a.style.pointerEvents="none";
+
+	this.menu.status.li.appendChild(this.menu.status.a);
 }
 
 robot_menu_t.prototype.create_button=function(name,onclick,glyph,options)
@@ -106,4 +100,9 @@ robot_menu_t.prototype.create_button=function(name,onclick,glyph,options)
 
 		this.drops[name].options[key].a.appendChild(this.drops[name].options[key].text);
 	}
+}
+
+robot_menu_t.prototype.status_area=function()
+{
+	return this.menu.status.a;
 }
