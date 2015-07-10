@@ -66,9 +66,16 @@ doorways_t.prototype.load=function(data)
 
 	if(data)
 		for(key in data)
-			this.create_window(data[key].title,data[key].x,data[key].y,data[key].active,data[key].minimized);
+			this.create_window_m(data[key].title,data[key].x,data[key].y,data[key].active,data[key].minimized);
 
 	this.refresh_windows_m();
+
+	//Hack to get refresh windows to be called when the windows are finally done loading...
+	var myself=this;
+	setTimeout(function(){myself.refresh_windows_m();},100);
+	setTimeout(function(){myself.refresh_windows_m();},500);
+	setTimeout(function(){myself.refresh_windows_m();},1000);
+	setTimeout(function(){myself.refresh_windows_m();},2000);
 }
 
 doorways_t.prototype.create_window=function(title,x,y,active,minimized)
@@ -77,7 +84,10 @@ doorways_t.prototype.create_window=function(title,x,y,active,minimized)
 		return null;
 
 	if(!this.windows[title])
+	{
 		this.create_window_m(title,x,y,active,minimized);
+		this.refresh_windows_m();
+	}
 }
 
 doorways_t.prototype.get_window=function(title)
@@ -87,8 +97,6 @@ doorways_t.prototype.get_window=function(title)
 
 	if(!this.windows[title])
 		return null;
-
-	this.refresh_windows_m();
 
 	return this.windows[title];
 }
@@ -151,22 +159,7 @@ doorways_t.prototype.remove_window=function(title)
 
 doorways_t.prototype.minimize=function(title,value)
 {
-	if(!title)
-		return;
-
-	if(!this.windows[title])
-		return;
-
-	if(value)
-	{
-		this.windows[title].minimized=true;
-		this.windows[title].active=false;
-	}
-	else
-	{
-		this.windows[title].minimized=false;
-	}
-
+	this.minimize_m(title,value);
 	this.refresh_windows_m();
 }
 
@@ -347,7 +340,8 @@ doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 		{
 			if(!myself.draggable)
 			{
-				myself.minimize_m(this);
+				if(this.doorways_t)
+					myself.minimize(this.doorways_t.title,true);
 				myself.draggable=true;
 			}
 		};
@@ -376,15 +370,26 @@ doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
 		this.windows[title].body.div.appendChild(this.windows[title].body.content);
 	}
 
-	this.refresh_windows_m();
-
 	return this.windows[title];
 }
 
-doorways_t.prototype.minimize_m=function(element)
+doorways_t.prototype.minimize_m=function(title,value)
 {
-	if(element.doorways_t)
-		this.minimize(element.doorways_t.title,true);
+	if(!title)
+		return;
+
+	if(!this.windows[title])
+		return;
+
+	if(value)
+	{
+		this.windows[title].minimized=true;
+		this.windows[title].active=false;
+	}
+	else
+	{
+		this.windows[title].minimized=false;
+	}
 }
 
 doorways_t.prototype.mouse_down_m=function(event,element)

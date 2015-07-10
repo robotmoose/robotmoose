@@ -8,8 +8,7 @@ function robot_menu_t(div)
 	this.menu={};
 
 	this.menu.nav=document.createElement("nav");
-	this.menu.div_outer=document.createElement("div");
-	this.menu.div_inner=document.createElement("div");
+	this.menu.div=document.createElement("div");
 	this.menu.ul=document.createElement("ul");
 	this.menu.status={};
 	this.menu.status.li=document.createElement("li");
@@ -23,15 +22,12 @@ function robot_menu_t(div)
 	this.menu.nav.style.marginBottom=-1;
 	this.element.appendChild(this.menu.nav);
 
-	this.menu.div_outer.className="container-fluid";
-	this.menu.nav.appendChild(this.menu.div_outer);
-
-	this.menu.div_inner.className="collapse navbar-collapse";
-	this.menu.div_outer.appendChild(this.menu.div_inner);
+	this.menu.div.className="container-fluid";
+	this.menu.nav.appendChild(this.menu.div);
 
 	this.menu.ul.className="nav navbar-nav";
 	this.menu.ul.style.width="100%";
-	this.menu.div_inner.appendChild(this.menu.ul);
+	this.menu.div.appendChild(this.menu.ul);
 
 	this.menu.status.li.style.float="right";
 	this.menu.ul.appendChild(this.menu.status.li);
@@ -41,6 +37,8 @@ function robot_menu_t(div)
 	this.menu.status.a.style.pointerEvents="none";
 
 	this.menu.status.li.appendChild(this.menu.status.a);
+
+	setInterval(function(){$('.hiddenclass').show();},100);
 }
 
 robot_menu_t.prototype.create_button=function(name,onclick,glyph,options)
