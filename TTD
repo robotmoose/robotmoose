@@ -4,9 +4,6 @@ robot menu
 		-open robot
 		-copy robot
 
-	other:
-		-come up with a common interface for all widgets...
-
 windows api (doorways)
 	need:
 		-Ability to alert.
