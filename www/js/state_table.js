@@ -126,8 +126,11 @@ state_table_t.prototype.create_entry=function(state,code)
 	if(!state||!code)
 		return null;
 
+	var myself=this;
 	var entry={};
 	entry.drag_list=this.drag_list.create_entry();
+	entry.drag_list.state_table_t=entry;
+	entry.drag_list.onremove=function(entry){myself.remove_entry(entry.state_table_t);};
 	this.create_entry_m(entry,state,code);
 	this.entries.push(entry);
 
@@ -143,7 +146,6 @@ state_table_t.prototype.remove_entry=function(entry)
 	{
 		if(this.entries[key]&&this.entries[key]===entry)
 		{
-			this.drag_list.remove_entry(this.entries[key].drag_list);
 			this.entries[key]=null;
 			break;
 		}
@@ -202,9 +204,6 @@ state_table_t.prototype.create_entry_m=function(entry,state,code)
 		{indentUnit:4,indentWithTabs:true,lineNumbers:true,
 			matchBrackets:true,mode:"text/x-javascript"});
 	entry.code_editor.setSize(320,100);
-
-	var myself=this;
-	entry.drag_list.onremove=function(){myself.remove_entry(entry);};
 
 	this.refresh_m();
 }

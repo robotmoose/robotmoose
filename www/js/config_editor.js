@@ -218,11 +218,11 @@ config_editor_t.prototype.create_entry=function(type,arg_types,arg_values)
 	var myself=this;
 	var entry={};
 	entry.drag_list=this.drag_list.create_entry();
-	entry.drag_list.config_editor2=entry;
-	entry.drag_list.onremove=function(entry){myself.remove_entry(entry.config_editor2);};
+	entry.drag_list.config_editor_t=entry;
+	entry.drag_list.onremove=function(entry){myself.remove_entry(entry.config_editor_t);};
 	this.create_entry_m(entry,type,arg_types,arg_values);
 	this.entries.push(entry);
-	this.refresh_m();
+
 	return entry;
 }
 
@@ -312,6 +312,8 @@ config_editor_t.prototype.create_entry_m=function(entry,type,arg_types,arg_value
 		if(ii+1<arg_types.length)
 			entry.table.cells[ii+1].style.paddingRight=10;
 	}
+
+	this.refresh_m();
 }
 
 config_editor_t.prototype.create_pin_drop_m=function(value)
