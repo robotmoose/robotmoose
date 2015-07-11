@@ -64,9 +64,6 @@ function config_editor_t(div)
 			myself.onconfigure(myself);
 	};
 	this.element.appendChild(this.configure_button);
-
-	setTimeout(function(){myself.get_options("demo");},200);
-	setTimeout(function(){myself.download("demo");},400);
 }
 
 config_editor_t.prototype.get_options=function(robot_name)
