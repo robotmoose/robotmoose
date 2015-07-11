@@ -146,6 +146,7 @@ state_table_t.prototype.remove_entry=function(entry)
 	{
 		if(this.entries[key]&&this.entries[key]===entry)
 		{
+			window.removeEventListener("click",this.entries[key].code_editor_event);
 			this.entries[key]=null;
 			break;
 		}
@@ -174,6 +175,7 @@ state_table_t.prototype.create_entry_m=function(entry,state,code)
 	if(!entry||!entry.drag_list||!state||!code)
 		return;
 
+	var myself=this;
 	entry.table={};
 	entry.table.element=document.createElement("table");
 	entry.table.row=entry.table.element.insertRow(0);
@@ -204,6 +206,8 @@ state_table_t.prototype.create_entry_m=function(entry,state,code)
 		{indentUnit:4,indentWithTabs:true,lineNumbers:true,
 			matchBrackets:true,mode:"text/x-javascript"});
 	entry.code_editor.setSize(320,100);
+	entry.code_editor_event=function(event){entry.code_editor.refresh();};
+	window.addEventListener("click",entry.code_editor_event);
 
 	this.refresh_m();
 }
