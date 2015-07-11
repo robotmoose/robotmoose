@@ -130,6 +130,7 @@ state_table_t.prototype.create_entry=function(state,code)
 	entry.drag_list=this.drag_list.create_entry();
 	this.create_entry_m(entry,state,code);
 	this.entries.push(entry);
+
 	return entry;
 }
 
@@ -147,6 +148,8 @@ state_table_t.prototype.remove_entry=function(entry)
 			break;
 		}
 	}
+
+	this.refresh_m();
 }
 
 
@@ -157,6 +160,12 @@ state_table_t.prototype.remove_entry=function(entry)
 
 
 
+
+state_table_t.prototype.refresh_m=function()
+{
+	if(this.onrefresh)
+		this.onrefresh();
+}
 
 state_table_t.prototype.create_entry_m=function(entry,state,code)
 {
@@ -196,6 +205,8 @@ state_table_t.prototype.create_entry_m=function(entry,state,code)
 
 	var myself=this;
 	entry.drag_list.onremove=function(){myself.remove_entry(entry);};
+
+	this.refresh_m();
 }
 
 state_table_t.prototype.validate_m=function(input)

@@ -16,7 +16,11 @@ function config_editor_t(div)
 	}
 
 	this.entries=[];
+	this.add_div=document.createElement("div");
 	this.tabula={};
+	this.tabula.select={};
+	this.tabula.select.element=document.createElement("select");
+	this.tabula.select.options=[];
 	this.tabula.options=[];
 	this.add_button=document.createElement("input");
 	this.configure_button=document.createElement("input");
@@ -24,16 +28,18 @@ function config_editor_t(div)
 	this.element.style.width=480;
 	this.div.appendChild(this.element);
 
-	this.tabula.select={};
-	this.tabula.select.element=document.createElement("select");
-	this.tabula.select.options=[];
+	this.add_div.className="form-inline";
+	this.element.appendChild(this.add_div);
 
-	this.tabula.select.element.className="form-control inline";
+	this.tabula.select.element.className="form-control";
 	this.tabula.select.element.disabled=true;
-	this.element.appendChild(this.tabula.select.element);
+	this.tabula.select.element.style.width=256;
+	this.tabula.select.element.style.marginRight=10;
+	this.add_div.appendChild(this.tabula.select.element);
 
 	this.add_button.className="btn btn-primary";
 	this.add_button.disabled=true;
+	this.add_button.style.width=64;
 	this.add_button.type="input";
 	this.add_button.value="Add";
 	this.add_button.onclick=function(event)
@@ -41,10 +47,13 @@ function config_editor_t(div)
 		var obj=myself.tabula.select.options[myself.tabula.select.element.selectedIndex].tabula;
 		myself.create_entry(obj.type,obj.args);
 	};
-	this.element.appendChild(this.add_button);
+	this.add_div.appendChild(this.add_button);
+
+	this.element.appendChild(document.createElement("br"));
 
 	this.configure_button.className="btn btn-primary";
 	this.configure_button.disabled=true;
+	this.configure_button.style.width=96;
 	this.configure_button.type="input";
 	this.configure_button.value="Configure";
 	this.configure_button.onclick=function(event)
@@ -213,7 +222,7 @@ config_editor_t.prototype.create_entry=function(type,arg_types,arg_values)
 	entry.drag_list.onremove=function(entry){myself.remove_entry(entry.config_editor2);};
 	this.create_entry_m(entry,type,arg_types,arg_values);
 	this.entries.push(entry);
-	this.update_disables_m();
+	this.refresh_m();
 	return entry;
 }
 
@@ -231,7 +240,7 @@ config_editor_t.prototype.remove_entry=function(entry)
 		}
 	}
 
-	this.update_disables_m();
+	this.refresh_m();
 }
 
 
@@ -291,7 +300,7 @@ config_editor_t.prototype.create_entry_m=function(entry,type,arg_types,arg_value
 
 		if(drop)
 		{
-			drop.onchange=function(){myself.update_disables_m()};
+			drop.onchange=function(){myself.refresh_m()};
 			entry.args.push(drop);
 			entry.table.cells[ii+1].appendChild(drop);
 		}
@@ -548,10 +557,10 @@ config_editor_t.prototype.get_options_m=function(options)
 		this.tabula.select.options.push(option);
 	}
 
-	this.update_disables_m();
+	this.refresh_m();
 }
 
-config_editor_t.prototype.update_disables_m=function()
+config_editor_t.prototype.refresh_m=function()
 {
 	this.tabula.select.element.disabled=(this.tabula.options.length==0);
 	this.add_button.disabled=(this.tabula.options.length==0);
@@ -588,4 +597,7 @@ config_editor_t.prototype.update_disables_m=function()
 	}
 
 	this.configure_button.disabled=!configureable;
+
+	if(this.onrefresh)
+		this.onrefresh();
 }
