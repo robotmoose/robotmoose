@@ -21,29 +21,6 @@ function config_editor2_t(div)
 	this.add_button=document.createElement("input");
 	this.configure_button=document.createElement("input");
 
-							//hack till get_options is all done...
-							var json=["serial_controller","create2 S","sabertooth2 S","sabertooth1 S","bts PPPP","neato SP","latency ","heartbeat ","commands16 ","commands8 ","sensors16 ","sensors8 ","bms ","analog P","pwm P","servo P"];
-							json.sort();
-							for(var ii=0;ii<json.length;++ii)
-							{
-								var parts=json[ii].split(" ");
-
-								if(parts.length==1)
-									parts.push("");
-
-								if(parts.length!=2)
-									continue;
-
-								var obj={};
-								obj.type=parts[0];
-								obj.args=new Array();
-
-								for(var jj=0;jj<parts[1].length;++jj)
-									obj.args[jj]=parts[1][jj];
-
-								this.tabula.options.push(obj);
-							}
-
 	this.element.style.width=480;
 	this.div.appendChild(this.element);
 
@@ -52,19 +29,8 @@ function config_editor2_t(div)
 	this.tabula.select.options=[];
 
 	this.tabula.select.element.className="form-control";
+	this.tabula.select.element.disabled=true;
 	this.element.appendChild(this.tabula.select.element);
-
-	for(var key in this.tabula.options)
-	{
-		var option={};
-		option.tabula=this.tabula.options[key];
-		option.element=document.createElement("option");
-		option.element.innerHTML=option.tabula.type;
-		option.element.value=option.tabula.type;
-
-		this.tabula.select.element.appendChild(option.element);
-		this.tabula.select.options.push(option);
-	}
 
 	this.add_button.className="btn btn-primary";
 	this.add_button.type="input";
@@ -85,13 +51,11 @@ function config_editor2_t(div)
 			myself.onconfigure(myself);
 	};
 	this.element.appendChild(this.configure_button);
-
-	setTimeout(function(){myself.download("demo");},500);
 }
 
 config_editor2_t.prototype.get_options=function(robot_name)
 {
-	/*if(!robot_name)
+	if(!robot_name)
 		return;
 
 	var myself=this;
@@ -101,37 +65,10 @@ config_editor2_t.prototype.get_options=function(robot_name)
 		send_request("GET","/superstar/"+robot_name,"options","?get",
 			function(response)
 			{
-				try
+				if(response)
 				{
-					if(response)
-					{
-						var json=JSON.parse(response);
-						json.sort();
-
-						for(var ii=0;ii<json.length;++ii)
-						{
-							var parts=json[ii].split(" ");
-
-							if(parts.length==1)
-								parts.push("");
-
-							if(parts.length!=2)
-								throw "Invalid tabula option \""+json[ii]+"\".";
-
-							var tabula={};
-							tabula.type=parts[0];
-							tabula.args=new Array();
-
-							for(var jj=0;jj<parts[1].length;++jj)
-								tabula.args[jj]=parts[1][jj];
-
-							myself.options.push(tabula);
-						}
-					}
-				}
-				catch(error)
-				{
-					throw error;
+					var options=JSON.parse(response);
+					myself.get_options_m(options);
 				}
 			},
 			function(error)
@@ -143,7 +80,7 @@ config_editor2_t.prototype.get_options=function(robot_name)
 		catch(error)
 		{
 			console.log("config_editor_t::get_options() - "+error);
-		}*/
+		}
 }
 
 config_editor2_t.prototype.download=function(robot_name)
@@ -174,23 +111,14 @@ config_editor2_t.prototype.download=function(robot_name)
 
 					var configs=myself.lex(config_text);
 
-					for(var cs in configs)
+					for(var key in configs)
 					{
-						var found=false;
+						var lookup=myself.find_option_m(configs[key]);
 
-						for(var ss in myself.tabula.options)
-						{
-							if(myself.tabula.options[ss].type==configs[cs].type&&
-								myself.tabula.options[ss].args.length==configs[cs].args.length)
-							{
-								found=true;
-								myself.create_entry(configs[cs].type,myself.tabula.options[ss].args,configs[cs].args);
-								break;
-							}
-						}
-
-						if(!found)
-							console.log("Invalid tabula config: "+configs[cs].type+"("+configs[cs].args+");");
+						if(lookup)
+							myself.create_entry(configs[key].type,lookup.args,configs[key].args);
+						else
+							console.log("Invalid tabula config: "+configs[key].type+"("+configs[key].args+");");
 					}
 				}
 			},
@@ -336,14 +264,29 @@ config_editor2_t.prototype.create_entry_m=function(entry,type,arg_types,arg_valu
 			value=arg_values[ii];
 
 		if(arg_types[ii]=='P')
-			drop=this.create_pin_drop_m(value);
-		else if(arg_types[ii]=='S')
-			drop=this.create_serial_drop_m(value);
-		else
-			console.log("config_editor2_t::create_entry_m - Invalid tabula argument type.");
+		{
+			if(!is_pin(value))
+				value=null;
 
-		entry.args.push(drop);
-		entry.table.cells[ii+1].appendChild(drop);
+			drop=this.create_pin_drop_m(value);
+		}
+		else if(arg_types[ii]=='S')
+		{
+			if(!is_serial(value))
+				value=null;
+
+			drop=this.create_serial_drop_m(value);
+		}
+
+		if(drop)
+		{
+			entry.args.push(drop);
+			entry.table.cells[ii+1].appendChild(drop);
+		}
+		else
+		{
+			console.log("config_editor2_t::create_entry_m - Invalid tabula argument type.");
+		}
 
 		if(ii+1<arg_types.length)
 			entry.table.cells[ii+1].style.paddingRight=10;
@@ -556,4 +499,63 @@ config_editor2_t.prototype.lex=function(config)
 	}
 
 	return configs;
+}
+
+config_editor2_t.prototype.find_option_m=function(option)
+{
+	if(!option)
+		return null;
+
+	for(var key in this.tabula.options)
+		if(this.tabula.options[key].type==option.type&&this.tabula.options[key].args.length==option.args.length)
+			return this.tabula.options[key];
+
+	return null;
+}
+
+config_editor2_t.prototype.get_options_m=function(options)
+{
+	for(var key in this.tabula.select.options)
+		this.tabula.select.element.removeChild(this.tabula.select.options[key]);
+
+	this.tabula.options=[];
+
+	if(!options)
+		return;
+
+	options.sort();
+
+	for(var ii=0;ii<options.length;++ii)
+	{
+		var parts=options[ii].split(" ");
+
+		if(parts.length==1)
+			parts.push("");
+
+		if(parts.length!=2)
+			continue;
+
+		var obj={};
+		obj.type=parts[0];
+		obj.args=[];
+
+		for(var jj=0;jj<parts[1].length;++jj)
+			obj.args[jj]=parts[1][jj];
+
+		this.tabula.options.push(obj);
+	}
+
+	for(var key in this.tabula.options)
+	{
+		var option={};
+		option.tabula=this.tabula.options[key];
+		option.element=document.createElement("option");
+		option.element.innerHTML=option.tabula.type;
+		option.element.value=option.tabula.type;
+
+		this.tabula.select.element.appendChild(option.element);
+		this.tabula.select.options.push(option);
+	}
+
+	this.tabula.select.element.disabled=(this.tabula.options.length==0);
 }

@@ -60,7 +60,7 @@
 				gui.create_window("Configuration",10,0);
 
 			var config_editor=new config_editor2_t(gui.get_window("Configuration").body.content,robot_name);
-			config_editor.onconfigure=function(){alert("CONFIGURE!");config_editor.upload("demo");}
+			config_editor.onconfigure=function(){alert("CONFIGURE!");}
 
 			if(!config_editor)
 				alert("Could not create config editor!");

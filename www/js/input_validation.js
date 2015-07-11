@@ -39,6 +39,9 @@ function is_int(str)
 
 function is_pin(arg)
 {
+	if(!arg)
+		return false;
+
 	arg=arg.toLowerCase();
 
 	return ((arg.length>0&&is_int(arg)&&arg>1)||
@@ -47,6 +50,9 @@ function is_pin(arg)
 
 function is_serial(arg)
 {
+	if(!arg)
+		return false;
+
 	arg=arg.toLowerCase();
 
 	if(arg.length>0&&arg[0]=='x'&&is_int(arg.substr(1,arg.length-1)))
