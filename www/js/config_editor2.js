@@ -33,6 +33,7 @@ function config_editor2_t(div)
 	this.element.appendChild(this.tabula.select.element);
 
 	this.add_button.className="btn btn-primary";
+	this.add_button.disabled=true;
 	this.add_button.type="input";
 	this.add_button.value="Add";
 	this.add_button.onclick=function(event)
@@ -43,6 +44,7 @@ function config_editor2_t(div)
 	this.element.appendChild(this.add_button);
 
 	this.configure_button.className="btn btn-primary";
+	this.configure_button.disabled=true;
 	this.configure_button.type="input";
 	this.configure_button.value="Configure";
 	this.configure_button.onclick=function(event)
@@ -51,6 +53,9 @@ function config_editor2_t(div)
 			myself.onconfigure(myself);
 	};
 	this.element.appendChild(this.configure_button);
+
+	setTimeout(function(){myself.get_options("demo");},2000);
+	setTimeout(function(){myself.download("demo");},4000);
 }
 
 config_editor2_t.prototype.get_options=function(robot_name)
@@ -109,7 +114,7 @@ config_editor2_t.prototype.download=function(robot_name)
 					for(var key in obj.configs)
 						config_text+=obj.configs[key]+"\n";
 
-					var configs=myself.lex(config_text);
+					var configs=myself.lex_m(config_text);
 
 					for(var key in configs)
 					{
@@ -120,6 +125,8 @@ config_editor2_t.prototype.download=function(robot_name)
 						else
 							console.log("Invalid tabula config: "+configs[key].type+"("+configs[key].args+");");
 					}
+
+					myself.update_disables_m();
 				}
 			},
 			function(error)
@@ -280,6 +287,7 @@ config_editor2_t.prototype.create_entry_m=function(entry,type,arg_types,arg_valu
 
 		if(drop)
 		{
+			drop.onchange=function(){myself.update_disables_m()};
 			entry.args.push(drop);
 			entry.table.cells[ii+1].appendChild(drop);
 		}
@@ -367,25 +375,7 @@ config_editor2_t.prototype.create_serial_drop_m=function(value)
 	return drop;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-config_editor2_t.prototype.lex=function(config)
+config_editor2_t.prototype.lex_m=function(config)
 {
 	var col=0;
 	var line=0;
@@ -557,5 +547,35 @@ config_editor2_t.prototype.get_options_m=function(options)
 		this.tabula.select.options.push(option);
 	}
 
+	this.update_disables_m();
+}
+
+config_editor2_t.prototype.update_disables_m=function()
+{
 	this.tabula.select.element.disabled=(this.tabula.options.length==0);
+	this.add_button.disabled=(this.tabula.options.length==0);
+
+	var configureable=false;
+
+	if(this.entries.length>0)
+	{
+		configureable=true;
+
+		for(var key in this.entries)
+		{
+			for(var drop in this.entries[key].args)
+			{
+				if(this.entries[key].args[drop].selectedIndex==0)
+				{
+					configureable=false;
+					break;
+				}
+			}
+
+			if(!configureable)
+				break;
+		}
+	}
+
+	this.configure_button.disabled=!configureable;
 }
