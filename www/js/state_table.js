@@ -195,7 +195,7 @@ state_table_t.prototype.create_entry_m=function(entry,state,code)
 	entry.code_editor.setSize(320,100);
 
 	var myself=this;
-	entry.drag_list.onremove=function(entry){myself.remove_entry(entry);};
+	entry.drag_list.onremove=function(){myself.remove_entry(entry);};
 }
 
 state_table_t.prototype.validate_m=function(input)
