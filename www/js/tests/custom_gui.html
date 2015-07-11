@@ -12,15 +12,15 @@
 			var robot_name="demo";
 			var div=document.getElementById("gui");
 
-			var test=new modal_t(div);
-			test.set_title("TESTING123");
-			test.get_content().innerHTML="...2";
-			test.get_footer().innerHTML="foot2";
+			var robot_connect=new modal_connect_t(div);
 
-			function connect_to_robot()
+			if(!robot_connect)
+				alert("Could not create robot connect modal!");
+
+			robot_connect.onconnect=function(robot_name)
 			{
-				test.show();
-			}
+				console.log("CONNECT:  "+robot_name);
+			};
 
 			var menu=new robot_menu_t(div);
 
@@ -37,7 +37,30 @@
 				{
 					"Connect":
 					{
-						onclick:connect_to_robot,
+						onclick:function()
+						{
+							robot_connect.robots=[];
+
+							try
+							{
+								send_request("GET","/superstar/","/","?get",
+									function(response)
+									{
+										robot_connect.robots=[];
+										robot_connect.robots=JSON.parse(response);
+										robot_connect.show();
+									},
+									function(error)
+									{
+										throw error;
+									},
+									"application/json");
+							}
+							catch(error)
+							{
+								console.log("Robot Connect - "+error);
+							}
+						},
 						glyph:"glyphicon glyphicon-off"
 					},
 					"Make a Copy":

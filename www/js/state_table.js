@@ -1,3 +1,7 @@
+//Members
+//		onrefresh() - callback triggered when window changes
+//		onrun() - callback triggered when run button is hit
+
 function state_table_t(div)
 {
 	if(!div)

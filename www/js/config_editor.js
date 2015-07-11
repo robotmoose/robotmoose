@@ -1,3 +1,7 @@
+//Members
+//		onrefresh() - callback triggered when window changes
+//		onconfigure() - callback triggered when configure button is hit
+
 function config_editor_t(div)
 {
 	if(!div)

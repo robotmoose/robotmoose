@@ -203,6 +203,39 @@ public:
 		else return "[]";
 	}
 
+	std::string get_roots()
+	{
+		db_t root_db;
+
+		for(auto value:db)
+		{
+			std::string temp;
+
+			for(size_t ii=0;ii<value.first.size();++ii)
+			{
+				if(value.first[ii]=='/')
+					break;
+
+				temp+=value.first[ii];
+			}
+
+			if(temp.size()>0)
+				root_db["\""+temp+"\""]="";
+		}
+
+		std::string roots="[";
+
+		for(auto value:root_db)
+			roots+=value.first+",";
+
+		if(roots[roots.size()-1]==',')
+			roots=roots.substr(0,roots.size()-1);
+
+		roots+="]";
+
+		return roots;
+	}
+
 	std::string sublinks(std::string path_prefix)
 	{
 		if(path_prefix.size()>0&&path_prefix[path_prefix.size()-1]!='/')
@@ -323,6 +356,11 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
   else { /* Not writing a new value */
   	if (query=="get")
   	{ /* getting raw JSON */
+		if(starpath=="")
+		{
+			return send_json(conn,superstar_db.get_roots());
+		}
+
 		return send_json(conn,superstar_db.get(starpath));
   	}
   	if (query=="sub") { /* substring search */
