@@ -1,23 +1,21 @@
-function config_editor_t(div,robot_name)
+function config_editor_old_t(div,robot_name)
 {
 	if(!div)
 		return null;
 
 	this.div=div;
 	this.element=document.createElement("div");
-	this.element.style.width="100%";
-	this.element.style.height="100%";
 	this.div.appendChild(this.element);
 	this.config="";
 	this.options=new Array();
-	this.counter=0;
+	this.counter=1;
 	this.robot_name=robot_name;
 
 	this.get_config();
 	this.get_options();
 }
 
-config_editor_t.prototype.get_config=function()
+config_editor_old_t.prototype.get_config=function()
 {
 	var myself=this;
 
@@ -42,19 +40,19 @@ config_editor_t.prototype.get_config=function()
 			}
 			catch(error)
 			{
-				console.log("config_editor_t::get_config() - "+error);
+				console.log("config_editor_old_t::get_config() - "+error);
 				setInterval(1000,function(){myself.get_config();});
 			}
 		},
 		function(error)
 		{
-			console.log("config_editor_t::get_config() - "+error);
+			console.log("config_editor_old_t::get_config() - "+error);
 			setInterval(1000,function(){myself.get_config();});
 		},
 		"application/json");
 }
 
-config_editor_t.prototype.get_options=function()
+config_editor_old_t.prototype.get_options=function()
 {
 	var myself=this;
 
@@ -90,19 +88,19 @@ config_editor_t.prototype.get_options=function()
 			}
 			catch(error)
 			{
-				console.log("config_editor_t::get_options() - "+error);
+				console.log("config_editor_old_t::get_options() - "+error);
 				setInterval(1000,function(){myself.get_options();});
 			}
 		},
 		function(error)
 		{
-			console.log("config_editor_t::get_options() - "+error);
+			console.log("config_editor_old_t::get_options() - "+error);
 			setInterval(1000,function(){myself.get_options();});
 		},
 		"application/json");
 }
 
-config_editor_t.prototype.configure=function(config_text)
+config_editor_old_t.prototype.configure=function(config_text)
 {
 	try
 	{
@@ -129,7 +127,7 @@ config_editor_t.prototype.configure=function(config_text)
 			},
 			function(error)
 			{
-				throw "config_editor_t::configure() - "+error;
+				throw "config_editor_old_t::configure() - "+error;
 			},
 			"application/json");
 	}
@@ -197,7 +195,7 @@ function skip_whitespace(str,col,line)
 	return {str:str,col:col,line:line};
 }
 
-config_editor_t.prototype.lex=function(config)
+config_editor_old_t.prototype.lex=function(config)
 {
 	var col=0;
 	var line=0;
@@ -313,7 +311,7 @@ config_editor_t.prototype.lex=function(config)
 	return configs;
 }
 
-config_editor_t.prototype.is_int=function(str)
+config_editor_old_t.prototype.is_int=function(str)
 {
 	for(var ii=0;ii<str.length;++ii)
 		if(str[ii]<'0'||str[ii]>'9')
@@ -322,7 +320,7 @@ config_editor_t.prototype.is_int=function(str)
 	return true;
 }
 
-config_editor_t.prototype.is_pin=function(arg)
+config_editor_old_t.prototype.is_pin=function(arg)
 {
 	arg=arg.toLowerCase();
 
@@ -330,7 +328,7 @@ config_editor_t.prototype.is_pin=function(arg)
 		(arg.length>0&&arg[0]=='a'&&this.is_int(arg.substr(1,arg.length-1))));
 }
 
-config_editor_t.prototype.is_serial=function(arg)
+config_editor_old_t.prototype.is_serial=function(arg)
 {
 	arg=arg.toLowerCase();
 
@@ -343,7 +341,7 @@ config_editor_t.prototype.is_serial=function(arg)
 	return false;
 }
 
-config_editor_t.prototype.arrays_equal=function(lhs,rhs)
+config_editor_old_t.prototype.arrays_equal=function(lhs,rhs)
 {
 	if(!lhs||!rhs||lhs.length!=rhs.length)
 		return false;
@@ -355,7 +353,7 @@ config_editor_t.prototype.arrays_equal=function(lhs,rhs)
 	return true;
 }
 
-config_editor_t.prototype.validate=function(configs)
+config_editor_old_t.prototype.validate=function(configs)
 {
 	for(var ii=0;ii<configs.length;++ii)
 	{
@@ -368,7 +366,7 @@ config_editor_t.prototype.validate=function(configs)
 			else if(this.is_serial(configs[ii].args[jj]))
 				arg_types.push("S");
 			else
-				throw "config_editor_t::validate - Invalid Argument type \""+configs[ii].args[jj]+"\".";
+				throw "config_editor_old_t::validate - Invalid Argument type \""+configs[ii].args[jj]+"\".";
 		}
 
 		var matched_name=false;
@@ -394,7 +392,7 @@ config_editor_t.prototype.validate=function(configs)
 		{
 			if(matched_name)
 			{
-				var error="config_editor_t::validate - Invalid argument list for device "+
+				var error="config_editor_old_t::validate - Invalid argument list for device "+
 					configs[ii].type+", got ";
 
 				if(arg_types.length==0)
@@ -410,17 +408,17 @@ config_editor_t.prototype.validate=function(configs)
 				throw error;
 			}
 
-			throw "config_editor_t::validate - Invalid device type "+configs[ii].type+".";
+			throw "config_editor_old_t::validate - Invalid device type "+configs[ii].type+".";
 		}
 	}
 }
 
-config_editor_t.prototype.set_robot_name=function(robot_name)
+config_editor_old_t.prototype.set_robot_name=function(robot_name)
 {
 	try
 	{
 		if(!robot_name)
-			throw "config_editor_t::set_robot_name - Invalid robot name."
+			throw "config_editor_old_t::set_robot_name - Invalid robot name."
 
 		this.robot_name=robot_name;
 		this.get_config();
@@ -434,7 +432,7 @@ config_editor_t.prototype.set_robot_name=function(robot_name)
 
 function config_cli_t(div,robot_name)
 {
-	this.editor=new config_editor_t(div,robot_name);
+	this.editor=new config_editor_old_t(div,robot_name);
 
 	if(!this.editor)
 		return null;
@@ -486,7 +484,7 @@ config_cli_t.prototype.set_robot_name=function(robot_name)
 function config_gui_t(div,robot_name)
 {
 	var myself=this;
-	this.editor=new config_editor_t(div,robot_name);
+	this.editor=new config_editor_old_t(div,robot_name);
 
 	if(!this.editor)
 		return null;
@@ -711,7 +709,6 @@ config_gui_t.prototype.create_row=function(type,args,create_new)
 		var li=document.createElement("li");
 		li.className="list-group-item";
 		li.style.width="100%";
-		li.style.height="100%";
 		li.style.display="inline-block";
 		li.style.whiteSpace="nowrap";
 		li.tabula={type:type,args:new Array()};

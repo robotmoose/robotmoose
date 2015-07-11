@@ -44,8 +44,10 @@ drag_list_t.prototype.create_entry=function()
 
 	entry.li.className="list-group-item";
 
-	entry.table.row.style.verticalAlign="top";
+	entry.table.left.style.verticalAlign="center";
+	entry.table.center.style.verticalAlign="top";
 	entry.table.center.style.width="100%";
+	entry.table.right.style.verticalAlign="top";
 	entry.li.appendChild(entry.table.table);
 
 	entry.move_handle.className="glyphicon glyphicon-move";

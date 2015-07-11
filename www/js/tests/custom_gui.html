@@ -53,26 +53,29 @@
 			if(!gui)
 				alert("Could not create gui!");
 
-			gui.load([{"title":"Configuration","x":460,"y":240,"active":false,"minimized":true},{"title":"State Editor","x":1000,"y":0,"active":true,"minimized":false}]);
+			gui.load([{"title":"Configuration","x":460,"y":240,"active":true,"minimized":false},
+				{"title":"States","x":1000,"y":0,"active":false,"minimized":false}]);
 
 			if(!gui.get_window("Configuration"))
 				gui.create_window("Configuration",10,0);
 
-			var config_editor=new config_gui_t(gui.get_window("Configuration").body.content,robot_name);
+			var config_editor=new config_editor2_t(gui.get_window("Configuration").body.content,robot_name);
+			config_editor.onconfigure=function(){alert("CONFIGURE!");config_editor.upload("demo");}
 
 			if(!config_editor)
 				alert("Could not create config editor!");
 
-			if(!gui.get_window("State Editor"))
-				gui.create_window("State Editor",0,0);
+			if(!gui.get_window("States"))
+				gui.create_window("States",0,0);
 
-			var state_editor=new state_table_t(gui.get_window("State Editor").body.content);
+			var state_table=new state_table_t(gui.get_window("States").body.content);
+			state_table.onrun=function(){alert("RUN!");}
 
-			if(!state_editor)
-				alert("Could not create state editor!");
+			if(!state_table)
+				alert("Could not create state table!");
 
-			state_editor.create_entry("drive","// Drive forward:\nif (robot.location.x<10) \n  robot.drive(100,100); \nelse \n  robot.state=turn; \n");
-			state_editor.create_entry("turn","// Turn left:\nif (robot.location.angle<90)\n  robot.drive(-100,100); \nelse  \n  robot.state=forward; \n");
+			state_table.create_entry("drive","// Drive forward:\nif (robot.location.x<10) \n  robot.drive(100,100); \nelse \n  robot.state=turn; \n");
+			state_table.create_entry("turn","// Turn left:\nif (robot.location.angle<90)\n  robot.drive(-100,100); \nelse  \n  robot.state=forward; \n");
 		</script>
 	</body>
 </html>
