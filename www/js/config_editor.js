@@ -1,4 +1,4 @@
-function config_editor2_t(div)
+function config_editor_t(div)
 {
 	if(!div)
 		return null;
@@ -58,7 +58,7 @@ function config_editor2_t(div)
 	setTimeout(function(){myself.download("demo");},400);
 }
 
-config_editor2_t.prototype.get_options=function(robot_name)
+config_editor_t.prototype.get_options=function(robot_name)
 {
 	if(!robot_name)
 		return;
@@ -88,7 +88,7 @@ config_editor2_t.prototype.get_options=function(robot_name)
 		}
 }
 
-config_editor2_t.prototype.download=function(robot_name)
+config_editor_t.prototype.download=function(robot_name)
 {
 	if(!robot_name)
 		return;
@@ -135,11 +135,11 @@ config_editor2_t.prototype.download=function(robot_name)
 	}
 	catch(error)
 	{
-		console.log("config_editor2_t::download() - "+error);
+		console.log("config_editor_t::download() - "+error);
 	}
 }
 
-config_editor2_t.prototype.upload=function(robot_name)
+config_editor_t.prototype.upload=function(robot_name)
 {
 	if(!robot_name)
 		return;
@@ -186,11 +186,11 @@ config_editor2_t.prototype.upload=function(robot_name)
 	}
 	catch(error)
 	{
-		console.log("config_editor2_t::upload() - "+error);
+		console.log("config_editor_t::upload() - "+error);
 	}
 }
 
-config_editor2_t.prototype.get_entries=function()
+config_editor_t.prototype.get_entries=function()
 {
 	this.entries.sort(function(lhs,rhs)
 	{
@@ -201,7 +201,7 @@ config_editor2_t.prototype.get_entries=function()
 	return this.entries;
 }
 
-config_editor2_t.prototype.create_entry=function(type,arg_types,arg_values)
+config_editor_t.prototype.create_entry=function(type,arg_types,arg_values)
 {
 	if(!type||!arg_types)
 		return null;
@@ -217,7 +217,7 @@ config_editor2_t.prototype.create_entry=function(type,arg_types,arg_values)
 	return entry;
 }
 
-config_editor2_t.prototype.remove_entry=function(entry)
+config_editor_t.prototype.remove_entry=function(entry)
 {
 	if(!entry)
 		return;
@@ -243,7 +243,7 @@ config_editor2_t.prototype.remove_entry=function(entry)
 
 
 
-config_editor2_t.prototype.create_entry_m=function(entry,type,arg_types,arg_values)
+config_editor_t.prototype.create_entry_m=function(entry,type,arg_types,arg_values)
 {
 	if(!entry||!entry.drag_list||!type||!arg_types)
 		return;
@@ -297,7 +297,7 @@ config_editor2_t.prototype.create_entry_m=function(entry,type,arg_types,arg_valu
 		}
 		else
 		{
-			console.log("config_editor2_t::create_entry_m - Invalid tabula argument type.");
+			console.log("config_editor_t::create_entry_m - Invalid tabula argument type.");
 		}
 
 		if(ii+1<arg_types.length)
@@ -305,7 +305,7 @@ config_editor2_t.prototype.create_entry_m=function(entry,type,arg_types,arg_valu
 	}
 }
 
-config_editor2_t.prototype.create_pin_drop_m=function(value)
+config_editor_t.prototype.create_pin_drop_m=function(value)
 {
 	var drop=document.createElement("select");
 	drop.style.width=80;
@@ -346,7 +346,7 @@ config_editor2_t.prototype.create_pin_drop_m=function(value)
 	return drop;
 }
 
-config_editor2_t.prototype.create_serial_drop_m=function(value)
+config_editor_t.prototype.create_serial_drop_m=function(value)
 {
 	var drop=document.createElement("select");
 	drop.style.width=80;
@@ -376,7 +376,7 @@ config_editor2_t.prototype.create_serial_drop_m=function(value)
 	return drop;
 }
 
-config_editor2_t.prototype.lex_m=function(config)
+config_editor_t.prototype.lex_m=function(config)
 {
 	var col=0;
 	var line=0;
@@ -492,7 +492,7 @@ config_editor2_t.prototype.lex_m=function(config)
 	return configs;
 }
 
-config_editor2_t.prototype.find_option_m=function(option)
+config_editor_t.prototype.find_option_m=function(option)
 {
 	if(!option)
 		return null;
@@ -504,7 +504,7 @@ config_editor2_t.prototype.find_option_m=function(option)
 	return null;
 }
 
-config_editor2_t.prototype.get_options_m=function(options)
+config_editor_t.prototype.get_options_m=function(options)
 {
 	for(var key in this.tabula.select.options)
 		this.tabula.select.element.removeChild(this.tabula.select.options[key]);
@@ -551,7 +551,7 @@ config_editor2_t.prototype.get_options_m=function(options)
 	this.update_disables_m();
 }
 
-config_editor2_t.prototype.update_disables_m=function()
+config_editor_t.prototype.update_disables_m=function()
 {
 	this.tabula.select.element.disabled=(this.tabula.options.length==0);
 	this.add_button.disabled=(this.tabula.options.length==0);

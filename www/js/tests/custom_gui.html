@@ -59,7 +59,7 @@
 			if(!gui.get_window("Configuration"))
 				gui.create_window("Configuration",10,0);
 
-			var config_editor=new config_editor2_t(gui.get_window("Configuration").body.content,robot_name);
+			var config_editor=new config_editor_t(gui.get_window("Configuration").body.content,robot_name);
 			config_editor.onconfigure=function(){alert("CONFIGURE!");}
 
 			if(!config_editor)
