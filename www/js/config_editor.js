@@ -43,8 +43,7 @@ function config_editor_t(div)
 
 	this.add_button.className="btn btn-primary";
 	this.add_button.disabled=true;
-	this.add_button.style.width=64;
-	this.add_button.type="input";
+	this.add_button.type="button";
 	this.add_button.value="Add";
 	this.add_button.onclick=function(event)
 	{
@@ -57,8 +56,7 @@ function config_editor_t(div)
 
 	this.configure_button.className="btn btn-primary";
 	this.configure_button.disabled=true;
-	this.configure_button.style.width=96;
-	this.configure_button.type="input";
+	this.configure_button.type="button";
 	this.configure_button.value="Configure";
 	this.configure_button.onclick=function(event)
 	{

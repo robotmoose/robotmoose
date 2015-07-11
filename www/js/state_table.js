@@ -25,14 +25,14 @@ function state_table_t(div)
 	this.div.appendChild(this.element);
 
 	this.run_button.className="btn btn-primary";
-	this.run_button.type="input";
+	this.run_button.type="button";
 	this.run_button.value="Run";
 	this.run_button.onclick=function(event){if(myself.onrun)myself.onrun(myself);};
 	this.element.appendChild(this.run_button);
 
 	this.new_button.className="btn btn-primary";
 	this.new_button.style.marginLeft=10;
-	this.new_button.type="input";
+	this.new_button.type="button";
 	this.new_button.value="Add State";
 	this.new_button.onclick=function(event){myself.create_entry("newState","// JavaScript code\n\n");};
 	this.element.appendChild(this.new_button);
