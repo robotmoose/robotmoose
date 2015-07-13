@@ -1,14 +1,25 @@
 //Members
-//		onclone(selected_robot) - triggered when connect button is hit
+//		clone_target - name of robot to clone (set before calling show)
+//		onclone(name,settings) - triggered when clone button is hit
 
 function modal_clone_t(div)
 {
 	this.modal=new modal_t(div);
-	this.clone_target={};
-	this.clone_target.div=document.createElement("div");
-	this.clone_target.input=document.createElement("input");
-	this.clone_target.timeout=null;
-	this.clone_target.span=document.createElement("span");
+	this.clone_target="";
+	this.clone_info={};
+	this.clone_info.has_typed=false;
+	this.clone_info.div=document.createElement("div");
+	this.clone_info.input=document.createElement("input");
+	this.clone_info.glyph=document.createElement("span");
+	this.clone_info.label=document.createElement("label");
+	this.clone_info.timeout=null;
+	this.settings={};
+	this.settings.text=document.createTextNode("Settings to clone:");
+	this.settings.div=document.createElement("div");
+	this.settings.checkboxes=[];
+	this.settings.buttons={};
+	this.settings.buttons.select_all=document.createElement("input");
+	this.settings.buttons.select_none=document.createElement("input");
 	this.clone_button=document.createElement("input");
 	this.cancel_button=document.createElement("input");
 
@@ -20,57 +31,71 @@ function modal_clone_t(div)
 
 	var myself=this;
 
-	this.modal.set_title("Clone Robot");
+	this.clone_info.div.className="has-feedback";
+	this.modal.get_content().appendChild(this.clone_info.div);
 
-	this.clone_target.div.className="form-group has-feedback";
-	this.modal.get_content().appendChild(this.clone_target.div);
+	this.clone_info.input.type="text";
+	this.clone_info.input.className="form-control";
+	this.clone_info.input.spellcheck=false;
+	this.clone_info.input.placeholder="Enter robot clone's name here..."
+	this.clone_info.input.onkeydown=this.clone_info.input.onkeyup=function()
+	{
+		myself.set_input_normal_m();
 
-	this.set_input_normal_m();
-	this.clone_target.div.appendChild(this.clone_target.span);
+		if(myself.clone_info.timeout)
+			clearTimeout(myself.clone_info.timeout);
 
-	this.clone_target.input.type="text";
-	this.clone_target.input.className="form-control";
-	this.clone_target.input.spellcheck=false;
-	this.clone_target.input.placeholder="Enter robot clone's name here..."
-	this.clone_target.input.onkeydown=
-		this.clone_target.input.onkeypress=
-		this.clone_target.input.onkeyup=
-		function()
+		if(myself.valid_robot_name_m(this.value))
 		{
-			myself.set_input_normal_m();
+			var input=this;
+			myself.clone_info.timeout=setTimeout(function(){myself.check_exists_m(input.value);},300);
+			myself.clone_button.disabled=false;
+			myself.set_input_success_m();
+		}
+		else if(myself.clone_info.has_typed||this.value.length!=0)
+		{
+			myself.clone_button.disabled=true;
+			myself.set_input_error_m();
+		}
 
-			if(myself.clone_target.timeout)
-				clearTimeout(myself.clone_target.timeout);
+		myself.clone_info.has_typed=true;
+	};
+	this.clone_info.div.appendChild(this.clone_info.input);
 
-			if(myself.valid_robot_name_m(this.value))
-			{
-				var input=this;
-				myself.clone_target.timeout=setTimeout(function(){myself.check_exists_m(input.value);},300);
-				myself.clone_button.disabled=false;
-			}
-			else
-			{
-				myself.clone_button.disabled=true;
-				myself.set_input_error_m();
-			}
-		};
-	this.clone_target.div.appendChild(this.clone_target.input);
+	this.clone_info.div.appendChild(this.clone_info.glyph);
 
+	this.clone_info.label.className="help-inline";
+	this.clone_info.div.appendChild(this.clone_info.label);
+
+	this.modal.get_content().appendChild(this.settings.text);
+
+	this.settings.div.style.marginLeft=10;
+	this.modal.get_content().appendChild(this.settings.div);
+
+	this.modal.get_content().appendChild(document.createElement("br"));
+
+	this.settings.buttons.select_all.type="button";
+	this.settings.buttons.select_all.className="btn btn-primary";
+	this.settings.buttons.select_all.style.marginRight=10;
+	this.settings.buttons.select_all.value="Select All";
+	this.settings.buttons.select_all.onclick=function(){myself.select_all_m();};
+	this.modal.get_content().appendChild(this.settings.buttons.select_all);
+
+	this.settings.buttons.select_none.type="button";
+	this.settings.buttons.select_none.className="btn btn-primary";
+	this.settings.buttons.select_none.value="Select None";
+	this.settings.buttons.select_none.onclick=function(){myself.select_none_m();};
+	this.modal.get_content().appendChild(this.settings.buttons.select_none);
+
+	this.clone_button.type="button";
 	this.clone_button.className="btn btn-primary";
 	this.clone_button.disabled=true;
-	this.clone_button.type="button";
 	this.clone_button.value="Clone";
-	this.clone_button.onclick=function()
-	{
-		if(myself.onclone)
-			myself.onclone(myself.clone_target.input.value);
-
-		myself.hide();
-	};
+	this.clone_button.onclick=function(){myself.onclone_m();};
 	this.modal.get_footer().appendChild(this.clone_button);
 
-	this.cancel_button.className="btn btn-primary";
 	this.cancel_button.type="button";
+	this.cancel_button.className="btn btn-primary";
 	this.cancel_button.value="Cancel";
 	this.cancel_button.onclick=function(){myself.hide();};
 	this.modal.get_footer().appendChild(this.cancel_button);
@@ -78,12 +103,101 @@ function modal_clone_t(div)
 
 modal_clone_t.prototype.show=function()
 {
+	this.modal.set_title("Clone Robot \""+this.clone_target+"\"");
+	this.clone_info.has_typed=false;
+	this.clone_info.input.value="";
+	this.set_input_normal_m();
+	this.build_checkboxes_m();
 	this.modal.show();
 }
 
 modal_clone_t.prototype.hide=function()
 {
 	this.modal.hide();
+}
+
+modal_clone_t.prototype.onclone_m=function()
+{
+	if(this.onclone)
+	{
+		var settings=[];
+
+		for(var key in this.settings.checkboxes)
+			settings.push(this.settings.checkboxes[key].value);
+
+		this.onclone(this.clone_info.input.value,settings);
+	}
+
+	this.hide();
+}
+
+modal_clone_t.prototype.build_checkboxes_m=function()
+{
+	var myself=this;
+
+	for(var key in this.settings.checkboxes)
+	{
+		this.settings.div.removeChild(this.settings.checkboxes[key].box);
+		this.settings.div.removeChild(this.settings.checkboxes[key].text);
+		this.settings.div.removeChild(this.settings.checkboxes[key].br);
+	}
+
+	this.settings.checkboxes.length=0;
+
+	if(!robot_name)
+		return;
+
+	try
+	{
+		send_request("GET","/superstar/",this.clone_target,"?sub",
+			function(response)
+			{
+				var settings=JSON.parse(response);
+
+				for(var key in settings)
+					myself.create_checkbox_m(settings[key]);
+			},
+			function(error)
+			{
+				throw error;
+			},
+			"application/json");
+	}
+	catch(error)
+	{
+		console.log("modal_clone_t::build_checkboxes_m() - "+error);
+	}
+}
+
+modal_clone_t.prototype.create_checkbox_m=function(value)
+{
+	var checkbox={};
+	checkbox.value=value;
+	checkbox.box=document.createElement("input");
+	checkbox.text=document.createTextNode(" "+value);
+	checkbox.br=document.createElement("br");
+
+	checkbox.box.type="checkbox";
+	checkbox.box.checked=true;
+	this.settings.div.appendChild(checkbox.box);
+
+	this.settings.div.appendChild(checkbox.text);
+
+	this.settings.div.appendChild(checkbox.br);
+
+	this.settings.checkboxes.push(checkbox);
+}
+
+modal_clone_t.prototype.select_all_m=function()
+{
+	for(var key in this.settings.checkboxes)
+		this.settings.checkboxes[key].box.checked=true;
+}
+
+modal_clone_t.prototype.select_none_m=function()
+{
+	for(var key in this.settings.checkboxes)
+		this.settings.checkboxes[key].box.checked=false;
 }
 
 modal_clone_t.prototype.check_exists_m=function(name)
@@ -93,7 +207,7 @@ modal_clone_t.prototype.check_exists_m=function(name)
 
 	try
 	{
-		send_request("GET","/superstar/",".","?get",
+		send_request("GET","/superstar/",".","?sub",
 			function(response)
 			{
 				myself.robots=[];
@@ -127,21 +241,32 @@ modal_clone_t.prototype.valid_robot_name_m=function(name)
 
 modal_clone_t.prototype.set_input_normal_m=function()
 {
-	this.clone_target.div.className="form-group has-feedback";
-	this.clone_target.span.className="glyphicon form-control-feedback";
-	this.clone_target.span.style.visibility="hidden";
+	this.clone_info.div.className="form-group has-feedback";
+	this.clone_info.glyph.className="glyphicon form-control-feedback";
+	this.clone_info.glyph.style.visibility="hidden";
+	this.clone_info.label.innerHTML="";
+}
+
+modal_clone_t.prototype.set_input_success_m=function()
+{
+	this.clone_info.div.className="form-group has-feedback has-success";
+	this.clone_info.glyph.className="glyphicon form-control-feedback glyphicon-ok";
+	this.clone_info.glyph.style.visibility="visible";
+	this.clone_info.label.innerHTML="";
 }
 
 modal_clone_t.prototype.set_input_warning_m=function()
 {
-	this.clone_target.div.className="form-group has-feedback has-warning";
-	this.clone_target.span.className="glyphicon form-control-feedback glyphicon-warning-sign";
-	this.clone_target.span.style.visibility="visible";
+	this.clone_info.div.className="form-group has-feedback has-warning";
+	this.clone_info.glyph.className="glyphicon form-control-feedback glyphicon-warning-sign";
+	this.clone_info.glyph.style.visibility="visible";
+	this.clone_info.label.innerHTML="Warning, this robot name already exists!";
 }
 
 modal_clone_t.prototype.set_input_error_m=function()
 {
-	this.clone_target.div.className="form-group has-feedback has-error";
-	this.clone_target.span.className="glyphicon form-control-feedback glyphicon glyphicon-remove";
-	this.clone_target.span.style.visibility="visible";
+	this.clone_info.div.className="form-group has-feedback has-error";
+	this.clone_info.glyph.className="glyphicon form-control-feedback glyphicon glyphicon-remove";
+	this.clone_info.glyph.style.visibility="visible";
+	this.clone_info.label.innerHTML="Invalid robot name!";
 }

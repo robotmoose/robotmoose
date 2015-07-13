@@ -49,7 +49,7 @@ modal_connect_t.prototype.show=function()
 
 	try
 	{
-		send_request("GET","/superstar/",".","?get",
+		send_request("GET","/superstar/",".","?sub",
 			function(response)
 			{
 				myself.robots=[];
