@@ -100,7 +100,7 @@ robot_menu_t.prototype.create_button=function(name,onclick,glyph,options)
 	}
 }
 
-robot_menu_t.prototype.status_area=function()
+robot_menu_t.prototype.get_status_area=function()
 {
 	return this.menu.status.a;
 }
