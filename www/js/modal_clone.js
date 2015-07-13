@@ -123,7 +123,8 @@ modal_clone_t.prototype.onclone_m=function()
 		var settings=[];
 
 		for(var key in this.settings.checkboxes)
-			settings.push(this.settings.checkboxes[key].value);
+			if(this.settings.checkboxes[key].box.checked)
+				settings.push(this.settings.checkboxes[key].value);
 
 		this.onclone(this.clone_info.input.value,settings);
 	}
