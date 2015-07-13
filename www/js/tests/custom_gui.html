@@ -22,6 +22,16 @@
 				console.log("CONNECT:  "+robot_name);
 			};
 
+			var robot_clone=new modal_clone_t(div);
+
+			if(!robot_clone)
+				alert("Could not create robot clone modal!");
+
+			robot_clone.onclone=function(robot_name)
+			{
+				console.log("CLONE:  "+robot_name);
+			};
+
 			var menu=new robot_menu_t(div);
 
 			if(!menu)
@@ -37,35 +47,12 @@
 				{
 					"Connect":
 					{
-						onclick:function()
-						{
-							robot_connect.robots=[];
-
-							try
-							{
-								send_request("GET","/superstar/",".","?get",
-									function(response)
-									{
-										robot_connect.robots=[];
-										robot_connect.robots=JSON.parse(response);
-										robot_connect.show();
-									},
-									function(error)
-									{
-										throw error;
-									},
-									"application/json");
-							}
-							catch(error)
-							{
-								console.log("Robot Connect - "+error);
-							}
-						},
+						onclick:function(){robot_connect.show();},
 						glyph:"glyphicon glyphicon-off"
 					},
-					"Make a Copy":
+					"Clone":
 					{
-						onclick:function(){alert("Copy!");},
+						onclick:function(){robot_clone.show();},
 						glyph:"glyphicon glyphicon-duplicate"
 					}
 				}

@@ -1,6 +1,5 @@
 //Members
 //		onconnect(selected_robot) - triggered when connect button is hit
-//		robots - array of robots to display in window
 
 function modal_connect_t(div)
 {
@@ -45,8 +44,29 @@ function modal_connect_t(div)
 
 modal_connect_t.prototype.show=function()
 {
-	this.build_robots_list_m();
-	this.modal.show();
+	this.robots=[];
+	var myself=this;
+
+	try
+	{
+		send_request("GET","/superstar/",".","?get",
+			function(response)
+			{
+				myself.robots=[];
+				myself.robots=JSON.parse(response);
+				myself.build_robots_list_m();
+				myself.modal.show();
+			},
+			function(error)
+			{
+				throw error;
+			},
+			"application/json");
+	}
+	catch(error)
+	{
+		console.log("modal_connect_t::show() - "+error);
+	}
 }
 
 modal_connect_t.prototype.hide=function()

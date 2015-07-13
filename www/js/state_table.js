@@ -192,7 +192,9 @@ state_table_t.prototype.create_entry_m=function(entry,state,code)
 	entry.table.left.style.paddingRight=10;
 	entry.drag_list.content.appendChild(entry.table.element);
 
+	entry.input.type="text";
 	entry.input.className="form-control";
+	entry.input.spellcheck=false;
 	entry.input.size=10;
 	entry.input.value=state;
 	entry.input.onblur=function(event){myself.validate_m(this);};
