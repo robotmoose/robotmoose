@@ -91,7 +91,7 @@ state_table_t.prototype.upload=function(robot_name)
 			if(this.entries[key])
 			{
 				var obj={};
-				obj.state=this.entries[key].input.value;
+				obj.name=this.entries[key].input.value;
 				obj.code=this.entries[key].code_editor.getValue();
 				data.push(obj);
 			}
@@ -134,7 +134,7 @@ state_table_t.prototype.create_entry=function(state,code)
 	var entry={};
 	entry.drag_list=this.drag_list.create_entry();
 	entry.drag_list.state_table_t=entry;
-	entry.drag_list.onremove=function(entry){myself.remove_entry(entry.state_table_t);};
+	entry.drag_list.onremove=function(entry){myself.remove_entry_m(entry.state_table_t);};
 	this.create_entry_m(entry,state,code);
 	this.entries.push(entry);
 
@@ -143,20 +143,10 @@ state_table_t.prototype.create_entry=function(state,code)
 
 state_table_t.prototype.remove_entry=function(entry)
 {
-	if(!entry)
+	if(!entry||!entry.drag_list)
 		return;
 
-	for(var key in this.entries)
-	{
-		if(this.entries[key]&&this.entries[key]===entry)
-		{
-			window.removeEventListener("click",this.entries[key].code_editor_event);
-			this.entries[key]=null;
-			break;
-		}
-	}
-
-	this.refresh_m();
+	this.drag_list.remove_entry(entry.drag_list);
 }
 
 
@@ -214,6 +204,24 @@ state_table_t.prototype.create_entry_m=function(entry,state,code)
 	entry.code_editor.setSize(320,100);
 	entry.code_editor_event=function(event){entry.code_editor.refresh();};
 	window.addEventListener("click",entry.code_editor_event);
+
+	this.refresh_m();
+}
+
+state_table_t.prototype.remove_entry_m=function(entry)
+{
+	if(!entry)
+		return;
+
+	for(var key in this.entries)
+	{
+		if(this.entries[key]&&this.entries[key]===entry)
+		{
+			window.removeEventListener("click",this.entries[key].code_editor_event);
+			this.entries[key]=null;
+			break;
+		}
+	}
 
 	this.refresh_m();
 }

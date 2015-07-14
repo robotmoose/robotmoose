@@ -66,7 +66,7 @@ function config_editor_t(div)
 	this.element.appendChild(this.configure_button);
 }
 
-config_editor_t.prototype.get_options=function(robot_name)
+config_editor_t.prototype.download=function(robot_name)
 {
 	if(!robot_name)
 		return;
@@ -83,6 +83,8 @@ config_editor_t.prototype.get_options=function(robot_name)
 					var options=JSON.parse(response);
 					myself.get_options_m(options);
 				}
+
+				myself.download_m(robot_name);
 			},
 			function(error)
 			{
@@ -92,59 +94,8 @@ config_editor_t.prototype.get_options=function(robot_name)
 		}
 		catch(error)
 		{
-			console.log("config_editor_t::get_options() - "+error);
+			console.log("config_editor_t::download() - "+error);
 		}
-}
-
-config_editor_t.prototype.download=function(robot_name)
-{
-	if(!robot_name)
-		return;
-
-	var myself=this;
-
-	try
-	{
-		send_request("GET","/superstar/"+robot_name,"config","?get",
-			function(response)
-			{
-				if(response)
-				{
-					for(var key in myself.entries)
-						myself.remove_entry(myself.entries[key]);
-
-					var obj=JSON.parse(response);
-
-					myself.counter=obj.counter+1;
-
-					var config_text="";
-
-					for(var key in obj.configs)
-						config_text+=obj.configs[key]+"\n";
-
-					var configs=myself.lex_m(config_text);
-
-					for(var key in configs)
-					{
-						var lookup=myself.find_option_m(configs[key]);
-
-						if(lookup)
-							myself.create_entry(configs[key].type,lookup.args,configs[key].args);
-						else
-							console.log("Invalid tabula config: "+configs[key].type+"("+configs[key].args+");");
-					}
-				}
-			},
-			function(error)
-			{
-				throw error;
-			},
-			"application/json");
-	}
-	catch(error)
-	{
-		console.log("config_editor_t::download() - "+error);
-	}
 }
 
 config_editor_t.prototype.upload=function(robot_name)
@@ -218,7 +169,7 @@ config_editor_t.prototype.create_entry=function(type,arg_types,arg_values)
 	var entry={};
 	entry.drag_list=this.drag_list.create_entry();
 	entry.drag_list.config_editor_t=entry;
-	entry.drag_list.onremove=function(entry){myself.remove_entry(entry.config_editor_t);};
+	entry.drag_list.onremove=function(entry){myself.remove_entry_m(entry.config_editor_t);};
 	this.create_entry_m(entry,type,arg_types,arg_values);
 	this.entries.push(entry);
 
@@ -227,19 +178,10 @@ config_editor_t.prototype.create_entry=function(type,arg_types,arg_values)
 
 config_editor_t.prototype.remove_entry=function(entry)
 {
-	if(!entry)
+	if(!entry||!entry.drag_list)
 		return;
 
-	for(var key in this.entries)
-	{
-		if(this.entries[key]&&this.entries[key]===entry)
-		{
-			this.entries[key]=null;
-			break;
-		}
-	}
-
-	this.refresh_m();
+	this.drag_list.remove_entry(entry.drag_list);
 }
 
 
@@ -250,6 +192,59 @@ config_editor_t.prototype.remove_entry=function(entry)
 
 
 
+
+config_editor_t.prototype.download_m=function(robot_name)
+{
+	if(!robot_name)
+		return;
+
+	var myself=this;
+
+	for(var key in this.entries)
+		this.remove_entry(this.entries[key]);
+
+	this.entries=[];
+
+	try
+	{
+		send_request("GET","/superstar/"+robot_name,"config","?get",
+			function(response)
+			{
+				if(response)
+				{
+					var obj=JSON.parse(response);
+
+					myself.counter=obj.counter+1;
+
+					var config_text="";
+
+					for(var key in obj.configs)
+						config_text+=obj.configs[key]+"\n";
+
+					var configs=myself.lex_m(config_text);
+
+					for(var key in configs)
+					{
+						var lookup=myself.find_option_m(configs[key]);
+
+						if(lookup)
+							myself.create_entry(configs[key].type,lookup.args,configs[key].args);
+						else
+							console.log("Invalid tabula config: "+configs[key].type+"("+configs[key].args+");");
+					}
+				}
+			},
+			function(error)
+			{
+				throw error;
+			},
+			"application/json");
+	}
+	catch(error)
+	{
+		console.log("config_editor_t::download_m() - "+error);
+	}
+}
 
 config_editor_t.prototype.create_entry_m=function(entry,type,arg_types,arg_values)
 {
@@ -386,6 +381,23 @@ config_editor_t.prototype.create_serial_drop_m=function(value)
 	return drop;
 }
 
+config_editor_t.prototype.remove_entry_m=function(entry)
+{
+	if(!entry)
+		return;
+
+	for(var key in this.entries)
+	{
+		if(this.entries[key]&&this.entries[key]===entry)
+		{
+			this.entries[key]=null;
+			break;
+		}
+	}
+
+	this.refresh_m();
+}
+
 config_editor_t.prototype.lex_m=function(config)
 {
 	var col=0;
@@ -517,8 +529,10 @@ config_editor_t.prototype.find_option_m=function(option)
 config_editor_t.prototype.get_options_m=function(options)
 {
 	for(var key in this.tabula.select.options)
-		this.tabula.select.element.removeChild(this.tabula.select.options[key]);
+		if(this.tabula.select.options[key].element)
+			this.tabula.select.element.removeChild(this.tabula.select.options[key].element);
 
+	this.tabula.select.options=[];
 	this.tabula.options=[];
 
 	if(!options)
