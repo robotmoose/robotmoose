@@ -130,14 +130,14 @@ public:
 					// Check for flags in the distance field
 					const int invalid_flag=(1<<15);
 					const int warning_flag=(1<<14);
-					int reportQuality=2;
+					//int reportQuality=2;
 					if (reportDistance&invalid_flag) { // invalid data
 						reportDistance=0;
-						reportQuality=0;
+						//reportQuality=0;
 					}
 					if (reportDistance&warning_flag) { // warning flag
 						reportDistance&=warning_flag-1; // keep low bits
-						reportQuality=1;
+						//reportQuality=1;
 					}
 
 					// Convert signal reflectance to bit count
