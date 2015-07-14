@@ -29,7 +29,7 @@ INCLUDE_DIR=-I$(ARDUINO_DIR)/cores -I$(ARDUINO_DIR)/cores/arduino
 ATMEGA328_INCLUDE_DIR=-I$(ARDUINO_DIR)/variants/standard
 ATMEGA2560_INCLUDE_DIR=-I$(ARDUINO_DIR)/variants/mega
 LIB_DIR=-I$(ARD_LIB_DIR)/Servo -I$(ARD_LIB_DIR)/SoftwareSerial -I$(ARD_LIB_DIR)/Wire -Ipatched
-LIB_SRC=$(ARD_LIB_DIR)/Servo/Servo.cpp patched/SoftwareSerial.cpp $(ARD_LIB_DIR)/Wire/Wire.cpp $(ARD_LIB_DIR)/Wire/utility/twi.c
+LIB_SRC=$(ARD_LIB_DIR)/Servo/Servo.cpp patched/SoftwareSerial.cpp $(ARD_LIB_DIR)/Wire/Wire.cpp patched/twi.cpp
 DIRS=$(INCLUDE_DIR) -I. -I$(SHARED_DIR) -I$(SRC_DIR)  $(LIB_DIR)
 
 #Compiler Flags
@@ -69,7 +69,7 @@ all: main.cpp main upload
 main.cpp: arduino.ino
 	cp $< $@
 
-main: $(MAIN_SRC) *.h
+main: main.cpp $(MAIN_SRC) *.h
 	$(COMPILER328) $(DIRS) $(CFLAGS) $(INCLUDE) $(MAIN_SRC) $(ARDUINO_SRC) -o $(BIN_DIR)/$@.elf
 	$(LINKER) -R .eeprom -O ihex $(BIN_FILE).elf $(BIN_FILE).hex
 
