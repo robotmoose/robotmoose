@@ -145,9 +145,6 @@ modal_clone_t.prototype.build_checkboxes_m=function()
 
 	this.settings.checkboxes.length=0;
 
-	if(!robot_name)
-		return;
-
 	try
 	{
 		send_request("GET","/superstar/",this.clone_target,"?sub",

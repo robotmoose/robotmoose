@@ -9,7 +9,43 @@
 		</div>
 
 		<script type="text/javascript">
-			var global_name="demo";
+			function clone(to,from,setting)
+			{
+				try
+				{
+					send_request("GET","/superstar/"+from,setting,"?get",
+						function(response)
+						{
+							try
+							{
+								send_request("GET","/superstar/"+to,setting,"?set="+response,
+									function(response)
+									{
+									},
+									function(error)
+									{
+										throw error;
+									},
+									"application/json");
+							}
+							catch(error)
+							{
+								console.log("clone::upload() - "+error);
+							}
+						},
+						function(error)
+						{
+							throw error;
+						},
+						"application/json");
+				}
+				catch(error)
+				{
+					console.log("clone::download() - "+error);
+				}
+			}
+
+			var global_name=null;
 			var div=document.getElementById("gui");
 
 			var config_editor=null;
@@ -28,6 +64,19 @@
 
 
 
+			var robot_clone=new modal_clone_t(div);
+
+			if(!robot_clone)
+				alert("Could not create robot clone modal!");
+
+			robot_clone.clone_target=global_name;
+			robot_clone.onclone=function(robot_name,settings)
+			{
+				if(robot_clone.clone_target)
+					for(var key in settings)
+						clone(robot_name,robot_clone.clone_target,settings[key]);
+			};
+
 			var robot_connect=new modal_connect_t(div);
 
 			if(!robot_connect)
@@ -38,20 +87,10 @@
 				if(robot_name)
 				{
 					global_name=robot_name;
+					robot_clone.clone_target=global_name;
 					config_editor.download(global_name);
 					state_table.download(global_name);
 				}
-			};
-
-			var robot_clone=new modal_clone_t(div);
-
-			if(!robot_clone)
-				alert("Could not create robot clone modal!");
-
-			robot_clone.clone_target=global_name;
-			robot_clone.onclone=function(robot_name,settings)
-			{
-				//console.log("CLONE:  "+robot_name+" - ["+settings+"]");
 			};
 
 			var menu=new robot_menu_t(div);
