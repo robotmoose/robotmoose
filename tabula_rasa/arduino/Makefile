@@ -1,4 +1,4 @@
-# Makefile for Arduino Firmware
+# Makefile for Arduino firmware build and upload
 
 #ubuntu
 #sudo apt-get install arduino
@@ -69,7 +69,7 @@ all: main.cpp main upload
 main.cpp: arduino.ino
 	cp $< $@
 
-main: $(MAIN_SRC)
+main: $(MAIN_SRC) *.h
 	$(COMPILER328) $(DIRS) $(CFLAGS) $(INCLUDE) $(MAIN_SRC) $(ARDUINO_SRC) -o $(BIN_DIR)/$@.elf
 	$(LINKER) -R .eeprom -O ihex $(BIN_FILE).elf $(BIN_FILE).hex
 
