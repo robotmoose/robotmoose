@@ -27,7 +27,7 @@ REGISTER_TABULA_DEVICE macro, and the tabula_configure_source object.
 // Compare strings with operator==, by reading each byte from program RAM
 inline bool operator==(const String &a,const __FlashStringHelper *b) {
   const char *pa=a.c_str();
-  const char PROGMEM *pb = (const char PROGMEM *)b;
+  const char /*PROGMEM*/ *pb = (const char /*PROGMEM*/ *)b;
   while (1) {
     unsigned char ac=*pa++;
     unsigned char bc=pgm_read_byte(pb++);
