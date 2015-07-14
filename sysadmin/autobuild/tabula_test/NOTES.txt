@@ -1,0 +1,15 @@
+Automated testing for tabula rasa
+
+Things tend to break unless they're run regularly, so we need to run tabula regularly.
+
+Idea:
+	Check out clean version of code
+	Start clean superstar
+	Build and flash tabula firmware
+	Start backend
+	Automate browser actions to configure backend
+	Verify commands are making it
+
+
+
+
