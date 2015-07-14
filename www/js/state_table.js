@@ -45,6 +45,9 @@ state_table_t.prototype.download=function(robot_name)
 
 	var myself=this;
 
+	for(var key in this.entries)
+		this.remove_entry(this.entries[key]);
+
 	try
 	{
 		send_request("GET","/superstar/"+robot_name,"states","?get",
@@ -52,9 +55,6 @@ state_table_t.prototype.download=function(robot_name)
 			{
 				if(response)
 				{
-					for(var key in myself.entries)
-						myself.remove_entry(myself.entries[key]);
-
 					var obj=JSON.parse(response);
 
 					for(var key in obj)
