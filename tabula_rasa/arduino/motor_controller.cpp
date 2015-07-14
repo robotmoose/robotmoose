@@ -72,7 +72,7 @@ void sabertooth_v2_controller_t::send_motor_m(const uint8_t address,const uint8_
 		address,
 		motor,
 		value_raw,
-		(address+motor+value_raw)&127
+		(uint8_t)((address+motor+value_raw)&127)
 	};
 
 	serial_m->write(data,4);
