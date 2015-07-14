@@ -50,6 +50,10 @@
 
 			var config_editor=null;
 			var state_table=null;
+			var menu=null;
+			var gui=null;
+			var robot_clone=null;
+			var robot_connect=null;
 
 
 
@@ -62,22 +66,7 @@
 
 
 
-
-
-			var robot_clone=new modal_clone_t(div);
-
-			if(!robot_clone)
-				alert("Could not create robot clone modal!");
-
-			robot_clone.clone_target=global_name;
-			robot_clone.onclone=function(robot_name,settings)
-			{
-				if(robot_clone.clone_target)
-					for(var key in settings)
-						clone(robot_name,robot_clone.clone_target,settings[key]);
-			};
-
-			var robot_connect=new modal_connect_t(div);
+			robot_connect=new modal_connect_t(div);
 
 			if(!robot_connect)
 				alert("Could not create robot connect modal!");
@@ -90,10 +79,25 @@
 					robot_clone.clone_target=global_name;
 					config_editor.download(global_name);
 					state_table.download(global_name);
+					menu.get_status_area().innerHTML="Connected to \""+global_name+"\"";
+					menu.buttons["Robot"].drops["Clone"].enable();
 				}
 			};
 
-			var menu=new robot_menu_t(div);
+			robot_clone=new modal_clone_t(div);
+
+			if(!robot_clone)
+				alert("Could not create robot clone modal!");
+
+			robot_clone.clone_target=global_name;
+			robot_clone.onclone=function(robot_name,settings)
+			{
+				if(robot_clone.clone_target)
+					for(var key in settings)
+						clone(robot_name,robot_clone.clone_target,settings[key]);
+			};
+
+			menu=new robot_menu_t(div);
 
 			if(!menu)
 				alert("Could not create robot menu!");
@@ -119,12 +123,14 @@
 				}
 			);
 
+			menu.buttons["Robot"].drops["Clone"].disable();
 
 
 
 
 
-			var gui=new doorways_t(div);
+
+			gui=new doorways_t(div);
 
 			if(!gui)
 				alert("Could not create gui!");
