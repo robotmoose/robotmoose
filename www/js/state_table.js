@@ -12,7 +12,7 @@ function state_table_t(div)
 	this.element=document.createElement("div");
 	this.drag_list=new drag_list_t(this.element);
 	this.run_button=document.createElement("input");
-	this.new_button=document.createElement("input");
+	this.add_button=document.createElement("input");
 	this.entries=[];
 
 	if(!this.drag_list)
@@ -24,29 +24,36 @@ function state_table_t(div)
 	this.element.style.width=640;
 	this.div.appendChild(this.element);
 
-	this.run_button.className="btn btn-primary";
 	this.run_button.type="button";
+	this.run_button.className="btn btn-primary";
+	this.run_button.disabled=true;
 	this.run_button.value="Run";
 	this.run_button.onclick=function(event){if(myself.onrun)myself.onrun(myself);};
 	this.element.appendChild(this.run_button);
 
-	this.new_button.className="btn btn-primary";
-	this.new_button.style.marginLeft=10;
-	this.new_button.type="button";
-	this.new_button.value="Add State";
-	this.new_button.onclick=function(event){myself.create_entry("newState","// JavaScript code\n\n");};
-	this.element.appendChild(this.new_button);
+	this.add_button.type="button";
+	this.add_button.className="btn btn-primary";
+	this.add_button.style.marginLeft=10;
+	this.add_button.disabled=true;
+	this.add_button.value="Add State";
+	this.add_button.onclick=function(event){myself.create_entry("newState","// JavaScript code\n\n");};
+	this.element.appendChild(this.add_button);
 }
 
 state_table_t.prototype.download=function(robot_name)
 {
+	for(var key in this.entries)
+		this.remove_entry(this.entries[key]);
+
+	this.run_button.disabled=true;
+	this.add_button.disabled=true;
+
 	if(!robot_name)
 		return;
 
 	var myself=this;
-
-	for(var key in this.entries)
-		this.remove_entry(this.entries[key]);
+	this.run_button.disabled=false;
+	this.add_button.disabled=false;
 
 	try
 	{

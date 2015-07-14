@@ -144,6 +144,8 @@ modal_clone_t.prototype.build_checkboxes_m=function()
 	}
 
 	this.settings.checkboxes.length=0;
+	this.settings.buttons.select_all.disabled=true;
+	this.settings.buttons.select_none.disabled=true;
 
 	try
 	{
@@ -155,6 +157,12 @@ modal_clone_t.prototype.build_checkboxes_m=function()
 
 				for(var key in settings)
 					myself.create_checkbox_m(settings[key]);
+
+				if(this.settings.checkboxes.length>0)
+				{
+					this.settings.buttons.select_all.disabled=false;
+					this.settings.buttons.select_none.disabled=false;
+				}
 			},
 			function(error)
 			{
