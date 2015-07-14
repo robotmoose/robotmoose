@@ -154,6 +154,7 @@ modal_clone_t.prototype.build_checkboxes_m=function()
 			function(response)
 			{
 				var settings=JSON.parse(response);
+				settings.sort();
 
 				for(var key in settings)
 					myself.create_checkbox_m(settings[key]);
