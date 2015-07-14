@@ -158,10 +158,10 @@ modal_clone_t.prototype.build_checkboxes_m=function()
 				for(var key in settings)
 					myself.create_checkbox_m(settings[key]);
 
-				if(this.settings.checkboxes.length>0)
+				if(myself.settings.checkboxes.length>0)
 				{
-					this.settings.buttons.select_all.disabled=false;
-					this.settings.buttons.select_none.disabled=false;
+					myself.settings.buttons.select_all.disabled=false;
+					myself.settings.buttons.select_none.disabled=false;
 				}
 			},
 			function(error)
