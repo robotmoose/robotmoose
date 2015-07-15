@@ -14,7 +14,7 @@ function robot_menu_t(div)
 	this.menu.status.li=document.createElement("li");
 	this.menu.status.a=document.createElement("a");
 
-	this.buttons=[];
+	this.drops=[];
 
 	this.div.appendChild(this.element);
 
@@ -41,78 +41,62 @@ function robot_menu_t(div)
 	setInterval(function(){$('.hiddenclass').show();},100);
 }
 
-robot_menu_t.prototype.create_button=function(name,onclick,glyph,drops)
+robot_menu_t.prototype.create_button=function(name,onclick,glyph,options)
 {
-	this.buttons[name]={};
-	this.buttons[name].li=document.createElement("li");
-	this.buttons[name].a=document.createElement("a");
-	this.buttons[name].glyph=document.createElement("span");
-	this.buttons[name].text=document.createTextNode(" "+name+" ");
+	var drop={};
+	this.drops[name]={};
+	this.drops[name].li=document.createElement("li");
+	this.drops[name].a=document.createElement("a");
+	this.drops[name].glyph=document.createElement("span");
+	this.drops[name].text=document.createTextNode(" "+name+" ");
 
 	if(!glyph||glyph.length==0)
-		this.buttons[name].text=document.createTextNode(name+" ");
+		this.drops[name].text=document.createTextNode(name+" ");
 
-	this.buttons[name].span=document.createElement("span");
-	this.buttons[name].ul=document.createElement("ul");
-	this.buttons[name].drops={};
+	this.drops[name].span=document.createElement("span");
+	this.drops[name].ul=document.createElement("ul");
+	this.drops[name].options={};
 
-	this.buttons[name].li.className="dropdown";
-	this.menu.ul.appendChild(this.buttons[name].li);
+	this.drops[name].li.className="dropdown";
+	this.menu.ul.appendChild(this.drops[name].li);
 
-	this.buttons[name].a.href="javascript:void(0);";
-	this.buttons[name].a.className="dropdown-toggle";
-	this.buttons[name].a.setAttribute("data-toggle","dropdown");
-	this.buttons[name].a.setAttribute("role","button");
-	this.buttons[name].a.setAttribute("aria-haspopup","true");
-	this.buttons[name].a.setAttribute("aria-expanded","false");
-	this.buttons[name].li.appendChild(this.buttons[name].a);
+	this.drops[name].a.href="javascript:void(0);";
+	this.drops[name].a.className="dropdown-toggle";
+	this.drops[name].a.setAttribute("data-toggle","dropdown");
+	this.drops[name].a.setAttribute("role","button");
+	this.drops[name].a.setAttribute("aria-haspopup","true");
+	this.drops[name].a.setAttribute("aria-expanded","false");
+	this.drops[name].li.appendChild(this.drops[name].a);
 
-	this.buttons[name].glyph.className=glyph;
-	this.buttons[name].a.appendChild(this.buttons[name].glyph);
+	this.drops[name].glyph.className=glyph;
+	this.drops[name].a.appendChild(this.drops[name].glyph);
 
-	this.buttons[name].a.appendChild(this.buttons[name].text);
+	this.drops[name].a.appendChild(this.drops[name].text);
 
-	this.buttons[name].span.className="caret";
-	this.buttons[name].a.appendChild(this.buttons[name].span);
+	this.drops[name].span.className="caret";
+	this.drops[name].a.appendChild(this.drops[name].span);
 
-	this.buttons[name].ul.className="dropdown-menu";
-	this.buttons[name].li.appendChild(this.buttons[name].ul);
+	this.drops[name].ul.className="dropdown-menu";
+	this.drops[name].li.appendChild(this.drops[name].ul);
 
-	for(var key in drops)
+	for(var key in options)
 	{
-		this.buttons[name].drops[key]={};
-		this.buttons[name].drops[key].li=document.createElement("li");
-		this.buttons[name].drops[key].a=document.createElement("a");
-		this.buttons[name].drops[key].span=document.createElement("span");
-		this.buttons[name].drops[key].text=document.createTextNode(" "+key);
-		this.buttons[name].drops[key].onclick=drops[key].onclick;
+		this.drops[name].options[key]={};
+		this.drops[name].options[key].li=document.createElement("li");
+		this.drops[name].options[key].a=document.createElement("a");
+		this.drops[name].options[key].span=document.createElement("span");
+		this.drops[name].options[key].text=document.createTextNode(" "+key);
 
-		this.buttons[name].ul.appendChild(this.buttons[name].drops[key].li);
+		this.drops[name].ul.appendChild(this.drops[name].options[key].li);
 
-		this.buttons[name].drops[key].a.href="javascript:void(0);";
-		this.buttons[name].drops[key].a.robot_menu_t=this.buttons[name].drops[key];
-		this.buttons[name].drops[key].a.click_event=drops[key].onclick;
-		this.buttons[name].drops[key].a.onclick=function()
-		{
-			if(this.robot_menu_t.li.className!="disabled")
-				this.robot_menu_t.onclick();
-		}
-		this.buttons[name].drops[key].li.appendChild(this.buttons[name].drops[key].a);
+		this.drops[name].options[key].a.href="javascript:void(0);";
+		this.drops[name].options[key].a.onclick=options[key].onclick;
+		this.drops[name].options[key].li.appendChild(this.drops[name].options[key].a);
 
-		this.buttons[name].drops[key].span.className=drops[key].glyph;
-		this.buttons[name].drops[key].a.appendChild(this.buttons[name].drops[key].span);
+		this.drops[name].options[key].span.className=options[key].glyph;
+		this.drops[name].options[key].a.appendChild(this.drops[name].options[key].span);
 
-		this.buttons[name].drops[key].a.appendChild(this.buttons[name].drops[key].text);
-
-		this.buttons[name].drops[key].disable=function()
-		{
-			this.li.className="disabled";
-		}
-
-		this.buttons[name].drops[key].enable=function()
-		{
-			this.li.className="none";
-		}
+		this.drops[name].options[key].a.appendChild(this.drops[name].options[key].text);
 	}
 }
 
