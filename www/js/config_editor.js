@@ -173,6 +173,9 @@ config_editor_t.prototype.download_m=function(robot_name)
 
 	superstar_get(robot_name,"config",function(obj)
 	{
+		if (obj==null) { // backend not connected, make fake config object
+			obj={counter:0};
+		}
 		myself.counter=obj.counter+1;
 
 		var config_text="";
