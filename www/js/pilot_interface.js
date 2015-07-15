@@ -1,10 +1,47 @@
 //Members
 //		onpilot(data) - callback triggered when pilot data needs to be sent
 
+
+
+
+// Return an "empty" robot power object, with everything stationary
+function emptyPower()
+{
+	return {L:0, R:0, dump:0, mine:0, arms:0};
+}
+function emptyLED()
+{
+ 	//return {R:this.color.rgb[0], G:this.color.rgb[1], B:this.color.rgb[3]};
+         return{On:false, Demo:false, R:0, G:0, B:0};
+}
+
+
+
+// Return the current wall clock time, in seconds
+function pilot_time() {
+	return (new Date()).getTime()/1000.0;
+}
+
+
+
 function pilot_interface_t(div)
 {
 	if(!div)
 		return null;
+	
+	this.pilot={
+		/* Power to each actuator */
+		power: emptyPower(),
+
+		/* Time, in seconds, of last pilot command */
+		time:0,
+
+		/*LED bits */
+		LED: emptyLED(),
+
+		/* Scripted command to run */
+		cmd: { run: "", arg:"" }
+	};
 
 	this.mouse_down=0;
 	this.arrowDiv=div;
@@ -63,13 +100,6 @@ function clamp(v,lo,hi) {
 	else return v;
 }
 
-
-
-// Return an "empty" robot power object, with everything stationary
-function emptyPower()
-{
-	return {L:0, R:0, dump:0, mine:0, arms:0};
-}
 
 
 // Return the drive power the user has currently selected
@@ -146,18 +176,18 @@ pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del) {
 // It's not clear a pilot needs to download data, but here it is!
 pilot_interface_t.prototype.download=function(robot_name)
 {
-	superstar_get(robot_name,"pilot",function(newPower) { this.power=newPower; });
+	superstar_get(robot_name,"pilot",function(newPilot) { this.pilot=newPilot; });
 }
 
 pilot_interface_t.prototype.upload=function(robot_name)
 {
-	superstar_set(robot_name,"pilot",this.power);
+	superstar_set(robot_name,"pilot",this.pilot);
 }
 
 // This is a simple placeholder, to get it working:
 pilot_interface_t.prototype.pilot_send=function(newPower) {
-	this.power=newPower;
-	if (this.onpilot) this.onpilot(newPower);
+	this.pilot.power=newPower;
+	if (this.onpilot) this.onpilot(this.pilot);
 };
 
 /*
