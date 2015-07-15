@@ -1,3 +1,10 @@
+/**
+  Network communication with superstar server.
+  
+  FIXME: Raise level of abstraction here, by adding something like superstar_get and/or superstar_set
+*/
+
+/// Bare XMLHttpRequest wrapper
 function send_request(method,path,request,uri,on_reply,on_error,data,content_type)
 {
 	try
@@ -18,6 +25,8 @@ function send_request(method,path,request,uri,on_reply,on_error,data,content_typ
 					else if(on_error)
 					{
 						on_error(xmlhttp.status);
+					} else {
+						throw "Network error while accessing "+path+"/"+request;
 					}
 				}
 			};
@@ -40,6 +49,51 @@ function send_request(method,path,request,uri,on_reply,on_error,data,content_typ
 	}
 	catch(e)
 	{
-		on_error(e);
+		if (on_error) {
+			on_error(e);
+		}
+		else {
+			throw e;
+		}
 	}
 }
+
+/**
+ Use superstar to set path/element=newObject
+ and then call onFinished.  
+*/
+function superstar_set(path,element,newObject,onFinished)
+{
+	send_network("GET", path, element, 
+		"?set=" + encodeURIComponent(JSON.stringify(newObject)),
+		function(replyData) { // reply OK
+			if (onFinished) onFinished(replyData);
+		},
+		undefined, // error function
+		undefined, // post data
+		"application/json"
+	);	
+}
+
+
+/**
+ Use superstar to get path/element,
+ and pass the returned object to onFinished.  
+*/
+function superstar_get(path,element,onFinished)
+{
+	send_network("GET", path, element, 
+		"?get",
+		function(replyData) { // reply OK
+			var replyObj=JSON.parse(replyData); // fixme: try/catch here
+			onFinished(replyObj);
+		},
+		undefined, // error function
+		undefined, // post data
+		"application/json"
+	);	
+}
+
+
+
+
