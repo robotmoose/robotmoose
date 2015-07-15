@@ -72,18 +72,35 @@
 			var global_name=null;
 			var div=document.getElementById("gui");
 
-			var config_editor=null;
-			var state_table=null;
-			var menu=null;
-			var gui=null;
+
+
 			var robot_clone=null;
 			var robot_connect=null;
+			var menu=null;
+			var gui=null;
+			var config_editor=null;
+			var state_table=null;
 
 
 
 
 
 
+
+
+
+			robot_clone=new modal_clone_t(div);
+
+			if(!robot_clone)
+				alert("Could not create robot clone modal!");
+
+			robot_clone.clone_target=global_name;
+			robot_clone.onclone=function(robot_name,settings)
+			{
+				if(robot_clone.clone_target)
+					for(var key in settings)
+						clone(robot_name,robot_clone.clone_target,settings[key]);
+			};
 
 
 
@@ -103,8 +120,6 @@
 					robot_clone.clone_target=global_name;
 					config_editor.download(global_name);
 					state_table.download(global_name);
-					menu.get_status_area().innerHTML="Connected to \""+global_name+"\"";
-					menu.buttons["Robot"].drops["Clone"].enable();
 				}
 			};
 
@@ -115,36 +130,6 @@
 
 
 
-
-
-
-			robot_clone=new modal_clone_t(div);
-
-			if(!robot_clone)
-				alert("Could not create robot clone modal!");
-
-			robot_clone.clone_target=global_name;
-			robot_clone.onclone=function(robot_name,settings,options)
-			{
-				console.log(robot_name);
-
-				if(robot_clone.clone_target)
-				{
-					for(var key in settings)
-						clone(robot_name,robot_clone.clone_target,settings[key]);
-
-					var connect_to_clone=false;
-
-					for(var key in options)
-					{
-						if(options[key]=="connect_to_clone")
-							connect_to_clone=true;
-					}
-
-					if(connect_to_clone)
-						clone_reconnect(robot_name);
-				}
-			};
 
 
 
@@ -189,10 +174,6 @@
 					}
 				}
 			);
-
-			menu.buttons["Robot"].drops["Clone"].disable();
-
-
 
 
 
