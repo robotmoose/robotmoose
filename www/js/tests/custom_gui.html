@@ -78,6 +78,7 @@
 			var gui=null;
 			var config_editor=null;
 			var state_table=null;
+			var pilot_interface=null;
 
 
 
@@ -202,8 +203,12 @@
 			if(!gui)
 				alert("Could not create gui!");
 
-			gui.load([{"title":"Configuration","x":460,"y":240,"active":false,"minimized":false},
-				{"title":"States","x":1000,"y":0,"active":true,"minimized":false}]);
+			gui.load
+			([
+				{"title":"Configuration","x":460,"y":240,"active":false,"minimized":false},
+				{"title":"States","x":1000,"y":0,"active":false,"minimized":false},
+				{"title":"Pilot","x":200,"y":100,"active":true,"minimized":false}
+			]);
 
 
 
@@ -247,6 +252,10 @@
 				gui.create_window("States",0,0);
 
 			state_table=new state_table_t(gui.get_window("States").body.content);
+
+			if(!state_table)
+				alert("Could not create state table!");
+
 			state_table.onrefresh=function(){gui.refresh_windows_m();};
 			state_table.onrun=function()
 			{
@@ -254,8 +263,29 @@
 					state_table.upload(global_name);
 			}
 
-			if(!state_table)
-				alert("Could not create state table!");
+
+
+
+
+
+
+
+
+
+
+			if(!gui.get_window("Pilot"))
+				gui.create_window("Pilot",0,0);
+
+			pilot_interface=new pilot_interface_t(gui.get_window("Pilot").body.content);
+
+			if(!pilot_interface)
+				alert("Could not create pilot interface!");
+
+			pilot_interface.onpilot=function(data)
+			{
+				if(global_name)
+					console.log("Pilot! - "+data);
+			}
 		</script>
 	</body>
 </html>
