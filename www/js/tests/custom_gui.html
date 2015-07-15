@@ -9,6 +9,8 @@
 		</div>
 
 		<script type="text/javascript">
+			var cloned=false;
+
 			function clone(to,from,setting)
 			{
 				try
@@ -21,9 +23,11 @@
 								send_request("GET","/superstar/"+to,setting,"?set="+response,
 									function(response)
 									{
+										cloned=true;
 									},
 									function(error)
 									{
+										cloned=true;
 										throw error;
 									},
 									"application/json");
@@ -35,6 +39,7 @@
 						},
 						function(error)
 						{
+							cloned=true;
 							throw error;
 						},
 						"application/json");
@@ -44,6 +49,25 @@
 					console.log("clone::download() - "+error);
 				}
 			}
+
+			function clone_reconnect(robot_name)
+			{
+				if(cloned)
+					robot_connect.onconnect(robot_name);
+				else
+					setTimeout(function(){clone_reconnect(robot_name);},50);
+			}
+
+
+
+
+
+
+
+
+
+
+
 
 			var global_name=null;
 			var div=document.getElementById("gui");
@@ -84,18 +108,61 @@
 				}
 			};
 
+
+
+
+
+
+
+
+
+
+
 			robot_clone=new modal_clone_t(div);
 
 			if(!robot_clone)
 				alert("Could not create robot clone modal!");
 
 			robot_clone.clone_target=global_name;
-			robot_clone.onclone=function(robot_name,settings)
+			robot_clone.onclone=function(robot_name,settings,options)
 			{
+				console.log(robot_name);
+
 				if(robot_clone.clone_target)
+				{
 					for(var key in settings)
 						clone(robot_name,robot_clone.clone_target,settings[key]);
+
+					var connect_to_clone=false;
+
+					for(var key in options)
+					{
+						if(options[key]=="connect_to_clone")
+							connect_to_clone=true;
+					}
+
+					if(connect_to_clone)
+						clone_reconnect(robot_name);
+				}
 			};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			menu=new robot_menu_t(div);
 
@@ -130,6 +197,8 @@
 
 
 
+
+
 			gui=new doorways_t(div);
 
 			if(!gui)
@@ -138,15 +207,21 @@
 			gui.load([{"title":"Configuration","x":460,"y":240,"active":false,"minimized":false},
 				{"title":"States","x":1000,"y":0,"active":true,"minimized":false}]);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 			if(!gui.get_window("Configuration"))
 				gui.create_window("Configuration",10,0);
-
-
-
-
-
-
-
 
 			config_editor=new config_editor_t(gui.get_window("Configuration").body.content,global_name);
 
@@ -159,6 +234,16 @@
 				if(global_name)
 					config_editor.upload(global_name);
 			}
+
+
+
+
+
+
+
+
+
+
 
 			if(!gui.get_window("States"))
 				gui.create_window("States",0,0);

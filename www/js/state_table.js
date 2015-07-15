@@ -70,13 +70,13 @@ state_table_t.prototype.download=function(robot_name)
 			},
 			function(error)
 			{
-				throw error;
+				console.log("state_table_t::download() - XMLHTTP returned "+error);
 			},
 			"application/json");
 	}
 	catch(error)
 	{
-		console.log("state_table_t::download() - "+error);
+		console.log("state_table_t::download() - XMLHTTP returned "+error);
 	}
 }
 
@@ -111,13 +111,13 @@ state_table_t.prototype.upload=function(robot_name)
 			},
 			function(error)
 			{
-				throw error;
+				console.log("state_table_t::upload() - XMLHTTP returned "+error);
 			},
 			"application/json");
 	}
 	catch(error)
 	{
-		console.log("state_table_t::upload() - "+error);
+		console.log("state_table_t::upload() - XMLHTTP returned "+error);
 	}
 }
 

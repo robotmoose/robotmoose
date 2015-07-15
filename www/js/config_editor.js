@@ -88,13 +88,13 @@ config_editor_t.prototype.download=function(robot_name)
 			},
 			function(error)
 			{
-				throw error;
+				console.log("config_editor_t::download() - XMLHTTP returned "+error);
 			},
 			"application/json");
 		}
 		catch(error)
 		{
-			console.log("config_editor_t::download() - "+error);
+			console.log("config_editor_t::download() - XMLHTTP returned "+error);
 		}
 }
 
@@ -139,7 +139,7 @@ config_editor_t.prototype.upload=function(robot_name)
 			},
 			function(error)
 			{
-				throw error;
+				console.log("config_editor_t::upload() - XMLHTTP returned "+error);
 			},
 			"application/json");
 	}
@@ -236,13 +236,13 @@ config_editor_t.prototype.download_m=function(robot_name)
 			},
 			function(error)
 			{
-				throw error;
+				console.log("config_editor_t::download_m() - XMLHTTP returned "+error);
 			},
 			"application/json");
 	}
 	catch(error)
 	{
-		console.log("config_editor_t::download_m() - "+error);
+		console.log("config_editor_t::download_m() - XMLHTTP returned "+error);
 	}
 }
 

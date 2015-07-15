@@ -1,6 +1,6 @@
 //Members
-//		clone_target - name of robot to clone (set before calling show)
-//		onclone(name,settings) - triggered when clone button is hit
+//		clone_target - variable that is the name of the robot to clone (set before calling show)
+//		onclone(name,settings,options) - callback triggered when clone button is hit
 
 function modal_clone_t(div)
 {
@@ -20,6 +20,10 @@ function modal_clone_t(div)
 	this.settings.buttons={};
 	this.settings.buttons.select_all=document.createElement("input");
 	this.settings.buttons.select_none=document.createElement("input");
+	this.options={};
+	this.options.text=document.createTextNode("Options:");
+	this.options.div=document.createElement("div");
+	this.options.checkboxes=[];
 	this.clone_button=document.createElement("input");
 	this.cancel_button=document.createElement("input");
 
@@ -87,6 +91,18 @@ function modal_clone_t(div)
 	this.settings.buttons.select_none.onclick=function(){myself.select_none_m();};
 	this.modal.get_content().appendChild(this.settings.buttons.select_none);
 
+	this.modal.get_content().appendChild(document.createElement("br"));
+	this.modal.get_content().appendChild(document.createElement("br"));
+
+	this.modal.get_content().appendChild(this.options.text);
+
+	this.options.div.style.marginLeft=10;
+	this.modal.get_content().appendChild(this.options.div);
+
+	this.create_checkbox_m("Connect to new clone",this.options,"connect_to_clone");
+
+	this.modal.get_content().appendChild(document.createElement("br"));
+
 	this.clone_button.type="button";
 	this.clone_button.className="btn btn-primary";
 	this.clone_button.disabled=true;
@@ -106,6 +122,7 @@ modal_clone_t.prototype.show=function()
 	this.modal.set_title("Clone Robot \""+this.clone_target+"\"");
 	this.clone_info.has_typed=false;
 	this.clone_info.input.value="";
+	this.clone_button.disabled=true;
 	this.set_input_normal_m();
 	this.build_checkboxes_m();
 	this.modal.show();
@@ -123,10 +140,30 @@ modal_clone_t.prototype.onclone_m=function()
 		var settings=[];
 
 		for(var key in this.settings.checkboxes)
+		{
 			if(this.settings.checkboxes[key].box.checked)
-				settings.push(this.settings.checkboxes[key].value);
+			{
+				if(this.settings.checkboxes[key].optional_value)
+					settings.push(this.settings.checkboxes[key].optional_value);
+				else
+					settings.push(this.settings.checkboxes[key].value);
+			}
+		}
 
-		this.onclone(this.clone_info.input.value,settings);
+		var options=[];
+
+		for(var key in this.options.checkboxes)
+		{
+			if(this.options.checkboxes[key].box.checked)
+			{
+				if(this.options.checkboxes[key].optional_value)
+					options.push(this.options.checkboxes[key].optional_value);
+				else
+					options.push(this.options.checkboxes[key].value);
+			}
+		}
+
+		this.onclone(this.clone_info.input.value,settings,options);
 	}
 
 	this.hide();
@@ -156,7 +193,7 @@ modal_clone_t.prototype.build_checkboxes_m=function()
 				settings.sort();
 
 				for(var key in settings)
-					myself.create_checkbox_m(settings[key]);
+					myself.create_checkbox_m(settings[key],myself.settings);
 
 				if(myself.settings.checkboxes.length>0)
 				{
@@ -166,19 +203,20 @@ modal_clone_t.prototype.build_checkboxes_m=function()
 			},
 			function(error)
 			{
-				throw error;
+				console.log("modal_clone_t::build_checkboxes_m() - XMLHTTP returned "+error);
 			},
 			"application/json");
 	}
 	catch(error)
 	{
-		console.log("modal_clone_t::build_checkboxes_m() - "+error);
+		console.log("modal_clone_t::build_checkboxes_m() - XMLHTTP returned "+error);
 	}
 }
 
-modal_clone_t.prototype.create_checkbox_m=function(value)
+modal_clone_t.prototype.create_checkbox_m=function(value,container,optional_value)
 {
 	var checkbox={};
+	checkbox.optional_value=optional_value;
 	checkbox.value=value;
 	checkbox.box=document.createElement("input");
 	checkbox.text=document.createTextNode(" "+value);
@@ -186,13 +224,13 @@ modal_clone_t.prototype.create_checkbox_m=function(value)
 
 	checkbox.box.type="checkbox";
 	checkbox.box.checked=true;
-	this.settings.div.appendChild(checkbox.box);
+	container.div.appendChild(checkbox.box);
 
-	this.settings.div.appendChild(checkbox.text);
+	container.div.appendChild(checkbox.text);
 
-	this.settings.div.appendChild(checkbox.br);
+	container.div.appendChild(checkbox.br);
 
-	this.settings.checkboxes.push(checkbox);
+	container.checkboxes.push(checkbox);
 }
 
 modal_clone_t.prototype.select_all_m=function()
@@ -231,13 +269,13 @@ modal_clone_t.prototype.check_exists_m=function(name)
 			},
 			function(error)
 			{
-				throw error;
+				console.log("modal_clone_t::check_exists_m() - XMLHTTP returned "+error);
 			},
 			"application/json");
 	}
 	catch(error)
 	{
-		console.log("modal_clone_t::show() - "+error);
+		console.log("modal_clone_t::check_exists_m() - XMLHTTP returned "+error);
 	}
 }
 
