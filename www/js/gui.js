@@ -1,3 +1,8 @@
+/**
+  This is an OLD version of the window managing;
+  the modern version is "doorways.js".  (2015-07)
+*/
+
 var gui_t_grid_size=64;
 
 function gui_t(div,widgets)

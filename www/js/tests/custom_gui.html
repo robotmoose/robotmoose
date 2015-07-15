@@ -223,8 +223,7 @@
 
 
 
-			if(!gui.get_window("Configuration"))
-				gui.create_window("Configuration",10,0);
+			gui.create_window("Configuration",10,0);
 
 			config_editor=new config_editor_t(gui.get_window("Configuration").body.content,global_name);
 
@@ -273,18 +272,18 @@
 
 
 
-			if(!gui.get_window("Pilot"))
-				gui.create_window("Pilot",0,0);
+			gui.create_window("Pilot",0,0);
 
 			pilot_interface=new pilot_interface_t(gui.get_window("Pilot").body.content);
 
 			if(!pilot_interface)
 				alert("Could not create pilot interface!");
 
-			pilot_interface.onpilot=function(data)
+			pilot_interface.onpilot=function(power)
 			{
+				console.log("Pilot! - "+JSON.stringify(power));
 				if(global_name)
-					console.log("Pilot! - "+data);
+					pilot_interface.upload(global_name);
 			}
 		</script>
 	</body>
