@@ -2,6 +2,8 @@
 // cauld@alaska.edu or clayauld@gmail.com
 // Nov 20, 2014
 
+// ITEST Battery Management System for Layla telepresence platform. This BMS system is based on the Linear LTC6803-2 chip.
+
 #include <SPI.h> 
 #include <Wire.h>
 #include <stdlib.h>
@@ -92,6 +94,7 @@ void setup()
 
   SPI.begin();          // Start SPI 
   Serial.begin(115200);   // Open serial port
+  Serial.println("Setup Done");
 //---------------------------------------------------------------------------------------------------------------------
 
 // I2C configs
