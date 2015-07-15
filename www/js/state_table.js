@@ -55,29 +55,11 @@ state_table_t.prototype.download=function(robot_name)
 	this.run_button.disabled=false;
 	this.add_button.disabled=false;
 
-	try
+	superstar_get(robot_name,"states",function(obj)
 	{
-		send_request("GET","/superstar/"+robot_name,"states","?get",
-			function(response)
-			{
-				if(response)
-				{
-					var obj=JSON.parse(response);
-
-					for(var key in obj)
-						myself.create_entry(obj[key].name,obj[key].code);
-				}
-			},
-			function(error)
-			{
-				console.log("state_table_t::download() - XMLHTTP returned "+error);
-			},
-			"application/json");
-	}
-	catch(error)
-	{
-		console.log("state_table_t::download() - XMLHTTP returned "+error);
-	}
+		for(var key in obj)
+			myself.create_entry(obj[key].name,obj[key].code);
+	});
 }
 
 state_table_t.prototype.upload=function(robot_name)
@@ -85,40 +67,22 @@ state_table_t.prototype.upload=function(robot_name)
 	if(!robot_name)
 		return;
 
+	var data=[];
+
 	this.get_entries();
 
-	try
+	for(var key in this.entries)
 	{
-		var data=[];
-
-		this.get_entries();
-
-		for(var key in this.entries)
+		if(this.entries[key])
 		{
-			if(this.entries[key])
-			{
-				var obj={};
-				obj.name=this.entries[key].input.value;
-				obj.code=this.entries[key].code_editor.getValue();
-				data.push(obj);
-			}
+			var obj={};
+			obj.name=this.entries[key].input.value;
+			obj.code=this.entries[key].code_editor.getValue();
+			data.push(obj);
 		}
+	}
 
-		send_request("GET","/superstar/"+robot_name,"states",
-			"?set="+encodeURIComponent(JSON.stringify(data)),
-			function(response)
-			{
-			},
-			function(error)
-			{
-				console.log("state_table_t::upload() - XMLHTTP returned "+error);
-			},
-			"application/json");
-	}
-	catch(error)
-	{
-		console.log("state_table_t::upload() - XMLHTTP returned "+error);
-	}
+	superstar_set(robot_name,"states",data);
 }
 
 state_table_t.prototype.get_entries=function()

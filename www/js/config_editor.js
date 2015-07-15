@@ -73,29 +73,11 @@ config_editor_t.prototype.download=function(robot_name)
 
 	var myself=this;
 
-	try
+	superstar_get(robot_name,"options",function(options)
 	{
-		send_request("GET","/superstar/"+robot_name,"options","?get",
-			function(response)
-			{
-				if(response)
-				{
-					var options=JSON.parse(response);
-					myself.get_options_m(options);
-				}
-
-				myself.download_m(robot_name);
-			},
-			function(error)
-			{
-				console.log("config_editor_t::download() - XMLHTTP returned "+error);
-			},
-			"application/json");
-		}
-		catch(error)
-		{
-			console.log("config_editor_t::download() - XMLHTTP returned "+error);
-		}
+		myself.get_options_m(options);
+		myself.download_m(robot_name);
+	});
 }
 
 config_editor_t.prototype.upload=function(robot_name)
@@ -105,48 +87,32 @@ config_editor_t.prototype.upload=function(robot_name)
 
 	this.get_entries();
 
-	try
+	var data={};
+	data.counter=this.counter++;
+	data.configs=[];
+
+	this.get_entries();
+
+	for(var key in this.entries)
 	{
-		var data={};
-		data.counter=this.counter++;
-		data.configs=[];
-
-		this.get_entries();
-
-		for(var key in this.entries)
+		if(this.entries[key])
 		{
-			if(this.entries[key])
+			var str=this.entries[key].type+"(";
+
+			for(var ii=0;ii<this.entries[key].args.length;++ii)
 			{
-				var str=this.entries[key].type+"(";
+				str+=this.entries[key].args[ii].options[this.entries[key].args[ii].selectedIndex].value;
 
-				for(var ii=0;ii<this.entries[key].args.length;++ii)
-				{
-					str+=this.entries[key].args[ii].options[this.entries[key].args[ii].selectedIndex].value;
-
-					if(ii+1!=this.entries[key].args.length)
-						str+=",";
-				}
-
-				str+=");";
-				data.configs.push(str);
+				if(ii+1!=this.entries[key].args.length)
+					str+=",";
 			}
-		}
 
-		send_request("GET","/superstar/"+robot_name,"config",
-			"?set="+encodeURIComponent(JSON.stringify(data)),
-			function(response)
-			{
-			},
-			function(error)
-			{
-				console.log("config_editor_t::upload() - XMLHTTP returned "+error);
-			},
-			"application/json");
+			str+=");";
+			data.configs.push(str);
+		}
 	}
-	catch(error)
-	{
-		console.log("config_editor_t::upload() - "+error);
-	}
+
+	superstar_set(robot_name,"config",data);
 }
 
 config_editor_t.prototype.get_entries=function()
@@ -205,45 +171,27 @@ config_editor_t.prototype.download_m=function(robot_name)
 
 	this.entries=[];
 
-	try
+	superstar_get(robot_name,"config",function(obj)
 	{
-		send_request("GET","/superstar/"+robot_name,"config","?get",
-			function(response)
-			{
-				if(response)
-				{
-					var obj=JSON.parse(response);
+		myself.counter=obj.counter+1;
 
-					myself.counter=obj.counter+1;
+		var config_text="";
 
-					var config_text="";
+		for(var key in obj.configs)
+			config_text+=obj.configs[key]+"\n";
 
-					for(var key in obj.configs)
-						config_text+=obj.configs[key]+"\n";
+		var configs=myself.lex_m(config_text);
 
-					var configs=myself.lex_m(config_text);
+		for(var key in configs)
+		{
+			var lookup=myself.find_option_m(configs[key]);
 
-					for(var key in configs)
-					{
-						var lookup=myself.find_option_m(configs[key]);
-
-						if(lookup)
-							myself.create_entry(configs[key].type,lookup.args,configs[key].args);
-						else
-							console.log("Invalid tabula config: "+configs[key].type+"("+configs[key].args+");");
-					}
-				}
-			},
-			function(error)
-			{
-				console.log("config_editor_t::download_m() - XMLHTTP returned "+error);
-			},
-			"application/json");
-	}
-	catch(error)
-	{
-		console.log("config_editor_t::download_m() - XMLHTTP returned "+error);
-	}
+			if(lookup)
+				myself.create_entry(configs[key].type,lookup.args,configs[key].args);
+			else
+				console.log("Invalid tabula config: "+configs[key].type+"("+configs[key].args+");");
+		}
+	});
 }
 
 config_editor_t.prototype.create_entry_m=function(entry,type,arg_types,arg_values)
@@ -528,6 +476,8 @@ config_editor_t.prototype.find_option_m=function(option)
 
 config_editor_t.prototype.get_options_m=function(options)
 {
+	console.log(options);
+
 	for(var key in this.tabula.select.options)
 		if(this.tabula.select.options[key].element)
 			this.tabula.select.element.removeChild(this.tabula.select.options[key].element);
