@@ -42,6 +42,7 @@
 			var config_editor=null;
 			var state_table=null;
 			var pilot_interface=null;
+			var doorways={};
 
 
 
@@ -58,6 +59,11 @@
 				superstar_get(robot_name,"gui",function(json)
 				{
 					gui.load(json);
+					create_doorways();
+					create_widgets();
+					robot_clone.clone_target=global_name;
+					config_editor.download(global_name);
+					state_table.download(global_name);
 					gui_interval=setInterval(gui_upload,1000);
 				});
 			}
@@ -131,9 +137,6 @@
 						clearInterval(gui_interval);
 						gui_interval=null;
 						global_name=robot_name;
-						robot_clone.clone_target=global_name;
-						config_editor.download(global_name);
-						state_table.download(global_name);
 						menu.get_status_area().innerHTML="Connected to \""+global_name+"\"";
 						menu.buttons["Robot"].drops["Clone"].enable();
 						gui_download();
@@ -169,15 +172,33 @@
 					alert("Could not create gui!");
 			}
 
-			function create_windows()
+			function create_doorways()
 			{
-				gui.create_window("Configuration",0,0);
-				gui.create_window("States",0,0);
-				gui.create_window("Pilot",0,0);
+				delete doorways.config;
+				delete doorways.states;
+				delete doorways.pilot;
 
-				config_editor=new config_editor_t(gui.get_window("Configuration").body.content,global_name);
-				state_table=new state_table_t(gui.get_window("States").body.content);
-				pilot_interface=new pilot_interface_t(gui.get_window("Pilot").body.content);
+				doorways.config=gui.get_by_title("Configuration");
+				doorways.states=gui.get_by_title("States");
+				doorways.pilot=gui.get_by_title("Pilot");
+
+				if(!doorways.config)
+					doorways.config=gui.create("Configuration");
+				if(!doorways.states)
+					doorways.states=gui.create("States");
+				if(!doorways.pilot)
+					doorways.pilot=gui.create("Pilot");
+			}
+
+			function create_widgets()
+			{
+				delete config_editor;
+				delete state_table;
+				delete pilot_interface;
+
+				config_editor=new config_editor_t(doorways.config.content,global_name);
+				state_table=new state_table_t(doorways.states.content);
+				pilot_interface=new pilot_interface_t(doorways.pilot.content);
 
 				if(!config_editor)
 					alert("Could not create config editor!");
@@ -185,9 +206,6 @@
 					alert("Could not create state table!");
 				if(!pilot_interface)
 					alert("Could not create pilot interface!");
-
-				config_editor.onrefresh=function(){gui.refresh_windows_m();};
-				state_table.onrefresh=function(){gui.refresh_windows_m();};
 
 				config_editor.onconfigure=function()
 				{
@@ -209,7 +227,6 @@
 
 			create_menus();
 			create_gui();
-			create_windows();
 		</script>
 	</body>
 </html>

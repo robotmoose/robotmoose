@@ -6,229 +6,408 @@ function doorways_t(div)
 	var myself=this;
 	this.div=div;
 	this.element=document.createElement("div");
-	this.draggable=true;
-	this.dragging=null;
-	this.mouse_x=0;
-	this.mouse_y=0;
-	this.offset_x=0;
-	this.offset_y=0;
-	this.windows={};
-	this.menu={};
-	this.menu.bar=document.createElement("ul");
 
-	this.menu.show_desktop=this.create_menu_button_m
-	(
-		"glyphicon glyphicon-eye-close",
-		function(event){myself.hide_all_windows();},
-		"Click here to hide all windows."
-	);
+	this.dragging=
+	{
+		on:false,
+		doorway:null,
+		mouse:
+		{
+			x:null,
+			y:null
+		},
+		offset:
+		{
+			x:null,
+			y:null
+		}
+	};
+
+	this.doorways=[];
+	this.menu=document.createElement("ul");
 
 	this.div.appendChild(this.element);
 
-	this.menu.bar.className="nav nav-tabs";
-	this.element.appendChild(this.menu.bar);
+	this.menu.className="nav nav-tabs";
+	this.element.appendChild(this.menu);
 
-	document.onmousemove=function(event){return myself.mouse_move_m(event);};
-	document.onmouseup=function(event){return myself.mouse_up_m(event);};
-	window.onblur=function(event){myself.mouse_up_m(event);myself.draggable=true;};
-	window.onresize=function(event){myself.refresh_windows_m();};
+	this.create_menu_button
+	(
+		"glyphicon glyphicon-eye-close",
+		function(event){myself.hide_all();},
+		"Click here to hide all windows."
+	);
+
+	document.onmousemove=function(event){return myself.onmousemove(event);};
+	document.onmouseup=function(event){return myself.onmouseup(event);};
+	window.onblur=function(event){myself.onblur(event);};
+	window.onresize=function(event){myself.onresize(event)};
 }
 
 doorways_t.prototype.save=function()
 {
 	var data=[];
 
-
-	for(var key in this.windows)
+	for(var key in this.doorways)
 	{
-		var obj={};
-		obj.title=key;
-		obj.x=parseInt(this.windows[key].window.style.left)-this.element.offsetLeft;
-		obj.y=parseInt(this.windows[key].window.style.top)-this.element.offsetTop-this.menu.bar.offsetHeight;
-		obj.z=parseInt(this.windows[key].window.style.zIndex);
-		obj.active=this.windows[key].active;
-		obj.minimized=this.windows[key].minimized;
-
-		if(!obj.x)
-			obj.x=0;
-
-		if(!obj.y)
-			obj.y=0;
-
-		if(!obj.z)
-			obj.z=0;
+		var obj=
+		{
+			title:this.doorways[key].title,
+			x:this.doorways[key].pos.x,
+			y:this.doorways[key].pos.y,
+			z:parseInt(this.doorways[key].panel.style.zIndex),
+			active:this.doorways[key].active,
+			minimized:this.doorways[key].minimized
+		};
 
 		data.push(obj);
 	}
+
+	data.sort(function(lhs,rhs){return lhs.z-rhs.z;});
 
 	return data;
 }
 
 doorways_t.prototype.load=function(data)
 {
-	if(!data)
-		return;
+	this.remove_all();
 
-	for(key in data)
+	data.sort(function(lhs,rhs){return lhs.z-rhs.z;});
+
+	for(var key in data)
 	{
-		var obj=data[key];
+		var temp=this.create(data[key].title,{x:data[key].x,y:data[key].y});
 
-		if(obj.title!=null&&obj.x!=null&&obj.y!=null&&obj.z!=null&&obj.active!=null&&obj.minimized!=null)
-		{
-			if(!this.windows[data[key].title])
-			{
-				this.create_window_m(obj.title,obj.x,obj.y,obj.active,obj.minimized);
-				this.windows[obj.title].window.style.zIndex=obj.z;
-			}
-			else
-			{
-				var myself=this;
+		if(data[key].active)
+			this.activate(temp);
+		else
+			this.deactivate(temp);
 
-				//Ugly forcing code...
-				var force_move=function()
-				{
-					var x=parseInt(myself.windows[obj.title].window.style.left)-
-						parseInt(myself.element.offsetLeft);
-					var y=parseInt(myself.windows[obj.title].window.style.top)-
-						parseInt(myself.element.offsetTop)-parseInt(myself.menu.bar.offsetHeight);
-
-					if(!x)
-						x=0;
-					if(!y)
-						y=0;
-
-					if(x!=obj.x||y!=obj.y)
-						setTimeout(force_move,100);
-
-					myself.move_window(obj.title,obj.x,obj.y);
-
-					myself.windows[obj.title].window.style.zIndex=obj.z;
-				};
-			}
-
-			force_move();
-		}
+		if(data[key].minimized)
+			this.minimize(temp);
 	}
+}
 
-	for(key in data)
-	{
-		var obj=data[key];
-
-		if(obj.title!=null&&obj.x!=null&&obj.y!=null&&obj.active!=null&&obj.minimized!=null)
-		{
-			this.set_menu_item_active(obj.title,obj.active);
-			this.minimize_m(obj.title,obj.minimized);
-		}
-	}
-
-	this.refresh_windows_m();
-
-	//Hack to get refresh windows to be called when the windows are finally done loading...
+doorways_t.prototype.create=function(title,pos)
+{
 	var myself=this;
-	setTimeout(function(){myself.refresh_windows_m();},100);
-	setTimeout(function(){myself.refresh_windows_m();},500);
+
+	var doorway=
+	{
+		active:true,
+		minimized:false,
+		title:title,
+		panel:document.createElement("div"),
+		bar:document.createElement("div"),
+		heading:document.createElement("h3"),
+		minimize:document.createElement("span"),
+		content:document.createElement("div"),
+		tab:
+		{
+			li:document.createElement("li"),
+			a:document.createElement("a")
+		},
+		pos:
+		{
+			x:0,
+			y:0
+		},
+		z:0
+	};
+
+	doorway.tab.li.setAttribute("role","presentation");
+	this.menu.appendChild(doorway.tab.li);
+
+	doorway.tab.a.doorways_t=doorway;
+	doorway.tab.a.innerHTML=title;
+	doorway.tab.a.href="javascript:void(0);";
+	doorway.tab.a.onclick=function(){myself.activate(this.doorways_t);};
+	doorway.tab.li.appendChild(doorway.tab.a);
+
+	doorway.panel.className="panel panel-primary";
+	doorway.panel.style.position="absolute";
+	this.element.appendChild(doorway.panel);
+
+	doorway.bar.className="panel-heading";
+	doorway.bar.style.cursor="move";
+	doorway.bar.doorways_t=doorway;
+	doorway.bar.onmousedown=function(event)
+	{
+		return myself.onmousedown(event,doorway);
+	};
+	doorway.panel.appendChild(doorway.bar);
+
+	doorway.minimize.className="glyphicon glyphicon-minus-sign";
+	doorway.minimize.style.cursor="pointer";
+	doorway.minimize.style.float="right";
+	doorway.minimize.doorways_t=doorway;
+	doorway.minimize.onclick=function(event)
+	{
+		myself.minimize(this.doorways_t);
+	};
+	doorway.bar.appendChild(doorway.minimize);
+
+	doorway.heading.className="panel-title";
+	doorway.heading.innerHTML=title;
+	doorway.bar.appendChild(doorway.heading);
+
+	doorway.content.className="panel-body";
+	doorway.content.doorways_t=doorway;
+	doorway.content.onclick=function(){myself.activate(this.doorways_t);};
+	doorway.panel.appendChild(doorway.content);
+
+	this.activate(doorway);
+	this.move(doorway,pos);
+
+	this.doorways.push(doorway);
+	return doorway;
 }
 
-doorways_t.prototype.create_window=function(title,x,y,active,minimized)
+doorways_t.prototype.get_by_title=function(title)
 {
-	if(!title)
-		return null;
+	for(var key in this.doorways)
+		if(this.doorways[key].title==title)
+			return this.doorways[key];
 
-	if(!this.windows[title])
+	return null;
+}
+
+doorways_t.prototype.move=function(doorway,pos)
+{
+	if(!doorway)
+		return;
+
+	if(pos)
 	{
-		this.create_window_m(title,x,y,active,minimized);
-		this.refresh_windows_m();
+		doorway.pos.x=pos.x;
+		doorway.pos.y=pos.y;
+	}
+
+	this.constrain(doorway);
+
+	doorway.panel.style.left=doorway.pos.x;
+	doorway.panel.style.top=doorway.pos.y;
+}
+
+doorways_t.prototype.remove=function(doorway)
+{
+	for(var key in this.doorways)
+	{
+		if(this.doorways[key]===doorway)
+		{
+			this.element.removeChild(doorway.panel);
+			this.menu.removeChild(doorway.tab.li);
+			delete this.doorways[key];
+			break;
+		}
 	}
 }
 
-doorways_t.prototype.get_window=function(title)
+doorways_t.prototype.minimize=function(doorway,value)
 {
-	if(!title)
-		return null;
-
-	if(!this.windows[title])
-		return null;
-
-	return this.windows[title];
-}
-
-doorways_t.prototype.move_window=function(title,x,y)
-{
-	if(!title)
+	if(!doorway)
 		return;
 
-	if(!this.windows[title])
-		return;
+	if(!value&&value!=false)
+		value=true;
 
-	var obj={};
-	obj.title=title;
-	obj.x=x;
-	obj.y=y;
-
-	obj=this.constrain_window_m(obj);
-
-	this.windows[title].window.style.left=obj.x;
-	this.windows[title].window.style.top=obj.y;
-}
-
-doorways_t.prototype.remove_window=function(title)
-{
-	if(!title)
-		return;
-
-	if(!this.windows[title])
-		return;
-
-	this.element.removeChild(this.windows[title].window);
-	this.menu.bar.removeChild(this.windows[title].menu.li);
-	delete this.windows[title];
-}
-
-doorways_t.prototype.minimize=function(title,value)
-{
-	this.minimize_m(title,value);
-	this.refresh_windows_m();
-}
-
-doorways_t.prototype.hide_all_windows=function()
-{
-	for(var key in this.windows)
-		this.minimize(key,true);
-}
-
-doorways_t.prototype.deactivate_all_windows=function()
-{
-	for(var key in this.windows)
-		this.windows[key].active=false;
-
-	this.refresh_windows_m();
-}
-
-doorways_t.prototype.set_menu_item_active=function(title,value)
-{
-	if(!title)
-		return;
-
-	if(!this.windows[title])
-		return;
-
-	this.windows[title].active=false;
+	this.deactivate(doorway);
+	doorway.minimized=value;
 
 	if(value)
-	{
-		for(var key in this.windows)
-			this.windows[key].active=false;
-
-		this.windows[title].active=true;
-		this.windows[title].minimized=false;
-	}
-
-	this.refresh_windows_m();
+		doorway.panel.style.visibility="hidden";
+	else
+		doorway.panel.style.visibility="visible";
 }
 
-doorways_t.prototype.create_menu_button_m=function(glyph,onclick,tooltip)
+doorways_t.prototype.activate=function(doorway)
 {
-	var myself=this;
+	this.deactivate_all();
+
+	if(!doorway)
+		return;
+
+	this.minimize(doorway,false);
+	doorway.active=true;
+	doorway.panel.className="panel panel-primary";
+	doorway.panel.style.zIndex=this.doorways.length+1;
+	doorway.tab.li.className="active";
+	this.update_zindicies();
+}
+
+doorways_t.prototype.deactivate=function(doorway)
+{
+	if(!doorway)
+		return;
+
+	doorway.active=false;
+	doorway.panel.className="panel panel-default";
+	doorway.tab.li.className="";
+}
+
+doorways_t.prototype.remove_all=function()
+{
+	for(var key in this.doorways)
+		this.remove(this.doorways[key]);
+
+	this.doorways.length=0;
+}
+
+doorways_t.prototype.hide_all=function()
+{
+	for(var key in this.doorways)
+		this.minimize(this.doorways[key]);
+}
+
+doorways_t.prototype.deactivate_all=function()
+{
+	for(var key in this.doorways)
+		this.deactivate(this.doorways[key]);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+doorways_t.prototype.onmousedown=function(event,doorway)
+{
+	if(!this.dragging.on&&!this.dragging.doorway&&doorway)
+	{
+		this.dragging.on=true;
+		this.dragging.doorway=doorway;
+		var offset_left=-parseInt(this.dragging.doorway.panel.offsetLeft);
+		var offset_top=-parseInt(this.dragging.doorway.panel.offsetTop);
+
+		if(!offset_left)
+			offset_left=0;
+		if(!offset_top)
+			offset_top=0;
+
+		offset_left+=this.dragging.mouse.x;
+		offset_top+=this.dragging.mouse.y;
+
+		this.dragging.offset.x=offset_left;
+		this.dragging.offset.y=offset_top;
+		this.activate(doorway);
+	}
+
+	return false;
+}
+
+doorways_t.prototype.onmousemove=function(event)
+{
+	this.dragging.mouse.x=event.pageX;
+	this.dragging.mouse.y=event.pageY;
+
+	if(document.all)
+	{
+		this.dragging.mouse.x=window.event.clientX;
+		this.dragging.mouse.y=window.event.clientY;
+	}
+
+	var pos=
+	{
+		x:this.dragging.mouse.x-this.dragging.offset.x,
+		y:this.dragging.mouse.y-this.dragging.offset.y
+	};
+
+	this.move(this.dragging.doorway,pos);
+
+	if((event.buttons%2)==0)
+		this.onmouseup(event);
+
+	return false;
+}
+
+doorways_t.prototype.onmouseup=function(event)
+{
+	this.dragging.on=false;
+	this.dragging.doorway=null;
+	return false;
+}
+
+doorways_t.prototype.onblur=function(event)
+{
+	this.onmouseup(event);
+}
+
+doorways_t.prototype.onresize=function(event)
+{
+	for(var key in this.doorways)
+		this.move(this.doorways[key]);
+}
+
+doorways_t.prototype.constrain=function(doorway)
+{
+	if(!doorway)
+		return;
+
+	var view_width=window.innerWidth;
+	var view_height=window.innerHeight;
+
+	var width=doorway.panel.offsetWidth;
+	var height=doorway.panel.offsetHeight;
+
+	var right=doorway.pos.x+width;
+	var bottom=doorway.pos.y+height;
+
+	var x_diff=view_width-right;
+	var y_diff=view_height-bottom;
+
+	if(x_diff<0)
+		doorway.pos.x+=x_diff;
+	if(doorway.pos.x<this.offset_left())
+		doorway.pos.x=this.offset_left();
+
+	if(y_diff<0)
+		doorway.pos.y+=y_diff;
+	if(doorway.pos.y<this.offset_top())
+		doorway.pos.y=this.offset_top();
+}
+
+doorways_t.prototype.offset_left=function()
+{
+	var offset=parseInt(this.element.offsetLeft);
+
+	if(!offset)
+		offset=0;
+
+	return offset;
+}
+
+doorways_t.prototype.offset_top=function()
+{
+	var offset=parseInt(this.element.offsetTop)+parseInt(this.menu.offsetHeight);
+
+	if(!offset)
+		offset=0;
+
+	return offset;
+}
+
+doorways_t.prototype.update_zindicies=function()
+{
+	this.doorways.sort(function(lhs,rhs)
+	{
+		var lhs_value=parseInt(lhs.panel.style.zIndex);
+		var rhs_value=parseInt(rhs.panel.style.zIndex);
+		return rhs_value-lhs_value;
+	});
+
+	for(var ii=0;ii<this.doorways.length;++ii)
+		if(this.doorways[ii])
+			this.doorways[ii].panel.style.zIndex=this.doorways.length-ii;
+}
+
+doorways_t.prototype.create_menu_button=function(glyph,onclick,tooltip)
+{
 	var button=document.createElement("button");
 	var span=document.createElement("span");
 
@@ -237,323 +416,10 @@ doorways_t.prototype.create_menu_button_m=function(glyph,onclick,tooltip)
 	button.style.float="right";
 	button.setAttribute("aria-label","Left Align");
 	button.onclick=onclick;
-	this.menu.bar.appendChild(button);
+	this.menu.appendChild(button);
 
 	span.className=glyph;
 	span.style.color="#337ab7";
 	span.setAttribute("aria-hidden","true");
 	button.appendChild(span);
-}
-
-doorways_t.prototype.refresh_windows_m=function()
-{
-	for(key in this.windows)
-	{
-		var local_window=this.windows[key];
-
-		if(local_window)
-		{
-			if(local_window.active)
-			{
-				local_window.window.style.zIndex=this.zindex_top_m();
-				local_window.menu.li.className="active";
-				local_window.window.className="panel panel-primary";
-				local_window.minimized=false;
-			}
-			else
-			{
-				local_window.menu.li.className="";
-				local_window.window.className="panel panel-default";
-			}
-
-			if(local_window.minimized)
-				local_window.window.style.display="none";
-			else
-				local_window.window.style.display="";
-
-			var x=local_window.window.offsetLeft-this.element.offsetLeft;
-			var y=local_window.window.offsetTop-this.element.offsetTop-this.menu.bar.offsetHeight;
-
-			if(!local_window.minimized)
-				this.move_window(key,x,y);
-		}
-	}
-}
-
-doorways_t.prototype.create_window_m=function(title,x,y,active,minimized)
-{
-	if(!this.windows[title])
-	{
-		var myself=this;
-
-		this.windows[title]={};
-		this.windows[title].title=title;
-
-		if(active)
-			this.windows[title].active=true;
-		else
-			this.windows[title].active=false;
-
-		if(minimized)
-			this.windows[title].minimized=true;
-		else
-			this.windows[title].minimized=false;
-
-		this.windows[title].menu={};
-		this.windows[title].menu.li=document.createElement("li");
-		this.windows[title].menu.a=document.createElement("a");
-		this.windows[title].window=document.createElement("div");
-		this.windows[title].title_bar=document.createElement("div");
-		this.windows[title].title_text=document.createElement("h3");
-		this.windows[title].buttons={};
-		this.windows[title].buttons.div=document.createElement("div");
-		this.windows[title].buttons.minimize=document.createElement("span");
-		this.windows[title].body={};
-		this.windows[title].body.div=document.createElement("div");
-		this.windows[title].body.content=document.createElement("div");
-
-		this.windows[title].window.style.marginBottom=0;
-		this.element.appendChild(this.windows[title].window);
-
-		this.menu.bar.appendChild(this.windows[title].menu.li);
-
-		this.windows[title].menu.li.setAttribute("role","presentation");
-		this.windows[title].menu.li.appendChild(this.windows[title].menu.a);
-
-		this.windows[title].menu.a.doorways_t=this.windows[title];
-		this.windows[title].menu.a.href="javascript:void(0);";
-		this.windows[title].menu.a.onclick=function()
-		{
-			if(this.doorways_t)
-			{
-				if(!this.doorways_t.active)
-					myself.set_menu_item_active(this.doorways_t.title,true);
-				//else
-					//myself.minimize(this.doorways_t.title,true);
-			}
-		};
-		this.windows[title].menu.a.innerHTML=title;
-
-		this.windows[title].window.className="panel panel-primary";
-		this.windows[title].window.style.position="absolute";
-		this.windows[title].window.style.zIndex=-1;
-		this.windows[title].window.style.zIndex=this.zindex_top_m();
-		this.move_window(title,x,y);
-		this.windows[title].window.appendChild(this.windows[title].title_bar);
-		this.windows[title].window.appendChild(this.windows[title].body.div);
-
-		this.windows[title].title_bar.className="panel-heading";
-		this.windows[title].title_bar.style.cursor="move";
-		this.windows[title].title_bar.doorways_t=this.windows[title];
-		this.windows[title].title_bar.onmousedown=function(event)
-		{
-			return myself.mouse_down_m(event,this);
-		};
-		/*this.windows[title].title_bar.ondblclick=function(event)
-		{
-			if(this.doorways_t)
-				myself.minimize(this.doorways_t.title,true);
-		};*/
-		this.windows[title].title_bar.appendChild(this.windows[title].title_text);
-
-		this.windows[title].title_text.className="panel-title";
-		this.windows[title].title_text.innerHTML=title;
-
-		this.windows[title].buttons.div.style.float="right";
-		this.windows[title].buttons.div.style.marginLeft=16;
-		this.windows[title].title_text.appendChild(this.windows[title].buttons.div);
-
-		this.windows[title].buttons.minimize.className="glyphicon glyphicon-minus-sign";
-		this.windows[title].buttons.minimize.style.cursor="pointer";
-		this.windows[title].buttons.minimize.doorways_t=this.windows[title];
-		this.windows[title].buttons.minimize.onclick=function(event)
-		{
-			if(!myself.draggable)
-			{
-				if(this.doorways_t)
-					myself.minimize(this.doorways_t.title,true);
-				myself.draggable=true;
-			}
-		};
-		this.windows[title].buttons.minimize.onmousedown=function(event)
-		{
-			myself.mouse_up_m(event);
-			myself.draggable=false;
-		};
-		this.windows[title].buttons.minimize.onmouseleave=function(event)
-		{
-			if(!myself.draggable)
-			{
-				myself.mouse_up_m(event);
-				myself.draggable=true;
-			}
-		};
-		this.windows[title].buttons.div.appendChild(this.windows[title].buttons.minimize);
-
-		this.windows[title].body.div.doorways_t=this.windows[title];
-		this.windows[title].body.div.className="panel-body";
-		this.windows[title].body.div.onmousedown=function(event)
-		{
-			if(myself.draggable&&!myself.dragging&&this.doorways_t)
-				myself.set_menu_item_active(this.doorways_t.title,true);
-		};
-		this.windows[title].body.div.appendChild(this.windows[title].body.content);
-	}
-
-	return this.windows[title];
-}
-
-doorways_t.prototype.minimize_m=function(title,value)
-{
-	if(!title)
-		return;
-
-	if(!this.windows[title])
-		return;
-
-	if(value)
-	{
-		this.windows[title].minimized=true;
-		this.windows[title].active=false;
-	}
-	else
-	{
-		this.windows[title].minimized=false;
-	}
-}
-
-doorways_t.prototype.mouse_down_m=function(event,element)
-{
-	if(this.draggable&&!this.dragging&&element.doorways_t)
-	{
-		this.dragging=element.doorways_t;
-		this.dragging.window.style.zIndex=this.zindex_top_m();
-		this.offset_x=this.mouse_x-this.dragging.window.offsetLeft;
-		this.offset_y=this.mouse_y-this.dragging.window.offsetTop;
-		this.set_menu_item_active(element.doorways_t.title,true);
-	}
-
-	return false;
-}
-
-doorways_t.prototype.mouse_move_m=function(event)
-{
-	this.mouse_x=event.pageX;
-	this.mouse_y=event.pageY;
-
-	if(document.all)
-	{
-		this.mouse_x=window.event.clientX;
-		this.mouse_y=window.event.clientY;
-	}
-
-	if(this.dragging)
-	{
-		var x=this.mouse_x-this.offset_x;
-		var y=this.mouse_y-this.offset_y-this.element.offsetTop-this.menu.bar.offsetHeight;
-
-		this.move_window(this.dragging.title,x,y);
-	}
-
-	return false;
-}
-
-doorways_t.prototype.mouse_up_m=function(event)
-{
-	this.dragging=null;
-	return false;
-}
-
-doorways_t.prototype.update_zindicies_m=function()
-{
-	var array=[];
-
-	for(var key in this.windows)
-		array.push(this.windows[key]);
-
-	array.sort(function(lhs,rhs)
-	{
-		if(!lhs||!lhs.window)
-			return 1;
-
-		if(!rhs||!rhs.window)
-			return -1;
-
-		var lhs_value=lhs.window.style.zIndex;
-		var rhs_value=rhs.window.style.zIndex;
-
-		if(lhs_value<0)
-			return -1;
-
-		if(rhs_value<0)
-			return 1;
-
-		return lhs_value-rhs_value;
-	});
-
-	for(var ii=0;ii<array.length;++ii)
-		if(array[ii]&&array[ii].title&&this.windows[array[ii].title])
-			this.windows[array[ii].title].window.style.zIndex=ii+1;
-}
-
-doorways_t.prototype.zindex_top_m=function()
-{
-	this.update_zindicies_m();
-	return Object.keys(this.windows).length+1;
-}
-
-doorways_t.prototype.constrain_window_m=function(obj)
-{
-	if(!obj)
-		return;
-
-	if(!this.windows[obj.title])
-		return;
-
-	var view_width=window.innerWidth;
-	var view_height=window.innerHeight;
-	var local_window=this.windows[obj.title].window;
-	var left_offset=parseInt(this.element.offsetLeft);
-	var top_offset=parseInt(this.element.offsetTop)+parseInt(this.menu.bar.offsetHeight);
-
-	if(!left_offset)
-		left_offset=0;
-	if(!top_offset)
-		top_offset=0;
-
-	if(obj.x||obj.x==0)
-	{
-		obj.x+=left_offset;
-		var width=local_window.offsetWidth;
-		var right=obj.x+width;
-		var x_diff=view_width-right;
-
-		if(x_diff<0)
-			obj.x+=x_diff;
-		if(obj.x<left_offset)
-			obj.x=left_offset;
-	}
-	else
-	{
-		obj.x=0;
-	}
-
-	if(obj.y||obj.y==0)
-	{
-		obj.y+=top_offset;
-		var height=local_window.offsetHeight;
-		var bottom=obj.y+height;
-		var y_diff=view_height-bottom;
-
-		if(y_diff<0)
-			obj.y+=y_diff;
-		if(obj.y<top_offset)
-			obj.y=top_offset;
-	}
-	else
-	{
-		obj.y=0;
-	}
-
-	return obj;
 }
