@@ -115,7 +115,10 @@ doorways_t.prototype.create=function(title,pos)
 			x:0,
 			y:0
 		},
-		z:0
+		z:0,
+		resizer:
+		{
+		}
 	};
 
 	doorway.tab.li.setAttribute("role","presentation");
@@ -156,7 +159,9 @@ doorways_t.prototype.create=function(title,pos)
 
 	doorway.content.className="panel-body";
 	doorway.content.doorways_t=doorway;
-	doorway.content.onclick=function(){myself.activate(this.doorways_t);};
+	doorway.content.onclick=doorway.content.onmousedown=function(){myself.activate(this.doorways_t);};
+	doorway.content.style.resize="both";
+	doorway.content.style.overflow="auto";
 	doorway.panel.appendChild(doorway.content);
 
 	this.activate(doorway);
