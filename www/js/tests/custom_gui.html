@@ -39,6 +39,7 @@
 			var menu=null;
 			var gui=null;
 			var gui_interval=null;
+			var gui_old="";
 			var config_editor=null;
 			var state_table=null;
 			var pilot_interface=null;
@@ -70,8 +71,14 @@
 
 			function gui_upload()
 			{
-				if(global_name)
-					superstar_set(global_name,"gui",gui.save());
+				var save=gui.save();
+				var stringified=JSON.stringify(save);
+
+				if(global_name&&gui_old!=stringified)
+				{
+					superstar_set(global_name,"gui",save);
+					gui_old=stringified;
+				}
 			}
 
 
