@@ -1,69 +1,11 @@
-//Members
-//		onpilot(data) - callback triggered when pilot data needs to be sent
+/*
+  This is the main operator control interface for a driving robot.
+
+Members
+	onpilot(pilotdata) - callback triggered when pilot data needs to be sent
+*/
 
 
-
-
-// Return an "empty" robot power object, with everything stationary
-function emptyPower()
-{
-	return {L:0, R:0, dump:0, mine:0, arms:0};
-}
-function emptyLED()
-{
- 	//return {R:this.color.rgb[0], G:this.color.rgb[1], B:this.color.rgb[3]};
-         return{On:false, Demo:false, R:0, G:0, B:0};
-}
-
-
-
-// Return the current wall clock time, in seconds
-function pilot_time() {
-	return (new Date()).getTime()/1000.0;
-}
-
-
-
-function pilot_interface_t(div)
-{
-	if(!div)
-		return null;
-	
-	this.pilot={
-		/* Power to each actuator */
-		power: emptyPower(),
-
-		/* Time, in seconds, of last pilot command */
-		time:0,
-
-		/*LED bits */
-		LED: emptyLED(),
-
-		/* Scripted command to run */
-		cmd: { run: "", arg:"" }
-	};
-
-	this.mouse_down=0;
-	this.arrowDiv=div;
-	div.style.backgroundColor="#808080";
-	div.style.position="relative";
-	div.style.width=div.style.height="200px";
-	var myself=this;
-	div.onmousedown=function(evt) { myself.pilot_mouse(evt,1); };
-	div.ondragstart=function(evt) { myself.pilot_mouse(evt,1); };
-	div.onmouseup=function(evt) { myself.pilot_mouse(evt,-1); };
-	div.onmouseout=function(evt) { myself.pilot_mouse(evt,-1); };
-	div.onmousemove=function(evt) { myself.pilot_mouse(evt,0); };
-	div.ondblclick=function(evt) { myself.pilot_mouse(evt,0); };
-	
-	var img=document.createElement("img");
-	img.src="/images/arrows_hard.png";
-	img.style.position="absolute";
-	img.style.left=img.style.top="0px";
-	img.style.width=img.style.height="100%";
-	img.style.pointerEvents="none";
-	div.appendChild(img);
-}
 
 
 /* Walk the DOM to get the client X,Y position of this element's topleft corner.
@@ -87,6 +29,17 @@ function getMouseFraction(event,domElement) {
 }
 
 
+// Return an "empty" robot power object, with everything stationary
+function emptyPower()
+{
+	return {L:0, R:0, dump:0, mine:0, arms:0};
+}
+function emptyLED()
+{
+ 	//return {R:this.color.rgb[0], G:this.color.rgb[1], B:this.color.rgb[3]};
+         return{On:false, Demo:false, R:0, G:0, B:0};
+}
+
 
 // Round this number to the nearest thousandth, making it look pretty.
 function pretty(number) {
@@ -99,6 +52,67 @@ function clamp(v,lo,hi) {
 	if (v>hi) return hi;
 	else return v;
 }
+
+
+
+// Return the current wall clock time, in seconds
+function pilot_time() {
+	return (new Date()).getTime()/1000.0;
+}
+
+
+
+function pilot_interface_t(div)
+{
+	if(!div)
+		return null;
+	
+	this.pilot={
+		/* Power to each actuator */
+		power: emptyPower(),
+
+		/* Time, in seconds, of last pilot command */
+		time:0,
+
+		/*LED bits (should these still be here, or made PWMs or something?) */
+		LED: emptyLED(),
+
+		/* Scripted command to run */
+		cmd: { run: "", arg:"" }
+	};
+
+	this.mouse_down=0;
+
+	this.arrowDiv=div;
+	div.style.backgroundColor="#808080";
+	div.style.position="relative";
+	div.style.width=div.style.height="200px";
+	
+	// Mouse event handlers for arrow div
+	var myself=this;
+	this.mouse_in_div=0;
+	div.onmousedown=function(evt) { myself.pilot_mouse(evt,1); };
+	div.ondragstart=function(evt) { myself.pilot_mouse(evt,1); };
+	div.onmouseup=function(evt) { myself.pilot_mouse(evt,-1); };
+	div.onmouseenter=function(evt) { myself.pilot_mouse(evt,0,+1); };
+	div.onmouseleave=function(evt) { myself.pilot_mouse(evt,-1,-1); };
+	div.onmousemove=function(evt) { myself.pilot_mouse(evt,0); };
+	div.ondblclick=function(evt) { myself.pilot_mouse(evt,0); };
+
+	// Add arrow image
+	var img=document.createElement("img");
+	img.src="/images/arrows_hard.png";
+	img.style.position="absolute";
+	img.style.left=img.style.top="0px";
+	img.style.width=img.style.height="100%";
+	img.style.pointerEvents="none";
+	div.appendChild(img);
+	
+	// Keyboard driving
+	this.keyboardIsDriving=false;
+	this.keyInput=new input_t(function() {myself.pilot_keyboard()},window);
+}
+
 
 
 
@@ -116,8 +130,11 @@ pilot_interface_t.prototype.get_pilot_power=function() {
 }
 
 // This function is called at every mouse event.
-//   upState: 0 if down, 1 if up, 2 if not changing
-pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del) {
+//   mouse_down_del: +1 if down, -1 if up, 0 if unchanged (move)
+//   mouse_in_del: +1 if entering, -1 if leaving, 0 if unchanged
+pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_del) {
+	if (mouse_in_del) this.mouse_in_div=mouse_in_del;
+	
 // Allow user to set maximum power
 	var maxPower=this.get_pilot_power();
 
@@ -171,9 +188,46 @@ pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del) {
 	event.stopPropagation();
 };
 
+//This function is called at every keypress event
+// FIXME: Add proportional control
+pilot_interface_t.prototype.pilot_keyboard=function() 
+{
+	if (this.mouse_in_div<1) return; // skip keystroke
+	
+	// console.log("Keyboard activity");
+	var maxPower=this.get_pilot_power();
+
+	// Return true if this key (as a string) is pressed
+	var keyInput=this.keyInput;
+	var keyDown=function(key,alternateKey) {
+		var code=key.charCodeAt(0);
+		// console.log("Key code "+code+" : "+keyInput.keys_down[code]);
+
+		if (keyInput.keys_down[code]) return true;
+
+		if (alternateKey) return keyDown(alternateKey);  // hacky recursion
+		return false;
+	}
+
+	var forward=0.0, turn=0.0;
+
+	if(keyDown('a','A')) turn-=1.0; // 'a' is pressed, turn left
+	if(keyDown('d','D')) turn+=1.0; //'d' is pressed, turn right
+	if(keyDown('s','S')) forward-=1.0; //'s' is pressed, reverse
+	if(keyDown('w','W')) forward+=1.0;
+	if(keyDown(' ')) turn=forward=0.0; // stop!
+
+	if (turn==0.0 && forward==0.0) this.keyboardIsDriving=false;
+	else this.keyboardIsDriving=true;
+
+	var newPower=emptyPower();
+	newPower.L=clamp(maxPower*(forward+turn),-maxPower,+maxPower);
+	newPower.R=clamp(maxPower*(forward-turn),-maxPower,+maxPower);
+	this.pilot_send(newPower);
+}
 
 
-// It's not clear a pilot needs to download data, but here it is!
+// It's not clear a pilot needs to download data, but it's easy:
 pilot_interface_t.prototype.download=function(robot_name)
 {
 	superstar_get(robot_name,"pilot",function(newPilot) { this.pilot=newPilot; });
@@ -184,7 +238,7 @@ pilot_interface_t.prototype.upload=function(robot_name)
 	superstar_set(robot_name,"pilot",this.pilot);
 }
 
-// This is a simple placeholder, to get it working:
+// This is a simple placeholder, to get things working for now:
 pilot_interface_t.prototype.pilot_send=function(newPower) {
 	this.pilot.power=newPower;
 	if (this.onpilot) this.onpilot(this.pilot);
