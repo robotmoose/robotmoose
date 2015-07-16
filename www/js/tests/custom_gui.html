@@ -199,10 +199,11 @@
 					if(global_name)
 						state_table.upload(global_name);
 				}
-				pilot_interface.onpilot=function(data)
+				pilot_interface.onpilot=function(power)
 				{
-					if(global_name)
-						console.log("Pilot! - "+data);
+					console.log("Pilot! - "+JSON.stringify(power));
+						if(global_name)
+							pilot_interface.upload(global_name);
 				}
 			}
 
