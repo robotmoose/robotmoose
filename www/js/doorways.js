@@ -84,6 +84,7 @@ doorways_t.prototype.load=function(data)
 			{
 				var myself=this;
 
+				//Ugly forcing code...
 				var force_move=function()
 				{
 					var x=parseInt(myself.windows[obj.title].window.style.left)-
@@ -159,42 +160,15 @@ doorways_t.prototype.move_window=function(title,x,y)
 	if(!this.windows[title])
 		return;
 
-	var view_width=window.innerWidth;
-	var view_height=window.innerHeight;
-	var local_window=this.windows[title].window;
+	var obj={};
+	obj.title=title;
+	obj.x=x;
+	obj.y=y;
 
-	var old_x=x;
-	var old_y=y;
+	obj=this.constrain_window_m(obj);
 
-	if(x||x==0)
-	{
-		x+=this.element.offsetLeft;
-		var width=local_window.offsetWidth;
-		var right=x+width;
-		var x_diff=view_width-right;
-
-		if(x_diff<0)
-			x+=x_diff;
-		if(x<this.element.offsetLeft)
-			x=this.element.offsetLeft;
-
-		local_window.style.left=x;
-	}
-
-	if(y||y==0)
-	{
-		y+=this.element.offsetTop+this.menu.bar.offsetHeight;
-		var height=local_window.offsetHeight;
-		var bottom=y+height;
-		var y_diff=view_height-bottom;
-
-		if(y_diff<0)
-			y+=y_diff;
-		if(y<this.element.offsetTop+this.menu.bar.offsetHeight)
-			y=this.element.offsetTop+this.menu.bar.offsetHeight;
-
-		local_window.style.top=y;
-	}
+	this.windows[title].window.style.left=obj.x;
+	this.windows[title].window.style.top=obj.y;
 }
 
 doorways_t.prototype.remove_window=function(title)
@@ -526,4 +500,60 @@ doorways_t.prototype.zindex_top_m=function()
 {
 	this.update_zindicies_m();
 	return Object.keys(this.windows).length+1;
+}
+
+doorways_t.prototype.constrain_window_m=function(obj)
+{
+	if(!obj)
+		return;
+
+	if(!this.windows[obj.title])
+		return;
+
+	var view_width=window.innerWidth;
+	var view_height=window.innerHeight;
+	var local_window=this.windows[obj.title].window;
+	var left_offset=parseInt(this.element.offsetLeft);
+	var top_offset=parseInt(this.element.offsetTop)+parseInt(this.menu.bar.offsetHeight);
+
+	if(!left_offset)
+		left_offset=0;
+	if(!top_offset)
+		top_offset=0;
+
+	if(obj.x||obj.x==0)
+	{
+		obj.x+=left_offset;
+		var width=local_window.offsetWidth;
+		var right=obj.x+width;
+		var x_diff=view_width-right;
+
+		if(x_diff<0)
+			obj.x+=x_diff;
+		if(obj.x<left_offset)
+			obj.x=left_offset;
+	}
+	else
+	{
+		obj.x=0;
+	}
+
+	if(obj.y||obj.y==0)
+	{
+		obj.y+=top_offset;
+		var height=local_window.offsetHeight;
+		var bottom=obj.y+height;
+		var y_diff=view_height-bottom;
+
+		if(y_diff<0)
+			obj.y+=y_diff;
+		if(obj.y<top_offset)
+			obj.y=top_offset;
+	}
+	else
+	{
+		obj.y=0;
+	}
+
+	return obj;
 }
