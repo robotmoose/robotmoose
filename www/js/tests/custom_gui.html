@@ -13,41 +13,10 @@
 
 			function clone(to,from,setting)
 			{
-				try
+				superstar_get(from,setting,function(obj)
 				{
-					send_request("GET","/superstar/"+from,setting,"?get",
-						function(response)
-						{
-							try
-							{
-								send_request("GET","/superstar/"+to,setting,"?set="+response,
-									function(response)
-									{
-										cloned=true;
-									},
-									function(error)
-									{
-										cloned=true;
-										throw error;
-									},
-									"application/json");
-							}
-							catch(error)
-							{
-								console.log("clone::upload() - "+error);
-							}
-						},
-						function(error)
-						{
-							cloned=true;
-							throw error;
-						},
-						"application/json");
-				}
-				catch(error)
-				{
-					console.log("clone::download() - "+error);
-				}
+					superstar_set(to,setting,obj,function(obj){cloned=true;});
+				});
 			}
 
 			function clone_reconnect(robot_name)
@@ -61,21 +30,15 @@
 
 
 
-
-
-
-
-
-
-
-
 			var global_name=null;
 			var div=document.getElementById("gui");
+			var disconnected_text="<font style='color:red;'>Disconnected</font>";
 
 			var robot_clone=null;
 			var robot_connect=null;
 			var menu=null;
 			var gui=null;
+			var gui_interval=null;
 			var config_editor=null;
 			var state_table=null;
 			var pilot_interface=null;
@@ -85,156 +48,24 @@
 
 
 
-
-
-
-
-
-
-			robot_connect=new modal_connect_t(div);
-
-			if(!robot_connect)
-				alert("Could not create robot connect modal!");
-
-			robot_connect.onconnect=function(robot_name)
+			function gui_download()
 			{
-				if(robot_name)
+				if(!global_name)
+					return;
+
+				var robot_name=global_name;
+
+				superstar_get(robot_name,"gui",function(json)
 				{
-					global_name=robot_name;
-					robot_clone.clone_target=global_name;
-					config_editor.download(global_name);
-					state_table.download(global_name);
-					menu.get_status_area().innerHTML="Connected to \""+global_name+"\"";
-					menu.buttons["Robot"].drops["Clone"].enable();
-				}
-			};
-
-
-
-
-
-
-
-
-
-
-
-			robot_clone=new modal_clone_t(div);
-
-			if(!robot_clone)
-				alert("Could not create robot clone modal!");
-
-			robot_clone.clone_target=global_name;
-			robot_clone.onclone=function(robot_name,settings,options)
-			{
-				if(robot_clone.clone_target)
-				{
-					for(var key in settings)
-						clone(robot_name,robot_clone.clone_target,settings[key]);
-
-					var connect_to_clone=false;
-
-					for(var key in options)
-					{
-						if(options[key]=="connect_to_clone")
-							connect_to_clone=true;
-					}
-
-					if(connect_to_clone)
-						clone_reconnect(robot_name);
-				}
-			};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			menu=new robot_menu_t(div);
-
-			if(!menu)
-				alert("Could not create robot menu!");
-
-			menu.get_status_area().innerHTML="<font style='color:red;'>Disconnected</font>";
-
-			menu.create_button
-			(
-				"Robot",
-				null,
-				"glyphicon glyphicon-cog",
-				{
-					"Connect":
-					{
-						onclick:function(){robot_connect.show();},
-						glyph:"glyphicon glyphicon-off"
-					},
-					"Clone":
-					{
-						onclick:function(){robot_clone.show();},
-						glyph:"glyphicon glyphicon-duplicate"
-					}
-				}
-			);
-
-			menu.buttons["Robot"].drops["Clone"].disable();
-
-
-
-
-
-
-
-
-			gui=new doorways_t(div);
-
-			if(!gui)
-				alert("Could not create gui!");
-
-			gui.load
-			([
-				{"title":"Configuration","x":460,"y":240,"active":false,"minimized":false},
-				{"title":"States","x":1000,"y":0,"active":false,"minimized":false},
-				{"title":"Pilot","x":200,"y":100,"active":true,"minimized":false}
-			]);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			gui.create_window("Configuration",10,0);
-
-			config_editor=new config_editor_t(gui.get_window("Configuration").body.content,global_name);
-
-			if(!config_editor)
-				alert("Could not create config editor!");
-
-			config_editor.onrefresh=function(){gui.refresh_windows_m();};
-			config_editor.onconfigure=function()
+					gui.load(json);
+					gui_interval=setInterval(gui_upload,1000);
+				});
+			}
+
+			function gui_upload()
 			{
 				if(global_name)
-					config_editor.upload(global_name);
+					superstar_set(global_name,"gui",gui.save());
 			}
 
 
@@ -247,44 +78,137 @@
 
 
 
-			if(!gui.get_window("States"))
+
+
+
+
+
+
+
+
+
+
+
+			function create_menus()
+			{
+				menu=new robot_menu_t(div);
+				robot_connect=new modal_connect_t(div);
+				robot_clone=new modal_clone_t(div);
+
+				if(!menu)
+					alert("Could not create robot menu!");
+				if(!robot_connect)
+					alert("Could not create robot connect modal!");
+				if(!robot_clone)
+					alert("Could not create robot clone modal!");
+
+				menu.get_status_area().innerHTML=disconnected_text;
+				menu.create_button
+				(
+					"Robot",
+					null,
+					"glyphicon glyphicon-cog",
+					{
+						"Connect":
+						{
+							onclick:function(){robot_connect.show();},
+							glyph:"glyphicon glyphicon-off"
+						},
+						"Clone":
+						{
+							onclick:function(){robot_clone.show();},
+							glyph:"glyphicon glyphicon-duplicate"
+						}
+					}
+				);
+				menu.buttons["Robot"].drops["Clone"].disable();
+
+				robot_connect.onconnect=function(robot_name)
+				{
+					if(robot_name)
+					{
+						global_name=null;
+						clearInterval(gui_interval);
+						gui_interval=null;
+						global_name=robot_name;
+						robot_clone.clone_target=global_name;
+						config_editor.download(global_name);
+						state_table.download(global_name);
+						menu.get_status_area().innerHTML="Connected to \""+global_name+"\"";
+						menu.buttons["Robot"].drops["Clone"].enable();
+						gui_download();
+					}
+				};
+				robot_clone.clone_target=global_name;
+				robot_clone.onclone=function(robot_name,settings,options)
+				{
+					if(robot_clone.clone_target)
+					{
+						for(var key in settings)
+							clone(robot_name,robot_clone.clone_target,settings[key]);
+
+						var connect_to_clone=false;
+
+						for(var key in options)
+						{
+							if(options[key]=="connect_to_clone")
+								connect_to_clone=true;
+						}
+
+						if(connect_to_clone)
+							clone_reconnect(robot_name);
+					}
+				};
+			}
+
+			function create_gui()
+			{
+				gui=new doorways_t(div);
+
+				if(!gui)
+					alert("Could not create gui!");
+			}
+
+			function create_windows()
+			{
+				gui.create_window("Configuration",0,0);
 				gui.create_window("States",0,0);
+				gui.create_window("Pilot",0,0);
 
-			state_table=new state_table_t(gui.get_window("States").body.content);
+				config_editor=new config_editor_t(gui.get_window("Configuration").body.content,global_name);
+				state_table=new state_table_t(gui.get_window("States").body.content);
+				pilot_interface=new pilot_interface_t(gui.get_window("Pilot").body.content);
 
-			if(!state_table)
-				alert("Could not create state table!");
+				if(!config_editor)
+					alert("Could not create config editor!");
+				if(!state_table)
+					alert("Could not create state table!");
+				if(!pilot_interface)
+					alert("Could not create pilot interface!");
 
-			state_table.onrefresh=function(){gui.refresh_windows_m();};
-			state_table.onrun=function()
-			{
-				if(global_name)
-					state_table.upload(global_name);
+				config_editor.onrefresh=function(){gui.refresh_windows_m();};
+				state_table.onrefresh=function(){gui.refresh_windows_m();};
+
+				config_editor.onconfigure=function()
+				{
+					if(global_name)
+						config_editor.upload(global_name);
+				}
+				state_table.onrun=function()
+				{
+					if(global_name)
+						state_table.upload(global_name);
+				}
+				pilot_interface.onpilot=function(data)
+				{
+					if(global_name)
+						console.log("Pilot! - "+data);
+				}
 			}
 
-
-
-
-
-
-
-
-
-
-
-			gui.create_window("Pilot",0,0);
-
-			pilot_interface=new pilot_interface_t(gui.get_window("Pilot").body.content);
-
-			if(!pilot_interface)
-				alert("Could not create pilot interface!");
-
-			pilot_interface.onpilot=function(power)
-			{
-				console.log("Pilot! - "+JSON.stringify(power));
-				if(global_name)
-					pilot_interface.upload(global_name);
-			}
+			create_menus();
+			create_gui();
+			create_windows();
 		</script>
 	</body>
 </html>

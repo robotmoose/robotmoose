@@ -479,8 +479,6 @@ config_editor_t.prototype.find_option_m=function(option)
 
 config_editor_t.prototype.get_options_m=function(options)
 {
-	console.log(options);
-
 	for(var key in this.tabula.select.options)
 		if(this.tabula.select.options[key].element)
 			this.tabula.select.element.removeChild(this.tabula.select.options[key].element);
