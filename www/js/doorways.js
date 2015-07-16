@@ -72,6 +72,9 @@ doorways_t.prototype.load=function(data)
 {
 	this.remove_all();
 
+	if(!data)
+		return;
+
 	data.sort(function(lhs,rhs){return lhs.z-rhs.z;});
 
 	for(var key in data)
