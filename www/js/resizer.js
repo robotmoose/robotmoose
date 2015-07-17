@@ -42,8 +42,6 @@ resizer_t.prototype.resize=function(size)
 	if(!size.height||size.height<this.dragging.min_size.height)
 		size.height=this.dragging.min_size.height;
 
-	console.log(JSON.stringify(size));
-
 	this.div.style.width=size.width;
 	this.div.style.height=size.height;
 	this.handle.style.left=parseInt(this.div.offsetLeft)+parseInt(this.div.offsetWidth)-this.dragging.size.width;
