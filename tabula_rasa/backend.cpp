@@ -546,6 +546,11 @@ void robot_backend::setup_devices(std::string robot_config)
 		}
 		else std::cout<<"Arduino backend: ignoring unknown device '"<<device<<"'\n";
 	}
+	
+	// Clear out command and sensor bytes (otherwise they're full of junk)
+	memset(tabula_command_storage.array,0,tabula_command_storage.count);
+	memset(tabula_sensor_storage.array,0,tabula_sensor_storage.count);
+	
 	printf("Backend configured: %d command bytes, %d sensor bytes!\n",
 		(int)tabula_command_storage.count,(int)tabula_sensor_storage.count);
 }
@@ -588,7 +593,6 @@ void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 	pkt=new A_packet_formatter<SerialPort>(port);
 	send_serial();
 	read_serial();
-	send_options();
 }
 
 void robot_backend::read_sensors(const A_packet& current_p)
@@ -783,7 +787,15 @@ void robot_backend::tabula_setup(std::string config)
 		sleep(1);
 		Serial.begin(Serial.Get_baud());
 		setup_arduino(Serial,config);
+	} else { // sim mode: fake options
+		all_dev_types.push_back("analog P");
+		all_dev_types.push_back("servo P");
+		all_dev_types.push_back("create2 S");
+		all_dev_types.push_back("neato SP");
+		all_dev_types.push_back("bts PPPP");
+		all_dev_types.push_back("bms");
 	}
+	send_options();
 }
 
 void robot_backend::read_config(std::string config,const json::Value& configs,const int counter)
@@ -888,6 +900,7 @@ int main(int argc, char *argv[])
 	std::string markerFile=""; // computer vision marker file
 	std::string sensors=""; // All our sensors
 	int baudrate=57600;  // serial comms to Arduino
+	int delay_ms=10; // milliseconds to wait in control loop (be kind to CPU, network)
 	for (int argi = 1; argi<argc; argi++) {
 		if (0 == strcmp(argv[argi], "--robot")) robotName = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--superstar")) superstarURL = argv[++argi];
@@ -898,8 +911,10 @@ int main(int argc, char *argv[])
 		else if (0 == strcmp(argv[argi], "--sensor")) sensors += argv[++argi]+std::string("\n");
 		else if (0 == strcmp(argv[argi], "--trim")) LRtrim = atof(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--debug")) debug = true;
+		else if (0 == strcmp(argv[argi], "--delay_ms")) delay_ms = atoi(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--sim")) { // no Arduino, for debugging
 			sim = true;
+			delay_ms=250;
 			baudrate=0;
 		}
 		else {
@@ -909,24 +924,22 @@ int main(int argc, char *argv[])
 	}
 
 	std::cout<<"Connecting to superstar at "<<superstarURL<<std::endl;
-	Serial.Set_baud(baudrate);
+	if (baudrate) Serial.Set_baud(baudrate);
 	backend=new robot_backend(superstarURL, robotName);
 	backend->LRtrim=LRtrim;
 	backend->debug = debug; // more output, more mess, but more data
 
-
-	// FIXME: should pull robot configuration from superstar robotName/+"config"
 	std::string robot_config=sensors+configMotor;
 
 	backend->tabula_setup(robot_config);
 
-	backend->send_config(robot_config);
+	// backend->send_config(robot_config); //<- this overwrites the web version
 
 	while (1) { // talk to robot via backend
 		backend->do_network();
 		backend->send_serial();
 #ifdef __unix__
-		usleep(10*1000); // limit rate to 100Hz, to be kind to serial port and network
+		usleep(delay_ms*1000); // limit rate to 100Hz, to be kind to serial port and network
 #endif
 		backend->read_serial();
 		if (markerFile!="") backend->location.update_vision(markerFile.c_str());
