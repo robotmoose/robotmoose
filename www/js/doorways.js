@@ -38,10 +38,10 @@ function doorways_t(div)
 		"Click here to hide all windows."
 	);
 
-	document.onmousemove=function(event){return myself.onmousemove(event);};
-	document.onmouseup=function(event){return myself.onmouseup(event);};
-	window.onblur=function(event){myself.onblur(event);};
-	window.onresize=function(event){myself.onresize(event)};
+	document.addEventListener("mousemove",function(event){return myself.onmousemove(event);});
+	document.addEventListener("mouseup",function(event){return myself.onmouseup(event);});
+	window.addEventListener("blur",function(event){myself.onblur(event);});
+	window.addEventListener("resize",function(event){myself.onresize(event);});
 }
 
 doorways_t.prototype.save=function()
@@ -56,6 +56,8 @@ doorways_t.prototype.save=function()
 			x:this.doorways[key].pos.x,
 			y:this.doorways[key].pos.y,
 			z:parseInt(this.doorways[key].panel.style.zIndex),
+			width:parseInt(this.doorways[key].panel.offsetWidth),
+			height:parseInt(this.doorways[key].panel.offsetHeight),
 			active:this.doorways[key].active,
 			minimized:this.doorways[key].minimized
 		};
@@ -79,15 +81,18 @@ doorways_t.prototype.load=function(data)
 
 	for(var key in data)
 	{
-		var temp=this.create(data[key].title,{x:data[key].x,y:data[key].y});
+		var doorway=this.create(data[key].title,{x:data[key].x,y:data[key].y});
+
+		if(data[key].width||data[key].height)
+			this.resize(doorway,{width:data[key].width,height:data[key].height});
 
 		if(data[key].active)
-			this.activate(temp);
+			this.activate(doorway);
 		else
-			this.deactivate(temp);
+			this.deactivate(doorway);
 
 		if(data[key].minimized)
-			this.minimize(temp);
+			this.minimize(doorway);
 	}
 }
 
@@ -100,25 +105,24 @@ doorways_t.prototype.create=function(title,pos)
 		active:true,
 		minimized:false,
 		title:title,
-		panel:document.createElement("div"),
-		bar:document.createElement("div"),
-		heading:document.createElement("h3"),
-		minimize:document.createElement("span"),
-		content:document.createElement("div"),
 		tab:
 		{
 			li:document.createElement("li"),
 			a:document.createElement("a")
 		},
+		panel:document.createElement("div"),
+		bar:document.createElement("div"),
+		heading:document.createElement("h3"),
+		minimize:document.createElement("span"),
+		body:document.createElement("div"),
+		content:document.createElement("div"),
+		resizer:null,
 		pos:
 		{
 			x:0,
 			y:0
 		},
-		z:0,
-		resizer:
-		{
-		}
+		z:0
 	};
 
 	doorway.tab.li.setAttribute("role","presentation");
@@ -157,17 +161,24 @@ doorways_t.prototype.create=function(title,pos)
 	doorway.heading.innerHTML=title;
 	doorway.bar.appendChild(doorway.heading);
 
-	doorway.content.className="panel-body";
+	doorway.body.className="panel-body";
+	doorway.body.doorways_t=doorway;
+	doorway.body.onclick=doorway.body.onmousedown=function(){myself.activate(this.doorways_t);};
+	doorway.body.style.overflow="auto";
+	doorway.panel.appendChild(doorway.body);
+
+	doorway.content.style.width="100%";
+	doorway.content.style.height="100%";
 	doorway.content.doorways_t=doorway;
-	doorway.content.onclick=doorway.content.onmousedown=function(){myself.activate(this.doorways_t);};
-	doorway.content.style.resize="both";
-	doorway.content.style.overflow="auto";
-	doorway.panel.appendChild(doorway.content);
+	doorway.body.appendChild(doorway.content);
+
+	doorway.resizer=new resizer_t(doorway.body,{min_size:{width:200,height:100}});
 
 	this.activate(doorway);
 	this.move(doorway,pos);
 
 	this.doorways.push(doorway);
+
 	return doorway;
 }
 
@@ -195,6 +206,17 @@ doorways_t.prototype.move=function(doorway,pos)
 
 	doorway.panel.style.left=doorway.pos.x;
 	doorway.panel.style.top=doorway.pos.y;
+}
+
+doorways_t.prototype.resize=function(doorway,size)
+{
+	if(!doorway)
+		return;
+
+	if(size)
+		doorway.resizer.resize(size);
+
+	this.move(doorway);
 }
 
 doorways_t.prototype.remove=function(doorway)
