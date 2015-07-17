@@ -56,8 +56,8 @@ doorways_t.prototype.save=function()
 			x:this.doorways[key].pos.x,
 			y:this.doorways[key].pos.y,
 			z:parseInt(this.doorways[key].panel.style.zIndex),
-			width:parseInt(this.doorways[key].panel.offsetWidth),
-			height:parseInt(this.doorways[key].panel.offsetHeight),
+			width:parseInt(this.doorways[key].body.offsetWidth),
+			height:parseInt(this.doorways[key].body.offsetHeight),
 			active:this.doorways[key].active,
 			minimized:this.doorways[key].minimized
 		};
@@ -136,6 +136,7 @@ doorways_t.prototype.create=function(title,pos)
 
 	doorway.panel.className="panel panel-primary";
 	doorway.panel.style.position="absolute";
+	doorway.panel.style.margin=0;
 	this.element.appendChild(doorway.panel);
 
 	doorway.bar.className="panel-heading";
