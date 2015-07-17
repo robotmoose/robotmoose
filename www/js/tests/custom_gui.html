@@ -60,7 +60,6 @@
 				superstar_get(robot_name,"gui",function(json)
 				{
 					gui.load(json);
-					create_doorways();
 					create_widgets();
 					robot_clone.clone_target=global_name;
 					config_editor.download(global_name);
@@ -178,33 +177,25 @@
 				if(!gui)
 					alert("Could not create gui!");
 			}
-
-			function create_doorways()
+			
+			function create_doorway(window_title) 
 			{
-				delete doorways.config;
-				delete doorways.states;
-				delete doorways.pilot;
-
-				doorways.config=gui.get_by_title("Configuration");
-				doorways.states=gui.get_by_title("States");
-				doorways.pilot=gui.get_by_title("Pilot");
-
-				if(!doorways.config)
-					doorways.config=gui.create("Configuration");
-				if(!doorways.states)
-					doorways.states=gui.create("States");
-				if(!doorways.pilot)
-					doorways.pilot=gui.create("Pilot");
+				var w=gui.get_by_title(window_title);
+				if (w) return w;
+				else return gui.create(window_title);
 			}
 
 			function create_widgets()
 			{
-				delete config_editor;
-				delete state_table;
-				delete pilot_interface;
-
+				doorways={}; // clean out old doorways
+				
+				doorways.config=create_doorway("Configuration");
 				config_editor=new config_editor_t(doorways.config.content,global_name);
+				
+				doorways.states=create_doorway("States");
 				state_table=new state_table_t(doorways.states.content);
+
+				doorways.pilot=create_doorway("Pilot");
 				pilot_interface=new pilot_interface_t(doorways.pilot.content);
 
 				if(!config_editor)
