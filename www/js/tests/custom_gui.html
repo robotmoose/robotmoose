@@ -62,7 +62,6 @@
 				superstar_get(robot_name,"gui",function(json)
 				{
 					gui.load(json);
-					create_doorways();
 					create_widgets();
 					menu.clone.clone_target=global_name;
 					gui.widgets.config.download(global_name);
@@ -202,7 +201,7 @@
 					config:new config_editor_t(doorways.config.content,global_name),
 					states:new state_table_t(doorways.states.content),
 					pilot:new pilot_interface_t(doorways.pilot.content),
-					sensor:new tree_viewer_t(doorways.sensor.content,{});
+					sensor:new tree_viewer_t(doorways.sensor.content,{}),
 				};
 				
 				// HACKITY HACK: fill initial sensor data.  Needs to be in set_interval.
