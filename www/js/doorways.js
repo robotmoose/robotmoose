@@ -34,8 +34,25 @@ function doorways_t(div)
 	this.create_menu_button
 	(
 		"glyphicon glyphicon-eye-close",
-		function(event){myself.hide_all();},
-		"Click here to hide all windows."
+		function(event)
+		{
+			var show_all=true;
+
+			for(var key in myself.doorways)
+			{
+				if(!myself.doorways[key].minimized)
+				{
+					show_all=false;
+					break;
+				}
+			}
+
+			if(show_all)
+				myself.show_all();
+			else
+				myself.hide_all();
+		},
+		"Click here to hide/show all windows."
 	);
 
 	document.addEventListener("mousemove",function(event){return myself.onmousemove(event);});
@@ -243,6 +260,7 @@ doorways_t.prototype.minimize=function(doorway,value)
 		value=true;
 
 	this.deactivate(doorway);
+	doorway.old_minimized=doorway.minimized;
 	doorway.minimized=value;
 
 	if(value)
@@ -259,6 +277,7 @@ doorways_t.prototype.activate=function(doorway)
 		return;
 
 	this.minimize(doorway,false);
+	doorway.old_active=doorway.active;
 	doorway.active=true;
 	doorway.panel.className="panel panel-primary";
 	doorway.panel.style.zIndex=this.doorways.length+1;
@@ -271,6 +290,7 @@ doorways_t.prototype.deactivate=function(doorway)
 	if(!doorway)
 		return;
 
+	doorway.old_active=doorway.active;
 	doorway.active=false;
 	doorway.panel.className="panel panel-default";
 	doorway.tab.li.className="";
@@ -286,8 +306,27 @@ doorways_t.prototype.remove_all=function()
 
 doorways_t.prototype.hide_all=function()
 {
+	console.log("hide all");
+
 	for(var key in this.doorways)
 		this.minimize(this.doorways[key]);
+}
+
+doorways_t.prototype.show_all=function()
+{
+	console.log("show all");
+
+	for(var key in this.doorways)
+	{
+		var temp_old_active=this.doorways[key].old_active;
+
+		this.minimize(this.doorways[key],this.doorways[key].old_minimized);
+
+		if(temp_old_active)
+			this.activate(this.doorways[key]);
+		else
+			this.deactivate(this.doorways[key]);
+	}
 }
 
 doorways_t.prototype.deactivate_all=function()

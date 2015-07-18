@@ -1,11 +1,8 @@
 windows api (doorways)
 	need:
 		-Ability to alert.
-		-Minimize/show all windows needs to save previous state and show windows...
 		-Dropouts should update state area.
 		-Integrate robot menu into the gui tab menu.
-		-Transfer current ui elements to standard ui widgets.
-		-Transfer custom_gui.html to a robot_gui class.
 
 	completely optional at this point:
 		-Touch events...
