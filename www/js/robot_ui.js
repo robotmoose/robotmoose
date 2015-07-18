@@ -23,10 +23,7 @@ function robot_ui_t(div)
 	this.doorways={}
 	this.widgets={};
 
-	this.create_menus();
 	this.create_gui();
-	this.create_doorways();
-	this.create_widgets();
 	this.connect_menu.show();
 }
 
@@ -116,6 +113,7 @@ robot_ui_t.prototype.create_menus=function()
 
 robot_ui_t.prototype.create_gui=function()
 {
+	this.create_menus();
 	this.gui.element=new doorways_t(div);
 }
 
@@ -129,7 +127,6 @@ robot_ui_t.prototype.download_gui=function()
 	superstar_get(this.robot_name,"gui",function(json)
 	{
 		myself.gui.element.load(json);
-		myself.create_doorways();
 		myself.create_widgets();
 		myself.clone_menu.clone_target=myself.robot_name;
 
@@ -166,6 +163,8 @@ robot_ui_t.prototype.create_doorways=function()
 
 robot_ui_t.prototype.create_widgets=function()
 {
+	this.create_doorways();
+
 	this.widgets=
 	{
 		config:new config_editor_t(this.doorways.config.content,this.robot_name),
