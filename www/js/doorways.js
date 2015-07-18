@@ -306,16 +306,12 @@ doorways_t.prototype.remove_all=function()
 
 doorways_t.prototype.hide_all=function()
 {
-	console.log("hide all");
-
 	for(var key in this.doorways)
 		this.minimize(this.doorways[key]);
 }
 
 doorways_t.prototype.show_all=function()
 {
-	console.log("show all");
-
 	for(var key in this.doorways)
 	{
 		var temp_old_active=this.doorways[key].old_active;
