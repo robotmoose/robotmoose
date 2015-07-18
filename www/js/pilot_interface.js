@@ -66,7 +66,7 @@ function pilot_interface_t(div)
 {
 	if(!div)
 		return null;
-	
+
 	this.pilot={
 		/* Power to each actuator */
 		power: emptyPower(),
@@ -83,21 +83,23 @@ function pilot_interface_t(div)
 
 	this.mouse_down=0;
 
-	this.arrowDiv=div;
-	div.style.backgroundColor="#808080";
-	div.style.position="relative";
-	div.style.width=div.style.height="200px";
-	
+	this.div=div;
+	this.arrowDiv=document.createElement("div");
+	this.arrowDiv.style.backgroundColor="#808080";
+	this.arrowDiv.style.position="relative";
+	this.arrowDiv.style.width=this.arrowDiv.style.height="200px";
+	this.div.appendChild(this.arrowDiv);
+
 	// Mouse event handlers for arrow div
 	var myself=this;
 	this.mouse_in_div=0;
-	div.onmousedown=function(evt) { myself.pilot_mouse(evt,1); };
-	div.ondragstart=function(evt) { myself.pilot_mouse(evt,1); };
-	div.onmouseup=function(evt) { myself.pilot_mouse(evt,-1); };
-	div.onmouseenter=function(evt) { myself.pilot_mouse(evt,0,+1); };
-	div.onmouseleave=function(evt) { myself.pilot_mouse(evt,-1,-1); };
-	div.onmousemove=function(evt) { myself.pilot_mouse(evt,0); };
-	div.ondblclick=function(evt) { myself.pilot_mouse(evt,0); };
+	this.arrowDiv.onmousedown=function(evt) { myself.pilot_mouse(evt,1); myself.div.click(); };
+	this.arrowDiv.ondragstart=function(evt) { myself.pilot_mouse(evt,1); };
+	this.arrowDiv.onmouseup=function(evt) { myself.pilot_mouse(evt,-1); };
+	this.arrowDiv.onmouseenter=function(evt) { myself.pilot_mouse(evt,0,+1); };
+	this.arrowDiv.onmouseleave=function(evt) { myself.pilot_mouse(evt,-1,-1); };
+	this.arrowDiv.onmousemove=function(evt) { myself.pilot_mouse(evt,0); };
+	this.arrowDiv.ondblclick=function(evt) { myself.pilot_mouse(evt,0); };
 
 	// Add arrow image
 	var img=document.createElement("img");
@@ -106,8 +108,8 @@ function pilot_interface_t(div)
 	img.style.left=img.style.top="0px";
 	img.style.width=img.style.height="100%";
 	img.style.pointerEvents="none";
-	div.appendChild(img);
-	
+	this.arrowDiv.appendChild(img);
+
 	// Keyboard driving
 	this.keyboardIsDriving=false;
 	this.keyInput=new input_t(function() {myself.pilot_keyboard()},window);
@@ -134,7 +136,7 @@ pilot_interface_t.prototype.get_pilot_power=function() {
 //   mouse_in_del: +1 if entering, -1 if leaving, 0 if unchanged
 pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_del) {
 	if (mouse_in_del) this.mouse_in_div=mouse_in_del;
-	
+
 // Allow user to set maximum power
 	var maxPower=this.get_pilot_power();
 
@@ -190,10 +192,10 @@ pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_d
 
 //This function is called at every keypress event
 // FIXME: Add proportional control
-pilot_interface_t.prototype.pilot_keyboard=function() 
+pilot_interface_t.prototype.pilot_keyboard=function()
 {
 	if (this.mouse_in_div<1) return; // skip keystroke
-	
+
 	// console.log("Keyboard activity");
 	var maxPower=this.get_pilot_power();
 
