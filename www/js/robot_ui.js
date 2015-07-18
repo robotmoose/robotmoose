@@ -1,5 +1,6 @@
-//to add a widget, add an entry to create_doorways and create_widgets.
-//if your widget has download and/or upload, it will be called.
+//to add a widget, add an entry to create_widgets.
+//if the widget has a download method, it will be called.
+//if the widget has a upload method, add the callback in create_widgets.
 
 function robot_ui_t(div)
 {
@@ -150,7 +151,7 @@ robot_ui_t.prototype.upload_gui=function()
 	}
 }
 
-robot_ui_t.prototype.create_doorways=function()
+robot_ui_t.prototype.create_widgets=function()
 {
 	this.doorways=
 	{
@@ -159,11 +160,6 @@ robot_ui_t.prototype.create_doorways=function()
 		sensor:this.create_doorway("Sensor"),
 		states:this.create_doorway("Code")
 	};
-}
-
-robot_ui_t.prototype.create_widgets=function()
-{
-	this.create_doorways();
 
 	this.widgets=
 	{
