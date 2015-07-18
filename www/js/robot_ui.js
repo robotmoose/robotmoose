@@ -179,18 +179,19 @@ robot_ui_t.prototype.create_widgets=function()
 
 	this.widgets.config.onconfigure=function()
 	{
-		if(this.robot_name)
-			this.widgets.config.upload(this.robot_name);
+		if(myself.robot_name)
+			myself.widgets.config.upload(myself.robot_name);
 	}
 	this.widgets.states.onrun=function()
 	{
-		if(this.robot_name)
-			this.widgets.states.upload(this.robot_name);
+		if(myself.robot_name)
+			myself.widgets.states.upload(myself.robot_name);
 	}
 	this.widgets.pilot.onpilot=function(power)
 	{
-		if(this.robot_name)
-			this.widgets.pilot.upload(this.robot_name);
+		console.log("Pilot data upload: "+myself.robot_name);
+		if(myself.robot_name)
+			myself.widgets.pilot.upload(myself.robot_name);
 	}
 }
 
