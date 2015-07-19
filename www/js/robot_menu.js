@@ -120,3 +120,8 @@ robot_menu_t.prototype.get_status_area=function()
 {
 	return this.menu.status.a;
 }
+
+robot_menu_t.prototype.get_menu_bar=function()
+{
+	return this.menu.ul;
+}

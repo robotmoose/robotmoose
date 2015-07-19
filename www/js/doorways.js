@@ -1,4 +1,4 @@
-function doorways_t(div)
+function doorways_t(div,menu)
 {
 	if(!div)
 		return null;
@@ -6,6 +6,7 @@ function doorways_t(div)
 	var myself=this;
 	this.div=div;
 	this.element=document.createElement("div");
+	this.menu_bar=menu;
 
 	this.dragging=
 	{
@@ -29,7 +30,6 @@ function doorways_t(div)
 	this.div.appendChild(this.element);
 
 	this.menu.className="nav nav-tabs";
-	this.element.appendChild(this.menu);
 
 	this.create_menu_button
 	(
@@ -59,6 +59,17 @@ function doorways_t(div)
 	document.addEventListener("mouseup",function(event){return myself.onmouseup(event);});
 	window.addEventListener("blur",function(event){myself.onblur(event);});
 	window.addEventListener("resize",function(event){myself.onresize(event);});
+
+	if(this.menu_bar)
+	{
+		this.menu.style.borderBottom=0;
+		this.menu.style.height=this.menu_bar.offsetHeight;
+		this.menu_bar.appendChild(this.menu);
+	}
+	else
+	{
+		this.element.appendChild(this.menu);
+	}
 }
 
 doorways_t.prototype.save=function()
@@ -196,6 +207,14 @@ doorways_t.prototype.create=function(title,pos)
 	this.move(doorway,pos);
 
 	this.doorways.push(doorway);
+
+	if(this.menu_bar)
+	{
+		doorway.tab.li.style.marginTop=1;
+		doorway.tab.a.style.paddingTop=13;
+		doorway.tab.a.style.paddingBottom=7;
+		doorway.tab.a.style.height="100%";
+	}
 
 	return doorway;
 }
@@ -450,7 +469,10 @@ doorways_t.prototype.offset_left=function()
 
 doorways_t.prototype.offset_top=function()
 {
-	var offset=parseInt(this.element.offsetTop)+parseInt(this.menu.offsetHeight);
+	var offset=parseInt(this.element.offsetTop);
+
+	if(!this.menu_bar)
+		offset+=parseInt(this.menu.offsetHeight);
 
 	if(!offset)
 		offset=0;
@@ -478,7 +500,7 @@ doorways_t.prototype.create_menu_button=function(glyph,onclick,tooltip)
 	var span=document.createElement("span");
 
 	button.className="btn btn-default btn-lg";
-	button.style.marginTop=1;
+
 	button.style.float="right";
 	button.setAttribute("aria-label","Left Align");
 	button.onclick=onclick;
@@ -488,4 +510,14 @@ doorways_t.prototype.create_menu_button=function(glyph,onclick,tooltip)
 	span.style.color="#337ab7";
 	span.setAttribute("aria-hidden","true");
 	button.appendChild(span);
+
+	if(this.menu_bar)
+	{
+		button.style.marginBottom=1;
+		button.style.height="100%";
+	}
+	else
+	{
+		button.style.marginTop=1;
+	}
 }

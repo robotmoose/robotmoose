@@ -2,7 +2,6 @@ windows api (doorways)
 	need:
 		-Ability to alert.
 		-Dropouts should update state area.
-		-Integrate robot menu into the gui tab menu.
 
 	completely optional at this point:
 		-Touch events...

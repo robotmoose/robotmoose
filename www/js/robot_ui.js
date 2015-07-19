@@ -115,7 +115,7 @@ robot_ui_t.prototype.create_menus=function()
 robot_ui_t.prototype.create_gui=function()
 {
 	this.create_menus();
-	this.gui.element=new doorways_t(div);
+	this.gui.element=new doorways_t(div,this.menu.get_menu_bar());
 }
 
 robot_ui_t.prototype.download_gui=function()
