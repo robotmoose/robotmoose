@@ -10,7 +10,7 @@ function robot_ui_t(div)
 	this.div=div;
 	this.cloned=false;
 	this.robot_name=null;
-	this.disconnected_text="<font style='color:red;'>Disconnected</font>";
+	this.disconnected_text="<font style='color:red;'>Not connected.</font>";
 
 	this.menu=null;
 	this.connect_menu=null;
@@ -135,9 +135,23 @@ robot_ui_t.prototype.download_gui=function()
 			if(myself.widgets[key].download)
 				myself.widgets[key].download(myself.robot_name);
 
-		myself.gui.interval=setInterval(function(){myself.upload_gui();},1000);
+		myself.gui.interval=setInterval(function(){myself.run_interval();},1000);
 	});
 }
+
+
+robot_ui_t.prototype.run_interval=function() {
+	// Update sensor data 
+	var myself=this;
+	superstar_get(this.robot_name,"sensors",
+		function(sensor_data)
+		{
+			myself.widgets.sensor.refresh(sensor_data);
+		});
+
+	this.upload_gui();
+}
+
 
 robot_ui_t.prototype.upload_gui=function()
 {
@@ -153,6 +167,8 @@ robot_ui_t.prototype.upload_gui=function()
 
 robot_ui_t.prototype.create_widgets=function()
 {
+	var myself=this; 
+
 	this.doorways=
 	{
 		config:this.create_doorway("Configure"),
@@ -168,14 +184,6 @@ robot_ui_t.prototype.create_widgets=function()
 		pilot:new pilot_interface_t(this.doorways.pilot.content),
 		sensor:new tree_viewer_t(this.doorways.sensor.content,{})
 	};
-
-	// HACKITY HACK: fill initial sensor data.  Needs to be in set_interval.
-	var myself=this;
-	superstar_get(this.robot_name,"sensors",
-		function(sensor_data)
-		{
-			myself.widgets.sensor.refresh(sensor_data);
-		});
 
 	this.widgets.config.onconfigure=function()
 	{
