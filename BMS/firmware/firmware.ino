@@ -34,8 +34,8 @@
 
 // Charge function parameters
 
-#define ABS_max           4.111  // Max Cell voltage: DO NOT CHARGE HIGHER
-#define max_working       4.100  // Discharge cells higher than this value
+#define ABS_max           4.2  // Max Cell voltage: DO NOT CHARGE HIGHER
+#define max_working       4.111  // Discharge cells higher than this value
 #define low_cell_working  3.500  // Warning Voltage
 #define ABS_min           3.200  //E-Stop or risk damage
 
@@ -267,9 +267,9 @@ void Charge()    // Function to turn on charging and cell balancing
 void BatteryCritical()
 {
   // Artificially set to test if statements:
-  //cellVoltage[0] = 3.3;
-  //cellVoltage[1] = 3.1;
-  //cellVoltage[2]=  3.2; 
+  //cellVoltage[0] = 4.5;
+  //cellVoltage[1] = 4.5;
+  //cellVoltage[2]=  4.5; 
   if ((cellVoltage[0] + cellVoltage[1] + cellVoltage[2]) == 0)
   {
     digitalWrite(OK, LOW);
@@ -409,7 +409,7 @@ void loop()
   Serial.println(" %");
   
   Serial.println("-------------------------------------");
-  delay(1200);
+  //yedelay(1200);
 }
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
