@@ -70,11 +70,11 @@ main.cpp: arduino.ino
 	cp $< $@
 
 main: main.cpp $(MAIN_SRC) *.h
-	$(COMPILER2560) $(DIRS) $(CFLAGS) $(INCLUDE) $(MAIN_SRC) $(ARDUINO_SRC) -o $(BIN_DIR)/$@.elf
+	$(COMPILER328) $(DIRS) $(CFLAGS) $(INCLUDE) $(MAIN_SRC) $(ARDUINO_SRC) -o $(BIN_DIR)/$@.elf
 	$(LINKER) -R .eeprom -O ihex $(BIN_FILE).elf $(BIN_FILE).hex
 
 upload: main
-	$(PROG2560) -P$(PROGRAM_PORT) -Uflash:w:$(BIN_FILE).hex $(PFLAGS)
+	$(PROG328) -P$(PROGRAM_PORT) -Uflash:w:$(BIN_FILE).hex $(PFLAGS)
 
 clean:
 	@rm -rf $(BIN_DIR)/main.hex
