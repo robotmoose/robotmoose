@@ -1,3 +1,8 @@
+/**
+  This is the new 2015-07 modular robot interface, with a row of buttons on top,
+  and moveable "doorways" showing each robot interface element.
+*/
+
 //to add a widget, add an entry to create_widgets.
 //if the widget has a download method, it will be called.
 //if the widget has a upload method, add the callback in create_widgets.
@@ -21,7 +26,8 @@ function robot_ui_t(div)
 		interval:null,
 		old:""
 	};
-	this.doorways={}
+	this.sensor_data_count=0;
+	this.doorways={};
 	this.widgets={};
 
 	this.create_gui();
@@ -135,7 +141,7 @@ robot_ui_t.prototype.download_gui=function()
 			if(myself.widgets[key].download)
 				myself.widgets[key].download(myself.robot_name);
 
-		myself.gui.interval=setInterval(function(){myself.run_interval();},1000);
+		myself.gui.interval=setInterval(function(){myself.run_interval();},50);
 	});
 }
 
@@ -143,11 +149,18 @@ robot_ui_t.prototype.download_gui=function()
 robot_ui_t.prototype.run_interval=function() {
 	// Update sensor data 
 	var myself=this;
-	superstar_get(this.robot_name,"sensors",
-		function(sensor_data)
-		{
-			myself.widgets.sensor.refresh(sensor_data);
-		});
+	
+	if (myself.sensor_data_count<2) 
+	{ // request more sensor data
+		this.sensor_data_count++;
+		superstar_get(this.robot_name,"sensors",
+			function(sensors) // sensor data has arrived:
+			{
+				myself.widgets.sensors.refresh(sensors);
+				myself.widgets.map.refresh(sensors);
+				myself.sensor_data_count--;
+			});
+	}
 
 	this.upload_gui();
 }
@@ -173,8 +186,9 @@ robot_ui_t.prototype.create_widgets=function()
 	{
 		config:this.create_doorway("Configure"),
 		pilot:this.create_doorway("Drive"),
-		sensor:this.create_doorway("Sensor"),
-		states:this.create_doorway("Code")
+		sensors:this.create_doorway("Sensors"),
+		states:this.create_doorway("Code"),
+		map:this.create_doorway("Map"),
 	};
 
 	this.widgets=
@@ -182,7 +196,8 @@ robot_ui_t.prototype.create_widgets=function()
 		config:new config_editor_t(this.doorways.config.content,this.robot_name),
 		states:new state_table_t(this.doorways.states.content),
 		pilot:new pilot_interface_t(this.doorways.pilot.content),
-		sensor:new tree_viewer_t(this.doorways.sensor.content,{})
+		sensors:new tree_viewer_t(this.doorways.sensors.content,{}),
+		map:new robot_map_t(this.doorways.map.content,{})
 	};
 
 	this.widgets.config.onconfigure=function()

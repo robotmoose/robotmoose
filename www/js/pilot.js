@@ -1,6 +1,9 @@
 /*
-  JSON Testing
-  Dr. Orion Lawlor, lawlor@alaska.edu, 2012-02-17
+  This is the old pre-summer 2015 robot piloting interface.
+  It's full featured, but everything is in fixed positions onscreen,
+  so you can't watch sensor data as you drive.
+  
+  Dr. Orion Lawlor, lawlor@alaska.edu, 2012-2015 (Public Domain)
 */
 
 
