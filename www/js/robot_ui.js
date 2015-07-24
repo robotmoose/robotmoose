@@ -141,7 +141,7 @@ robot_ui_t.prototype.download_gui=function()
 			if(myself.widgets[key].download)
 				myself.widgets[key].download(myself.robot_name);
 
-		myself.gui.interval=setInterval(function(){myself.run_interval();},50);
+		myself.gui.interval=setInterval(function(){myself.run_interval();},100);
 	});
 }
 
