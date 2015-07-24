@@ -189,7 +189,9 @@ robot_ui_t.prototype.create_widgets=function()
 		sensors:this.create_doorway("Sensors"),
 		states:this.create_doorway("Code"),
 		map:this.create_doorway("Map"),
+		video:this.create_doorway("Video"),
 	};
+	this.doorways.video.minimize();
 
 	this.widgets=
 	{
@@ -197,7 +199,8 @@ robot_ui_t.prototype.create_widgets=function()
 		states:new state_table_t(this.doorways.states.content),
 		pilot:new pilot_interface_t(this.doorways.pilot.content),
 		sensors:new tree_viewer_t(this.doorways.sensors.content,{}),
-		map:new robot_map_t(this.doorways.map.content,{})
+		map:new robot_map_t(this.doorways.map.content,{}),
+		video:new video_gruveo_t(this.doorways.video.content)
 	};
 
 	this.widgets.config.onconfigure=function()
