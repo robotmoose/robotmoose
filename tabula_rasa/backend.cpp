@@ -544,6 +544,9 @@ void robot_backend::setup_devices(std::string robot_config)
 		else if (device=="pwm") {
 			commands.push_back(new json_command<float,uint8_t>(json_path("pwm",pwms++)));
 		}
+		else if (device=="heartbeat") {
+			sensors.push_back(new json_sensor<int,uint8_t>(json_path("heartbeats")));
+		}
 		else std::cout<<"Arduino backend: ignoring unknown device '"<<device<<"'\n";
 	}
 	
@@ -566,7 +569,7 @@ void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 		if (start[0]=='9') break;
 	}
 
-	// Pull Arduino's current device list
+	// Pull Arduino's current options list
 	port.write("list\n",5);
 	std::string count_str=getline_serial(port);
 	int count=atoi(count_str.c_str());
@@ -575,9 +578,10 @@ void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 		std::cerr<<"Invalid Arduino device list--do you need to flash the latest tabula_rasa firmware?\n";
 	}
 	for (int dev=0;dev<count;dev++) {
-		std::string dev_types=getline_serial(port);
-		std::cout<<"  Arduino device supported: "<<dev_types<<"\n";
-		all_dev_types.push_back(dev_types);
+		std::string option=getline_serial(port);
+		std::cout<<"  Arduino device supported: '"<<option<<"'\n";
+		if (option!="serial_controller ")
+			all_dev_types.push_back(option);
 	}
 
 	// Now dump configuration to Arduino
@@ -787,9 +791,10 @@ void robot_backend::tabula_setup(std::string config)
 		sleep(1);
 		Serial.begin(Serial.Get_baud());
 		setup_arduino(Serial,config);
-	} else { // sim mode: fake options
+	} else { // sim mode: fake a bunch of options
 		all_dev_types.push_back("analog P");
 		all_dev_types.push_back("servo P");
+		all_dev_types.push_back("pwm P");
 		all_dev_types.push_back("create2 S");
 		all_dev_types.push_back("neato SP");
 		all_dev_types.push_back("bts PPPP");
