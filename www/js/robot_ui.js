@@ -191,7 +191,7 @@ robot_ui_t.prototype.create_widgets=function()
 		map:this.create_doorway("Map"),
 		video:this.create_doorway("Video"),
 	};
-	this.doorways.video.minimize();
+	this.gui.element.minimize(this.doorways.video);
 
 	this.widgets=
 	{
