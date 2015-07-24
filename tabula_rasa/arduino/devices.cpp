@@ -105,7 +105,7 @@ REGISTER_TABULA_DEVICE(bms,"",
 	actions_1s.add(device);
 )
     
-
+/*
 // Watch sensor or command values on serial port (in ASCII)
 template <class T>
 class sensor_watcher : public action { public:
@@ -126,18 +126,19 @@ class command_watcher : public action { public:
 };
 REGISTER_TABULA_DEVICE(commands8,"", actions_1s.add(new command_watcher<unsigned char>());  )
 REGISTER_TABULA_DEVICE(commands16,"", actions_1s.add(new command_watcher<int16_t>());  )
+*/
 
-
-// Simple ASCII serial heartbeat
+// Sensor heartbeat: simple increasing value
 class heartbeat : public action {
 public:
-   void loop() { Serial.println(F("Heartbeat!")); }
+   unsigned char count;
+   tabula_sensor<unsigned char> heartbeats;
+   void loop() { heartbeats=count++; }
 };
 
 REGISTER_TABULA_DEVICE(heartbeat,"",
-  actions_1s.add(new heartbeat());
+  actions_100ms.add(new heartbeat());
 )
-
 
 // Latency monitor
 class latency_monitor : public action {
