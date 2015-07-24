@@ -8,7 +8,8 @@ function tree_viewer_t(div,json)
 	this.json=json;
 
 	this.div.style.width=480;
-	this.spacing=-10;
+	this.indent=50; // pixels of indenting per level
+	this.spacing=-this.indent;
 	this.paths=[];
 	this.views={};
 
@@ -23,7 +24,7 @@ tree_viewer_t.prototype.create_handle=function(li)
 	var myself=this;
 	var handle=document.createElement("span");
 	handle.style.cursor="pointer";
-	handle.onclick=function()
+	handle.onmousedown=function()
 	{
 		if(li.tree_parent.style.display=="none")
 		{
@@ -60,7 +61,7 @@ tree_viewer_t.prototype.build=function(json,parent)
 		ul.className="list-group";
 		ul.style.marginBottom=-1;
 		parent.appendChild(ul);
-		myself.spacing+=10;
+		myself.spacing+=myself.indent;
 
 		for(var key in json)
 		{
@@ -120,7 +121,7 @@ tree_viewer_t.prototype.build=function(json,parent)
 			}
 		}
 
-		myself.spacing-=10;
+		myself.spacing-=myself.indent;
 		return ul;
 	})();
 }
