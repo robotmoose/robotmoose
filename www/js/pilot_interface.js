@@ -1,5 +1,6 @@
 /*
-  This is the main operator control interface for a driving robot.
+  This is the main operator control interface for a driving robot,
+  in the new 2015-07 UI style.
 
 Members
 	onpilot(pilotdata) - callback triggered when pilot data needs to be sent
@@ -89,7 +90,18 @@ function pilot_interface_t(div)
 	this.arrowDiv.style.position="relative";
 	this.arrowDiv.style.width=this.arrowDiv.style.height="200px";
 	this.div.appendChild(this.arrowDiv);
+	
+	// Drive power input textbox
+	var p=document.createElement("p");
+	p.innerHTML="Drive power: ";
+	this.div.appendChild(p);
+	this.drive_power=document.createElement("input");
+	this.drive_power.type="text";
+	this.drive_power.size=8;
+	this.drive_power.value="40%";
+	p.appendChild(this.drive_power);
 
+	
 	// Mouse event handlers for arrow div
 	var myself=this;
 	this.mouse_in_div=0;
@@ -120,11 +132,11 @@ function pilot_interface_t(div)
 
 // Return the drive power the user has currently selected
 pilot_interface_t.prototype.get_pilot_power=function() {
-	var maxPower=0.7;
+	var maxPower=1.0;
 
 	var powerUI=0.2;
-	var powerUIdom=document.getElementById('robot_power');
-	if (powerUIdom) powerUI=powerUIdom.value*0.01;
+	var powerUIdom=this.drive_power;
+	if (powerUIdom) powerUI=parseFloat(powerUIdom.value)*0.01;
 	if (isNaN(powerUI)) powerUI=0.2;
 	else if (powerUI<maxPower) { maxPower=powerUI; }
 
