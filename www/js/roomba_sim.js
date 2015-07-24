@@ -164,8 +164,8 @@ roomba_t.prototype.set_location=function(P,angle_rad)
 	this.sensorObject3D.position.copy(this.P);
 
 	// Update camera position to follow robot
-	renderer.controls.center.set(this.P.x,this.P.y,this.P.z);
-	renderer.controls.object.position.set(
+	this.renderer.controls.center.set(this.P.x,this.P.y,this.P.z);
+	this.renderer.controls.object.position.set(
 		this.P.x,this.P.y-1200,this.P.z+1400);
 
 	// Update wheel trackers
