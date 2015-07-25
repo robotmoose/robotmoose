@@ -549,11 +549,11 @@ void robot_backend::setup_devices(std::string robot_config)
 		}
 		else std::cout<<"Arduino backend: ignoring unknown device '"<<device<<"'\n";
 	}
-	
+
 	// Clear out command and sensor bytes (otherwise they're full of junk)
 	memset(tabula_command_storage.array,0,tabula_command_storage.count);
 	memset(tabula_sensor_storage.array,0,tabula_sensor_storage.count);
-	
+
 	printf("Backend configured: %d command bytes, %d sensor bytes!\n",
 		(int)tabula_command_storage.count,(int)tabula_sensor_storage.count);
 }
@@ -702,40 +702,44 @@ void robot_backend::read_network(const std::string &read_json)
 		json::Value pilot=return_json[0];
 		json::Object config=return_json[1];
 
+		if(config["configs"].GetType()==json::ArrayVal&&config["configs"].GetType()==json::ArrayVal&&config["counter"].IsNumeric())
+			read_config("",config["configs"].ToArray(),config["counter"].ToInt());
+
 		// Pull registered commands from JSON
 		for (unsigned int i=0;i< commands.size();i++) commands[i]->modify(pilot);
 
 #ifndef	_WIN32
-		// Script execution magic
-		static std::string last_cmd_arg="";
-		std::string run=pilot["cmd"]["run"];
-		std::string arg=pilot["cmd"]["arg"];
 
-		read_config("",config["configs"].ToArray(),config["counter"].ToInt());
+		if(pilot["cmd"].GetType()==json::ObjectVal)
+		{
+			// Script execution magic
+			static std::string last_cmd_arg="";
+			std::string run=pilot["cmd"]["run"];
+			std::string arg=pilot["cmd"]["arg"];
 
-		if (run.find_first_of("./\\\"")==std::string::npos) { // looks clean
-			std::string cmd_arg=run+arg;
-			if (last_cmd_arg!=cmd_arg) { // new script command: run it
+			if (run.find_first_of("./\\\"")==std::string::npos) { // looks clean
+				std::string cmd_arg=run+arg;
+				if (last_cmd_arg!=cmd_arg) { // new script command: run it
 
-				std::string path="./"+run;
-				printf("RUNNING SCRIPT: '%s' with arg '%s'\n",
-					path.c_str(),arg.c_str());
+					std::string path="./"+run;
+					printf("RUNNING SCRIPT: '%s' with arg '%s'\n",
+						path.c_str(),arg.c_str());
 
-				if (fork()==0) {
-					if (chdir("../layla/backend/scripts")!=0) {
-						printf("SCRIPT chdir FAILED\n");
+					if (fork()==0) {
+						if (chdir("../layla/backend/scripts")!=0) {
+							printf("SCRIPT chdir FAILED\n");
+						}
+
+						else {
+							execl(path.c_str(),path.c_str(),arg.c_str(),(char *)NULL);
+							perror("SCRIPT EXECUTE FAILED\n");
+						}
+						exit(0);
 					}
-
-					else {
-						execl(path.c_str(),path.c_str(),arg.c_str(),(char *)NULL);
-						perror("SCRIPT EXECUTE FAILED\n");
-					}
-					exit(0);
 				}
+
+				last_cmd_arg=cmd_arg;
 			}
-
-			last_cmd_arg=cmd_arg;
-
 		}
 
 #endif
@@ -743,12 +747,17 @@ void robot_backend::read_network(const std::string &read_json)
 		if (sim) {
 			double distance_per_power=0.02; // meters per timestep
 			double wheelbase=0.3; // meters
-			double delL=pilot["power"]["L"];
-			double delR=pilot["power"]["R"];
-			location.move_wheels(
-				delL*distance_per_power,
-				delR*distance_per_power,
-				wheelbase);
+
+			if(pilot["power"].GetType()==json::ObjectVal&&pilot["power"]["L"].IsNumeric()&&pilot["power"]["R"].IsNumeric())
+			{
+				double delL=pilot["power"]["L"];
+				double delR=pilot["power"]["R"];
+
+				location.move_wheels(
+					delL*distance_per_power,
+					delR*distance_per_power,
+					wheelbase);
+			}
 		}
 
 	} catch (std::exception &e) {
