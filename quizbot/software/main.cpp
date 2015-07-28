@@ -1,7 +1,7 @@
 #include <arduino.hpp>
 #include "littlestar.hpp"
 
-arduino_t arduino("/dev/ttyUSB0",57600);
+arduino_t arduino("/dev/ttyACM0",57600);
 
 bool client_func(littlestar_client_t client)
 {
