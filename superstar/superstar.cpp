@@ -266,7 +266,27 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
   if (ev!=MG_REQUEST) return false; // not a request? not our problem
   // else it's a request
 
-  printf("Incoming request: client %s:%d, URI %s\n",conn->remote_ip,conn->remote_port,conn->uri);
+  std::string remote_ip(conn->remote_ip);
+
+  if(remote_ip==std::string("127.0.0.1"))
+  {
+		std::cout<<"Local IP detected, attempting to get remote..."<<std::flush;
+
+		for(int ii=0;ii<conn->num_headers;++ii)
+		{
+			if(conn->http_headers[ii].name==std::string("X-Forwarded-For"))
+			{
+				remote_ip=std::string(conn->http_headers[ii].value);
+				std::cout<<"success, X-Forwarded-For header found."<<std::endl;
+				break;
+			}
+		}
+
+		if(remote_ip==std::string("127.0.0.1"))
+			std::cout<<"failed."<<std::endl;
+  }
+
+  printf("Incoming request: client %s:%d, URI %s\n",remote_ip.c_str(),conn->remote_port,conn->uri);
 
   const char *prefix="/superstar/";
   if (strncmp(conn->uri,prefix,strlen(prefix))!=0)
@@ -277,7 +297,7 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
   if (conn->query_string) query=conn->query_string;
 
   std::string content="<HTML><BODY>Hello from mongoose!  "
-  	"I see you're using source IP "+std::string(conn->remote_ip)+" and port "+my_itos(conn->remote_port)+"\n";
+  "I see you're using source IP "+remote_ip+" and port "+my_itos(conn->remote_port)+"\n";
   content+="<P>Superstar path: "+starpath+"\n";
 
   enum {NBUF=32767}; // maximum length for JSON data being set
