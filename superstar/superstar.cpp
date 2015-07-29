@@ -268,21 +268,21 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 
   std::string remote_ip(conn->remote_ip);
 
-  if(remote_ip==std::string("127.0.0.1"))
+  if(remote_ip=="127.0.0.1")
   {
 		std::cout<<"Local IP detected, attempting to get remote..."<<std::flush;
 
 		for(int ii=0;ii<conn->num_headers;++ii)
 		{
-			if(conn->http_headers[ii].name==std::string("X-Forwarded-For"))
+			if(std::string(conn->http_headers[ii].name)=="X-Forwarded-For")
 			{
-				remote_ip=std::string(conn->http_headers[ii].value);
+				remote_ip=conn->http_headers[ii].value;
 				std::cout<<"success, X-Forwarded-For header found."<<std::endl;
 				break;
 			}
 		}
 
-		if(remote_ip==std::string("127.0.0.1"))
+		if(remote_ip=="127.0.0.1")
 			std::cout<<"failed."<<std::endl;
   }
 
