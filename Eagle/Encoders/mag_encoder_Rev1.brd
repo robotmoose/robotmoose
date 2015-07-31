@@ -6,7 +6,11 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
+<<<<<<< HEAD
 <grid distance="0.05" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="mm" altunit="mm"/>
+=======
+<grid distance="0.5" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.25" altunitdist="mm" altunit="mm"/>
+>>>>>>> Modified encoder board designs.
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -133,6 +137,7 @@
 </layers>
 <board>
 <plain>
+<<<<<<< HEAD
 <text x="9.783" y="3.925" size="1.27" layer="26" rot="MR90">Magnetic Encoder Rev1</text>
 <text x="2.286" y="20.955" size="0.762" layer="25">GND</text>
 <text x="8.5725" y="20.955" size="0.762" layer="25">SIG</text>
@@ -144,6 +149,20 @@
 <wire x1="1.6" y1="3.6" x2="4.05" y2="1.15" width="0" layer="20"/>
 <wire x1="4.05" y1="1.15" x2="9.1" y2="1.15" width="0" layer="20"/>
 <wire x1="9.1" y1="1.15" x2="11.5" y2="3.55" width="0" layer="20"/>
+=======
+<wire x1="1.143" y1="2.794" x2="3.683" y2="0.254" width="0" layer="20"/>
+<wire x1="3.683" y1="0.254" x2="9.398" y2="0.254" width="0" layer="20"/>
+<wire x1="9.398" y1="0.254" x2="11.938" y2="2.794" width="0" layer="20"/>
+<wire x1="11.938" y1="2.794" x2="11.938" y2="27.305" width="0" layer="20"/>
+<wire x1="1.143" y1="2.794" x2="1.143" y2="27.305" width="0" layer="20"/>
+<text x="10.033" y="3.175" size="1.27" layer="26" rot="MR90">Magnetic Encoder Rev1</text>
+<text x="2.286" y="20.955" size="0.762" layer="25">GND</text>
+<text x="8.5725" y="20.955" size="0.762" layer="25">SIG</text>
+<text x="5.588" y="20.955" size="0.762" layer="25">VCC</text>
+<wire x1="11.938" y1="27.305" x2="11.4935" y2="27.7495" width="0" layer="20"/>
+<wire x1="11.4935" y1="27.7495" x2="1.5875" y2="27.7495" width="0" layer="20"/>
+<wire x1="1.143" y1="27.305" x2="1.5875" y2="27.7495" width="0" layer="20"/>
+>>>>>>> Modified encoder board designs.
 </plain>
 <libraries>
 <library name="SparkFun-Capacitors">
@@ -446,7 +465,11 @@ Please make sure your boards conform to these design rules.</description>
 <element name="R1" library="SparkFun-Resistors" package="0603" value="10k" x="6.477" y="8.505" rot="R180">
 <attribute name="PROD_ID" value="RES-09570" x="6.477" y="8.505" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
+<<<<<<< HEAD
 <element name="U$2" library="Clayton" package="MOUNTING_SCREW-3MM" value="MOUNTING_SCREW-3MM" x="6.477" y="4.183"/>
+=======
+<element name="U$2" library="Clayton" package="MOUNTING_SCREW-3MM" value="MOUNTING_SCREW-3MM" x="6.477" y="3.683"/>
+>>>>>>> Modified encoder board designs.
 <element name="U$3" library="Clayton" package="MOUNTING_SCREW-3MM" value="MOUNTING_SCREW-3MM" x="6.477" y="17.78"/>
 <element name="U$1" library="Clayton" package="3_PIN_JST-XH" value="3_PIN_JST-XH" x="11.4935" y="27.7495" rot="R180"/>
 </elements>
@@ -465,30 +488,78 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="10.1854" y1="13.0302" x2="9.787" y2="12.915" width="0.254" layer="1"/>
 <wire x1="6.5278" y1="13.2588" x2="6.477" y2="13.365" width="0.254" layer="1"/>
 <contactref element="U$1" pad="P$3"/>
+<<<<<<< HEAD
 <wire x1="6.7564" y1="13.0302" x2="9.787" y2="12.915" width="0" layer="19" extent="1-1"/>
 <wire x1="3.167" y1="12.915" x2="6.477" y2="13.365" width="0" layer="19" extent="1-1"/>
 <wire x1="4.0435" y1="24.3495" x2="6.477" y2="13.365" width="0" layer="19" extent="1-1"/>
+=======
+<wire x1="6.858" y1="12.954" x2="10.2108" y2="12.954" width="0.1524" layer="1"/>
+<wire x1="10.2108" y1="12.954" x2="10.287" y2="12.915" width="0.1524" layer="1"/>
+<wire x1="6.858" y1="12.954" x2="6.477" y2="13.365" width="0.1524" layer="1"/>
+<via x="4.0005" y="13.9065" extent="1-16" drill="0.6"/>
+<wire x1="3.048" y1="12.954" x2="2.7432" y2="12.954" width="0.1524" layer="1"/>
+<wire x1="3.9624" y1="13.8684" x2="3.048" y2="12.954" width="0.1524" layer="1"/>
+<wire x1="2.7432" y1="12.954" x2="2.667" y2="12.915" width="0.1524" layer="1"/>
+<wire x1="4.4196" y1="13.4112" x2="3.9624" y2="13.8684" width="0.1524" layer="1"/>
+<wire x1="6.4008" y1="13.4112" x2="4.4196" y2="13.4112" width="0.1524" layer="1"/>
+<wire x1="3.9624" y1="13.8684" x2="4.0005" y2="13.9065" width="0.1524" layer="1"/>
+<wire x1="6.4008" y1="13.4112" x2="6.477" y2="13.365" width="0.1524" layer="1"/>
+>>>>>>> Modified encoder board designs.
 </signal>
 <signal name="VCC">
 <contactref element="C1" pad="1"/>
 <contactref element="IC1" pad="1"/>
 <contactref element="R1" pad="2"/>
 <contactref element="U$1" pad="P$2"/>
+<<<<<<< HEAD
 <wire x1="5.0292" y1="11.1252" x2="2.7432" y2="11.1252" width="0.1524" layer="1"/>
 <wire x1="5.334" y1="10.8204" x2="5.0292" y2="11.1252" width="0.1524" layer="1"/>
 <wire x1="2.7432" y1="11.1252" x2="3.167" y2="11.215" width="0.1524" layer="1"/>
 <wire x1="5.334" y1="10.8204" x2="5.377" y2="10.765" width="0.1524" layer="1"/>
 <wire x1="5.0292" y1="11.1252" x2="6.5435" y2="24.3495" width="0" layer="19" extent="1-1"/>
 <wire x1="5.627" y1="8.505" x2="5.377" y2="10.765" width="0" layer="19" extent="1-1"/>
+=======
+<wire x1="5.4864" y1="10.668" x2="5.4864" y2="8.382" width="0.1524" layer="1"/>
+<wire x1="5.4864" y1="8.382" x2="5.627" y2="8.255" width="0.1524" layer="1"/>
+<wire x1="5.4864" y1="10.668" x2="5.377" y2="10.765" width="0.1524" layer="1"/>
+<wire x1="5.0292" y1="11.1252" x2="2.7432" y2="11.1252" width="0.1524" layer="1"/>
+<wire x1="5.334" y1="10.8204" x2="5.0292" y2="11.1252" width="0.1524" layer="1"/>
+<wire x1="2.7432" y1="11.1252" x2="2.667" y2="11.215" width="0.1524" layer="1"/>
+<wire x1="5.334" y1="10.8204" x2="5.377" y2="10.765" width="0.1524" layer="1"/>
+<wire x1="5.6388" y1="24.384" x2="6.4008" y2="24.384" width="0.1524" layer="1"/>
+<wire x1="4.7244" y1="25.2984" x2="5.6388" y2="24.384" width="0.1524" layer="1"/>
+<wire x1="3.3528" y1="25.2984" x2="4.7244" y2="25.2984" width="0.1524" layer="1"/>
+<wire x1="1.8288" y1="23.7744" x2="3.3528" y2="25.2984" width="0.1524" layer="1"/>
+<wire x1="1.8288" y1="12.0396" x2="1.8288" y2="23.7744" width="0.1524" layer="1"/>
+<wire x1="2.5908" y1="11.2776" x2="1.8288" y2="12.0396" width="0.1524" layer="1"/>
+<wire x1="6.4008" y1="24.384" x2="6.5435" y2="24.3495" width="0.1524" layer="1"/>
+<wire x1="2.5908" y1="11.2776" x2="2.667" y2="11.215" width="0.1524" layer="1"/>
+>>>>>>> Modified encoder board designs.
 </signal>
 <signal name="SIG">
 <contactref element="R1" pad="1"/>
 <contactref element="IC1" pad="2"/>
 <contactref element="C2" pad="1"/>
 <contactref element="U$1" pad="P$1"/>
+<<<<<<< HEAD
 <wire x1="9.787" y1="11.215" x2="9.0435" y2="24.3495" width="0" layer="19" extent="1-1"/>
 <wire x1="7.577" y1="10.765" x2="9.787" y2="11.215" width="0" layer="19" extent="1-1"/>
 <wire x1="7.327" y1="8.505" x2="7.577" y2="10.765" width="0" layer="19" extent="1-1"/>
+=======
+<wire x1="7.4676" y1="10.668" x2="7.4676" y2="8.382" width="0.1524" layer="1"/>
+<wire x1="7.4676" y1="8.382" x2="7.327" y2="8.255" width="0.1524" layer="1"/>
+<wire x1="7.4676" y1="10.668" x2="7.577" y2="10.765" width="0.1524" layer="1"/>
+<wire x1="7.9248" y1="11.1252" x2="10.2108" y2="11.1252" width="0.1524" layer="1"/>
+<wire x1="7.62" y1="10.8204" x2="7.9248" y2="11.1252" width="0.1524" layer="1"/>
+<wire x1="10.2108" y1="11.1252" x2="10.287" y2="11.215" width="0.1524" layer="1"/>
+<wire x1="7.62" y1="10.8204" x2="7.577" y2="10.765" width="0.1524" layer="1"/>
+<wire x1="9.144" y1="19.5072" x2="9.144" y2="24.2316" width="0.1524" layer="1"/>
+<wire x1="11.1252" y1="17.526" x2="9.144" y2="19.5072" width="0.1524" layer="1"/>
+<wire x1="11.1252" y1="12.0396" x2="11.1252" y2="17.526" width="0.1524" layer="1"/>
+<wire x1="10.3632" y1="11.2776" x2="11.1252" y2="12.0396" width="0.1524" layer="1"/>
+<wire x1="9.144" y1="24.2316" x2="9.0435" y2="24.3495" width="0.1524" layer="1"/>
+<wire x1="10.3632" y1="11.2776" x2="10.287" y2="11.215" width="0.1524" layer="1"/>
+>>>>>>> Modified encoder board designs.
 </signal>
 </signals>
 </board>
