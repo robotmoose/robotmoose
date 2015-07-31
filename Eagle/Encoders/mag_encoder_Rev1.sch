@@ -787,71 +787,45 @@ In this library the device names are the same as the pin names of the symbols, t
 </library>
 <library name="Clayton">
 <packages>
-<package name="JST_B3B-PH_HEADER">
-<description>3-pin JST PH Shrouded Header &lt;br&gt;
-2.0mm pitch &lt;br&gt;
-P/N B3B-PH-K-S.  Mating plug PHR-3 &lt;br&gt;</description>
-<pad name="P3" x="-1.9725" y="0.0475" drill="0.8" shape="long" rot="R90"/>
-<pad name="P2" x="0.0275" y="0.0475" drill="0.8" shape="long" rot="R90"/>
-<pad name="P1" x="2.0275" y="0.0475" drill="0.8" shape="long" rot="R90"/>
-<wire x1="-3.9225" y1="2.3825" x2="3.9275" y2="2.3825" width="0.127" layer="21"/>
-<wire x1="3.9275" y1="2.3825" x2="3.9275" y2="-2.1175" width="0.127" layer="21"/>
-<wire x1="3.9275" y1="-2.1175" x2="-3.9225" y2="-2.1175" width="0.127" layer="21"/>
-<wire x1="-3.9225" y1="-2.1175" x2="-3.9225" y2="2.3825" width="0.127" layer="21"/>
-<rectangle x1="-1.9725" y1="-2.1175" x2="2.0275" y2="-1.6175" layer="21"/>
-<text x="-3.9725" y="2.6825" size="0.8128" layer="25" font="vector">&gt;NAME</text>
-<text x="2.145" y="-1.635" size="0.8128" layer="21" font="vector">1</text>
-</package>
 <package name="MOUNTING_SCREW-3MM">
 <pad name="P$1" x="0" y="0" drill="3.2" diameter="5.65"/>
 </package>
+<package name="3_PIN_JST-XH">
+<wire x1="0" y1="0" x2="2.45" y2="0" width="0.127" layer="21"/>
+<wire x1="2.45" y1="0" x2="7.45" y2="0" width="0.127" layer="21"/>
+<wire x1="7.45" y1="0" x2="9.9" y2="0" width="0.127" layer="21"/>
+<wire x1="9.9" y1="0" x2="9.9" y2="5.75" width="0.127" layer="21"/>
+<wire x1="9.9" y1="5.75" x2="0" y2="5.75" width="0.127" layer="21"/>
+<wire x1="0" y1="5.75" x2="0" y2="0" width="0.127" layer="21"/>
+<pad name="P$1" x="2.45" y="3.4" drill="0.8" shape="square"/>
+<pad name="P$2" x="4.95" y="3.4" drill="0.8" shape="square"/>
+<pad name="P$3" x="7.45" y="3.4" drill="0.8" shape="square"/>
+<wire x1="2.45" y1="0" x2="2.45" y2="1" width="0.127" layer="21"/>
+<wire x1="7.45" y1="0" x2="7.45" y2="1" width="0.127" layer="21"/>
+</package>
 </packages>
 <symbols>
-<symbol name="JST_PHR-3">
-<description>3-pin JST PH Shrouded Header, top entry &lt;br&gt;
-P/N B3B-PH-K-S &lt;br&gt;
-Mating connector PHR-3 &lt;br&gt;</description>
-<pin name="1" x="-5.08" y="2.54" visible="pin" length="middle"/>
-<pin name="2" x="-5.08" y="0" visible="pin" length="middle"/>
-<pin name="3" x="-5.08" y="-2.54" visible="pin" length="middle"/>
-<text x="-2.54" y="5.842" size="1.27" layer="95">&gt;NAME</text>
-<text x="-2.54" y="-6.858" size="1.27" layer="96">&gt;VALUE</text>
-<wire x1="-2.54" y1="5.08" x2="5.08" y2="5.08" width="0.254" layer="94"/>
-<wire x1="5.08" y1="5.08" x2="5.08" y2="-5.08" width="0.254" layer="94"/>
-<wire x1="5.08" y1="-5.08" x2="-2.54" y2="-5.08" width="0.254" layer="94"/>
-<wire x1="-2.54" y1="-5.08" x2="-2.54" y2="5.08" width="0.254" layer="94"/>
-<circle x="0" y="2.54" radius="0.915809375" width="0.254" layer="94"/>
-<circle x="0" y="0" radius="0.915809375" width="0.254" layer="94"/>
-<circle x="0" y="-2.54" radius="0.915809375" width="0.254" layer="94"/>
-</symbol>
 <symbol name="VIA">
 <pin name="P$1" x="0" y="0" length="point"/>
 <circle x="0" y="0" radius="1.54501875" width="0.254" layer="94"/>
 <text x="-2.286" y="1.778" size="1.27" layer="95">&gt;NAME</text>
 <text x="-2.286" y="-3.048" size="1.27" layer="96">&gt;VALUE</text>
 </symbol>
+<symbol name="3_PIN_JST-XH">
+<wire x1="0" y1="5" x2="2.5" y2="5" width="0.254" layer="94"/>
+<wire x1="2.5" y1="5" x2="7.5" y2="5" width="0.254" layer="94"/>
+<wire x1="7.5" y1="5" x2="10" y2="5" width="0.254" layer="94"/>
+<wire x1="10" y1="5" x2="10" y2="12.5" width="0.254" layer="94"/>
+<wire x1="10" y1="12.5" x2="0" y2="12.5" width="0.254" layer="94"/>
+<wire x1="0" y1="12.5" x2="0" y2="5" width="0.254" layer="94"/>
+<wire x1="2.5" y1="5" x2="2.5" y2="7.5" width="0.254" layer="94"/>
+<wire x1="7.5" y1="5" x2="7.5" y2="7.5" width="0.254" layer="94"/>
+<pin name="P$1" x="2.54" y="0" length="middle" rot="R90"/>
+<pin name="P$2" x="5.08" y="0" length="middle" rot="R90"/>
+<pin name="P$3" x="7.62" y="0" length="middle" rot="R90"/>
+</symbol>
 </symbols>
 <devicesets>
-<deviceset name="JST-PH_3-PIN_HEADER">
-<description>3-pin JST PH Shrouded Header, top entry &lt;br&gt;
-P/N B3B-PH-K-S &lt;br&gt;
-Mating connector PHR-3 &lt;br&gt;</description>
-<gates>
-<gate name="G$1" symbol="JST_PHR-3" x="-2.54" y="0"/>
-</gates>
-<devices>
-<device name="" package="JST_B3B-PH_HEADER">
-<connects>
-<connect gate="G$1" pin="1" pad="P1"/>
-<connect gate="G$1" pin="2" pad="P2"/>
-<connect gate="G$1" pin="3" pad="P3"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
 <deviceset name="MOUNTING_SCREW-3MM">
 <gates>
 <gate name="G$1" symbol="VIA" x="0" y="0"/>
@@ -860,6 +834,24 @@ Mating connector PHR-3 &lt;br&gt;</description>
 <device name="" package="MOUNTING_SCREW-3MM">
 <connects>
 <connect gate="G$1" pin="P$1" pad="P$1"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="3_PIN_JST-XH">
+<description>3-pin JST XH Shrouded Header, top entry, 2.5 mm pitch</description>
+<gates>
+<gate name="G$1" symbol="3_PIN_JST-XH" x="0" y="-5.08"/>
+</gates>
+<devices>
+<device name="" package="3_PIN_JST-XH">
+<connects>
+<connect gate="G$1" pin="P$1" pad="P$1"/>
+<connect gate="G$1" pin="P$2" pad="P$2"/>
+<connect gate="G$1" pin="P$3" pad="P$3"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -887,10 +879,10 @@ Mating connector PHR-3 &lt;br&gt;</description>
 <part name="SUPPLY1" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY2" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY3" library="supply2" deviceset="GND" device=""/>
-<part name="U$1" library="Clayton" deviceset="JST-PH_3-PIN_HEADER" device=""/>
-<part name="SUPPLY4" library="supply2" deviceset="GND" device=""/>
 <part name="U$2" library="Clayton" deviceset="MOUNTING_SCREW-3MM" device=""/>
 <part name="U$3" library="Clayton" deviceset="MOUNTING_SCREW-3MM" device=""/>
+<part name="U$1" library="Clayton" deviceset="3_PIN_JST-XH" device=""/>
+<part name="SUPPLY4" library="supply2" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -905,28 +897,14 @@ Mating connector PHR-3 &lt;br&gt;</description>
 <instance part="SUPPLY1" gate="GND" x="55.88" y="38.1"/>
 <instance part="SUPPLY2" gate="GND" x="17.78" y="40.64"/>
 <instance part="SUPPLY3" gate="GND" x="71.12" y="38.1"/>
-<instance part="U$1" gate="G$1" x="93.98" y="60.96"/>
-<instance part="SUPPLY4" gate="GND" x="88.9" y="38.1"/>
 <instance part="U$2" gate="G$1" x="109.22" y="86.36"/>
 <instance part="U$3" gate="G$1" x="109.22" y="78.74"/>
+<instance part="U$1" gate="G$1" x="91.44" y="66.04" rot="R270"/>
+<instance part="SUPPLY4" gate="GND" x="83.82" y="38.1"/>
 </instances>
 <busses>
 </busses>
 <nets>
-<net name="VOUT" class="0">
-<segment>
-<pinref part="IC1" gate="G$1" pin="OUT"/>
-<wire x1="50.8" y1="60.96" x2="71.12" y2="60.96" width="0.1524" layer="91"/>
-<pinref part="C2" gate="G$1" pin="1"/>
-<wire x1="71.12" y1="60.96" x2="88.9" y2="60.96" width="0.1524" layer="91"/>
-<wire x1="71.12" y1="53.34" x2="71.12" y2="60.96" width="0.1524" layer="91"/>
-<junction x="71.12" y="60.96"/>
-<pinref part="R1" gate="G$1" pin="1"/>
-<wire x1="71.12" y1="66.04" x2="71.12" y2="60.96" width="0.1524" layer="91"/>
-<label x="81.28" y="60.96" size="1.778" layer="95" rot="R270" xref="yes"/>
-<pinref part="U$1" gate="G$1" pin="2"/>
-</segment>
-</net>
 <net name="GND" class="0">
 <segment>
 <pinref part="IC1" gate="G$1" pin="GND"/>
@@ -945,15 +923,14 @@ Mating connector PHR-3 &lt;br&gt;</description>
 <wire x1="17.78" y1="55.88" x2="17.78" y2="43.18" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="U$1" gate="G$1" pin="3"/>
+<pinref part="U$1" gate="G$1" pin="P$3"/>
+<wire x1="91.44" y1="58.42" x2="83.82" y2="58.42" width="0.1524" layer="91"/>
 <pinref part="SUPPLY4" gate="GND" pin="GND"/>
-<wire x1="88.9" y1="58.42" x2="88.9" y2="40.64" width="0.1524" layer="91"/>
+<wire x1="83.82" y1="58.42" x2="83.82" y2="40.64" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="WIRE" class="0">
+<net name="VCC" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="1"/>
-<wire x1="88.9" y1="63.5" x2="88.9" y2="78.74" width="0.1524" layer="91"/>
 <pinref part="C1" gate="G$1" pin="1"/>
 <wire x1="17.78" y1="63.5" x2="17.78" y2="71.12" width="0.1524" layer="91"/>
 <pinref part="R1" gate="G$1" pin="2"/>
@@ -968,13 +945,39 @@ Mating connector PHR-3 &lt;br&gt;</description>
 <junction x="55.88" y="78.74"/>
 <wire x1="17.78" y1="71.12" x2="55.88" y2="71.12" width="0.1524" layer="91"/>
 <junction x="55.88" y="71.12"/>
-<wire x1="88.9" y1="78.74" x2="71.12" y2="78.74" width="0.1524" layer="91"/>
 <junction x="71.12" y="78.74"/>
+<pinref part="U$1" gate="G$1" pin="P$2"/>
+<wire x1="83.82" y1="78.74" x2="71.12" y2="78.74" width="0.1524" layer="91"/>
+<wire x1="91.44" y1="60.96" x2="83.82" y2="60.96" width="0.1524" layer="91"/>
+<wire x1="83.82" y1="60.96" x2="83.82" y2="78.74" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="SIG" class="0">
+<segment>
+<pinref part="IC1" gate="G$1" pin="OUT"/>
+<wire x1="50.8" y1="60.96" x2="71.12" y2="60.96" width="0.1524" layer="91"/>
+<pinref part="C2" gate="G$1" pin="1"/>
+<wire x1="71.12" y1="53.34" x2="71.12" y2="60.96" width="0.1524" layer="91"/>
+<junction x="71.12" y="60.96"/>
+<pinref part="R1" gate="G$1" pin="1"/>
+<wire x1="71.12" y1="66.04" x2="71.12" y2="60.96" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="60.96" x2="73.66" y2="60.96" width="0.1524" layer="91"/>
+<label x="73.66" y="60.96" size="1.778" layer="95" xref="yes"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="G$1" pin="P$1"/>
+<wire x1="91.44" y1="63.5" x2="86.36" y2="63.5" width="0.1524" layer="91"/>
+<wire x1="86.36" y1="63.5" x2="86.36" y2="68.58" width="0.1524" layer="91"/>
+<label x="86.36" y="68.58" size="1.778" layer="95" xref="yes"/>
 </segment>
 </net>
 </nets>
 </sheet>
 </sheets>
+<errors>
+<approved hash="101,1,109.22,86.36,U$2,P$1,,,,"/>
+<approved hash="101,1,109.22,78.74,U$3,P$1,,,,"/>
+</errors>
 </schematic>
 </drawing>
 </eagle>
