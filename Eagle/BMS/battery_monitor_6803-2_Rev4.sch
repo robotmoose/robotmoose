@@ -3421,6 +3421,11 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 <wire x1="210.82" y1="91.44" x2="218.44" y2="91.44" width="0.1524" layer="91"/>
 <label x="218.44" y="91.44" size="1.778" layer="95" xref="yes"/>
 </segment>
+<segment>
+<pinref part="U$4" gate="G$1" pin="P$4"/>
+<wire x1="124.46" y1="68.58" x2="121.92" y2="68.58" width="0.1524" layer="91"/>
+<label x="121.92" y="68.58" size="1.016" layer="95" rot="R180" xref="yes"/>
+</segment>
 </net>
 <net name="VREG" class="0">
 <segment>
@@ -3838,21 +3843,6 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 <junction x="241.3" y="35.56"/>
 </segment>
 </net>
-<net name="CHARGER_OUT" class="0">
-<segment>
-<wire x1="256.54" y1="43.18" x2="261.62" y2="43.18" width="0.1524" layer="91"/>
-<label x="261.62" y="43.18" size="1.27" layer="95" xref="yes"/>
-<wire x1="256.54" y1="43.18" x2="256.54" y2="50.8" width="0.1524" layer="91"/>
-<pinref part="Q9" gate="G$1" pin="DRAIN"/>
-<wire x1="256.54" y1="50.8" x2="254" y2="50.8" width="0.1524" layer="91"/>
-<junction x="256.54" y="43.18"/>
-</segment>
-<segment>
-<pinref part="U$4" gate="G$1" pin="P$4"/>
-<wire x1="124.46" y1="68.58" x2="121.92" y2="68.58" width="0.1524" layer="91"/>
-<label x="121.92" y="68.58" size="1.016" layer="95" rot="R180" xref="yes"/>
-</segment>
-</net>
 <net name="ESTOP2" class="0">
 <segment>
 <pinref part="U$6" gate="G$1" pin="P$2"/>
@@ -3879,6 +3869,14 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 <wire x1="124.46" y1="83.82" x2="121.92" y2="83.82" width="0.1524" layer="91"/>
 <label x="121.92" y="83.82" size="1.016" layer="95" rot="R180" xref="yes"/>
 <pinref part="U$4" gate="G$1" pin="P$1"/>
+</segment>
+<segment>
+<wire x1="256.54" y1="43.18" x2="261.62" y2="43.18" width="0.1524" layer="91"/>
+<label x="261.62" y="43.18" size="1.27" layer="95" xref="yes"/>
+<wire x1="256.54" y1="43.18" x2="256.54" y2="50.8" width="0.1524" layer="91"/>
+<pinref part="Q9" gate="G$1" pin="DRAIN"/>
+<wire x1="256.54" y1="50.8" x2="254" y2="50.8" width="0.1524" layer="91"/>
+<junction x="256.54" y="43.18"/>
 </segment>
 </net>
 <net name="ESTOP1" class="0">

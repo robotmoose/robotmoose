@@ -155,17 +155,14 @@ IN</text>
 <text x="3.937" y="29.337" size="1.778" layer="25" rot="R90">ITEST BMS Rev 4</text>
 <text x="8.509" y="20.574" size="0.508" layer="21">ESTOP1</text>
 <text x="8.509" y="17.907" size="0.508" layer="21">ESTOP2</text>
-<text x="9.652" y="2.667" size="0.508" layer="21" rot="R90">CHGR
-OUT</text>
+<text x="9.017" y="2.794" size="0.508" layer="21" rot="R90">VOUT</text>
 <wire x1="89.662" y1="48.641" x2="89.662" y2="25.146" width="0" layer="20"/>
 <wire x1="67.31" y1="3.302" x2="64.77" y2="0.762" width="0" layer="20"/>
 <wire x1="89.662" y1="48.641" x2="84.201" y2="54.102" width="0" layer="20"/>
 <wire x1="89.662" y1="25.146" x2="87.503" y2="22.987" width="0" layer="20"/>
-<wire x1="87.503" y1="22.987" x2="72.263" y2="22.987" width="0" layer="20"/>
-<wire x1="72.263" y1="22.987" x2="72.136" y2="22.987" width="0" layer="20"/>
+<wire x1="87.503" y1="22.987" x2="69.469" y2="22.987" width="0" layer="20"/>
 <wire x1="67.31" y1="3.302" x2="67.31" y2="20.828" width="0" layer="20"/>
 <wire x1="67.31" y1="20.828" x2="69.469" y2="22.987" width="0" layer="20"/>
-<wire x1="69.469" y1="22.987" x2="72.136" y2="22.987" width="0" layer="20"/>
 </plain>
 <libraries>
 <library name="isaac1">
@@ -1848,6 +1845,12 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="2.667" y1="39.96441875" x2="2.8357" y2="40.13311875" width="1.016" layer="1"/>
 <wire x1="12.230846875" y1="16.256" x2="2.667" y2="25.819846875" width="0.8128" layer="1"/>
 <wire x1="2.667" y1="25.819846875" x2="2.667" y2="26.035" width="0.8128" layer="1"/>
+<contactref element="U$4" pad="P$4"/>
+<wire x1="4.953" y1="3.683" x2="6.858" y2="3.683" width="0.8128" layer="16"/>
+<wire x1="6.858" y1="3.683" x2="9.779" y2="6.604" width="0.8128" layer="16"/>
+<wire x1="9.779" y1="6.604" x2="9.779" y2="13.462" width="0.8128" layer="16"/>
+<wire x1="9.779" y1="13.462" x2="12.573" y2="16.256" width="0.8128" layer="16"/>
+<wire x1="12.573" y1="16.256" x2="14.097" y2="16.256" width="0.8128" layer="16"/>
 </signal>
 <signal name="VREG">
 <contactref element="R11" pad="2"/>
@@ -2503,25 +2506,6 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="24.638" y1="13.843" x2="24.638" y2="14.732" width="0.3048" layer="1"/>
 <wire x1="24.638" y1="14.732" x2="23.876" y2="15.494" width="0.3048" layer="1"/>
 </signal>
-<signal name="CHARGER_OUT">
-<contactref element="Q9" pad="5"/>
-<contactref element="Q9" pad="6"/>
-<contactref element="Q9" pad="7"/>
-<contactref element="Q9" pad="8"/>
-<wire x1="20.066" y1="20.694" x2="21.336" y2="20.694" width="0.8128" layer="1"/>
-<wire x1="21.336" y1="20.694" x2="22.606" y2="20.694" width="0.8128" layer="1"/>
-<wire x1="22.606" y1="20.694" x2="23.876" y2="20.694" width="0.8128" layer="1"/>
-<contactref element="U$4" pad="P$4"/>
-<wire x1="20.066" y1="20.694" x2="18.923" y2="20.694" width="0.8128" layer="1"/>
-<wire x1="18.923" y1="20.694" x2="18.923" y2="11.43" width="0.8128" layer="1"/>
-<via x="18.923" y="11.43" extent="1-16" drill="0.6"/>
-<wire x1="18.923" y1="11.43" x2="18.923" y2="11.049" width="0.8128" layer="16"/>
-<wire x1="18.923" y1="11.049" x2="14.605" y2="6.731" width="0.8128" layer="16"/>
-<wire x1="14.605" y1="6.731" x2="11.938" y2="6.731" width="0.8128" layer="16"/>
-<wire x1="11.938" y1="6.731" x2="8.636" y2="3.429" width="0.8128" layer="16"/>
-<wire x1="8.636" y1="3.429" x2="5.207" y2="3.429" width="0.8128" layer="16"/>
-<wire x1="5.207" y1="3.429" x2="4.953" y2="3.683" width="0.8128" layer="16"/>
-</signal>
 <signal name="ESTOP2">
 <wire x1="33.02" y1="13.462" x2="31.115" y2="11.811" width="0.8128" layer="1"/>
 <via x="31.115" y="11.811" extent="1-16" drill="0.6"/>
@@ -2535,12 +2519,23 @@ Please make sure your boards conform to these design rules.</description>
 </signal>
 <signal name="BATTERY+">
 <contactref element="Q10" pad="S"/>
-<wire x1="14.097" y1="18.796" x2="15.963" y2="18.796" width="0.8128" layer="1"/>
+<wire x1="14.097" y1="18.796" x2="17.272" y2="18.796" width="0.8128" layer="1"/>
 <contactref element="U$4" pad="P$1"/>
 <contactref element="R26" pad="2"/>
-<wire x1="17.272" y1="17.487" x2="15.963" y2="18.796" width="0.8128" layer="1"/>
 <wire x1="4.953" y1="11.303" x2="12.446" y2="18.796" width="0.8128" layer="16"/>
 <wire x1="12.446" y1="18.796" x2="14.097" y2="18.796" width="0.8128" layer="16"/>
+<contactref element="Q9" pad="8"/>
+<contactref element="Q9" pad="7"/>
+<contactref element="Q9" pad="5"/>
+<contactref element="Q9" pad="6"/>
+<wire x1="23.876" y1="20.694" x2="22.606" y2="20.694" width="0.8128" layer="1"/>
+<wire x1="22.606" y1="20.694" x2="21.336" y2="20.694" width="0.8128" layer="1"/>
+<wire x1="21.336" y1="20.694" x2="20.066" y2="20.694" width="0.8128" layer="1"/>
+<wire x1="20.066" y1="20.694" x2="20.059" y2="20.701" width="0.8128" layer="1"/>
+<wire x1="20.059" y1="20.701" x2="18.923" y2="20.701" width="0.8128" layer="1"/>
+<wire x1="18.923" y1="20.701" x2="17.272" y2="19.05" width="0.8128" layer="1"/>
+<wire x1="17.272" y1="19.05" x2="17.272" y2="18.796" width="0.8128" layer="1"/>
+<wire x1="17.272" y1="18.796" x2="17.272" y2="17.487" width="0.8128" layer="1"/>
 </signal>
 <signal name="ESTOP1">
 <contactref element="U$6" pad="P$1"/>
@@ -2699,6 +2694,8 @@ Please make sure your boards conform to these design rules.</description>
 <approved hash="5,1,f9261977b18cb719"/>
 <approved hash="19,1,035492b6d6f0871c"/>
 <approved hash="19,1,17905b5acf1daaae"/>
+<approved hash="19,1,d3f2cbc71918957e"/>
+<approved hash="19,1,75f2fba68407b845"/>
 <approved hash="19,1,4517f8b75af12b53"/>
 <approved hash="5,1,4e1dddc4dea04532"/>
 <approved hash="5,1,e397a09f5d61f877"/>

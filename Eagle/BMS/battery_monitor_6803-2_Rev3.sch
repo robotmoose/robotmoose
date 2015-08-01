@@ -1451,95 +1451,6 @@ We've spent an enormous amount of time creating and checking these footprints an
 </deviceset>
 </devicesets>
 </library>
-<library name="diode">
-<description>&lt;b&gt;Diodes&lt;/b&gt;&lt;p&gt;
-Based on the following sources:
-&lt;ul&gt;
-&lt;li&gt;Motorola : www.onsemi.com
-&lt;li&gt;Fairchild : www.fairchildsemi.com
-&lt;li&gt;Philips : www.semiconductors.com
-&lt;li&gt;Vishay : www.vishay.de
-&lt;/ul&gt;
-&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
-<packages>
-<package name="POWERMITE">
-<description>&lt;b&gt;Footprint Powermite&lt;/b&gt; SOD80C, SOD87&lt;p&gt;
-Source: http://www.semiconductors.philips.com/acrobat_download/literature/9397/75007774.pdf</description>
-<wire x1="-1.385" y1="0.7" x2="-1.585" y2="0.5" width="0.2032" layer="51"/>
-<wire x1="-1.385" y1="0.7" x2="1.415" y2="0.7" width="0.2032" layer="51"/>
-<wire x1="1.415" y1="0.7" x2="1.615" y2="0.5" width="0.2032" layer="51"/>
-<wire x1="1.415" y1="-0.7" x2="1.615" y2="-0.5" width="0.2032" layer="51"/>
-<wire x1="1.415" y1="-0.7" x2="-1.385" y2="-0.7" width="0.2032" layer="51"/>
-<wire x1="-1.385" y1="-0.7" x2="-1.585" y2="-0.5" width="0.2032" layer="51"/>
-<smd name="1" x="-0.635" y="0" dx="2.7" dy="2.5" layer="1"/>
-<smd name="2" x="1.665" y="0" dx="0.7" dy="1.3" layer="1"/>
-<text x="-1.905" y="-2.54" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
-<text x="-1.905" y="1.905" size="1.27" layer="25" ratio="10">&gt;NAME</text>
-<rectangle x1="1.565" y1="-0.8" x2="1.865" y2="0.8" layer="51"/>
-<rectangle x1="-1.835" y1="-0.8" x2="-1.535" y2="0.8" layer="51"/>
-<rectangle x1="-1.16" y1="-0.65" x2="-0.885" y2="0.65" layer="51"/>
-</package>
-<package name="SOD80C">
-<description>&lt;B&gt;DIODE&lt;/B&gt;</description>
-<wire x1="1.3208" y1="0.7874" x2="-1.3208" y2="0.7874" width="0.1524" layer="51"/>
-<wire x1="1.3208" y1="-0.7874" x2="-1.3208" y2="-0.7874" width="0.1524" layer="51"/>
-<wire x1="0.627" y1="0.6" x2="-0.373" y2="0" width="0.2032" layer="21"/>
-<wire x1="-0.373" y1="0" x2="0.627" y2="-0.6" width="0.2032" layer="21"/>
-<wire x1="0.627" y1="-0.6" x2="0.627" y2="0.6" width="0.2032" layer="21"/>
-<smd name="C" x="-1.7" y="0" dx="1.4" dy="1.8" layer="1"/>
-<smd name="A" x="1.7" y="0" dx="1.4" dy="1.8" layer="1"/>
-<text x="-1.524" y="1.143" size="1.27" layer="25">&gt;NAME</text>
-<text x="-1.524" y="-2.413" size="1.27" layer="27">&gt;VALUE</text>
-<rectangle x1="-1.8542" y1="-0.8636" x2="-1.2954" y2="0.8636" layer="51"/>
-<rectangle x1="1.2954" y1="-0.8636" x2="1.8542" y2="0.8636" layer="51"/>
-<rectangle x1="-0.8636" y1="-0.7874" x2="-0.254" y2="0.7874" layer="21"/>
-</package>
-</packages>
-<symbols>
-<symbol name="D">
-<wire x1="-1.27" y1="-1.27" x2="1.27" y2="0" width="0.254" layer="94"/>
-<wire x1="1.27" y1="0" x2="-1.27" y2="1.27" width="0.254" layer="94"/>
-<wire x1="1.27" y1="1.27" x2="1.27" y2="0" width="0.254" layer="94"/>
-<wire x1="-1.27" y1="1.27" x2="-1.27" y2="-1.27" width="0.254" layer="94"/>
-<wire x1="1.27" y1="0" x2="1.27" y2="-1.27" width="0.254" layer="94"/>
-<text x="2.54" y="0.4826" size="1.778" layer="95">&gt;NAME</text>
-<text x="2.54" y="-2.3114" size="1.778" layer="96">&gt;VALUE</text>
-<pin name="A" x="-2.54" y="0" visible="off" length="short" direction="pas"/>
-<pin name="C" x="2.54" y="0" visible="off" length="short" direction="pas" rot="R180"/>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="PMLL41*" prefix="D">
-<description>&lt;b&gt;High-speed diodes&lt;/b&gt;&lt;p&gt;
-Source: http://www.semiconductors.philips.com/acrobat_download/datasheets/PMLL4150_2.pdf</description>
-<gates>
-<gate name="G$1" symbol="D" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="POWERMITE">
-<connects>
-<connect gate="G$1" pin="A" pad="2"/>
-<connect gate="G$1" pin="C" pad="1"/>
-</connects>
-<technologies>
-<technology name="50"/>
-<technology name="51"/>
-<technology name="53"/>
-</technologies>
-</device>
-<device name="SOD80C" package="SOD80C">
-<connects>
-<connect gate="G$1" pin="A" pad="A"/>
-<connect gate="G$1" pin="C" pad="C"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 <library name="SparkFun-Capacitors">
 <description>&lt;h3&gt;SparkFun Electronics' preferred foot prints&lt;/h3&gt;
 In this library you'll find resistors, capacitors, inductors, test points, jumper pads, etc.&lt;br&gt;&lt;br&gt;
@@ -2519,11 +2430,6 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 </part>
 <part name="SUPPLY10" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY11" library="supply2" deviceset="GND" device=""/>
-<part name="D2" library="diode" deviceset="PMLL41*" device="SOD80C">
-<attribute name="MF" value="FAIRCHILD SEMICONDUCTOR"/>
-<attribute name="MPN" value="FDLL4148"/>
-<attribute name="OC_NEWARK" value="18C6408"/>
-</part>
 <part name="I2C" library="isaac1" deviceset="SCREW_TERMINAL_2" device="">
 <attribute name="MF" value="TYCO ELECTRONICS"/>
 <attribute name="MPN" value="282834-2"/>
@@ -2899,11 +2805,6 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 </instance>
 <instance part="SUPPLY10" gate="GND" x="231.14" y="-2.54"/>
 <instance part="SUPPLY11" gate="GND" x="210.82" y="10.16"/>
-<instance part="D2" gate="G$1" x="223.52" y="60.96" rot="R90">
-<attribute name="OC_NEWARK" x="223.52" y="60.96" size="1.778" layer="96" display="off"/>
-<attribute name="MF" x="223.52" y="60.96" size="1.778" layer="96" display="off"/>
-<attribute name="MPN" x="223.52" y="60.96" size="1.778" layer="96" display="off"/>
-</instance>
 <instance part="I2C" gate="G$1" x="205.74" y="0">
 <attribute name="OC_NEWARK" x="205.74" y="0" size="1.778" layer="96" display="off"/>
 <attribute name="MF" x="205.74" y="0" size="1.778" layer="96" display="off"/>
@@ -3513,14 +3414,14 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 <label x="139.7" y="12.7" size="1.016" layer="95" rot="R180" xref="yes"/>
 </segment>
 <segment>
-<pinref part="D2" gate="G$1" pin="C"/>
-<wire x1="223.52" y1="63.5" x2="223.52" y2="66.04" width="0.1524" layer="91"/>
-<label x="223.52" y="66.04" size="1.016" layer="95" rot="R90" xref="yes"/>
-</segment>
-<segment>
 <pinref part="Q10" gate="G$1" pin="D"/>
 <wire x1="210.82" y1="91.44" x2="218.44" y2="91.44" width="0.1524" layer="91"/>
 <label x="218.44" y="91.44" size="1.778" layer="95" xref="yes"/>
+</segment>
+<segment>
+<pinref part="U$4" gate="G$1" pin="P$4"/>
+<wire x1="124.46" y1="68.58" x2="121.92" y2="68.58" width="0.1524" layer="91"/>
+<label x="121.92" y="68.58" size="1.016" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
 <net name="VREG" class="0">
@@ -3893,21 +3794,6 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 <junction x="241.3" y="35.56"/>
 </segment>
 </net>
-<net name="CHARGER_OUT" class="0">
-<segment>
-<wire x1="256.54" y1="43.18" x2="261.62" y2="43.18" width="0.1524" layer="91"/>
-<label x="261.62" y="43.18" size="1.27" layer="95" xref="yes"/>
-<wire x1="256.54" y1="43.18" x2="256.54" y2="50.8" width="0.1524" layer="91"/>
-<pinref part="Q9" gate="G$1" pin="DRAIN"/>
-<wire x1="256.54" y1="50.8" x2="254" y2="50.8" width="0.1524" layer="91"/>
-<junction x="256.54" y="43.18"/>
-</segment>
-<segment>
-<pinref part="U$4" gate="G$1" pin="P$4"/>
-<wire x1="124.46" y1="68.58" x2="121.92" y2="68.58" width="0.1524" layer="91"/>
-<label x="121.92" y="68.58" size="1.016" layer="95" rot="R180" xref="yes"/>
-</segment>
-</net>
 <net name="ESTOP2" class="0">
 <segment>
 <pinref part="U$6" gate="G$1" pin="P$2"/>
@@ -3915,7 +3801,6 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 <label x="248.92" y="81.28" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
 <segment>
-<pinref part="D2" gate="G$1" pin="A"/>
 <pinref part="Q6" gate="G$1" pin="D"/>
 <wire x1="223.52" y1="58.42" x2="223.52" y2="53.34" width="0.1524" layer="91"/>
 <wire x1="223.52" y1="53.34" x2="223.52" y2="27.94" width="0.1524" layer="91"/>
@@ -3937,6 +3822,14 @@ http://www.bourns.com/data/global/pdfs/7914.pdf</description>
 <wire x1="124.46" y1="83.82" x2="121.92" y2="83.82" width="0.1524" layer="91"/>
 <label x="121.92" y="83.82" size="1.016" layer="95" rot="R180" xref="yes"/>
 <pinref part="U$4" gate="G$1" pin="P$1"/>
+</segment>
+<segment>
+<wire x1="256.54" y1="43.18" x2="261.62" y2="43.18" width="0.1524" layer="91"/>
+<label x="261.62" y="43.18" size="1.27" layer="95" xref="yes"/>
+<wire x1="256.54" y1="43.18" x2="256.54" y2="50.8" width="0.1524" layer="91"/>
+<pinref part="Q9" gate="G$1" pin="DRAIN"/>
+<wire x1="256.54" y1="50.8" x2="254" y2="50.8" width="0.1524" layer="91"/>
+<junction x="256.54" y="43.18"/>
 </segment>
 </net>
 <net name="ESTOP1" class="0">
