@@ -121,7 +121,7 @@ modal_connect_t.prototype.build_robot_list_m=function()
 		this.update_disables_m();
 
 		if(this.school_select.selectedIndex!=0)
-			send_request("GET","/superstar/",this.school_select.options[this.school_select.selectedIndex].text+"/","?sub",
+			send_request("GET","/superstar/",this.school_select.options[this.school_select.selectedIndex].text,"?sub",
 				function(response)
 				{
 					myself.robots=JSON.parse(response);
