@@ -406,11 +406,11 @@ public:
 	robot_location location;
 	double LRtrim;
 	bool debug;
-	int myCounter;
+	int config_counter;
 
 	robot_backend(std::string superstarURL, std::string robotName_)
 		:parseURL(superstarURL), superstar(parseURL.host,0,parseURL.port),
-		robotName(robotName_), pkt(0), LRtrim(1.0),myCounter(1)
+		robotName(robotName_), pkt(0), LRtrim(1.0),config_counter(-1234)
 	{
 		//stop();
 	}
@@ -820,9 +820,9 @@ void robot_backend::read_config(std::string config,const json::Value& configs,co
 		for(size_t ii=0;ii<configs.ToArray().size();++ii)
 			config+=configs.ToArray()[ii].ToString()+"\n";
 
-		if(myCounter!=counter)
+		if(config_counter!=counter)
 		{
-			myCounter=counter;
+			config_counter=counter;
 			tabula_setup(config);
 		}
 
@@ -841,7 +841,7 @@ void robot_backend::send_config(std::string config)
 	try
 	{ // send all registered tabula devices
 		json::Object json;
-		json["counter"]=myCounter;
+		json["counter"]=config_counter;
 		json["configs"]=json::Array();
 
 		std::string temp="";
