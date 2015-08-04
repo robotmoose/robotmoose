@@ -72,6 +72,13 @@ std::string uri_encode(std::string str)
 	return str;
 }
 
+/// All sensor and command data is stored in these arrays.
+///   They're the raw binary data going to/from the Arduino
+tabula_control_storage tabula_sensor_storage;
+tabula_control_storage tabula_command_storage;
+
+
+
 /**
   This class is used to localize the robot
 */
@@ -199,6 +206,7 @@ public:
 	}
 };
 
+
 /**
  This represents a way of reading or writing stored JSON values.
 */
@@ -207,22 +215,41 @@ public:
 	json_path path;
 	json_target(const json_path &path_) :path(path_) {}
 	virtual ~json_target() {}
-
-	virtual void modify(json::Value &root) =0;
 };
 
-/// All sensor and command data is stored in these arrays.
-tabula_control_storage tabula_sensor_storage;
-tabula_control_storage tabula_command_storage;
+/* Abstract superclass of robot sensors */
+class json_sensor_abstract : public json_target 
+{
+public:
+	json_sensor_abstract(const json_path &path_) :json_target(path_) {}
+	
+	// Read the current value of this sensor.
+	virtual void read_sensor(json::Value &sensor_root) =0;
+};
+
+
+/* Abstract superclass of robot commands */
+class json_command_abstract : public json_target 
+{
+public:
+	json_command_abstract(const json_path &path_) :json_target(path_) {}
+	
+	// Read this commanded value from the pilot, and execute it.
+	virtual void do_command(json::Value &pilot_root) =0;
+	
+	// Send our current value to this sensor structure
+	virtual void do_sensor(json::Value &sensor_root) =0;
+};
+
 
 /**
  Read this sensor from the storage array, and write it into JSON
 */
 template <class jsonT,class deviceT>
-class json_sensor : public json_target {
+class json_sensor : public json_sensor_abstract {
 public:
 	tabula_sensor<deviceT> sensor;
-	json_sensor(const json_path &path_) :json_target(path_) {}
+	json_sensor(const json_path &path_) :json_sensor_abstract(path_) {}
 
 	// Return the last-read value of our sensor
 	deviceT read(void) const {
@@ -230,16 +257,16 @@ public:
 	}
 
 	// Write our sensor value into this JSON object
-	virtual void modify(json::Value &root) {
+	virtual void read_sensor(json::Value &root) {
 		deviceT d=read();
 		path.in(root) = (jsonT)d;
 	}
 };
 
-/* Specialization to output sensor data from Neato */
+/* Specialization to output sensor data from Neato XV-11 laser distance sensor */
 #include "arduino/neato_serial.h"
 template <>
-class json_sensor<float,NeatoLDSbatch> : public json_target {
+class json_sensor<float,NeatoLDSbatch> : public json_sensor_abstract {
 public:
 	unsigned char changes; // nonce counter for updates
 	int updated_count; // number of new samples received
@@ -247,7 +274,7 @@ public:
 	enum {NDIR=360};
 	NeatoLDSdir dirs[NDIR];
 	tabula_sensor<NeatoLDSbatch> sensor;
-	json_sensor(const json_path &path_) :json_target(path_) {
+	json_sensor(const json_path &path_) :json_sensor_abstract(path_) {
 		changes=0;
 		updated_count=0;
 	}
@@ -258,7 +285,7 @@ public:
 	}
 
 	// Write our sensor value into this JSON object
-	virtual void modify(json::Value &root) {
+	virtual void read_sensor(json::Value &root) {
 		NeatoLDSbatch b=read();
 		if (b.index>=0 && b.index+NeatoLDSbatch::size<=NDIR)
 		{ // copy data from this latest batch into the global array
@@ -292,6 +319,47 @@ public:
 };
 
 
+template <class deviceT>
+class wheel_encoders : public json_sensor_abstract {
+	deviceT oldL, oldR;
+public:
+	robot_location &location;
+	json_sensor<int,deviceT> L;
+	json_sensor<int,deviceT> R;
+	float distance_per_count, wheelbase;
+	wheel_encoders(robot_location &location_,float distance_per_count_,float wheelbase_)
+		:json_sensor_abstract(json_path("encoder")), location(location_),
+		 L(json_path("encoder","L")), R(json_path("encoder","R")),
+		 distance_per_count(distance_per_count_), wheelbase(wheelbase_)
+	{
+		oldL=L.read();
+		oldR=R.read();
+	}
+
+	double wraparound_fix(deviceT devDiff) {
+		return (0xff&(devDiff+128))-128;
+	}
+
+	virtual void read_sensor(json::Value &root) {
+		// Pass new encoder values up to robot location
+		deviceT newL=L.read(), newR=R.read();
+		double delL=wraparound_fix(newL-oldL), delR=wraparound_fix(newR-oldR);
+		if (delL!=0 || delR!=0) {
+			location.move_wheels(
+				delL*distance_per_count,
+				delR*distance_per_count,
+				wheelbase);
+		}
+		oldL=newL; oldR=newR;
+
+		// Pass value out to JSON
+		L.read_sensor(root);
+		R.read_sensor(root);
+	}
+};
+
+
+
 // Type conversion specialization interface
 template <class jsonT,class deviceT>
 deviceT json_command_conversion(const jsonT &v) {
@@ -314,7 +382,6 @@ int8_t json_command_conversion<float,int8_t>(const float &v) {
 	else if (iv>+127) return 127;
 	else return (int8_t)iv;
 }
-
 // PWM conversion from float [0..1] to unsigned char [0..255]
 template <>
 uint8_t json_command_conversion<float,uint8_t>(const float &v) {
@@ -324,62 +391,49 @@ uint8_t json_command_conversion<float,uint8_t>(const float &v) {
 	else return (uint8_t)iv;
 }
 
-template <class deviceT>
-class wheel_encoders : public json_target {
-	deviceT oldL, oldR;
-public:
-	robot_location &location;
-	json_sensor<int,deviceT> L;
-	json_sensor<int,deviceT> R;
-	float distance_per_count, wheelbase;
-	wheel_encoders(robot_location &location_,float distance_per_count_,float wheelbase_)
-		:json_target(json_path("encoder")), location(location_),
-		 L(json_path("encoder","L")), R(json_path("encoder","R")),
-		 distance_per_count(distance_per_count_), wheelbase(wheelbase_)
-	{
-		oldL=L.read();
-		oldR=R.read();
-	}
+// Servo or PWM conversion from int to unsigned char [0..255]
+template <>
+uint8_t json_command_conversion<int,uint8_t>(const int &v) {
+	int iv=(int)(v);
+	     if (iv<0) return 0;
+	else if (iv>255) return 255;
+	else return (uint8_t)iv;
+}
 
-	double wraparound_fix(deviceT devDiff) {
-		return (0xff&(devDiff+128))-128;
-	}
-
-	virtual void modify(json::Value &root) {
-		// Pass new encoder values up to robot location
-		deviceT newL=L.read(), newR=R.read();
-		double delL=wraparound_fix(newL-oldL), delR=wraparound_fix(newR-oldR);
-		if (delL!=0 || delR!=0) {
-			location.move_wheels(
-				delL*distance_per_count,
-				delR*distance_per_count,
-				wheelbase);
-		}
-		oldL=newL; oldR=newR;
-
-		// Pass value out to JSON
-		L.modify(root);
-		R.modify(root);
-	}
-};
 
 /**
  Read this command from JSON, optionally convert it,
  and write it to the storage array.
 */
 template <class jsonT,class deviceT>
-class json_command : public json_target {
+class json_command : public json_command_abstract {
 public:
 	jsonT scaleFactor; // from JSON to device value
 	tabula_command<deviceT> command;
 	json_command(const json_path &path_,jsonT scaleFactor_=1.0)
-		:json_target(path_), scaleFactor(scaleFactor_) { }
+		:json_command_abstract(path_), scaleFactor(scaleFactor_) { }
 
-	virtual void modify(json::Value &root) {
-		jsonT j=path.in(root);
-		j*=scaleFactor;
-		deviceT d=json_command_conversion<jsonT,deviceT>(j);
+	virtual void do_command(json::Value &pilot_root) 
+	{
+		json::Value &pilot_raw=path.in(pilot_root); // read commanded value from pilot
+		deviceT d=0;
+		if (pilot_raw.IsNumeric()) {
+			jsonT j=pilot_raw; // convert to number
+			j*=scaleFactor;
+			d=json_command_conversion<jsonT,deviceT>(j);
+		}
+		
+		// Write value into command array
 		*(deviceT *)&tabula_command_storage.array[command.get_index()]=d;
+	}
+	
+	// Send our current value to this sensor structure
+	virtual void do_sensor(json::Value &sensor_root) 
+	{
+		// Read value from command array
+		deviceT d=*(deviceT *)&tabula_command_storage.array[command.get_index()];
+		jsonT j=(jsonT)d;
+		path.in(sensor_root)=j;
 	}
 };
 
@@ -400,8 +454,8 @@ private:
 
 	// These are the central magic that lets us convert data to/from JSON:
 	//   an array of configure types.
-	std::vector<json_target *> sensors;
-	std::vector<json_target *> commands;
+	std::vector<json_sensor_abstract *> sensors;
+	std::vector<json_command_abstract *> commands;
 public:
 	robot_location location;
 	double LRtrim;
@@ -475,6 +529,7 @@ void robot_backend::setup_devices(std::string robot_config)
 	int analogs=0;
 	int servos=0;
 	int pwms=0;
+	int blinks=0;
 
 	// Parse lines of the configuration outselves, to
 	//   find the command and sensor fields and match them to JSON
@@ -539,10 +594,13 @@ void robot_backend::setup_devices(std::string robot_config)
 			sensors.push_back(new json_sensor<int,uint16_t>(json_path("analog",analogs++)));
 		}
 		else if (device=="servo") {
-			commands.push_back(new json_command<float,uint8_t>(json_path("servo",servos++)));
+			commands.push_back(new json_command<int,uint8_t>(json_path("power","servo",servos++)));
 		}
 		else if (device=="pwm") {
-			commands.push_back(new json_command<float,uint8_t>(json_path("pwm",pwms++)));
+			commands.push_back(new json_command<int,uint8_t>(json_path("power","pwm",pwms++)));
+		}
+		else if (device=="blink") {
+			commands.push_back(new json_command<int,uint8_t>(json_path("power","blink",blinks++)));
 		}
 		else if (device=="heartbeat") {
 			sensors.push_back(new json_sensor<int,uint8_t>(json_path("heartbeats")));
@@ -706,7 +764,7 @@ void robot_backend::read_network(const std::string &read_json)
 			read_config("",config["configs"].ToArray(),config["counter"].ToInt());
 
 		// Pull registered commands from JSON
-		for (unsigned int i=0;i< commands.size();i++) commands[i]->modify(pilot);
+		for (unsigned int i=0;i< commands.size();i++) commands[i]->do_command(pilot);
 
 #ifndef	_WIN32
 
@@ -774,11 +832,12 @@ std::string robot_backend::send_network(void)
 	std::string send_json="";
 	try
 	{ // send all registered sensor values
-		json::Value root=json::Object();
-		location.copy_to_json(root);
-		for (unsigned int i=0;i< sensors.size();i++) sensors[i]->modify(root);
+		json::Value sensorsJ=json::Object();
+		location.copy_to_json(sensorsJ);
+		for (unsigned int i=0;i< sensors.size();i++) sensors[i]->read_sensor(sensorsJ);
+		for (unsigned int i=0;i< commands.size();i++) commands[i]->do_sensor(sensorsJ);
 
-		send_json = json::Serialize(root);
+		send_json = json::Serialize(sensorsJ);
 		send_json=uri_encode(send_json);
 	} catch (std::exception &e) {
 		printf("Exception while preparing network JSON to send: %s\n",e.what());
@@ -916,7 +975,22 @@ int main(int argc, char *argv[])
 	int baudrate=57600;  // serial comms to Arduino
 	int delay_ms=10; // milliseconds to wait in control loop (be kind to CPU, network)
 	for (int argi = 1; argi<argc; argi++) {
-		if (0 == strcmp(argv[argi], "--robot")) robotName = argv[++argi];
+		if (0 == strcmp(argv[argi], "--robot")) {
+			robotName = argv[++argi];
+			
+			// Replace back slashes \ with forward slashes /
+			char *fwdSlash=&robotName[0];
+			while (NULL!=(fwdSlash=strchr(fwdSlash,'\\'))) *fwdSlash++='/';
+			
+			// Check if there's any slashes--there should be, for the school name
+			if (NULL==strchr(&robotName[0],'/')) {
+				printf("ERROR: Your robot name needs a school first, like   uaf/myrobot\n");
+				exit(1);
+			}
+			
+			// Lowercase the robot names, for consistency:
+			for (char *letter=&robotName[0];*letter!=0;letter++) *letter=tolower(*letter);
+		}
 		else if (0 == strcmp(argv[argi], "--superstar")) superstarURL = argv[++argi];
 		else if (0 == strcmp(argv[argi], "--local")) superstarURL = "http://localhost:8081";
 		else if (0 == strcmp(argv[argi], "--baudrate")) baudrate = atoi(argv[++argi]);
@@ -928,7 +1002,7 @@ int main(int argc, char *argv[])
 		else if (0 == strcmp(argv[argi], "--delay_ms")) delay_ms = atoi(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--sim")) { // no Arduino, for debugging
 			sim = true;
-			delay_ms=250;
+			delay_ms=100;
 			baudrate=0;
 		}
 		else {
