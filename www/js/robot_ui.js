@@ -64,10 +64,11 @@ robot_ui_t.prototype.create_menus=function()
 	this.menu.get_status_area().innerHTML=this.disconnected_text;
 	this.menu.create_button
 	(
-		"Robot",
-		null,
-		"glyphicon glyphicon-cog",
-		{
+		"Connect",
+		function(){myself.connect_menu.show();},//null,
+		"glyphicon glyphicon-off",//"glyphicon glyphicon-cog",
+		null
+		/*{
 			"Connect":
 			{
 				onclick:function(){myself.connect_menu.show();},
@@ -78,9 +79,11 @@ robot_ui_t.prototype.create_menus=function()
 				onclick:function(){myself.clone_menu.show();},
 				glyph:"glyphicon glyphicon-duplicate"
 			}
-		}
+		}*/
 	);
-	this.menu.buttons["Robot"].drops["Clone"].disable();
+
+	if(this.menu.buttons["Robot"]&&this.menu.buttons["Robot"].drops["Clone"])
+		this.menu.buttons["Robot"].drops["Clone"].disable();
 
 	this.connect_menu.onconnect=function(robot_name)
 	{
@@ -91,7 +94,10 @@ robot_ui_t.prototype.create_menus=function()
 			myself.gui.interval=null;
 			myself.robot_name=robot_name;
 			myself.menu.get_status_area().innerHTML="Connected to \""+myself.robot_name+"\"";
-			myself.menu.buttons["Robot"].drops["Clone"].enable();
+
+			if(myself.menu.buttons["Robot"]&&myself.menu.buttons["Robot"].drops["Clone"])
+				myself.menu.buttons["Robot"].drops["Clone"].enable();
+
 			myself.download_gui();
 		}
 	};
@@ -147,10 +153,10 @@ robot_ui_t.prototype.download_gui=function()
 
 
 robot_ui_t.prototype.run_interval=function() {
-	// Update sensor data 
+	// Update sensor data
 	var myself=this;
-	
-	if (myself.sensor_data_count<2) 
+
+	if (myself.sensor_data_count<2)
 	{ // request more sensor data
 		this.sensor_data_count++;
 		superstar_get(this.robot_name,"sensors",
@@ -180,7 +186,7 @@ robot_ui_t.prototype.upload_gui=function()
 
 robot_ui_t.prototype.create_widgets=function()
 {
-	var myself=this; 
+	var myself=this;
 
 	this.doorways=
 	{

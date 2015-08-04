@@ -163,7 +163,7 @@ modal_clone_t.prototype.onclone_m=function()
 			}
 		}
 
-		this.onclone(this.clone_info.input.value,settings,options);
+		this.onclone(this.clone_info.input.value.toLowerCase(),settings,options);
 	}
 
 	this.hide();
@@ -247,6 +247,7 @@ modal_clone_t.prototype.select_none_m=function()
 
 modal_clone_t.prototype.check_exists_m=function(name)
 {
+	name=name.toLowerCase();
 	this.robots=[];
 	var myself=this;
 
@@ -260,6 +261,8 @@ modal_clone_t.prototype.check_exists_m=function(name)
 
 				for(var key in myself.robots)
 				{
+					myself.robots[key]=myself.robots[key].toLowerCase();
+
 					if(name==myself.robots[key])
 					{
 						myself.set_input_warning_m();
