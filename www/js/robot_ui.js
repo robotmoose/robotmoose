@@ -201,15 +201,19 @@ robot_ui_t.prototype.create_widgets=function()
 
 	this.widgets=
 	{
-		config:new config_editor_t(this.doorways.config.content,this.robot_name),
+		config:new config_editor_t(this.doorways.config.content),
 		states:new state_table_t(this.doorways.states.content),
 		pilot:new pilot_interface_t(this.doorways.pilot.content),
 		sensors:new tree_viewer_t(this.doorways.sensors.content,{}),
 		map:new robot_map_t(this.doorways.map.content,{}),
 		video:new video_gruveo_t(this.doorways.video.content)
 	};
+	
+	this.widgets.config.onchange=function() { // recreate pilot GUI when configuration changes
+		myself.widgets.pilot.reconfigure(myself.widgets.config);
+	}
 
-	this.widgets.config.onconfigure=function()
+	this.widgets.config.onconfigure=function() // allow configuration upload
 	{
 		if(myself.robot_name)
 			myself.widgets.config.upload(myself.robot_name);

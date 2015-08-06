@@ -1,6 +1,7 @@
 //Members
 //		onrefresh() - callback triggered when window needs updating (resizes)
 //		onconfigure() - callback triggered when configure button is hit
+//		onchange() - callback triggered when configuration is updated (download or UI)
 
 function config_editor_t(div)
 {
@@ -62,6 +63,8 @@ function config_editor_t(div)
 	{
 		if(myself.onconfigure)
 			myself.onconfigure(myself);
+		if (myself.onchange)
+			myself.onchange(myself);
 	};
 	this.element.appendChild(this.configure_button);
 }
@@ -194,6 +197,10 @@ config_editor_t.prototype.download_m=function(robot_name)
 			else
 				console.log("Invalid tabula config: "+configs[key].type+"("+configs[key].args+");");
 		}
+		
+		// Finally finished downloading--fire onchange
+		if (myself.onchange)
+			myself.onchange(myself);
 	});
 }
 
