@@ -33,12 +33,7 @@ function getMouseFraction(event,domElement) {
 // Return an "empty" robot power object, with everything stationary
 function emptyPower()
 {
-	return {L:0, R:0, dump:0, mine:0, arms:0};
-}
-function emptyLED()
-{
- 	//return {R:this.color.rgb[0], G:this.color.rgb[1], B:this.color.rgb[3]};
-         return{On:false, Demo:false, R:0, G:0, B:0};
+	return {L:0, R:0};
 }
 
 
@@ -65,6 +60,7 @@ function pilot_time() {
 
 function pilot_interface_t(div)
 {
+	var myself=this;
 	if(!div)
 		return null;
 
@@ -75,16 +71,99 @@ function pilot_interface_t(div)
 		/* Time, in seconds, of last pilot command */
 		time:0,
 
-		/*LED bits (should these still be here, or made PWMs or something?) */
-		LED: emptyLED(),
-
 		/* Scripted command to run */
 		cmd: { run: "", arg:"" }
 	};
 
-	this.mouse_down=0;
 
 	this.div=div;
+
+	// Keyboard driving
+	this.keyboardIsDriving=false;
+	this.keyInput=new input_t(function() {myself.pilot_keyboard()},window);
+}
+
+// Configure our pilot GUI for the current firmware setup
+pilot_interface_t.prototype.reconfigure=function(config_editor)
+{
+	var entries=config_editor.get_entries();
+	
+	// Check if we need to reconfigure at all
+	var entries_string="";
+	for(var key in entries) if(entries[key]) entries_string+=entries[key].type+",";
+	if (entries_string==this.last_entries_string) return; // no changes to report
+	this.last_entries_string=entries_string;
+	
+	// Clear out existing pilot GUI elements from our div
+	while (this.div.firstChild) {
+		this.div.removeChild(this.div.firstChild);
+	}
+	// this.pilot.power=emptyPower(); //<- cleaner, but loses servo positions on reconfigure
+	
+	// Add pilot GUI elements for each configured device
+	var servos=0, pwms=0, blinks=0;
+	for(var key in entries)
+	if(entries[key])
+	{
+		var type=entries[key].type;
+		switch (type) {
+		case "create2":
+		case "bts":
+		case "sabertooth1":
+		case "sabertooth2":
+			this.make_drive(entries[key]);
+			break;
+		
+		case "servo":
+			this.make_slider(entries[key],"servo",servos, 0,180);
+			servos++;
+			break;
+		
+		case "pwm":
+			this.make_slider(entries[key],"pwm",pwms, 0,255);
+			pwms++;
+			break;
+		
+		default: // ignore unknown object
+			break;
+		};
+	}
+}
+
+// Add GUI element for a simple adjustable value, stored in pilot.name[number]
+pilot_interface_t.prototype.make_slider=function(config_entry,name,number, minval,maxval)
+{
+	var myself=this;
+	var pilotpower=myself.pilot.power;
+	if (!pilotpower[name]) pilotpower[name]=[]; 
+	var value=pilotpower[name][number];
+	if (!value) value=0.0;
+	
+	var p=document.createElement("p");
+	var label_name=document.createTextNode(name+"["+number+"] = ");
+	var label_value=document.createTextNode(""+(0xffFFffFF&value));
+	
+	var slider=document.createElement("input");
+	slider.type="range";
+	slider.min=minval;
+	slider.max=maxval;
+	slider.value=value;
+	slider.onchange=slider.oninput=function() {
+		pilotpower[name][number]=parseInt(slider.value);
+		myself.pilot_send();
+		label_value.nodeValue=""+(0xffFFffFF&pilotpower[name][number]);
+	}
+	
+	p.appendChild(label_name);
+	p.appendChild(label_value);
+	p.appendChild(slider);
+	this.div.appendChild(p);
+}
+
+// Add GUI elements for driving around (arrows)
+pilot_interface_t.prototype.make_drive=function(config_entry)
+{
+	// Make arrow div
 	this.arrowDiv=document.createElement("div");
 	this.arrowDiv.style.backgroundColor="#808080";
 	this.arrowDiv.style.position="relative";
@@ -100,10 +179,10 @@ function pilot_interface_t(div)
 	this.drive_power.size=8;
 	this.drive_power.value="40%";
 	p.appendChild(this.drive_power);
-
 	
 	// Mouse event handlers for arrow div
 	var myself=this;
+	this.mouse_down=0;
 	this.mouse_in_div=0;
 	this.arrowDiv.onmousedown=function(evt) { myself.pilot_mouse(evt,1); myself.div.click(); };
 	this.arrowDiv.ondragstart=function(evt) { myself.pilot_mouse(evt,1); };
@@ -121,13 +200,7 @@ function pilot_interface_t(div)
 	img.style.width=img.style.height="100%";
 	img.style.pointerEvents="none";
 	this.arrowDiv.appendChild(img);
-
-	// Keyboard driving
-	this.keyboardIsDriving=false;
-	this.keyInput=new input_t(function() {myself.pilot_keyboard()},window);
 }
-
-
 
 
 // Return the drive power the user has currently selected
@@ -149,6 +222,9 @@ pilot_interface_t.prototype.get_pilot_power=function() {
 pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_del) {
 	if (mouse_in_del) this.mouse_in_div=mouse_in_del;
 
+	if (mouse_down_del==1) this.mouse_down=1;
+	if (mouse_down_del==-1) this.mouse_down=-1;	
+	
 // Allow user to set maximum power
 	var maxPower=this.get_pilot_power();
 
@@ -164,41 +240,23 @@ pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_d
 	dir.forward=dir.forward*2.0*maxPower;
 	dir.turn=dir.turn*2.0*maxPower;
 
-	var totPower=Math.abs(dir.forward)+Math.abs(dir.turn);
-	var newPower=emptyPower();
-	if (frac.x<0.9) { /* normal driving */
-		newPower.L=pretty(clamp(dir.forward+dir.turn,-maxPower,maxPower));
-		newPower.R=pretty(clamp(dir.forward-dir.turn,-maxPower,maxPower));
-	} else { /* right hand corner of screen: special magic values */
-		if (frac.y<0.33) {
-			newPower.dump=pretty((1.0/6-frac.y)*3);
-		} else if (frac.y<0.66) {
-			newPower.mine=pretty((3.0/6-frac.y)*3);
-		} else {
-			newPower.arms=pretty((5.0/6-frac.y)*3);
-		}
-	}
-	var newPowerStr=JSON.stringify(newPower);
-	str+="Power "+newPower.L+" left, "+newPower.R+" right, "+newPowerStr+" ";
+	var mousePower={"L":0.0, "R":0.0};
+	mousePower.L=pretty(clamp(dir.forward+dir.turn,-maxPower,maxPower));
+	mousePower.R=pretty(clamp(dir.forward-dir.turn,-maxPower,maxPower));
 
-	if (mouse_down_del==1) this.mouse_down=1;
-	if (mouse_down_del==-1) this.mouse_down=-1;
 	if (this.mouse_down==1) {
 		arrowDiv.style.backgroundColor='#222222';
 		str+=" SENDING";
 	} else {
 		arrowDiv.style.backgroundColor='#404040';
-		newPower=emptyPower();
-		totPower=0;
+		mousePower.L=mousePower.R=0.0;
 		str+=" (click to send)";
 	}
-	this.pilot_send(newPower);
+	this.pilot.power.L=mousePower.L;
+	this.pilot.power.R=mousePower.R;
+	this.pilot_send();
 
-	// Report debug data:
-	console.log(str);
 	// document.getElementById('p_outputPilot').innerHTML=str;
-
-	// document.getElementById('glow').style.opacity=clamp(totPower*3.0,0.0,1.0);
 	event.stopPropagation();
 };
 
@@ -234,10 +292,9 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 	if (turn==0.0 && forward==0.0) this.keyboardIsDriving=false;
 	else this.keyboardIsDriving=true;
 
-	var newPower=emptyPower();
-	newPower.L=clamp(maxPower*(forward+turn),-maxPower,+maxPower);
-	newPower.R=clamp(maxPower*(forward-turn),-maxPower,+maxPower);
-	this.pilot_send(newPower);
+	this.pilot.power.L=clamp(maxPower*(forward+turn),-maxPower,+maxPower);
+	this.pilot.power.R=clamp(maxPower*(forward-turn),-maxPower,+maxPower);
+	this.pilot_send();
 }
 
 
@@ -253,13 +310,12 @@ pilot_interface_t.prototype.upload=function(robot_name)
 }
 
 // This is a simple placeholder, to get things working for now:
-pilot_interface_t.prototype.pilot_send=function(newPower) {
-	this.pilot.power=newPower;
+pilot_interface_t.prototype.pilot_send=function() {
 	if (this.onpilot) this.onpilot(this.pilot);
 };
 
 /*
-  This is the real version, with network spam prevention and such.
+  This is the real version, with network spam prevention and authentication and such.
 
 // This counts outstanding network requests
 var networkBusy=0;
