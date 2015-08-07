@@ -3151,7 +3151,7 @@ Grid 5.08 mm&lt;p&gt;
 <attribute name="OC_NEWARK" value="27T5837"/>
 </part>
 <part name="D1" library="SparkFun-DiscreteSemi" deviceset="DIODE" device="SOD123" value="SMD26PL-TP"/>
-<part name="IC1" library="linear" deviceset="MCP1703" device="DB" value="MIC2954-03WS"/>
+<part name="IC1" library="linear" deviceset="MCP1703" device="DB" value="MIC2920A-12WS"/>
 <part name="SUPPLY20" library="supply2" deviceset="GND" device=""/>
 <part name="X1" library="con-wago-508" deviceset="W237-07P" device="" value="W237-07P"/>
 <part name="D2" library="SparkFun-DiscreteSemi" deviceset="DIODE" device="SOD123" value="SMD26PL-TP"/>
