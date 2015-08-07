@@ -26,6 +26,8 @@ function modal_connect_t(div)
 	this.school_select.onchange=function(){myself.build_robot_list_m()};
 	this.modal.get_content().appendChild(this.school_select);
 
+	this.modal.get_content().appendChild(document.createElement("br"));
+
 	this.robot_select.className="form-control";
 	this.robot_select.onchange=function(){myself.update_disables_m();};
 	this.modal.get_content().appendChild(this.robot_select);
