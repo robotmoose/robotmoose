@@ -18,8 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBSERIALPORT_LIBSERIALPORT_INTERNAL_H
+#define LIBSERIALPORT_LIBSERIALPORT_INTERNAL_H
+
+#include "config.h"
+
 #ifdef __linux__
-#define _BSD_SOURCE // for timeradd, timersub, timercmp
+#define _BSD_SOURCE /* For timeradd, timersub, timercmp. */
 #endif
 
 #include <string.h>
@@ -104,6 +109,7 @@ struct sp_port {
 	DWORD events;
 	BYTE pending_byte;
 	BOOL writing;
+	BOOL wait_running;
 #else
 	int fd;
 #endif
@@ -155,10 +161,7 @@ struct std_baudrate {
 	int value;
 };
 
-extern const struct std_baudrate std_baudrates[];
-
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
-#define NUM_STD_BAUDRATES ARRAY_SIZE(std_baudrates)
 
 extern void (*sp_debug_handler)(const char *format, ...);
 
@@ -177,18 +180,19 @@ extern void (*sp_debug_handler)(const char *format, ...);
 #define RETURN() do { \
 	DEBUG_FMT("%s returning", __func__); \
 	return; \
-} while(0)
+} while (0)
 #define RETURN_CODE(x) do { \
 	DEBUG_FMT("%s returning " #x, __func__); \
 	return x; \
 } while (0)
 #define RETURN_CODEVAL(x) do { \
 	switch (x) { \
-		case SP_OK: RETURN_CODE(SP_OK); \
-		case SP_ERR_ARG: RETURN_CODE(SP_ERR_ARG); \
-		case SP_ERR_FAIL: RETURN_CODE(SP_ERR_FAIL); \
-		case SP_ERR_MEM: RETURN_CODE(SP_ERR_MEM); \
-		case SP_ERR_SUPP: RETURN_CODE(SP_ERR_SUPP); \
+	case SP_OK: RETURN_CODE(SP_OK); \
+	case SP_ERR_ARG: RETURN_CODE(SP_ERR_ARG); \
+	case SP_ERR_FAIL: RETURN_CODE(SP_ERR_FAIL); \
+	case SP_ERR_MEM: RETURN_CODE(SP_ERR_MEM); \
+	case SP_ERR_SUPP: RETURN_CODE(SP_ERR_SUPP); \
+	default: RETURN_CODE(SP_ERR_FAIL); \
 	} \
 } while (0)
 #define RETURN_OK() RETURN_CODE(SP_OK);
@@ -220,10 +224,12 @@ extern void (*sp_debug_handler)(const char *format, ...);
 #define TRACE(fmt, ...) DEBUG_FMT("%s(" fmt ") called", __func__, __VA_ARGS__)
 #define TRACE_VOID() DEBUG_FMT("%s() called", __func__)
 
-#define TRY(x) do { int ret = x; if (ret != SP_OK) RETURN_CODEVAL(ret); } while (0)
+#define TRY(x) do { int retval = x; if (retval != SP_OK) RETURN_CODEVAL(retval); } while (0)
 
 SP_PRIV struct sp_port **list_append(struct sp_port **list, const char *portname);
 
 /* OS-specific Helper functions. */
 SP_PRIV enum sp_return get_port_details(struct sp_port *port);
 SP_PRIV enum sp_return list_ports(struct sp_port ***list);
+
+#endif

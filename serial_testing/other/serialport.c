@@ -2,8 +2,8 @@
  * This file is part of the libserialport project.
  *
  * Copyright (C) 2010-2012 Bert Vermeulen <bert@biot.com>
- * Copyright (C) 2010-2012 Uwe Hermann <uwe@hermann-uwe.de>
- * Copyright (C) 2013 Martin Ling <martin-libserialport@earth.li>
+ * Copyright (C) 2010-2015 Uwe Hermann <uwe@hermann-uwe.de>
+ * Copyright (C) 2013-2015 Martin Ling <martin-libserialport@earth.li>
  * Copyright (C) 2013 Matthias Heidbrink <m-sigrok@heidbrink.biz>
  * Copyright (C) 2014 Aurelien Jacobs <aurel@gnuage.org>
  *
@@ -24,7 +24,7 @@
 #include "libserialport.h"
 #include "libserialport_internal.h"
 
-const struct std_baudrate std_baudrates[] = {
+static const struct std_baudrate std_baudrates[] = {
 #ifdef _WIN32
 	/*
 	 * The baudrates 50/75/134/150/200/1800/230400/460800 do not seem to
@@ -43,6 +43,8 @@ const struct std_baudrate std_baudrates[] = {
 #endif
 #endif
 };
+
+#define NUM_STD_BAUDRATES ARRAY_SIZE(std_baudrates)
 
 void (*sp_debug_handler)(const char *format, ...) = sp_default_debug_handler;
 
@@ -124,7 +126,7 @@ SP_API char *sp_get_port_name(const struct sp_port *port)
 	RETURN_STRING(port->name);
 }
 
-SP_API char *sp_get_port_description(struct sp_port *port)
+SP_API char *sp_get_port_description(const struct sp_port *port)
 {
 	TRACE("%p", port);
 
@@ -134,7 +136,7 @@ SP_API char *sp_get_port_description(struct sp_port *port)
 	RETURN_STRING(port->description);
 }
 
-SP_API enum sp_transport sp_get_port_transport(struct sp_port *port)
+SP_API enum sp_transport sp_get_port_transport(const struct sp_port *port)
 {
 	TRACE("%p", port);
 
@@ -156,8 +158,10 @@ SP_API enum sp_return sp_get_port_usb_bus_address(const struct sp_port *port,
 	if (port->usb_bus < 0 || port->usb_address < 0)
 		RETURN_ERROR(SP_ERR_SUPP, "Bus and address values are not available");
 
-	if (usb_bus)      *usb_bus     = port->usb_bus;
-	if (usb_address)  *usb_address = port->usb_address;
+	if (usb_bus)
+		*usb_bus = port->usb_bus;
+	if (usb_address)
+		*usb_address = port->usb_address;
 
 	RETURN_OK();
 }
@@ -174,8 +178,10 @@ SP_API enum sp_return sp_get_port_usb_vid_pid(const struct sp_port *port,
 	if (port->usb_vid < 0 || port->usb_pid < 0)
 		RETURN_ERROR(SP_ERR_SUPP, "VID:PID values are not available");
 
-	if (usb_vid)  *usb_vid = port->usb_vid;
-	if (usb_pid)  *usb_pid = port->usb_pid;
+	if (usb_vid)
+		*usb_vid = port->usb_vid;
+	if (usb_pid)
+		*usb_pid = port->usb_pid;
 
 	RETURN_OK();
 }
@@ -228,6 +234,8 @@ SP_API enum sp_return sp_get_port_handle(const struct sp_port *port,
 
 	if (!port)
 		RETURN_ERROR(SP_ERR_ARG, "Null port");
+	if (!result_ptr)
+		RETURN_ERROR(SP_ERR_ARG, "Null result pointer");
 
 #ifdef _WIN32
 	HANDLE *handle_ptr = result_ptr;
@@ -316,39 +324,39 @@ fail:
 
 SP_API enum sp_return sp_list_ports(struct sp_port ***list_ptr)
 {
+#ifndef NO_ENUMERATION
 	struct sp_port **list;
 	int ret;
+#endif
 
 	TRACE("%p", list_ptr);
 
 	if (!list_ptr)
 		RETURN_ERROR(SP_ERR_ARG, "Null result pointer");
 
+	*list_ptr = NULL;
+
+#ifdef NO_ENUMERATION
+	RETURN_ERROR(SP_ERR_SUPP, "Enumeration not supported on this platform");
+#else
 	DEBUG("Enumerating ports");
 
-	if (!(list = malloc(sizeof(struct sp_port **))))
+	if (!(list = malloc(sizeof(struct sp_port *))))
 		RETURN_ERROR(SP_ERR_MEM, "Port list malloc failed");
 
 	list[0] = NULL;
 
-#ifdef NO_ENUMERATION
-	ret = SP_ERR_SUPP;
-#else
 	ret = list_ports(&list);
-#endif
 
-	switch (ret) {
-	case SP_OK:
+	if (ret == SP_OK) {
 		*list_ptr = list;
-		RETURN_OK();
-	case SP_ERR_SUPP:
-		DEBUG_ERROR(SP_ERR_SUPP, "Enumeration not supported on this platform");
-	default:
-		if (list)
-			sp_free_port_list(list);
+	} else {
+		sp_free_port_list(list);
 		*list_ptr = NULL;
-		return ret;
 	}
+
+	RETURN_CODEVAL(ret);
+#endif
 }
 
 SP_API void sp_free_port_list(struct sp_port **list)
@@ -372,9 +380,9 @@ SP_API void sp_free_port_list(struct sp_port **list)
 }
 
 #define CHECK_PORT() do { \
-	if (port == NULL) \
+	if (!port) \
 		RETURN_ERROR(SP_ERR_ARG, "Null port"); \
-	if (port->name == NULL) \
+	if (!port->name) \
 		RETURN_ERROR(SP_ERR_ARG, "Null port name"); \
 } while (0)
 #ifdef _WIN32
@@ -392,6 +400,43 @@ SP_API void sp_free_port_list(struct sp_port **list)
 	CHECK_PORT(); \
 	CHECK_PORT_HANDLE(); \
 } while (0)
+
+#ifdef WIN32
+/** To be called after port receive buffer is emptied. */
+static enum sp_return restart_wait(struct sp_port *port)
+{
+	DWORD wait_result;
+
+	if (port->wait_running) {
+		/* Check status of running wait operation. */
+		if (GetOverlappedResult(port->hdl, &port->wait_ovl,
+				&wait_result, FALSE)) {
+			DEBUG("Previous wait completed");
+			port->wait_running = FALSE;
+		} else if (GetLastError() == ERROR_IO_INCOMPLETE) {
+			DEBUG("Previous wait still running");
+			RETURN_OK();
+		} else {
+			RETURN_FAIL("GetOverlappedResult() failed");
+		}
+	}
+
+	if (!port->wait_running) {
+		/* Start new wait operation. */
+		if (WaitCommEvent(port->hdl, &port->events,
+				&port->wait_ovl)) {
+			DEBUG("New wait returned, events already pending");
+		} else if (GetLastError() == ERROR_IO_PENDING) {
+			DEBUG("New wait running in background");
+			port->wait_running = TRUE;
+		} else {
+			RETURN_FAIL("WaitCommEvent() failed");
+		}
+	}
+
+	RETURN_OK();
+}
+#endif
 
 SP_API enum sp_return sp_open(struct sp_port *port, enum sp_mode flags)
 {
@@ -425,16 +470,13 @@ SP_API enum sp_return sp_open(struct sp_port *port, enum sp_mode flags)
 	if (flags & SP_MODE_WRITE)
 		desired_access |= GENERIC_WRITE;
 
-    port->hdl = CreateFileA(escaped_port_name, desired_access, 0, 0,
+	port->hdl = CreateFile(escaped_port_name, desired_access, 0, 0,
 			 OPEN_EXISTING, flags_and_attributes, 0);
-
-
-    fprintf(stderr, "Port name '%s'\n", escaped_port_name);
 
 	free(escaped_port_name);
 
 	if (port->hdl == INVALID_HANDLE_VALUE)
-		RETURN_FAIL("port CreateFile() failed");
+		RETURN_FAIL("Port CreateFile() failed");
 
 	/* All timeouts initially disabled. */
 	port->timeouts.ReadIntervalTimeout = 0;
@@ -469,16 +511,15 @@ SP_API enum sp_return sp_open(struct sp_port *port, enum sp_mode flags)
 		RETURN_FAIL("SetCommMask() failed");
 	}
 
-	/* Start background operation for RX and error events. */
-	if (WaitCommEvent(port->hdl, &port->events, &port->wait_ovl) == 0) {
-		if (GetLastError() != ERROR_IO_PENDING) {
-			sp_close(port);
-			RETURN_FAIL("WaitCommEvent() failed");
-		}
-	}
-
 	port->writing = FALSE;
+	port->wait_running = FALSE;
 
+	ret = restart_wait(port);
+
+	if (ret < 0) {
+		sp_close(port);
+		RETURN_CODEVAL(ret);
+	}
 #else
 	int flags_local = O_NONBLOCK | O_NOCTTY;
 
@@ -507,7 +548,7 @@ SP_API enum sp_return sp_open(struct sp_port *port, enum sp_mode flags)
 	data.dcb.fDsrSensitivity = FALSE;
 	data.dcb.fErrorChar = FALSE;
 	data.dcb.fNull = FALSE;
-	data.dcb.fAbortOnError = TRUE;
+	data.dcb.fAbortOnError = FALSE;
 #else
 	/* Turn off all fancy termios tricks, give us a raw channel. */
 	data.term.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IMAXBEL);
@@ -573,7 +614,7 @@ SP_API enum sp_return sp_close(struct sp_port *port)
 #ifdef _WIN32
 	/* Returns non-zero upon success, 0 upon failure. */
 	if (CloseHandle(port->hdl) == 0)
-		RETURN_FAIL("port CloseHandle() failed");
+		RETURN_FAIL("Port CloseHandle() failed");
 	port->hdl = INVALID_HANDLE_VALUE;
 
 	/* Close event handles for overlapped structures. */
@@ -620,6 +661,9 @@ SP_API enum sp_return sp_flush(struct sp_port *port, enum sp_buffer buffers)
 	/* Returns non-zero upon success, 0 upon failure. */
 	if (PurgeComm(port->hdl, flags) == 0)
 		RETURN_FAIL("PurgeComm() failed");
+
+	if (buffers & SP_BUF_INPUT)
+		TRY(restart_wait(port));
 #else
 	int flags = 0;
 	if (buffers == SP_BUF_BOTH)
@@ -673,18 +717,18 @@ SP_API enum sp_return sp_drain(struct sp_port *port)
 }
 
 SP_API enum sp_return sp_blocking_write(struct sp_port *port, const void *buf,
-                                        size_t count, unsigned int timeout)
+                                        size_t count, unsigned int timeout_ms)
 {
-	TRACE("%p, %p, %d, %d", port, buf, count, timeout);
+	TRACE("%p, %p, %d, %d", port, buf, count, timeout_ms);
 
 	CHECK_OPEN_PORT();
 
 	if (!buf)
 		RETURN_ERROR(SP_ERR_ARG, "Null buffer");
 
-	if (timeout)
+	if (timeout_ms)
 		DEBUG_FMT("Writing %d bytes to port %s, timeout %d ms",
-			count, port->name, timeout);
+			count, port->name, timeout_ms);
 	else
 		DEBUG_FMT("Writing %d bytes to port %s, no timeout",
 			count, port->name);
@@ -707,56 +751,62 @@ SP_API enum sp_return sp_blocking_write(struct sp_port *port, const void *buf,
 	}
 
 	/* Set timeout. */
-	port->timeouts.WriteTotalTimeoutConstant = timeout;
-	if (SetCommTimeouts(port->hdl, &port->timeouts) == 0)
-		RETURN_FAIL("SetCommTimeouts() failed");
+	if (port->timeouts.WriteTotalTimeoutConstant != timeout_ms) {
+		port->timeouts.WriteTotalTimeoutConstant = timeout_ms;
+		if (SetCommTimeouts(port->hdl, &port->timeouts) == 0)
+			RETURN_FAIL("SetCommTimeouts() failed");
+	}
 
 	/* Start write. */
-	if (WriteFile(port->hdl, buf, count, NULL, &port->write_ovl) == 0) {
-		if (GetLastError() == ERROR_IO_PENDING) {
-			DEBUG("Waiting for write to complete");
-			GetOverlappedResult(port->hdl, &port->write_ovl, &bytes_written, TRUE);
-			DEBUG_FMT("Write completed, %d/%d bytes written", bytes_written, count);
-			RETURN_INT(bytes_written);
-		} else {
-			RETURN_FAIL("WriteFile() failed");
-		}
-	} else {
+	if (WriteFile(port->hdl, buf, count, NULL, &port->write_ovl)) {
 		DEBUG("Write completed immediately");
 		RETURN_INT(count);
+	} else if (GetLastError() == ERROR_IO_PENDING) {
+		DEBUG("Waiting for write to complete");
+		if (GetOverlappedResult(port->hdl, &port->write_ovl, &bytes_written, TRUE) == 0)
+			RETURN_FAIL("GetOverlappedResult() failed");
+		DEBUG_FMT("Write completed, %d/%d bytes written", bytes_written, count);
+		RETURN_INT(bytes_written);
+	} else {
+		RETURN_FAIL("WriteFile() failed");
 	}
 #else
 	size_t bytes_written = 0;
 	unsigned char *ptr = (unsigned char *) buf;
 	struct timeval start, delta, now, end = {0, 0};
+	int started = 0;
 	fd_set fds;
 	int result;
 
-	if (timeout) {
+	if (timeout_ms) {
 		/* Get time at start of operation. */
 		gettimeofday(&start, NULL);
 		/* Define duration of timeout. */
-		delta.tv_sec = timeout / 1000;
-		delta.tv_usec = (timeout % 1000) * 1000;
+		delta.tv_sec = timeout_ms / 1000;
+		delta.tv_usec = (timeout_ms % 1000) * 1000;
 		/* Calculate time at which we should give up. */
 		timeradd(&start, &delta, &end);
 	}
 
+	FD_ZERO(&fds);
+	FD_SET(port->fd, &fds);
+
 	/* Loop until we have written the requested number of bytes. */
-	while (bytes_written < count)
-	{
-		/* Wait until space is available. */
-		FD_ZERO(&fds);
-		FD_SET(port->fd, &fds);
-		if (timeout) {
+	while (bytes_written < count) {
+		/*
+		 * Check timeout only if we have run select() at least once,
+		 * to avoid any issues if a short timeout is reached before
+		 * select() is even run.
+		 */
+		if (timeout_ms && started) {
 			gettimeofday(&now, NULL);
-			if (timercmp(&now, &end, >)) {
-				DEBUG("write timed out");
-				RETURN_INT(bytes_written);
-			}
+			if (timercmp(&now, &end, >))
+				/* Timeout has expired. */
+				break;
 			timersub(&end, &now, &delta);
 		}
-		result = select(port->fd + 1, NULL, &fds, NULL, timeout ? &delta : NULL);
+		result = select(port->fd + 1, NULL, &fds, NULL, timeout_ms ? &delta : NULL);
+		started = 1;
 		if (result < 0) {
 			if (errno == EINTR) {
 				DEBUG("select() call was interrupted, repeating");
@@ -765,8 +815,8 @@ SP_API enum sp_return sp_blocking_write(struct sp_port *port, const void *buf,
 				RETURN_FAIL("select() failed");
 			}
 		} else if (result == 0) {
-			DEBUG("write timed out");
-			RETURN_INT(bytes_written);
+			/* Timeout has expired. */
+			break;
 		}
 
 		/* Do write. */
@@ -784,6 +834,9 @@ SP_API enum sp_return sp_blocking_write(struct sp_port *port, const void *buf,
 		bytes_written += result;
 		ptr += result;
 	}
+
+	if (bytes_written < count)
+		DEBUG("Write timed out");
 
 	RETURN_INT(bytes_written);
 #endif
@@ -821,14 +874,17 @@ SP_API enum sp_return sp_nonblocking_write(struct sp_port *port,
 	}
 
 	/* Set timeout. */
-	port->timeouts.WriteTotalTimeoutConstant = 0;
-	if (SetCommTimeouts(port->hdl, &port->timeouts) == 0)
-		RETURN_FAIL("SetCommTimeouts() failed");
+	if (port->timeouts.WriteTotalTimeoutConstant != 0) {
+		port->timeouts.WriteTotalTimeoutConstant = 0;
+		if (SetCommTimeouts(port->hdl, &port->timeouts) == 0)
+			RETURN_FAIL("SetCommTimeouts() failed");
+	}
 
-	/* Keep writing data until the OS has to actually start an async IO for it.
-	 * At that point we know the buffer is full. */
-	while (written < count)
-	{
+	/*
+	 * Keep writing data until the OS has to actually start an async IO
+	 * for it. At that point we know the buffer is full.
+	 */
+	while (written < count) {
 		/* Copy first byte of user buffer. */
 		port->pending_byte = *ptr++;
 
@@ -869,19 +925,39 @@ SP_API enum sp_return sp_nonblocking_write(struct sp_port *port,
 #endif
 }
 
-SP_API enum sp_return sp_blocking_read(struct sp_port *port, void *buf,
-                                       size_t count, unsigned int timeout)
+#ifdef _WIN32
+/* Restart wait operation if buffer was emptied. */
+static enum sp_return restart_wait_if_needed(struct sp_port *port, unsigned int bytes_read)
 {
-	TRACE("%p, %p, %d, %d", port, buf, count, timeout);
+	DWORD errors;
+	COMSTAT comstat;
+
+	if (bytes_read == 0)
+		RETURN_OK();
+
+	if (ClearCommError(port->hdl, &errors, &comstat) == 0)
+		RETURN_FAIL("ClearCommError() failed");
+
+	if (comstat.cbInQue == 0)
+		TRY(restart_wait(port));
+
+	RETURN_OK();
+}
+#endif
+
+SP_API enum sp_return sp_blocking_read(struct sp_port *port, void *buf,
+                                       size_t count, unsigned int timeout_ms)
+{
+	TRACE("%p, %p, %d, %d", port, buf, count, timeout_ms);
 
 	CHECK_OPEN_PORT();
 
 	if (!buf)
 		RETURN_ERROR(SP_ERR_ARG, "Null buffer");
 
-	if (timeout)
+	if (timeout_ms)
 		DEBUG_FMT("Reading %d bytes from port %s, timeout %d ms",
-			count, port->name, timeout);
+			count, port->name, timeout_ms);
 	else
 		DEBUG_FMT("Reading %d bytes from port %s, no timeout",
 			count, port->name);
@@ -893,30 +969,30 @@ SP_API enum sp_return sp_blocking_read(struct sp_port *port, void *buf,
 	DWORD bytes_read = 0;
 
 	/* Set timeout. */
-	port->timeouts.ReadIntervalTimeout = 0;
-	port->timeouts.ReadTotalTimeoutConstant = timeout;
-	if (SetCommTimeouts(port->hdl, &port->timeouts) == 0)
-		RETURN_FAIL("SetCommTimeouts() failed");
+	if (port->timeouts.ReadIntervalTimeout != 0 ||
+			port->timeouts.ReadTotalTimeoutMultiplier != 0 ||
+			port->timeouts.ReadTotalTimeoutConstant != timeout_ms) {
+		port->timeouts.ReadIntervalTimeout = 0;
+		port->timeouts.ReadTotalTimeoutMultiplier = 0;
+		port->timeouts.ReadTotalTimeoutConstant = timeout_ms;
+		if (SetCommTimeouts(port->hdl, &port->timeouts) == 0)
+			RETURN_FAIL("SetCommTimeouts() failed");
+	}
 
 	/* Start read. */
-	if (ReadFile(port->hdl, buf, count, NULL, &port->read_ovl) == 0) {
-		if (GetLastError() == ERROR_IO_PENDING) {
-			DEBUG("Waiting for read to complete");
-			GetOverlappedResult(port->hdl, &port->read_ovl, &bytes_read, TRUE);
-			DEBUG_FMT("Read completed, %d/%d bytes read", bytes_read, count);
-		} else {
-			RETURN_FAIL("ReadFile() failed");
-		}
-	} else {
+	if (ReadFile(port->hdl, buf, count, NULL, &port->read_ovl)) {
 		DEBUG("Read completed immediately");
 		bytes_read = count;
+	} else if (GetLastError() == ERROR_IO_PENDING) {
+		DEBUG("Waiting for read to complete");
+		if (GetOverlappedResult(port->hdl, &port->read_ovl, &bytes_read, TRUE) == 0)
+			RETURN_FAIL("GetOverlappedResult() failed");
+		DEBUG_FMT("Read completed, %d/%d bytes read", bytes_read, count);
+	} else {
+		RETURN_FAIL("ReadFile() failed");
 	}
 
-	/* Start background operation for subsequent events. */
-	if (WaitCommEvent(port->hdl, &port->events, &port->wait_ovl) == 0) {
-		if (GetLastError() != ERROR_IO_PENDING)
-			RETURN_FAIL("WaitCommEvent() failed");
-	}
+	TRY(restart_wait_if_needed(port, bytes_read));
 
 	RETURN_INT(bytes_read);
 
@@ -924,33 +1000,39 @@ SP_API enum sp_return sp_blocking_read(struct sp_port *port, void *buf,
 	size_t bytes_read = 0;
 	unsigned char *ptr = (unsigned char *) buf;
 	struct timeval start, delta, now, end = {0, 0};
+	int started = 0;
 	fd_set fds;
 	int result;
 
-	if (timeout) {
+	if (timeout_ms) {
 		/* Get time at start of operation. */
 		gettimeofday(&start, NULL);
 		/* Define duration of timeout. */
-		delta.tv_sec = timeout / 1000;
-		delta.tv_usec = (timeout % 1000) * 1000;
+		delta.tv_sec = timeout_ms / 1000;
+		delta.tv_usec = (timeout_ms % 1000) * 1000;
 		/* Calculate time at which we should give up. */
 		timeradd(&start, &delta, &end);
 	}
 
+	FD_ZERO(&fds);
+	FD_SET(port->fd, &fds);
+
 	/* Loop until we have the requested number of bytes. */
-	while (bytes_read < count)
-	{
-		/* Wait until data is available. */
-		FD_ZERO(&fds);
-		FD_SET(port->fd, &fds);
-		if (timeout) {
+	while (bytes_read < count) {
+		/*
+		 * Check timeout only if we have run select() at least once,
+		 * to avoid any issues if a short timeout is reached before
+		 * select() is even run.
+		 */
+		if (timeout_ms && started) {
 			gettimeofday(&now, NULL);
 			if (timercmp(&now, &end, >))
 				/* Timeout has expired. */
-				RETURN_INT(bytes_read);
+				break;
 			timersub(&end, &now, &delta);
 		}
-		result = select(port->fd + 1, &fds, NULL, NULL, timeout ? &delta : NULL);
+		result = select(port->fd + 1, &fds, NULL, NULL, timeout_ms ? &delta : NULL);
+		started = 1;
 		if (result < 0) {
 			if (errno == EINTR) {
 				DEBUG("select() call was interrupted, repeating");
@@ -959,12 +1041,150 @@ SP_API enum sp_return sp_blocking_read(struct sp_port *port, void *buf,
 				RETURN_FAIL("select() failed");
 			}
 		} else if (result == 0) {
-			DEBUG("read timed out");
-			RETURN_INT(bytes_read);
+			/* Timeout has expired. */
+			break;
 		}
 
 		/* Do read. */
 		result = read(port->fd, ptr, count - bytes_read);
+
+		if (result < 0) {
+			if (errno == EAGAIN)
+				/*
+				 * This shouldn't happen because we did a
+				 * select() first, but handle anyway.
+				 */
+				continue;
+			else
+				/* This is an actual failure. */
+				RETURN_FAIL("read() failed");
+		}
+
+		bytes_read += result;
+		ptr += result;
+	}
+
+	if (bytes_read < count)
+		DEBUG("Read timed out");
+
+	RETURN_INT(bytes_read);
+#endif
+}
+
+SP_API enum sp_return sp_blocking_read_next(struct sp_port *port, void *buf,
+                                            size_t count, unsigned int timeout_ms)
+{
+	TRACE("%p, %p, %d, %d", port, buf, count, timeout_ms);
+
+	CHECK_OPEN_PORT();
+
+	if (!buf)
+		RETURN_ERROR(SP_ERR_ARG, "Null buffer");
+
+	if (count == 0)
+		RETURN_ERROR(SP_ERR_ARG, "Zero count");
+
+	if (timeout_ms)
+		DEBUG_FMT("Reading next max %d bytes from port %s, timeout %d ms",
+			count, port->name, timeout_ms);
+	else
+		DEBUG_FMT("Reading next max %d bytes from port %s, no timeout",
+			count, port->name);
+
+#ifdef _WIN32
+	DWORD bytes_read = 0;
+
+	/* If timeout_ms == 0, set maximum timeout. */
+	DWORD timeout_val = (timeout_ms == 0 ? MAXDWORD - 1 : timeout_ms);
+
+	/* Set timeout. */
+	if (port->timeouts.ReadIntervalTimeout != MAXDWORD ||
+			port->timeouts.ReadTotalTimeoutMultiplier != MAXDWORD ||
+			port->timeouts.ReadTotalTimeoutConstant != timeout_val) {
+		port->timeouts.ReadIntervalTimeout = MAXDWORD;
+		port->timeouts.ReadTotalTimeoutMultiplier = MAXDWORD;
+		port->timeouts.ReadTotalTimeoutConstant = timeout_val;
+		if (SetCommTimeouts(port->hdl, &port->timeouts) == 0)
+			RETURN_FAIL("SetCommTimeouts() failed");
+	}
+
+	/* Loop until we have at least one byte, or timeout is reached. */
+	while (bytes_read == 0) {
+		/* Start read. */
+		if (ReadFile(port->hdl, buf, count, NULL, &port->read_ovl)) {
+			DEBUG("Read completed immediately");
+			bytes_read = count;
+		} else if (GetLastError() == ERROR_IO_PENDING) {
+			DEBUG("Waiting for read to complete");
+			if (GetOverlappedResult(port->hdl, &port->read_ovl, &bytes_read, TRUE) == 0)
+				RETURN_FAIL("GetOverlappedResult() failed");
+			if (bytes_read > 0) {
+				DEBUG("Read completed");
+			} else if (timeout_ms > 0) {
+				DEBUG("Read timed out");
+				break;
+			} else {
+				DEBUG("Restarting read");
+			}
+		} else {
+			RETURN_FAIL("ReadFile() failed");
+		}
+	}
+
+	TRY(restart_wait_if_needed(port, bytes_read));
+
+	RETURN_INT(bytes_read);
+
+#else
+	size_t bytes_read = 0;
+	struct timeval start, delta, now, end = {0, 0};
+	int started = 0;
+	fd_set fds;
+	int result;
+
+	if (timeout_ms) {
+		/* Get time at start of operation. */
+		gettimeofday(&start, NULL);
+		/* Define duration of timeout. */
+		delta.tv_sec = timeout_ms / 1000;
+		delta.tv_usec = (timeout_ms % 1000) * 1000;
+		/* Calculate time at which we should give up. */
+		timeradd(&start, &delta, &end);
+	}
+
+	FD_ZERO(&fds);
+	FD_SET(port->fd, &fds);
+
+	/* Loop until we have at least one byte, or timeout is reached. */
+	while (bytes_read == 0) {
+		/*
+		 * Check timeout only if we have run select() at least once,
+		 * to avoid any issues if a short timeout is reached before
+		 * select() is even run.
+		 */
+		if (timeout_ms && started) {
+			gettimeofday(&now, NULL);
+			if (timercmp(&now, &end, >))
+				/* Timeout has expired. */
+				break;
+			timersub(&end, &now, &delta);
+		}
+		result = select(port->fd + 1, &fds, NULL, NULL, timeout_ms ? &delta : NULL);
+		started = 1;
+		if (result < 0) {
+			if (errno == EINTR) {
+				DEBUG("select() call was interrupted, repeating");
+				continue;
+			} else {
+				RETURN_FAIL("select() failed");
+			}
+		} else if (result == 0) {
+			/* Timeout has expired. */
+			break;
+		}
+
+		/* Do read. */
+		result = read(port->fd, buf, count);
 
 		if (result < 0) {
 			if (errno == EAGAIN)
@@ -975,9 +1195,11 @@ SP_API enum sp_return sp_blocking_read(struct sp_port *port, void *buf,
 				RETURN_FAIL("read() failed");
 		}
 
-		bytes_read += result;
-		ptr += result;
+		bytes_read = result;
 	}
+
+	if (bytes_read == 0)
+		DEBUG("Read timed out");
 
 	RETURN_INT(bytes_read);
 #endif
@@ -999,10 +1221,15 @@ SP_API enum sp_return sp_nonblocking_read(struct sp_port *port, void *buf,
 	DWORD bytes_read;
 
 	/* Set timeout. */
-	port->timeouts.ReadIntervalTimeout = MAXDWORD;
-	port->timeouts.ReadTotalTimeoutConstant = 0;
-	if (SetCommTimeouts(port->hdl, &port->timeouts) == 0)
-		RETURN_FAIL("SetCommTimeouts() failed");
+	if (port->timeouts.ReadIntervalTimeout != MAXDWORD ||
+			port->timeouts.ReadTotalTimeoutMultiplier != 0 ||
+			port->timeouts.ReadTotalTimeoutConstant != 0) {
+		port->timeouts.ReadIntervalTimeout = MAXDWORD;
+		port->timeouts.ReadTotalTimeoutMultiplier = 0;
+		port->timeouts.ReadTotalTimeoutConstant = 0;
+		if (SetCommTimeouts(port->hdl, &port->timeouts) == 0)
+			RETURN_FAIL("SetCommTimeouts() failed");
+	}
 
 	/* Do read. */
 	if (ReadFile(port->hdl, buf, count, NULL, &port->read_ovl) == 0)
@@ -1012,13 +1239,7 @@ SP_API enum sp_return sp_nonblocking_read(struct sp_port *port, void *buf,
 	if (GetOverlappedResult(port->hdl, &port->read_ovl, &bytes_read, TRUE) == 0)
 		RETURN_FAIL("GetOverlappedResult() failed");
 
-	if (bytes_read > 0) {
-		/* Start background operation for subsequent events. */
-		if (WaitCommEvent(port->hdl, &port->events, &port->wait_ovl) == 0) {
-			if (GetLastError() != ERROR_IO_PENDING)
-				RETURN_FAIL("WaitCommEvent() failed");
-		}
-	}
+	TRY(restart_wait_if_needed(port, bytes_read));
 
 	RETURN_INT(bytes_read);
 #else
@@ -1114,13 +1335,14 @@ static enum sp_return add_handle(struct sp_event_set *event_set,
 
 	if (!(new_handles = realloc(event_set->handles,
 			sizeof(event_handle) * (event_set->count + 1))))
-		RETURN_ERROR(SP_ERR_MEM, "handle array realloc() failed");
+		RETURN_ERROR(SP_ERR_MEM, "Handle array realloc() failed");
+
+	event_set->handles = new_handles;
 
 	if (!(new_masks = realloc(event_set->masks,
 			sizeof(enum sp_event) * (event_set->count + 1))))
-		RETURN_ERROR(SP_ERR_MEM, "mask array realloc() failed");
+		RETURN_ERROR(SP_ERR_MEM, "Mask array realloc() failed");
 
-	event_set->handles = new_handles;
 	event_set->masks = new_masks;
 
 	((event_handle *) event_set->handles)[event_set->count] = handle;
@@ -1183,22 +1405,23 @@ SP_API void sp_free_event_set(struct sp_event_set *event_set)
 }
 
 SP_API enum sp_return sp_wait(struct sp_event_set *event_set,
-                              unsigned int timeout)
+                              unsigned int timeout_ms)
 {
-	TRACE("%p, %d", event_set, timeout);
+	TRACE("%p, %d", event_set, timeout_ms);
 
 	if (!event_set)
 		RETURN_ERROR(SP_ERR_ARG, "Null event set");
 
 #ifdef _WIN32
 	if (WaitForMultipleObjects(event_set->count, event_set->handles, FALSE,
-			timeout ? timeout : INFINITE) == WAIT_FAILED)
+			timeout_ms ? timeout_ms : INFINITE) == WAIT_FAILED)
 		RETURN_FAIL("WaitForMultipleObjects() failed");
 
 	RETURN_OK();
 #else
 	struct timeval start, delta, now, end = {0, 0};
-	int result, timeout_remaining;
+	int started = 0;
+	int result, timeout_remaining_ms;
 	struct pollfd *pollfds;
 	unsigned int i;
 
@@ -1217,30 +1440,39 @@ SP_API enum sp_return sp_wait(struct sp_event_set *event_set,
 			pollfds[i].events |= POLLERR;
 	}
 
-	if (timeout) {
+	if (timeout_ms) {
 		/* Get time at start of operation. */
 		gettimeofday(&start, NULL);
 		/* Define duration of timeout. */
-		delta.tv_sec = timeout / 1000;
-		delta.tv_usec = (timeout % 1000) * 1000;
+		delta.tv_sec = timeout_ms / 1000;
+		delta.tv_usec = (timeout_ms % 1000) * 1000;
 		/* Calculate time at which we should give up. */
 		timeradd(&start, &delta, &end);
 	}
 
 	/* Loop until an event occurs. */
-	while (1)
-	{
-		if (timeout) {
+	while (1) {
+		/*
+		 * Check timeout only if we have run poll() at least once,
+		 * to avoid any issues if a short timeout is reached before
+		 * poll() is even run.
+		 */
+		if (!timeout_ms) {
+			timeout_remaining_ms = -1;
+		} else if (!started) {
+			timeout_remaining_ms = timeout_ms;
+		} else {
 			gettimeofday(&now, NULL);
 			if (timercmp(&now, &end, >)) {
-				DEBUG("wait timed out");
+				DEBUG("Wait timed out");
 				break;
 			}
 			timersub(&end, &now, &delta);
-			timeout_remaining = delta.tv_sec * 1000 + delta.tv_usec / 1000;
+			timeout_remaining_ms = delta.tv_sec * 1000 + delta.tv_usec / 1000;
 		}
 
-		result = poll(pollfds, event_set->count, timeout ? timeout_remaining : -1);
+		result = poll(pollfds, event_set->count, timeout_remaining_ms);
+		started = 1;
 
 		if (result < 0) {
 			if (errno == EINTR) {
@@ -1278,7 +1510,7 @@ static enum sp_return get_baudrate(int fd, int *baudrate)
 
 	if (ioctl(fd, get_termios_get_ioctl(), data) < 0) {
 		free(data);
-		RETURN_FAIL("getting termios failed");
+		RETURN_FAIL("Getting termios failed");
 	}
 
 	*baudrate = get_termios_speed(data);
@@ -1301,7 +1533,7 @@ static enum sp_return set_baudrate(int fd, int baudrate)
 
 	if (ioctl(fd, get_termios_get_ioctl(), data) < 0) {
 		free(data);
-		RETURN_FAIL("getting termios failed");
+		RETURN_FAIL("Getting termios failed");
 	}
 
 	DEBUG("Setting baud rate");
@@ -1310,7 +1542,7 @@ static enum sp_return set_baudrate(int fd, int baudrate)
 
 	if (ioctl(fd, get_termios_set_ioctl(), data) < 0) {
 		free(data);
-		RETURN_FAIL("setting termios failed");
+		RETURN_FAIL("Setting termios failed");
 	}
 
 	free(data);
@@ -1333,7 +1565,7 @@ static enum sp_return get_flow(int fd, struct port_data *data)
 
 	if (ioctl(fd, TCGETX, termx) < 0) {
 		free(termx);
-		RETURN_FAIL("getting termiox failed");
+		RETURN_FAIL("Getting termiox failed");
 	}
 
 	get_termiox_flow(termx, &data->rts_flow, &data->cts_flow,
@@ -1357,7 +1589,7 @@ static enum sp_return set_flow(int fd, struct port_data *data)
 
 	if (ioctl(fd, TCGETX, termx) < 0) {
 		free(termx);
-		RETURN_FAIL("getting termiox failed");
+		RETURN_FAIL("Getting termiox failed");
 	}
 
 	DEBUG("Setting advanced flow control");
@@ -1367,7 +1599,7 @@ static enum sp_return set_flow(int fd, struct port_data *data)
 
 	if (ioctl(fd, TCSETX, termx) < 0) {
 		free(termx);
-		RETURN_FAIL("setting termiox failed");
+		RETURN_FAIL("Setting termiox failed");
 	}
 
 	free(termx);
@@ -1951,8 +2183,10 @@ static enum sp_return set_config(struct sp_port *port, struct port_data *data,
 	if (baud_nonstd != B0) {
 		if (ioctl(port->fd, IOSSIOSPEED, &baud_nonstd) == -1)
 			RETURN_FAIL("IOSSIOSPEED ioctl failed");
-		/* Set baud rates in data->term to correct, but incompatible
-		 * with tcsetattr() value, same as delivered by tcgetattr(). */
+		/*
+		 * Set baud rates in data->term to correct, but incompatible
+		 * with tcsetattr() value, same as delivered by tcgetattr().
+		 */
 		if (cfsetspeed(&data->term, baud_nonstd) < 0)
 			RETURN_FAIL("cfsetspeed() failed");
 	}
@@ -1984,7 +2218,7 @@ SP_API enum sp_return sp_new_config(struct sp_port_config **config_ptr)
 	*config_ptr = NULL;
 
 	if (!(config = malloc(sizeof(struct sp_port_config))))
-		RETURN_ERROR(SP_ERR_MEM, "config malloc failed");
+		RETURN_ERROR(SP_ERR_MEM, "Config malloc failed");
 
 	config->baudrate = -1;
 	config->bits = -1;
@@ -2062,6 +2296,8 @@ SP_API enum sp_return sp_set_##x(struct sp_port *port, type x) { \
 SP_API enum sp_return sp_get_config_##x(const struct sp_port_config *config, \
                                         type *x) { \
 	TRACE("%p, %p", config, x); \
+	if (!x) \
+		RETURN_ERROR(SP_ERR_ARG, "Null result pointer"); \
 	if (!config) \
 		RETURN_ERROR(SP_ERR_ARG, "Null config"); \
 	*x = config->x; \
@@ -2223,19 +2459,15 @@ SP_API int sp_last_error_code(void)
 #endif
 }
 
-#include <stdio.h>
-#include <wchar.h>
-#include <string.h>
-
 SP_API char *sp_last_error_message(void)
 {
 	TRACE_VOID();
 
 #ifdef _WIN32
-	LPVOID message;
+	TCHAR *message;
 	DWORD error = GetLastError();
 
-    FormatMessageA(
+	DWORD length = FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -2245,13 +2477,10 @@ SP_API char *sp_last_error_message(void)
 		(LPTSTR) &message,
 		0, NULL );
 
-    /*
-    static char msg[1024];
-    wcstombs(msg, message, wcslen(message) + 1);
-*/
+	if (length >= 2 && message[length - 2] == '\r')
+		message[length - 2] = '\0';
 
-
-    RETURN_STRING(message);
+	RETURN_STRING(message);
 #else
 	RETURN_STRING(strerror(errno));
 #endif
