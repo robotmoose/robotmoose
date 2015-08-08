@@ -15,18 +15,31 @@
 #include <string>
 #include <map>
 #include "mongoose/mongoose.h" /* central webserver library */
-#include <cstdint>
-#include <chrono>
-#include <thread>
+#include <stdint.h>
 
 #include "osl/sha2_auth.h" /* for authentication */
 #include "osl/sha2.cpp" /* for easier linking */
+
+
+#ifdef USE_CPP_11
+#include <chrono>
+#include <thread>
 
 int64_t millis()
 {
 	auto system_time=std::chrono::system_clock::now().time_since_epoch();
 	return std::chrono::duration_cast<std::chrono::milliseconds>(system_time).count();
 }
+
+#else
+#include <time.h>
+
+int64_t millis() {
+	int64_t now=time(0); // seconds
+	return 1000*now;  // HOPE YOU DIDN'T NEED MILLISECOND RESOLUTION!
+}
+
+#endif
 
 std::string ADDRESS="0.0.0.0:8081";
 const std::string backup_filename="db.bak";
