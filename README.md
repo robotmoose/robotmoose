@@ -77,8 +77,9 @@ There are also several peripherals supported:
 
 
 ### Making a Superstar 
+For most tasks, it's best to use UAF's main superstar server (http://robotmoose.com/superstar).  But if you don't have reliable internet access, or want to change our web user interface code, you need your own local superstar server.
 
-To edit the web front end locally, you need to change the files in robotmoose/www/js, and serve them using your own local copy of superstar:
+To make and run your own local copy of superstar:
 ```
 cd ~/robotmoose/superstar
 make
@@ -121,12 +122,27 @@ Uploading new config to arduino!
 Arduino startup: 
 ```
 
-The fix for both problems is to make the Arduino device (/dev/ttyACM0 here, sometimes /dev/ttyUSB0) readable and writeable by your user account:
+A temporary fix is to force the Arduino device to be readable and writeable, but this will need to be repeated every time you unplug the Arduino:
+```
+sudo chmod 777 /dev/tty[UA]*
+```
+
+The permanent fix for both problems is to make all serial devices readable and writeable by your user account:
 ```
 sudo usermod -a -G dialout $USER
 ```
-You'll need to log out and log back in to be in the new group, and then the Arduino should work correctly.
+You'll need to log out and log back in to be in the new group, and then any Arduino should work correctly, permanently.
 
+
+### Internet Connection Error
+The backend needs a network connection to the superstar server, or you will get errors like this:
+```
+Connecting to superstar at http://robotmoose.com/
+terminate called after throwing an instance of 'skt_error'
+  what():  Invalid domain name: 'robotmoose.com'
+```
+
+Check that the wireless network is connected correctly.
 
 
 
