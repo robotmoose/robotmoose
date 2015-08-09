@@ -29,10 +29,17 @@ make
 ./backend --robot test/yourbot --sim
 ```
 
-You should immediately be able to pilot the simulated robot by entering the robot name of "yourbot" at http://robotmoose.com/pilot/
+You should immediately be able to pilot the simulated robot by choosing the robot at http://robotmoose.com/pilot/
+
 
 ### Firmware Installation and Physical Backend
-To use a real physical Arduino with real robot components, first plug in the Arduino and flash the firmware at robotmoose/tabula_rasa/arduino, using either the Arduino IDE or the Makefile there:
+To use a real physical Arduino with real robot components, you first need to make sure you have permission to access the USB serial port where the Arduino connects.  On Ubuntu, you need to be a member of the "dialout" group:
+```
+sudo usermod -a -G dialout $USER
+```
+You'll need to log out and log back in to be in the new group.
+
+Now plug in the Arduino and flash the firmware at robotmoose/tabula_rasa/arduino, using either the Arduino IDE or the Makefile there:
 ```
 cd ~/robotmoose/tabula_rasa/arduino
 make
@@ -46,6 +53,29 @@ make
 ./backend --robot test/yourbot
 ```
 
+### Configure and Pilot your Robot
+
+You access the main robot web interface at [http://localhost:8081/pilot/](http://localhost:8081/pilot/).  
+* Connect to the school ("test") and robot name ("yourbot") you gave the backend above.
+* Configure the robot in the "Configure" tab by selecting a piece of hardware and hitting "Add".  I always start with a "heartbeat" so I can verify communication works.  Hit "Configure" to copy this configuration to the Arduino.
+* Check the "Sensors" tab to see the data sent back by your robot.  The "heartbeat" is a number that counts up from 0 to 255 again and again, so you can see the Arduino is connected.  The "location" is a guess of the position of the robot, and is updated as the robot moves.
+
+There are many types of robot driving hardware (tabula_rasa/arduino/motor_controller.cpp) supported by this system.  Once you configure any of these robot motors, the "Drive" tab will gain a set of arrows allowing you to drive the robot!
+* "create2" is a serial connection to an iRobot Create 2 or 500/600 series Roomba.  When you press "Configure", you need to press the Roomba's power button to wake up the Roomba, or the Arduino will sit waiting for the Roomba to connect.
+* "bts" represents two BTS 7960B motor controllers, used to drive the left and right wheels of your robot.  There are four pins listed, two PWM pins for each motor.  (Tie the BTS's VCC and EN lines to Arduino 5V, and the GND line to Arduino ground.  You can leave the IS pins unconnected.)
+* "sabertooth2" is a Dimension Engineering SaberTooth dual motor controller, version 2.  You set the serial port that sends serial commands to this device.  (Set address 128, packetized serial format, 9600 baud)
+* "sabertooth1" is a Dimension Engineering SaberTooth, version 1.  (Set simple serial format, 9600 baud)
+
+There are also several peripherals supported:
+* "analog" reads an Arduino analog pin, like A3.  The read value will show up in the Sensors tab.
+* "servo" is an RC servo, like with a model plane.  You can hook the servo's white control wire to any Arduino pin, and power the red from 5v and black to ground.  In the "Drive" tab, you set the servo position in degrees, from 0 to 180 degrees. 
+* "pwm" is a pulse width modulated (PWM) pin, which can be used to smoothly vary the brightness of an LED.  For example, pin 13 is the standard Arduino LED, so you can control it by adding a pwm device on pin 13, and dragging the brightness slider around.
+* "neato" is a Neato XV-11 laser distance sensor, which uses a laser to measure distance in a 360 degree plane around the robot.  You give a serial port to read the neato's serial data distance reports, and a pin to control the neato's motor power via a transistor.
+* "latency" measures the Arduino firmware's control loop latency, in milliseconds.  It should normally read 1 millisecond.
+* "heartbeat" is incremented every 10ms by Arduino firmware.  If you can see this number changing in the "Sensors" tab, you have connectivity between the web front end, superstar, backend, and Arduino.  If this number stops changing, something has been disconnected.
+
+
+
 ### Making a Superstar 
 
 To edit the web front end locally, you need to change the files in robotmoose/www/js, and serve them using your own local copy of superstar:
@@ -55,12 +85,15 @@ make
 ./superstar > log &
 ```
 
-You should now be able to point your web browser to http://localhost:8081/pilot/ and see your local copy of the web user interface.  Connect a robot backend to this local interface using:
+Connect a robot backend to this local interface using:
 ```
 cd ~/robotmoose/tabula_rasa
 make
 ./backend --robot test/yourbot --superstar http://localhost:8081/
 ```
+
+You should now be able to point your web browser to [http://localhost:8081/pilot/](http://localhost:8081/pilot/) and see your local copy of the web user interface.  Edit the files in ~/robotmoose/www/js and hit reload to modify the interface.
+
 
 ### Fun Tricks
 The superstar server has been tested with up to ten robots and pilots connected.  Normally, each robot has a unique name, which allows the pilot to control it.
@@ -68,6 +101,32 @@ The superstar server has been tested with up to ten robots and pilots connected.
 If you give several robots the same name, the pilot interface jumps between their sensor data as they report it, which isn't very useful.  But all the robots read the same pilot commands, so they move together like synchronized swimmers!
 
 If several pilots connect to the same robot, they all see the same sensor data, but the pilot's commands overwrite each other, which makes for very jerky driving.
+
+
+
+## Debugging
+The real trick with debugging is slowly and systematically looking at what is happening.
+
+### Arduino permission error
+If you have an Arduino permission problem, flashing the Arduino from the command line (cd ~/robotmoose/tabula_rasa/arduino; make) will error with:
+```
+avrdude: ser_open(): can't open device "/dev/ttyACM0": Permission denied
+ioctl("TIOCMGET"): Invalid argument
+ioctl("TIOCMGET"): Invalid argument
+```
+
+Even if you manage to flash the Arduino, if you have a permission problem the backend will hang when connecting to the Arduino:
+```
+Uploading new config to arduino!
+Arduino startup: 
+```
+
+The fix for both problems is to make the Arduino device (/dev/ttyACM0 here, sometimes /dev/ttyUSB0) readable and writeable by your user account:
+```
+sudo usermod -a -G dialout $USER
+```
+You'll need to log out and log back in to be in the new group, and then the Arduino should work correctly.
+
 
 
 
