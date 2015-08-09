@@ -26,7 +26,7 @@ The easy way to get started is to connect a **simulated** robot backend to the d
 ```
 cd ~/robotmoose/tabula_rasa
 make
-./backend --robot yourbot --sim
+./backend --robot test/yourbot --sim
 ```
 
 You should immediately be able to pilot the simulated robot by entering the robot name of "yourbot" at http://robotmoose.com/pilot/
@@ -43,7 +43,7 @@ Now run the backend again, but leave off the "--sim" argument, and the backend w
 ```
 cd ~/robotmoose/tabula_rasa
 make
-./backend --robot yourbot
+./backend --robot test/yourbot
 ```
 
 ### Making a Superstar 
@@ -59,7 +59,7 @@ You should now be able to point your web browser to http://localhost:8081/pilot/
 ```
 cd ~/robotmoose/tabula_rasa
 make
-./backend --robot yourbot --superstar http://localhost:8081/
+./backend --robot test/yourbot --superstar http://localhost:8081/
 ```
 
 ### Fun Tricks
