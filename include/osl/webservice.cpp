@@ -11,7 +11,7 @@ osl::network_progress::~network_progress() {}
 /** Parse URL into its component parts */
 osl::url_parser::url_parser(std::string URL) {
 	while (isspace(URL[0])) URL=URL.substr(1,std::string::npos);
-	unsigned int ds=URL.find_first_of("//"); /* double-slash */
+	size_t ds=URL.find_first_of("//"); /* double-slash */
 	if (ds!=std::string::npos) {
 		protocol=URL.substr(0,ds-1);
 		ds+=2; /* skip over double-slash, so ds points at start of host */
@@ -19,10 +19,12 @@ osl::url_parser::url_parser(std::string URL) {
 		ds=0;
 		protocol="http";
 	}
+
 	size_t ps=URL.find_first_of("/",ds);
 	if (ps==std::string::npos) ps=URL.size();
 	host=URL.substr(ds,ps-(ds));
-	unsigned int colon=host.find_first_of(":");
+
+	size_t colon=host.find_first_of(":");
 	port=80;
 	if (colon!=std::string::npos) { // Parse port number, like www.foo.com:80
 		sscanf(&host[colon+1],"%d",&port);
