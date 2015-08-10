@@ -1,20 +1,17 @@
-windows api (doorways)
+windows api (doorways):
 	need:
 		-Ability to alert.
-		-Dropouts should update state area.
 
 	completely optional at this point:
 		-Touch events...
 
-webcam (webrtc)
+achievements:
 	need:
-		-start session
-		-stop session
-		-join session
-		-camera image div access
-			-position
-			-resize
+		-Create (server side only).
+		-Delete (server side only).
+		-Widget.
+		-Unlock animation.
 
-	things that would be nice:
-		-quality
-		-sound control
+serial:
+	need:
+		Macport listing.
