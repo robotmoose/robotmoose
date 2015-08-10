@@ -13,7 +13,7 @@
 #  define WINDOWS 1
 #  include <windows.h>
 #  define snprintf _snprintf /* what the heck, windows... */
-#elif defined(__apple__)
+#elif defined(__APPLE__)||defined(__MACH__)
 #  define MACOSX 1
 #  include <termios.h>
 #else 
@@ -31,6 +31,9 @@ public:
 	/// Usage: Serial.begin(115200);
 	int begin(int baudrate) {
 		std::vector<std::string> ports=port_list();
+		//for(size_t ii=0;ii<ports.size();++ii)
+		//std::cout<<ii<<":  "<<ports[ii]<<std::endl;
+
 		if (ports.size()==0) { printf("ERROR!  No serial ports found!  (Is it plugged in?)\n"); return -1; }
 		
 		if (0==Open(port_list()[0])) {

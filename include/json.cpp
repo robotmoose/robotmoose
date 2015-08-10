@@ -181,7 +181,7 @@ const char *name_of_ValueType(json::ValueType vt)
                 "BoolVal"
 	};
 	if (vt<0) return "invalidNegativeValueType";
-	else if (vt>=sizeof(names)/sizeof(names[0])) return "invalidTooBigValueType";
+	else if (vt>=(int)(sizeof(names)/sizeof(names[0]))) return "invalidTooBigValueType";
 	else return names[vt];
 }
 

@@ -45,7 +45,7 @@
   #include <time.h>
   #include <CoreFoundation/CoreFoundation.h>
   #include <IOKit/IOKitLib.h>
-  #include <IOKit/serial/IOSerialPortKeys.h>
+  #include <IOKit/serial/IOSerialKeys.h>
   #include <IOKit/IOBSD.h>
 #elif defined(WINDOWS)
   #include <windows.h>
@@ -711,7 +711,7 @@ static const char *devnames[] = {
 
 
 #if defined(MACOSX)
-static void macos_ports(io_iterator_t  * PortIterator, std::stringArrayString& list)
+static void macos_ports(io_iterator_t  * PortIterator, std::vector<std::string>& list)
 {
 	io_object_t modemService;
 	CFTypeRef nameCFstring;
@@ -807,10 +807,10 @@ std::vector<std::string> SerialPort::port_list()
 	}
 	closedir(dir);
 #elif defined(MACOSX)
-	// adapted from SerialPortPortSample.c, by Apple
-	// http://developer.apple.com/samplecode/SerialPortPortSample/listing2.html
+	// adapted from SerialSample.c, by Apple
+	// http://developer.apple.com/samplecode/SerialSample/listing2.html
 	// and also testserial.c, by Keyspan
-	// http://www.keyspan.com/downloads-files/developer/macosx/KesypanTestSerialPort.c
+	// http://www.keyspan.com/downloads-files/developer/macosx/KesypanTestSerial.c
 	// www.rxtx.org, src/SerialPortImp.c seems to be based on Keyspan's testserial.c
 	// neither keyspan nor rxtx properly release memory allocated.
 	// more documentation at:
@@ -821,20 +821,20 @@ std::vector<std::string> SerialPort::port_list()
 	if (IOMasterPort(NULL, &masterPort) != KERN_SUCCESS) return list;
 	// a usb-serial adaptor is usually considered a "modem",
 	// especially when it implements the CDC class spec
-	classesToMatch = IOServiceMatching(kIOSerialPortBSDServiceValue);
+	classesToMatch = IOServiceMatching(kIOSerialBSDServiceValue);
 	if (!classesToMatch) return list;
-	CFDictionarySetValue(classesToMatch, CFSTR(kIOSerialPortBSDTypeKey),
-	   CFSTR(kIOSerialPortBSDModemType));
+	CFDictionarySetValue(classesToMatch, CFSTR(kIOSerialBSDTypeKey),
+	   CFSTR(kIOSerialBSDModemType));
 	if (IOServiceGetMatchingServices(masterPort, classesToMatch,
 	   &serialPortIterator) != KERN_SUCCESS) return list;
 	macos_ports(&serialPortIterator, list);
 	IOObjectRelease(serialPortIterator);
 	// but it might be considered a "rs232 port", so repeat this
 	// search for rs232 ports
-	classesToMatch = IOServiceMatching(kIOSerialPortBSDServiceValue);
+	classesToMatch = IOServiceMatching(kIOSerialBSDServiceValue);
 	if (!classesToMatch) return list;
-	CFDictionarySetValue(classesToMatch, CFSTR(kIOSerialPortBSDTypeKey),
-	   CFSTR(kIOSerialPortBSDRS232Type));
+	CFDictionarySetValue(classesToMatch, CFSTR(kIOSerialBSDTypeKey),
+	   CFSTR(kIOSerialBSDRS232Type));
 	if (IOServiceGetMatchingServices(masterPort, classesToMatch,
 	   &serialPortIterator) != KERN_SUCCESS) return list;
 	macos_ports(&serialPortIterator, list);
@@ -857,7 +857,7 @@ std::vector<std::string> SerialPort::port_list()
 	memset(buffer, 0, QUERYDOSDEVICE_BUFFER_SIZE);
 	ret = QueryDosDeviceA(NULL, buffer, QUERYDOSDEVICE_BUFFER_SIZE);
 	if (ret) {
-		printf("Detect SerialPort using QueryDosDeviceA: ");
+		printf("Detect Serial using QueryDosDeviceA: ");
 		for (p = buffer; *p; p += strlen(p) + 1) {
 			printf(":  %s", p);
 			if (strncmp(p, "COM", 3)) continue;
