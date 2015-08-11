@@ -31,17 +31,26 @@ public:
 	/// Usage: Serial.begin(115200);
 	int begin(int baudrate) {
 		std::vector<std::string> ports=port_list();
-		//for(size_t ii=0;ii<ports.size();++ii)
-		//std::cout<<ii<<":  "<<ports[ii]<<std::endl;
 
 		if (ports.size()==0) { printf("ERROR!  No serial ports found!  (Is it plugged in?)\n"); return -1; }
-		
-		if (0==Open(port_list()[0])) {
-			printf("\nOpened serial port %s, baud rate %d\n",
-				port_list()[0].c_str(), baudrate);
+
+		for(size_t ii=0;ii<ports.size();++ii)
+		{
+			std::cout<<ii<<":  "<<ports[ii]<<std::endl;
+
+			if (ports[ii].find("Bluetooth")==std::string::npos)
+			{
+				if(0==Open(ports[ii]))
+				{
+					printf("\nOpened serial port %s, baud rate %d\n",ports[ii].c_str(),baudrate);
+				}
+				else
+				{
+					return -1;
+				}
+			}
 		}
-		else
-		return -1;
+		
 		Set_baud(baudrate);
 		return 0;
 	}

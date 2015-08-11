@@ -141,7 +141,7 @@ public:
 					}
 
 					// Convert signal reflectance to bit count
-					unsigned int bits=0, val=1;
+					unsigned int bits=0;
 					while (reportSignal>0) {
   					   reportSignal=reportSignal>>2;
 					   bits++;

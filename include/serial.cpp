@@ -818,7 +818,7 @@ std::vector<std::string> SerialPort::port_list()
 	mach_port_t masterPort;
 	CFMutableDictionaryRef classesToMatch;
 	io_iterator_t serialPortIterator;
-	if (IOMasterPort(NULL, &masterPort) != KERN_SUCCESS) return list;
+	if (IOMasterPort(0, &masterPort) != KERN_SUCCESS) return list;
 	// a usb-serial adaptor is usually considered a "modem",
 	// especially when it implements the CDC class spec
 	classesToMatch = IOServiceMatching(kIOSerialBSDServiceValue);

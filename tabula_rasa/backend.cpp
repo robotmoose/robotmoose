@@ -62,7 +62,7 @@ std::string uri_encode(std::string str)
 	{
 		bool found=dont_encode.find(str[ii],0)!=std::string::npos;
 
-		if(!found&&!isdigit(str[ii])!=0&&!isalpha(str[ii])!=0)
+		if(!found&&isdigit(str[ii])==0&&isalpha(str[ii])==0)
 		{
 			str.replace(ii,1,"%"+char_to_hex(str[ii]));
 			ii+=2;
@@ -968,7 +968,7 @@ int main(int argc, char *argv[])
 {
 	double LRtrim=1.0;
 	std::string superstarURL = "http://robotmoose.com/"; // superstar server
-	std::string robotName = "demo"; // superstar robot name
+	std::string robotName = "test/demo"; // superstar robot name
 	std::string configMotor; // Arduino firmware device name
 	std::string markerFile=""; // computer vision marker file
 	std::string sensors=""; // All our sensors

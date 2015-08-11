@@ -28,6 +28,7 @@ tabula_rasa/backend
 tabula_rasa/backend.exe
 tabula_rasa/tester
 tabula_rasa/tester.exe
+tabula_rasa/backend.dSYM
 sensors/imu/show_IMU/main
 sensors/imu/show_IMU/main.exe
 sensors/imu/show_IMU/main.o
