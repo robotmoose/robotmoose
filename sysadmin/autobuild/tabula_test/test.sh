@@ -10,8 +10,7 @@ sudo apt-get install git make g++ freeglut3-dev arduino
 # Check out a clean copy of the code
 cd /tmp
 rm -fr robotmoose
-git clone https://github.com/robotmoose/main
-mv main robotmoose
+git clone https://github.com/robotmoose/robotmoose
 
 # Run a local superstar
 (
@@ -31,7 +30,7 @@ mv main robotmoose
 (
 	cd robotmoose/tabula_rasa
 	make
-	./backend --robot autotest1 --superstar http://localhost:8081 &
+	./backend --robot test/autotest1 --superstar http://localhost:8081 &
 	sleep 4 # wait for firmware to start
 ) || exit 1
 

@@ -16,10 +16,10 @@ First, you need the version control system git to get this code.  For Windows, u
 sudo apt-get install git make g++ freeglut3-dev arduino
 ```
 
-Now clone our repository, and rename it "robotmoose":
+Now clone our software repository:
 ```
-git clone https://github.com/robotmoose/main
-mv main ~/robotmoose
+cd
+git clone https://github.com/robotmoose/robotmoose
 ```
 
 The easy way to get started is to connect a **simulated** robot backend to our robotmoose.com superstar server:
