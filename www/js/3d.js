@@ -193,6 +193,7 @@ function renderer_t(div,setup_func,loop_func)
 
 	myself.setup=function()
 	{
+		try {
 		if(myself.div&&myself.user_setup&&myself.user_loop)
 		{
 			window.addEventListener("resize",myself.resize,false);
@@ -219,6 +220,10 @@ function renderer_t(div,setup_func,loop_func)
 			myself.loop();
 
 			return true;
+		}
+		} catch (e) {
+			console.log("Disabling THREE.WebGL after setup error: "+e);
+			return false;
 		}
 
 		return false;

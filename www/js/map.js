@@ -9,16 +9,16 @@ function robot_map_t(div)
 	this.div=div;
 	var myself=this;
 	this.renderer=new renderer_t(div,function() {myself.setup();}, function() {myself.loop();} );
-	if(!this.renderer) {
+	if(!this.renderer.setup()) {
 		var p=document.createElement("p");
 		p.innerHTML="Is WebGL enabled?";
 		div.appendChild(p);
+		this.renderer=null;
 	}
-	else
-		this.renderer.setup();
 }
 
 robot_map_t.prototype.setup=function() {
+	if (this.renderer===null) return;
 	this.renderer.set_size(this.div.offsetWidth,this.div.offsetWidth); // FIXME resize this
 
 	// Add grid
@@ -45,10 +45,13 @@ robot_map_t.prototype.setup=function() {
 }
 
 robot_map_t.prototype.refresh=function(sensors) {
+	if (this.renderer===null) return;
 	this.sensors=sensors;
 }
 
 robot_map_t.prototype.loop=function() {
+	if (this.renderer===null) return;
+
 	var sensors=this.sensors;
 	if (!sensors || !sensors.location) return;
 

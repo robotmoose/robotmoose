@@ -2,7 +2,7 @@
 # Automated clean build and test for Tabula Rasa robot control system
 
 # Make sure the machine configuration is correct
-sudo apt-get install git make g++ freeglut3-dev arduino
+#  sudo apt-get install git make g++ freeglut3-dev arduino
 
 # Kill any running servers
 `dirname $0`/stoptest.sh
