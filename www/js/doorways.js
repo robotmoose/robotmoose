@@ -100,8 +100,6 @@ doorways_t.prototype.save=function()
 
 doorways_t.prototype.load=function(data)
 {
-	this.remove_all();
-
 	if(!data)
 		return;
 
@@ -109,18 +107,27 @@ doorways_t.prototype.load=function(data)
 
 	for(var key in data)
 	{
-		var doorway=this.create(data[key].title,{x:data[key].x,y:data[key].y});
+		var doorway=this.get_by_title(data[key].title);
+
+		if(!doorway)
+		{
+			doorway=this.create(data[key].title,{x:data[key].x,y:data[key].y});
+		}
+		else
+		{
+			doorway.z=0;
+			this.move(doorway,{x:data[key].x,y:data[key].y});
+		}
 
 		if(data[key].width||data[key].height)
 			this.resize(doorway,{width:data[key].width,height:data[key].height});
+
+		this.minimize(doorway,data[key].minimized);
 
 		if(data[key].active)
 			this.activate(doorway);
 		else
 			this.deactivate(doorway);
-
-		if(data[key].minimized)
-			this.minimize(doorway);
 	}
 }
 

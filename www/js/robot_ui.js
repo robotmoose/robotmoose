@@ -139,6 +139,18 @@ robot_ui_t.prototype.download_gui=function()
 
 	superstar_get(this.robot_name,"gui",function(json)
 	{
+		myself.doorways=
+		{
+			config:myself.create_doorway("Configure"),
+			pilot:myself.create_doorway("Drive"),
+			sensors:myself.create_doorway("Sensors"),
+			states:myself.create_doorway("Code"),
+			map:myself.create_doorway("Map"),
+			video:myself.create_doorway("Video")
+		};
+		myself.gui.element.hide_all();
+		myself.gui.element.minimize(myself.doorways.config,false);
+
 		myself.gui.element.load(json);
 		myself.create_widgets();
 		myself.clone_menu.clone_target=myself.robot_name;
@@ -188,17 +200,6 @@ robot_ui_t.prototype.create_widgets=function()
 {
 	var myself=this;
 
-	this.doorways=
-	{
-		config:this.create_doorway("Configure"),
-		pilot:this.create_doorway("Drive"),
-		sensors:this.create_doorway("Sensors"),
-		states:this.create_doorway("Code"),
-		map:this.create_doorway("Map"),
-		video:this.create_doorway("Video"),
-	};
-	this.gui.element.minimize(this.doorways.video);
-
 	this.widgets=
 	{
 		config:new config_editor_t(this.doorways.config.content),
@@ -208,7 +209,7 @@ robot_ui_t.prototype.create_widgets=function()
 		map:new robot_map_t(this.doorways.map.content,{}),
 		video:new video_gruveo_t(this.doorways.video.content)
 	};
-	
+
 	this.widgets.config.onchange=function() { // recreate pilot GUI when configuration changes
 		myself.widgets.pilot.reconfigure(myself.widgets.config);
 	}
