@@ -14,6 +14,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <stdarg.h>
 #include "mongoose/mongoose.h" /* central webserver library */
 #include <stdint.h>
 

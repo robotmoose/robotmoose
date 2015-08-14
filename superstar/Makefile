@@ -2,12 +2,16 @@ CXX=g++
 OPTS=-O
 CFLAGS=$(OPTS) -Wall -I../include 
 # CFLAGS+=-DLISTEN80
-LIBS=-lpthread
+LIBS=
+
+ifeq ($(OS),Windows_NT)
+	LIBS+=-lWs2_32
+endif
 
 all: superstar netbench
 
 superstar: superstar.cpp
-	$(CXX) $(CFLAGS) $< mongoose/mongoose.c -o $@ $(LIBS)
+	$(CXX) $(CFLAGS) $< ../include/mongoose/mongoose.c -o $@ $(LIBS)
 
 # This is needed to allow access to port 80
 supercap: superstar
