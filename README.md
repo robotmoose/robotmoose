@@ -11,7 +11,7 @@ The typical usage model puts the front end on the robot pilot's web browser, sup
 
 ## Installation and Setup
 
-First, you need the version control system git to get this code.  For Windows, use [Git for Windows](https://msysgit.github.io/).  For Ubuntu, use:
+First, you need the version control system git to get this code.  For Mac, use [GitHub for Mac](https://desktop.github.com/).For Windows, use [Git for Windows](https://msysgit.github.io/).  For Ubuntu, use:
 ```
 sudo apt-get install git make g++ freeglut3-dev arduino
 ```
