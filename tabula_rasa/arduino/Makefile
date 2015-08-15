@@ -10,7 +10,7 @@
 #STUFF YOU GOTTA CHANGE...
 ifeq ($(shell uname),Darwin)
 	#MAC
-	PROGRAM_PORT=/dev/tty.usbserial-A599akkr
+	PROGRAM_PORT=$(shell echo /dev/tty.usb*)
 else
 	#LINUX
 	PROGRAM_PORT=/dev/ttyACM0

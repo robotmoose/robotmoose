@@ -43,6 +43,20 @@
 # define M_PI 3.1415926535897
 #endif
 
+void moose_sleep_ms(int delay_ms)
+{
+#if defined(__unix__)||defined(__MACH__)
+	timespec t1;
+	t1.tv_sec=delay_ms/1000; // remaining seconds
+	t1.tv_nsec=1000*1000*(delay_ms%1000); // nanoseconds
+	nanosleep(&t1,NULL); // limit rate to 100Hz, to be kind to serial port and network
+#else
+	Sleep(delay_ms);
+#endif
+}
+
+
+
 
 bool sim = false; // use --sim to enable simulation mode
 bool debug = false;  // spams more output data
@@ -1026,14 +1040,8 @@ int main(int argc, char *argv[])
 	while (1) { // talk to robot via backend
 		backend->do_network();
 		backend->send_serial();
-#ifdef __unix__
-		timespec t1;
-		t1.tv_sec=delay_ms/1000; // remaining seconds
-		t1.tv_nsec=1000*1000*(delay_ms%1000); // nanoseconds
-		nanosleep(&t1,NULL); // limit rate to 100Hz, to be kind to serial port and network
-#else
-		Sleep(delay_ms);
-#endif
+		moose_sleep_ms(delay_ms);
+
 		backend->read_serial();
 		if (markerFile!="") backend->location.update_vision(markerFile.c_str());
 	}
