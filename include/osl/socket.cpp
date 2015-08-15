@@ -265,11 +265,11 @@ SOCKET skt_datagram(unsigned int *port, int bufsize)
   
 retry:
   ret = socket(AF_INET,SOCK_DGRAM,0);
-  if (ret == (SOCKET)(SOCKET_ERROR)) {
+  if (ret == (SOCKET)SOCKET_ERROR) {
     if (skt_should_retry()) goto retry;  
     return skt_abort(93490,"Error creating datagram socket.");
   }
-  if (bind(ret, (struct sockaddr *)&addr, sizeof(addr)) == (SOCKET)(SOCKET_ERROR))
+  if (bind(ret, (struct sockaddr *)&addr, sizeof(addr)) == SOCKET_ERROR)
 	  return skt_abort(93491,"Error binding datagram socket.");
   
   len = sizeof(addr);
@@ -279,9 +279,9 @@ retry:
   if (bufsize) 
   {
     len = sizeof(int);
-    if (setsockopt(ret, SOL_SOCKET , SO_RCVBUF , (char *)&bufsize, len) == (SOCKET)(SOCKET_ERROR)) 
+    if (setsockopt(ret, SOL_SOCKET , SO_RCVBUF , (char *)&bufsize, len) == SOCKET_ERROR) 
 		return skt_abort(93495,"Error on RCVBUF sockopt for datagram socket.");
-    if (setsockopt(ret, SOL_SOCKET , SO_SNDBUF , (char *)&bufsize, len) == (SOCKET)(SOCKET_ERROR)) 
+    if (setsockopt(ret, SOL_SOCKET , SO_SNDBUF , (char *)&bufsize, len) == SOCKET_ERROR) 
 		return skt_abort(93496,"Error on SNDBUF sockopt for datagram socket.");
   }
   
@@ -304,19 +304,19 @@ SOCKET skt_server_ip(unsigned int *port,skt_ip_t *ip)
 retry:
   ret = socket(PF_INET, SOCK_STREAM, 0);
   
-  if (ret == (SOCKET)(SOCKET_ERROR)) {
+  if (ret == (SOCKET)SOCKET_ERROR) {
     if (skt_should_retry()) goto retry;
     else return skt_abort(93483,"Error creating server socket.");
   }
   /* Prevents 3-minute socket reuse timeout after a server crash. */
   setsockopt(ret, SOL_SOCKET, SO_REUSEADDR, (const char *)&on, sizeof(on));
   
-  if (bind(ret, (struct sockaddr *)&addr, sizeof(addr)) == (SOCKET)(SOCKET_ERROR)) 
+  if (bind(ret, (struct sockaddr *)&addr, sizeof(addr)) == SOCKET_ERROR) 
 	  return skt_abort(93484,"Error binding server socket.  Is another process listening on that port already?");
-  if (listen(ret,5) == (SOCKET)(SOCKET_ERROR)) 
+  if (listen(ret,5) == SOCKET_ERROR) 
 	  return skt_abort(93485,"Error listening on server socket.");
   len = sizeof(addr);
-  if (getsockname(ret, (struct sockaddr *)&addr, &len) == (SOCKET)(SOCKET_ERROR)) 
+  if (getsockname(ret, (struct sockaddr *)&addr, &len) == SOCKET_ERROR) 
 	  return skt_abort(93486,"Error getting name on server socket.");
 
   if (port!=NULL) *port = (int)ntohs(addr.sin_port);
@@ -332,7 +332,7 @@ SOCKET skt_accept(SOCKET src_fd,skt_ip_t *pip, unsigned int *port)
   len = sizeof(addr);
 retry:
   ret = accept(src_fd, (struct sockaddr *)&addr, &len);
-  if (ret == (SOCKET)(SOCKET_ERROR)) {
+  if (ret == (SOCKET)SOCKET_ERROR) {
     if (skt_should_retry()) goto retry;
     else return skt_abort(93523,"Error in accept.");
   }
@@ -352,13 +352,13 @@ SOCKET skt_connect(skt_ip_t ip, int port, int timeout)
   while (time(0)-begin < timeout) 
   {
     ret = socket(AF_INET, SOCK_STREAM, 0);
-    if (ret==(SOCKET)(SOCKET_ERROR)) 
+    if (ret==(SOCKET)SOCKET_ERROR) 
     {
 	  if (skt_should_retry()) continue;  
       else return skt_abort(93512,"Error creating socket");
     }
     ok = connect(ret, (struct sockaddr *)&(addr), sizeof(addr));
-    if (ok != (SOCKET)(SOCKET_ERROR)) 
+    if (ok != SOCKET_ERROR) 
 	  return ret;/*Good connect*/
 	else { /*Bad connect*/
 	  skt_close(ret);
@@ -373,9 +373,9 @@ SOCKET skt_connect(skt_ip_t ip, int port, int timeout)
 void skt_setSockBuf(SOCKET skt, int bufsize)
 {
   int len = sizeof(int);
-  if (setsockopt(skt, SOL_SOCKET , SO_SNDBUF , (char *)&bufsize, len) == (SOCKET)(SOCKET_ERROR))
+  if (setsockopt(skt, SOL_SOCKET , SO_SNDBUF , (char *)&bufsize, len) == SOCKET_ERROR)
 	skt_abort(93496,"Error on SNDBUF sockopt for datagram socket.");
-  if (setsockopt(skt, SOL_SOCKET , SO_RCVBUF , (char *)&bufsize, len) == (SOCKET)(SOCKET_ERROR))
+  if (setsockopt(skt, SOL_SOCKET , SO_RCVBUF , (char *)&bufsize, len) == SOCKET_ERROR)
 	skt_abort(93496,"Error on RCVBUF sockopt for datagram socket.");
 }
 
