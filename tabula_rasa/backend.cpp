@@ -1027,7 +1027,12 @@ int main(int argc, char *argv[])
 		backend->do_network();
 		backend->send_serial();
 #ifdef __unix__
-		usleep(delay_ms*1000); // limit rate to 100Hz, to be kind to serial port and network
+		timespec t1;
+		t1.tv_nsec=100000*delay_ms;
+		t1.tv_sec=0;
+		nanosleep(&t1,NULL); // limit rate to 100Hz, to be kind to serial port and network
+#else
+		Sleep(delay_ms);
 #endif
 		backend->read_serial();
 		if (markerFile!="") backend->location.update_vision(markerFile.c_str());
@@ -1035,5 +1040,3 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
-
-
