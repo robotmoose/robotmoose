@@ -1334,7 +1334,11 @@ void ns_mgr_free(struct ns_mgr *s) {
 #define fopen(x, y) mg_fopen((x), (y))
 #define open(x, y, z) mg_open((x), (y), (z))
 #define close(x) _close(x)
-#define fileno(x) _fileno(x)
+
+#ifndef fileno
+#  define fileno(x) _fileno(x)
+#endif
+
 #define lseek(x, y, z) _lseeki64((x), (y), (z))
 #define read(x, y, z) _read((x), (y), (z))
 #define write(x, y, z) _write((x), (y), (z))
@@ -2146,8 +2150,8 @@ static process_id_t start_process(const char *interp, const char *cmd,
   process_id_t pid = fork();
   (void) env;
 
-  if (pid == 0) {
-    (void) chdir(dir);
+  if (pid == 0 ) {
+    if (0!=chdir(dir)) { /* error doing chdir (who cares?) */ }
     (void) dup2(sock, 0);
     (void) dup2(sock, 1);
     closesocket(sock);
