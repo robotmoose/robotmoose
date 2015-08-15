@@ -6,6 +6,7 @@ SHA-256 Hash in C++
 http://cpansearch.perl.org/src/BJOERN/Compress-Deflate7-1.0/7zip/C/Sha256.c
 This code is based on public domain code from Wei Dai's Crypto++ library.
 */
+#include <stdint.h>
 #include "sha2.h" /* that's "osl/sha2.h" for the rest of you... */
 
 
@@ -137,7 +138,7 @@ void SHA256::add(const void *data, size_t size)
 /* End Sha256 processing, and write out message digest. */
 SHA256::digest SHA256::finish(void)
 {
-  size_t lenInBits = (count << 3); // i.e., times 8 bits per byte
+  uint64_t lenInBits = (count << 3); // i.e., times 8 bits per byte
   UInt32 curBufferPos = (UInt32)count & 0x3F; // 0x3f is mask to wrap around to buffer size
   unsigned i;
   buffer[curBufferPos++] = 0x80; // standard specifies "add a one bit...
