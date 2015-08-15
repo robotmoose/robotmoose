@@ -1028,8 +1028,8 @@ int main(int argc, char *argv[])
 		backend->send_serial();
 #ifdef __unix__
 		timespec t1;
-		t1.tv_nsec=100000*delay_ms;
-		t1.tv_sec=0;
+		t1.tv_sec=delay_ms/1000; // remaining seconds
+		t1.tv_nsec=1000*1000*(delay_ms%1000); // nanoseconds
 		nanosleep(&t1,NULL); // limit rate to 100Hz, to be kind to serial port and network
 #else
 		Sleep(delay_ms);
