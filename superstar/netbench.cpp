@@ -22,7 +22,7 @@ int main(int argc,char *argv[]) {
 	double start=time_in_seconds();
 	for (int rep=0;rep<count;rep++) {
 		std::string data=osl::download_url(URL);
-		if (rep==0) printf("Got %ld bytes of data: %s\n",data.size(),data.c_str());
+		if (rep==0) printf("Got %d bytes of data: %s\n",(int)data.size(),data.c_str());
 	}
 	double elapsed=time_in_seconds()-start;
 	double per=elapsed/count;
