@@ -55,6 +55,30 @@ void moose_sleep_ms(int delay_ms)
 #endif
 }
 
+int tabula_serial_begin(int baudrate) {
+	std::vector<std::string> ports=Serial.port_list();
+
+	if (ports.size()==0) { printf("ERROR!  No serial ports found!  (Is it plugged in?)\n"); return -1; }
+
+	for(size_t ii=0;ii<ports.size();++ii)
+	{
+		std::cout<<ii<<":  "<<ports[ii]<<std::endl;
+
+		if (ports[ii].find("Bluetooth")==std::string::npos)
+		{
+			if(0==Serial.Open(ports[ii]))
+			{
+				printf("\nOpened serial port %s, baud rate %d\n",ports[ii].c_str(),baudrate);
+				Serial.Set_baud(baudrate);
+				return 0;
+			}
+		}
+	}
+
+	printf("ERROR!  No serial ports were opened!  (Do you have permissions?)\n");
+	return -1;
+}
+
 
 
 
@@ -232,25 +256,25 @@ public:
 };
 
 /* Abstract superclass of robot sensors */
-class json_sensor_abstract : public json_target 
+class json_sensor_abstract : public json_target
 {
 public:
 	json_sensor_abstract(const json_path &path_) :json_target(path_) {}
-	
+
 	// Read the current value of this sensor.
 	virtual void read_sensor(json::Value &sensor_root) =0;
 };
 
 
 /* Abstract superclass of robot commands */
-class json_command_abstract : public json_target 
+class json_command_abstract : public json_target
 {
 public:
 	json_command_abstract(const json_path &path_) :json_target(path_) {}
-	
+
 	// Read this commanded value from the pilot, and execute it.
 	virtual void do_command(json::Value &pilot_root) =0;
-	
+
 	// Send our current value to this sensor structure
 	virtual void do_sensor(json::Value &sensor_root) =0;
 };
@@ -427,7 +451,7 @@ public:
 	json_command(const json_path &path_,jsonT scaleFactor_=1.0)
 		:json_command_abstract(path_), scaleFactor(scaleFactor_) { }
 
-	virtual void do_command(json::Value &pilot_root) 
+	virtual void do_command(json::Value &pilot_root)
 	{
 		json::Value &pilot_raw=path.in(pilot_root); // read commanded value from pilot
 		deviceT d=0;
@@ -436,13 +460,13 @@ public:
 			j*=scaleFactor;
 			d=json_command_conversion<jsonT,deviceT>(j);
 		}
-		
+
 		// Write value into command array
 		*(deviceT *)&tabula_command_storage.array[command.get_index()]=d;
 	}
-	
+
 	// Send our current value to this sensor structure
-	virtual void do_sensor(json::Value &sensor_root) 
+	virtual void do_sensor(json::Value &sensor_root)
 	{
 		// Read value from command array
 		deviceT d=*(deviceT *)&tabula_command_storage.array[command.get_index()];
@@ -871,7 +895,7 @@ void robot_backend::tabula_setup(std::string config)
 		std::cout<<"Uploading new config to arduino!"<<std::endl;
 		Serial.Close();
 		sleep(1);
-		Serial.begin(Serial.Get_baud());
+		tabula_serial_begin(Serial.Get_baud());
 		setup_arduino(Serial,config);
 	} else { // sim mode: fake a bunch of options
 		all_dev_types.push_back("analog P");
@@ -991,17 +1015,17 @@ int main(int argc, char *argv[])
 	for (int argi = 1; argi<argc; argi++) {
 		if (0 == strcmp(argv[argi], "--robot")) {
 			robotName = argv[++argi];
-			
+
 			// Replace back slashes \ with forward slashes /
 			char *fwdSlash=&robotName[0];
 			while (NULL!=(fwdSlash=strchr(fwdSlash,'\\'))) *fwdSlash++='/';
-			
+
 			// Check if there's any slashes--there should be, for the school name
 			if (NULL==strchr(&robotName[0],'/')) {
 				printf("ERROR: Your robot name needs a school first, like   uaf/myrobot\n");
 				exit(1);
 			}
-			
+
 			// Lowercase the robot names, for consistency:
 			for (char *letter=&robotName[0];*letter!=0;letter++) *letter=tolower(*letter);
 		}

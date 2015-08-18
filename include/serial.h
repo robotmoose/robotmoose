@@ -4,7 +4,6 @@
 #ifndef __serial_h__
 #define __serial_h__
 
-#include <iostream>
 #include <string>
 #include <vector>
 #include <stdio.h> /* for error reporting */
@@ -17,7 +16,7 @@
 #elif defined(__APPLE__)||defined(__MACH__)
 #  define MACOSX 1
 #  include <termios.h>
-#else 
+#else
 #  define LINUX 1
 #  include <termios.h>
 #endif
@@ -37,32 +36,26 @@ public:
 
 		for(size_t ii=0;ii<ports.size();++ii)
 		{
-			std::cout<<ii<<":  "<<ports[ii]<<std::endl;
+			printf("Trying %s...\n",ports[ii].c_str());
 
-			if (ports[ii].find("Bluetooth")==std::string::npos)
+			if(0==Open(ports[ii]))
 			{
-				if(0==Open(ports[ii]))
-				{
-					printf("\nOpened serial port %s, baud rate %d\n",ports[ii].c_str(),baudrate);
-					break;
-				}
-				else
-				{
-					return -1;
-				}
+				printf("\nOpened serial port %s, baud rate %d\n",ports[ii].c_str(),baudrate);
+				Set_baud(baudrate);
+				return 0;
 			}
 		}
-		
-		Set_baud(baudrate);
-		return 0;
+
+		printf("ERROR!  No serial ports were opened!  (Do you have permissions?)\n");
+		return -1;
 	}
-	
+
 	/// Return the number of bytes available to read, or 0 if none available.
 	int available(void) {
 		if (Input_wait(0)>0) return 1;
 		else return 0;
 	}
-	
+
 	/// Read a byte of serial data, or return -1 if none is available.
 	int read(void) {
 		if (Input_wait(0)>0) {
@@ -71,27 +64,27 @@ public:
 			{
 				return -1;
 			}
-						
+
 			else return c;
 		} else return -1;
 	}
-	
+
 	/// Write a byte of serial data
 	void write(unsigned char theByte) {
 		Write(&theByte,1);
 	}
-	
+
 	/// Write a string to the serial port
 	void write(char *theString) {
 		while (*theString!=0) Write(theString++,1);
 	}
-	
+
 	/// Write an entire buffer
 	void write(const void *theBuffer,int len) {
 		Write(theBuffer,len);
 	}
-	
-	
+
+
 /* This is the original C++ interface. */
 	std::vector<std::string> port_list();
 	int Open(const std::string& name);
