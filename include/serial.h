@@ -44,6 +44,7 @@ public:
 				if(0==Open(ports[ii]))
 				{
 					printf("\nOpened serial port %s, baud rate %d\n",ports[ii].c_str(),baudrate);
+					break;
 				}
 				else
 				{
