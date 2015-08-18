@@ -35,7 +35,7 @@ function modal_clone_t(div)
 
 	var myself=this;
 
-	this.clone_info.div.className="has-feedback";
+	this.clone_info.div.className="form-group has-feedback";
 	this.modal.get_content().appendChild(this.clone_info.div);
 
 	this.clone_info.input.type="text";
@@ -284,7 +284,7 @@ modal_clone_t.prototype.check_exists_m=function(name)
 
 modal_clone_t.prototype.valid_robot_name_m=function(name)
 {
-	return isident(name);
+	return is_ident(name);
 }
 
 modal_clone_t.prototype.set_input_normal_m=function()

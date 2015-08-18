@@ -17,6 +17,7 @@ function robot_ui_t(div)
 	this.robot_name=null;
 	this.disconnected_text="<font style='color:red;'>Not connected.</font>";
 
+	this.state_runner=new state_runner_t();
 	this.menu=null;
 	this.connect_menu=null;
 	this.clone_menu=null;
@@ -163,7 +164,6 @@ robot_ui_t.prototype.download_gui=function()
 	});
 }
 
-
 robot_ui_t.prototype.run_interval=function() {
 	// Update sensor data
 	var myself=this;
@@ -182,7 +182,6 @@ robot_ui_t.prototype.run_interval=function() {
 
 	this.upload_gui();
 }
-
 
 robot_ui_t.prototype.upload_gui=function()
 {
@@ -222,7 +221,15 @@ robot_ui_t.prototype.create_widgets=function()
 	this.widgets.states.onrun=function()
 	{
 		if(myself.robot_name)
+		{
 			myself.widgets.states.upload(myself.robot_name);
+			myself.state_runner.run(myself.widgets.states);
+		}
+	}
+	this.widgets.states.onstop=function()
+	{
+		if(myself.robot_name)
+			myself.state_runner.stop(myself.widgets.states);
 	}
 	this.widgets.pilot.onpilot=function(power)
 	{

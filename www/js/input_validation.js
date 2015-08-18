@@ -13,7 +13,7 @@ function isalnum(c)
 	return (isalpha(c)||isdigit(c));
 }
 
-function isident(value)
+function is_ident(value)
 {
 	if(value.length<=0)
 		return false;
@@ -23,6 +23,21 @@ function isident(value)
 
 	for(var ii=1;ii<value.length;++ii)
 		if(!isalnum(value[ii])&&value[ii]!='_')
+			return false;
+
+	return true;
+}
+
+function is_time(value)
+{
+	if(value.length<=0)
+		return false;
+
+	if(!is_int(value[0])||parseInt(value[0],10)<=0)
+		return false;
+
+	for(var ii=1;ii<value.length;++ii)
+		if(!is_int(value[ii]))
 			return false;
 
 	return true;

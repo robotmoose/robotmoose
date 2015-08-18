@@ -12,6 +12,19 @@ achievements:
 		-Widget.
 		-Unlock animation.
 
-serial:
-	need:
-		Macport listing.
+pictures:
+	how tos
+		-quizbots
+		-
+	hardware element icons
+
+lessons:
+	-basics
+		-blink led
+		-
+	-quizbot
+		-assembly
+		-
+	-tabula
+		-roomba
+		-

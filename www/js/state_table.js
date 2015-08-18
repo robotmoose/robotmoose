@@ -1,6 +1,7 @@
 //Members
 //		onrefresh() - callback triggered when window needs updating (resizes)
 //		onrun() - callback triggered when run button is hit
+//		onstop() - callback triggered when stop button is hit
 
 function state_table_t(div)
 {
@@ -28,7 +29,7 @@ function state_table_t(div)
 	this.run_button.className="btn btn-primary";
 	this.run_button.disabled=true;
 	this.run_button.value="Run";
-	this.run_button.onclick=function(event){if(myself.onrun)myself.onrun(myself);};
+	this.run_button.onclick=function(event){myself.run_button_pressed_m();};
 	this.element.appendChild(this.run_button);
 
 	this.add_button.type="button";
@@ -36,7 +37,7 @@ function state_table_t(div)
 	this.add_button.style.marginLeft=10;
 	this.add_button.disabled=true;
 	this.add_button.value="Add State";
-	this.add_button.onclick=function(event){myself.create_entry("newState","// JavaScript code\n\n");};
+	this.add_button.onclick=function(event){myself.create_entry("","","// JavaScript code\n");};
 	this.element.appendChild(this.add_button);
 }
 
@@ -58,8 +59,10 @@ state_table_t.prototype.download=function(robot_name)
 	superstar_get(robot_name,"states",function(obj)
 	{
 		for(var key in obj)
-			myself.create_entry(obj[key].name,obj[key].code);
+		myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
 	});
+
+	this.update_states_m();
 }
 
 state_table_t.prototype.upload=function(robot_name)
@@ -67,6 +70,11 @@ state_table_t.prototype.upload=function(robot_name)
 	if(!robot_name)
 		return;
 
+	superstar_set(robot_name,"states",this.get_states());
+}
+
+state_table_t.prototype.get_states=function()
+{
 	var data=[];
 
 	this.get_entries();
@@ -76,13 +84,14 @@ state_table_t.prototype.upload=function(robot_name)
 		if(this.entries[key])
 		{
 			var obj={};
-			obj.name=this.entries[key].input.value;
+			obj.name=this.entries[key].input.text.value;
+			obj.time=this.entries[key].time.value;
 			obj.code=this.entries[key].code_editor.getValue();
 			data.push(obj);
 		}
 	}
 
-	superstar_set(robot_name,"states",data);
+	return data;
 }
 
 state_table_t.prototype.get_entries=function()
@@ -96,18 +105,28 @@ state_table_t.prototype.get_entries=function()
 	return this.entries;
 }
 
-state_table_t.prototype.create_entry=function(state,code)
+state_table_t.prototype.create_entry=function(state,time,code)
 {
-	if(!state||!code)
-		return null;
+	if(!state)
+		state="";
+
+	if(!code)
+		code="";
+
+	if(!time)
+		time="";
 
 	var myself=this;
 	var entry={};
 	entry.drag_list=this.drag_list.create_entry();
 	entry.drag_list.state_table_t=entry;
 	entry.drag_list.onremove=function(entry){myself.remove_entry_m(entry.state_table_t);};
-	this.create_entry_m(entry,state,code);
+	this.create_entry_m(entry,state,time,code);
 	this.entries.push(entry);
+	this.update_states_m();
+
+	if(this.run_button.value!="Run")
+		this.onstop_m();
 
 	return entry;
 }
@@ -120,6 +139,21 @@ state_table_t.prototype.remove_entry=function(entry)
 	this.drag_list.remove_entry(entry.drag_list);
 }
 
+state_table_t.prototype.set_active=function(state)
+{
+	var entries=this.get_entries();
+
+	for(var key in entries)
+	{
+		if(entries[key])
+		{
+			if(entries[key].input.text.value==state)
+				entries[key].drag_list.li.style.backgroundColor="#337ab7";
+			else
+				entries[key].drag_list.li.style.backgroundColor="";
+		}
+	}
+}
 
 
 
@@ -128,6 +162,29 @@ state_table_t.prototype.remove_entry=function(entry)
 
 
 
+state_table_t.prototype.run_button_pressed_m=function()
+{
+	if(this.run_button.value=="Run")
+		this.onrun_m();
+	else
+		this.onstop_m();
+}
+
+state_table_t.prototype.onrun_m=function()
+{
+	if(this.onrun)
+		this.onrun(this);
+
+	this.run_button.value="Stop";
+}
+
+state_table_t.prototype.onstop_m=function()
+{
+	if(this.onstop)
+		this.onstop(this);
+
+	this.run_button.value="Run";
+}
 
 state_table_t.prototype.refresh_m=function()
 {
@@ -135,10 +192,19 @@ state_table_t.prototype.refresh_m=function()
 		this.onrefresh();
 }
 
-state_table_t.prototype.create_entry_m=function(entry,state,code)
+state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 {
-	if(!entry||!entry.drag_list||!state||!code)
+	if(!entry||!entry.drag_list)
 		return;
+
+	if(!state)
+		state="";
+
+	if(!time)
+		time="";
+
+	if(!code)
+		code="";
 
 	var myself=this;
 	entry.table={};
@@ -146,32 +212,66 @@ state_table_t.prototype.create_entry_m=function(entry,state,code)
 	entry.table.row=entry.table.element.insertRow(0);
 	entry.table.left=entry.table.row.insertCell(0);
 	entry.table.right=entry.table.row.insertCell(1);
-	entry.input=document.createElement("input");
+	entry.input={};
+	entry.input.div=document.createElement("div");
+	entry.input.glyph=document.createElement("span");
+	entry.input.text=document.createElement("input");
+	entry.time=document.createElement("input");
 	entry.textarea=document.createElement("textarea");
 
-	entry.table.row.style.verticalAlign="top";
+	entry.table.row.style.verticalAlign="middle";
 	entry.table.left.style.paddingRight=10;
 	entry.drag_list.content.appendChild(entry.table.element);
 
-	entry.input.type="text";
-	entry.input.className="form-control";
-	entry.input.spellcheck=false;
-	entry.input.size=10;
-	entry.input.value=state;
-	entry.input.onblur=function(event){myself.validate_m(this);};
-	entry.input.onchange=function(event){myself.validate_m(this);};
-	entry.input.onkeydown=function(event){myself.validate_m(this);};
-	entry.input.onkeyup=function(event){myself.validate_m(this);};
-	entry.input.onkeypress=function(event){myself.validate_m(this);};
-	this.validate_m(entry.input);
-	entry.table.left.appendChild(entry.input);
+	entry.input.div.className="form-group has-feedback has-error";
+	entry.table.left.appendChild(entry.input.div);
+
+	entry.input.text.type="text";
+	entry.input.text.placeholder="Name";
+	entry.input.text.className="form-control";
+	entry.input.text.style.width="128px";
+	entry.input.text.spellcheck=false;
+	entry.input.text.size=10;
+	entry.input.text.value=state;
+	entry.input.text.entry_input=entry.input;
+	entry.input.text.onchange=function(event){myself.update_states_m();};
+	entry.input.text.onkeydown=function(event){myself.update_states_m();};
+	entry.input.text.onkeyup=function(event){myself.update_states_m();};
+	entry.input.text.onkeypress=function(event){myself.update_states_m();};
+	this.update_states_m();
+	entry.input.div.appendChild(entry.input.text);
+
+	entry.input.glyph.className="glyphicon form-control-feedback glyphicon glyphicon-remove";
+	entry.input.div.appendChild(entry.input.glyph);
+
+	entry.table.left.appendChild(document.createElement("br"));
+
+	entry.time.type="text";
+	entry.time.placeholder="Run Time (ms)";
+	entry.time.className="form-control";
+	entry.time.style.width="128px";
+	entry.time.spellcheck=false;
+	entry.time.size=10;
+	entry.time.value=time;
+	entry.time.onchange=function(event){myself.validate_time_m(this);};
+	entry.time.onkeydown=function(event){myself.validate_time_m(this);};
+	entry.time.onkeyup=function(event){myself.validate_time_m(this);};
+	entry.time.onkeypress=function(event){myself.validate_time_m(this);};
+	this.validate_time_m(entry.time);
+	entry.table.left.appendChild(entry.time);
 
 	entry.textarea.innerHTML=code;
 	entry.table.right.appendChild(entry.textarea);
 
 	entry.code_editor=CodeMirror.fromTextArea(entry.textarea,
-		{indentUnit:4,indentWithTabs:true,lineNumbers:true,
-			matchBrackets:true,mode:"text/x-javascript"});
+	{
+		indentUnit:4,
+		indentWithTabs:true,
+		lineNumbers:true,
+		matchBrackets:true,
+		mode:"text/x-javascript"
+	});
+	entry.code_editor.on("change",function(){myself.code_change_m()});
 	entry.code_editor.setSize(320,100);
 	entry.code_editor_event=function(event){entry.code_editor.refresh();};
 	window.addEventListener("click",entry.code_editor_event);
@@ -195,10 +295,94 @@ state_table_t.prototype.remove_entry_m=function(entry)
 	}
 
 	this.refresh_m();
+	this.update_states_m();
+
+	if(this.run_button.value!="Run")
+		this.onstop_m();
 }
 
-state_table_t.prototype.validate_m=function(input)
+state_table_t.prototype.update_states_m=function()
 {
-	while(input.value.length>0&&!isident(input.value))
+	for(var key in this.entries)
+		if(this.entries[key])
+			this.set_state_name_valid_m(this.entries[key].input,this.validate_state_m(this.entries[key].input));
+
+	this.update_buttons_m();
+}
+
+state_table_t.prototype.validate_state_m=function(input)
+{
+	if(!input)
+		return true;
+
+	while(input.text.value.length>0&&!is_ident(input.text.value))
+		input.text.value=input.text.value.substr(0,input.text.value.length-1);
+
+	var valid=input.text.value.length>0;
+
+	var entries=this.get_entries();
+	var counts={};
+
+	for(var key in entries)
+	{
+		if(entries[key])
+		{
+			if(!counts[entries[key].input.text.value])
+				counts[entries[key].input.text.value]=1;
+			else
+				counts[entries[key].input.text.value]+=1;
+		}
+	}
+
+	if(counts[input.text.value]>1)
+		valid=false;
+
+	return valid;
+}
+
+state_table_t.prototype.validate_time_m=function(input)
+{
+	while(input.value.length>0&&!is_time(input.value))
 		input.value=input.value.substr(0,input.value.length-1);
+
+	if(this.run_button.value!="Run")
+		this.onstop_m();
+}
+
+state_table_t.prototype.set_state_name_valid_m=function(input,valid)
+{
+	if(valid)
+	{
+		input.div.className="form-group";
+		input.glyph.style.visibility="hidden";
+	}
+	else
+	{
+		input.div.className="form-group has-feedback has-error";
+		input.glyph.style.visibility="visible";
+	}
+}
+
+state_table_t.prototype.update_buttons_m=function(valid)
+{
+	var entries=this.get_entries();
+	var valid=true;
+
+	for(var key in entries)
+	{
+		if(entries[key])
+			if(!this.validate_state_m(entries[key].input))
+				valid=false;
+	}
+
+	this.run_button.disabled=!valid;
+
+	if(this.run_button.value!="Run")
+		this.onstop_m();
+}
+
+state_table_t.prototype.code_change_m=function()
+{
+	if(this.run_button.value!="Run")
+		this.onstop_m();
 }
