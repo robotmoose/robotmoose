@@ -4,6 +4,7 @@
 #ifndef __serial_h__
 #define __serial_h__
 
+#include <iostream>
 #include <string>
 #include <vector>
 #include <stdio.h> /* for error reporting */

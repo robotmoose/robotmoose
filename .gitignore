@@ -29,6 +29,9 @@ tabula_rasa/backend.exe
 tabula_rasa/tester
 tabula_rasa/tester.exe
 tabula_rasa/backend.dSYM
+tabula_rasa/arduino/main.cpp
+tabula_rasa/arduino/main.elf
+tabula_rasa/arduino/main.hex
 sensors/imu/show_IMU/main
 sensors/imu/show_IMU/main.exe
 sensors/imu/show_IMU/main.o
