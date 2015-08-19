@@ -77,16 +77,16 @@ state_table_t.prototype.get_states=function()
 {
 	var data=[];
 
-	this.get_entries();
+	var entries=this.get_entries();
 
-	for(var key in this.entries)
+	for(var key in entries)
 	{
-		if(this.entries[key])
+		if(entries[key])
 		{
 			var obj={};
-			obj.name=this.entries[key].input.text.value;
-			obj.time=this.entries[key].time.value;
-			obj.code=this.entries[key].code_editor.getValue();
+			obj.name=entries[key].input.text.value;
+			obj.time=entries[key].time.value;
+			obj.code=entries[key].code_editor.getValue();
 			data.push(obj);
 		}
 	}
@@ -367,13 +367,21 @@ state_table_t.prototype.update_buttons_m=function(valid)
 {
 	var entries=this.get_entries();
 	var valid=true;
+	var count=0;
 
 	for(var key in entries)
 	{
 		if(entries[key])
+		{
+			++count;
+
 			if(!this.validate_state_m(entries[key].input))
 				valid=false;
+		}
 	}
+
+	if(count==0)
+		valid=false;
 
 	this.run_button.disabled=!valid;
 
