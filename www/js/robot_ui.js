@@ -34,16 +34,50 @@ function robot_ui_t(div)
 	this.create_gui();
 
 	var options=parse_uri(location.search);
+	var split = null;
+	var school = null;
+	var robot = null;
+	var myself = this;
 
 	if(options.robot)
 	{
-		this.robot_name=options.robot;
-		this.connect_menu.onconnect(this.robot_name);
+		split = options.robot.split("/");
+	}
+
+	if(split && split.length==2)
+	{
+		school = split[0];
+		robot = split[1];
+		var get_schools = function(obj)
+		{
+			if(obj && array_find(obj, school)!=-1)
+			{
+				var get_robots = function(obj)
+				{
+					if(obj && array_find(obj, robot)!=-1)
+					{
+						myself.robot_name = school + "/" + robot;
+						myself.connect_menu.onconnect(myself.robot_name);
+						return;
+	
+					}
+					myself.connect_menu.show();
+				};
+
+				superstar_sub("/" + school, get_robots)
+			}
+			else
+			{
+				myself.connect_menu.show();
+			}
+		};
+		superstar_sub("/", get_schools);
 	}
 	else
 	{
 		this.connect_menu.show();
 	}
+
 }
 
 robot_ui_t.prototype.clone=function(to,from,setting)

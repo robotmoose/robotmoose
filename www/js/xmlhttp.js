@@ -97,6 +97,24 @@ function superstar_get(path,element,onFinished)
 	);
 }
 
-
+/**
+ Use superstar to get sub elements of path,
+ and pass the returned object to onFinished.
+*/
+function superstar_sub(path,onFinished)
+{
+	send_request("GET", "/superstar/"+path, ".",
+		"?sub",
+		function(replyData) { // reply OK
+			var replyObj=null;
+			if(replyData)
+				replyObj=JSON.parse(replyData); // fixme: try/catch here
+			onFinished(replyObj);
+		},
+		undefined, // error function
+		undefined, // post data
+		"application/json"
+	);
+}
 
 
