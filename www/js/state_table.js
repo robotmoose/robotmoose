@@ -1,3 +1,9 @@
+/*
+ Manage the UI of the "Code" tab of the main robot pilot interface
+
+ Mike Moss, 2015-08 (Public Domain)
+*/
+
 //Members
 //		onrefresh() - callback triggered when window needs updating (resizes)
 //		onrun() - callback triggered when run button is hit
@@ -10,6 +16,13 @@ function state_table_t(div)
 
 	var myself=this;
 	this.div=div;
+	
+	this.errors=document.createElement("span");
+	this.errors.style.color="#a00000";
+	this.errors.style.background="#ffd0d0";
+	// this.errors.textContent="Sample error here";
+	this.div.appendChild(this.errors);
+	
 	this.element=document.createElement("div");
 	this.drag_list=new drag_list_t(this.element);
 	this.run_button=document.createElement("input");
@@ -37,7 +50,11 @@ function state_table_t(div)
 	this.add_button.style.marginLeft=10;
 	this.add_button.disabled=true;
 	this.add_button.value="Add State";
-	this.add_button.onclick=function(event){myself.create_entry("","","// JavaScript code\n");};
+	this.add_button.onclick=function(event){
+		var state_name="";
+		if (myself.get_states().length==0) state_name="start";
+		myself.create_entry(state_name,"","// JavaScript code\n");
+	};
 	this.element.appendChild(this.add_button);
 }
 
@@ -92,6 +109,17 @@ state_table_t.prototype.get_states=function()
 	}
 
 	return data;
+}
+
+state_table_t.prototype.clear_error=function() 
+{
+	this.show_error("",null); // hacky way to clear errors?
+}
+
+state_table_t.prototype.show_error=function(error_text,current_state)
+{
+	this.errors.textContent=error_text;
+	// FIXME: highlight color of erroring state
 }
 
 state_table_t.prototype.get_entries=function()
