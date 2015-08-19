@@ -32,7 +32,18 @@ function robot_ui_t(div)
 	this.widgets={};
 
 	this.create_gui();
-	this.connect_menu.show();
+
+	var options=parse_uri(location.search);
+
+	if(options.robot)
+	{
+		this.robot_name=options.robot;
+		this.connect_menu.onconnect(this.robot_name);
+	}
+	else
+	{
+		this.connect_menu.show();
+	}
 }
 
 robot_ui_t.prototype.clone=function(to,from,setting)
@@ -177,7 +188,7 @@ robot_ui_t.prototype.run_interval=function() {
 				myself.sensor_data_count--;
 				myself.widgets.sensors.refresh(sensors);
 				myself.widgets.map.refresh(sensors);
-				
+
 				myself.state_runner.VM_sensors=sensors;
 			});
 	}
