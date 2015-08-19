@@ -33,6 +33,13 @@ function robot_ui_t(div)
 
 	this.create_gui();
 
+	this.auto_connect();
+
+}
+
+robot_ui_t.prototype.auto_connect = function()
+{
+
 	var options=parse_uri(location.search);
 	var split = null;
 	var school = null;
@@ -50,14 +57,17 @@ function robot_ui_t(div)
 		robot = split[1];
 		var get_schools = function(obj)
 		{
+
 			if(obj && array_find(obj, school)!=-1)
 			{
 				var get_robots = function(obj)
 				{
+
 					if(obj && array_find(obj, robot)!=-1)
 					{
 						myself.robot_name = school + "/" + robot;
 						myself.connect_menu.onconnect(myself.robot_name);
+
 						return;
 	
 					}
@@ -77,7 +87,6 @@ function robot_ui_t(div)
 	{
 		this.connect_menu.show();
 	}
-
 }
 
 robot_ui_t.prototype.clone=function(to,from,setting)
