@@ -35,3 +35,6 @@ code execution:
 		-rearranging states (dragging and dropping) should stop code execution.
 	-questions:
 		-should any change to the state table save (instead of just when you hit run?)
+
+robot_ui:
+	-going to a robot with a uri argument should give an error.
