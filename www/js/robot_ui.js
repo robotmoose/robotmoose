@@ -179,9 +179,6 @@ robot_ui_t.prototype.run_interval=function() {
 				myself.widgets.map.refresh(sensors);
 				
 				myself.state_runner.VM_sensors=sensors;
-				
-				// if (myself.state_runner.VM_power) { pilot upload? }
-				
 			});
 	}
 
@@ -227,6 +224,7 @@ robot_ui_t.prototype.create_widgets=function()
 	{
 		if(myself.robot_name)
 		{
+			myself.state_runner.VM_power=myself.widgets.pilot.pilot.power;
 			myself.widgets.states.upload(myself.robot_name);
 			myself.state_runner.run(myself.widgets.states);
 		}
@@ -236,7 +234,7 @@ robot_ui_t.prototype.create_widgets=function()
 		if(myself.robot_name)
 			myself.state_runner.stop(myself.widgets.states);
 	}
-	this.widgets.pilot.onpilot=function(power)
+	this.widgets.pilot.onpilot=myself.state_runner.onpilot=function(power)
 	{
 		console.log("Pilot data upload: "+myself.robot_name);
 		if(myself.robot_name)

@@ -1,5 +1,6 @@
 /*
- Execute student code from the "Code" tab of the main robot pilot interface
+ Execute student code from the "Code" tab,
+ of the main robot pilot interface
 
  Mike Moss & Orion Lawlor, 2015-08 (Public Domain)
 */
@@ -63,7 +64,7 @@ state_runner_t.prototype.run_m=function(state_table)
 	if(this.state_list.length<=0)
 	{
 		console.log("no state_list");
-		state_table.onstop_m();
+		this.stop_m(state_table);
 		return;
 	}
 
@@ -74,17 +75,28 @@ state_runner_t.prototype.run_m=function(state_table)
 	setTimeout(function(){myself.execute_m(state_table);},this.execution_interval);
 }
 
-// Inner code execution driver: externally visible UI, and eval
+state_runner_t.prototype.stop_m=function(state_table)
+{
+	if (this.VM_power) { // stop the robot when the code stops
+		this.VM_power.L=this.VM_power.R=0.0; // hacky!
+		if (this.onpilot) this.onpilot(this.VM_power);
+	}
+	
+	state_table.onstop_m();
+}
+
+
+// Inner code execution driver: prepare student-visible UI, and eval
 //  Returns the virtual machine object used to wrap user code
 state_runner_t.prototype.make_user_VM=function(code,states)
 {
-	var VM={}; // everything the user can access goes here
+	var VM={}; // virtual machine with everything the user can access
 
-// Block access to all parent-created members:
+// Block access to all parent-created members (e.g., inherited locals)
 	for(var key in this)
 		VM[key]=undefined;
 
-// Import each of their states
+// Import each of their state names (e.g., "start" state)
 	for(var key in states)
 		if(states[key])
 			VM[states[key].name]=states[key].name;
@@ -99,10 +111,11 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	VM.stop=function() { VM.state=null; }
 	
 	VM.sensors=this.VM_sensors;
-	VM.power=this.VM_power;
+	VM.power=this.VM_power; 
+	VM.power_original=JSON.stringify(VM.power); // hack for change detection
 	VM.robot={sensors:VM.sensors, power:VM.power};
 
-// eval
+// Basically eval user's code here
 	(new Function("with(this)\n{\n"+code+"\n}")).call(VM);
 	return VM;
 }
@@ -134,7 +147,7 @@ state_runner_t.prototype.execute_m=function(state_table)
 			if(VM.state===null)
 			{
 				//user stopped
-				state_table.onstop_m();
+				this.stop_m(state_table);
 				return;
 			}
 
@@ -146,6 +159,11 @@ state_runner_t.prototype.execute_m=function(state_table)
 				this.clear_continue_m();
 				this.state=VM.state;
 			}
+			
+			if (JSON.stringify(VM.power)!=VM.power_original)
+			{ // Send off autopilot's driving commands
+				if (this.onpilot) this.onpilot(VM.power);
+			}
 
 			var myself=this;
 			setTimeout(function(){myself.execute_m(state_table);},this.execution_interval);
@@ -155,7 +173,7 @@ state_runner_t.prototype.execute_m=function(state_table)
 			//stop with error
 			state_table.show_error(error,this.state);
 			console.log("Error! - "+error);
-			state_table.onstop_m();
+			this.stop_m(state_table);
 		}
 	}
 }
@@ -182,7 +200,7 @@ state_runner_t.prototype.continue_m=function(state_table)
 	}
 
 	if(!found)
-		state_table.onstop_m();
+		this.stop_m(state_table);
 }
 
 // State run time limiting
