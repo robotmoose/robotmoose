@@ -39,8 +39,16 @@ state_runner_t.prototype.stop=function(state_table)
 {
 	console.log("stopping");
 	this.kill=true;
+	
+	// Make sure continue doesn't fire after a stop
 	this.clear_continue_m();
-	state_table.set_active();
+	
+	state_table.set_active(); // no section is active
+	
+	if (this.VM_power) { // stop the robot when the code stops running
+		this.VM_power.L=this.VM_power.R=0.0; // hacky!
+		if (this.onpilot) this.onpilot(this.VM_power);
+	}
 }
 
 // Look up this state in our state list, or return null if it's not listed
@@ -75,16 +83,9 @@ state_runner_t.prototype.run_m=function(state_table)
 	setTimeout(function(){myself.execute_m(state_table);},this.execution_interval);
 }
 
+// General utility: request a stop (put actual functionality into stop, above)
 state_runner_t.prototype.stop_m=function(state_table)
 {
-	if (this.VM_power) { // stop the robot when the code stops
-		this.VM_power.L=this.VM_power.R=0.0; // hacky!
-		if (this.onpilot) this.onpilot(this.VM_power);
-	}
-	
-	// Make sure continue doesn't fire after a stop
-	this.clear_continue_m();
-	
 	state_table.onstop_m();
 }
 
