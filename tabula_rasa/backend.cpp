@@ -489,6 +489,9 @@ private:
 
 	// All supported tabula devices, with their argument list.
 	json::Array all_dev_types;
+	
+	// All the configured device strings, as parsed by setup_devices
+	std::vector<std::string> robot_config_devices;
 
 	// These are the central magic that lets us convert data to/from JSON:
 	//   an array of configure types.
@@ -553,6 +556,7 @@ std::string getline_serial(SerialPort &port) {
 void robot_backend::setup_devices(std::string robot_config)
 {
 	all_dev_types.Clear();
+	robot_config_devices=std::vector<std::string>();
 
 	// Clear existing lists of sensors and actuators
 	for (unsigned int i=0;i<commands.size();i++) delete commands[i];
@@ -583,6 +587,7 @@ void robot_backend::setup_devices(std::string robot_config)
 			std::cout<<"Configuring backend: missing terminating semicolon on "<<device<<"!\n";
 			robot_config_stream.unget(); // put char back
 		}
+		robot_config_devices.push_back(device+"("+args+");");
 
 		// This fixed table could be replaced with registration from tabula_config.h
 		if (device=="serial_controller") {
@@ -681,11 +686,19 @@ void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 	}
 
 	// Now dump configuration to Arduino
-	port.write(&robot_config[0],robot_config.size());
-	while (true) {
-		std::string status=getline_serial(port);
-		if (status=="-1") break;
-		std::cout<<"Arduino config: "<<status<<"\n";
+	for (unsigned int i=0;i<robot_config_devices.size();i++) {
+		// Send device to Arduino
+		std::string dev=robot_config_devices[i];
+		std::cout<<"  To Arduino: "<<dev<<"\n";
+		port.write(&dev[0],dev.size());
+		
+		// Wait for device creation confirmation from Arduino
+		std::string status="";
+		do {
+			status=getline_serial(port);
+			std::cout<<"  From Arduino: "<<status<<"\n";
+			if (status=="-1") break;
+		} while (status[0]!='1');
 	}
 
 	std::cout<<"Arduino switching to binary communication\n";
