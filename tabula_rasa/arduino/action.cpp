@@ -6,17 +6,17 @@
  so this global stores the current time, in milliseconds,
  the last time you called loop()
 */
-long action_time_ms; 
+milli_t action_time_ms; 
 
 /* A "meta device" that runs this action_list every N milliseconds.
    These are used to make the faster rungs call the slower rungs. */
 class timer_device : public action {
-  long every_N_ms; // how often we should run
-  long time_last_ms; // the last time we ran
+  milli_t every_N_ms; // how often we should run
+  milli_t time_last_ms; // the last time we ran
   action_list &devices;
 public:
-  timer_device(long every_N_ms_,action_list &devices_) 
-    :every_N_ms(every_N_ms_),time_last_ms(-5),devices(devices_)  {}
+  timer_device(milli_t every_N_ms_,action_list &devices_) 
+    :every_N_ms(every_N_ms_),time_last_ms(0),devices(devices_)  {}
   void loop() {
     if (action_time_ms-time_last_ms>=every_N_ms) 
     {
@@ -35,7 +35,7 @@ public:
 action_list action_lists[action_lists_count];
 
 void action_setup() {
-  long every_N_ms=1;
+  milli_t every_N_ms=1;
   // Link a timer into each faster list, to run the next-slower list
   for (int i=1;i<action_lists_count;i++) {
   	action_lists[i-i].add(new timer_device(every_N_ms,action_lists[i]));
@@ -45,7 +45,7 @@ void action_setup() {
 
 void action_loop() {
   // Update the timers and run the loop
-  action_time_ms=micros()>>10;
+  action_time_ms=milli_t(micros()>>10);
   actions_always.loop();
 }
 
@@ -120,7 +120,6 @@ void setup() {
   // Test with a serial print device
   actions_1s.add(new serial_print("Every 1 second"));
   actions_10s.add(new serial_print("Every 10 seconds"));
-  actions_100s.add(new serial_print("Every 100 seconds"));
   
   actions_always.add(new int_counter);
   actions_1s.add(new int_counter_reset);

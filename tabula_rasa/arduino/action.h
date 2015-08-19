@@ -61,13 +61,19 @@ public:
   }
 };
 
+/**
+  This is a time, in milliseconds.
+  Note that it wraps around every 65 seconds on an Arduino--
+  this is to force you to fix timer wraparound bugs!
+*/
+typedef unsigned int milli_t;
 
 /**
  This global stores the current time, in milliseconds,
  the last time you called action_loop().
  (Here because calling timer functions repeatedly is slow.)
 */
-extern long action_time_ms; 
+extern milli_t action_time_ms; 
 
 /**
   This bool goes true when we're receiving commands from the PC,
@@ -81,7 +87,7 @@ extern bool pc_connected;
   You add your action to the appropriate rung, like
       actions_10ms.add(new my_crazy_device(A3));
 */
-enum {action_lists_count=8};
+enum {action_lists_count=6};
 extern action_list action_lists[action_lists_count];
 
 #define actions_always action_lists[0] // run every loop()
@@ -90,8 +96,6 @@ extern action_list action_lists[action_lists_count];
 #define actions_100ms action_lists[3] // every 100ms
 #define actions_1s action_lists[4] // every 1 second
 #define actions_10s action_lists[5] // every 10 seconds
-#define actions_100s action_lists[6] // every 100 seconds
-#define actions_1000s action_lists[7] // every 1000 seconds
 
 extern void action_setup();
 extern void action_loop();

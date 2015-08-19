@@ -24,15 +24,15 @@ public:
 	HardwareSerial &serial;
 	A_packet_formatter<HardwareSerial> pkt; // packet formatter
 	A_packet p; // last received packet
-	uint32_t last_read; // millis() the last time we got data back
-	uint32_t next_send; // millis() the next time we should send off data
+	milli_t last_read; // millis() the last time we got data back
+	milli_t last_send; // millis() the last time we sent off ping data
 
 	serial_channel(HardwareSerial &serial_)
 		:serial(serial_), pkt(serial)
 	{
 		pc_connected=false;
 		last_read=0;
-		next_send=0;
+		last_send=0;
 		p.valid=0;
 	}
 
@@ -41,14 +41,18 @@ public:
 		if (serial.available()) {
 			while (-1==pkt.read_packet(p)) { }
 			if (p.valid) {
-				last_read=action_time_ms;
-				next_send=action_time_ms+500;
+				last_read=last_send=action_time_ms;
 				pc_connected=true; // got valid packet
 				return true;
 			}
 		}
-		if (action_time_ms>next_send) { // read timeout
-			next_send=action_time_ms+500;
+		if (action_time_ms-last_send>1000) { // comms timeout
+			last_send=action_time_ms;
+			
+			// Zero our incoming command buffer (stops motors)
+			tabula_command_storage.zero();
+			
+			// Flush serial buffers and try to re-synchronize
 			pkt.reset();
 			pkt.write_packet(0,4,"ping"); // send heartbeat ping packet
 			pc_connected=false;

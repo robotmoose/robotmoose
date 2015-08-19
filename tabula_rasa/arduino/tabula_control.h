@@ -30,6 +30,11 @@ public:
 	
 	tabula_control_storage() :array(0), count(0) {}
 	~tabula_control_storage() { clear(); }
+	
+	// Zero all data in this buffer
+	void zero(void) {
+		memset(array,sizeof(storage_t)*count,0);
+	}
 
 	// Deallocate all space used in this storage object
 	void clear(void) {
