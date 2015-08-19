@@ -30,6 +30,9 @@ lessons:
 		-
 
 code execution:
-	-rearranging states (dragging and dropping) should stop code execution.
-	-pass robot object and such into the state runner eval code.
-	-show state runner errors somewhere.
+	-need:
+		-rearranging states (dragging and dropping) should stop code execution.
+		-pass robot object and such into the state runner eval code.
+		-show state runner errors somewhere.
+	-questions:
+		-should any change to the state table save (instead of just when you hit run?)
