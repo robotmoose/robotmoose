@@ -129,7 +129,7 @@ state_runner_t.prototype.execute_m=function(state_table)
 		catch(error)
 		{
 			//stop with error
-			state_table.show_error("Error! - "+error,this.state);
+			state_table.show_error(error,this.state);
 			console.log("Error! - "+error);
 			state_table.onstop_m();
 		}

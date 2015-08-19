@@ -4,6 +4,7 @@
  Mike Moss, 2015-08 (Public Domain)
 */
 
+
 //Members
 //		onrefresh() - callback triggered when window needs updating (resizes)
 //		onrun() - callback triggered when run button is hit
@@ -17,11 +18,16 @@ function state_table_t(div)
 	var myself=this;
 	this.div=div;
 	
-	this.errors=document.createElement("span");
-	this.errors.style.color="#a00000";
-	this.errors.style.background="#ffd0d0";
-	// this.errors.textContent="Sample error here";
-	this.div.appendChild(this.errors);
+	this.make_error_span=function () {
+		var errors=document.createElement("span");
+		errors.style.color="#a00000";
+		errors.style.background="#ffd0d0";
+		return errors;
+	}
+	this.global_errors=this.make_error_span();
+	// this.global_errors.textContent="Sample error here";
+	this.div.appendChild(this.global_errors);
+	this.last_error_entry=null;
 	
 	this.element=document.createElement("div");
 	this.drag_list=new drag_list_t(this.element);
@@ -113,13 +119,50 @@ state_table_t.prototype.get_states=function()
 
 state_table_t.prototype.clear_error=function() 
 {
-	this.show_error("",null); // hacky way to clear errors?
+	this.show_error(null,null); // hacky way to clear errors
 }
 
 state_table_t.prototype.show_error=function(error_text,current_state)
 {
-	this.errors.textContent=error_text;
-	// FIXME: highlight color of erroring state
+	var error_entry=null;
+	if (current_state) error_entry=this.get_entry(current_state);
+	
+	var global_report="", local_report="";
+	if (error_text) {
+		local_report="Error here: "+error_text;
+		if (error_entry) { // detailed error next to state
+			global_report="Error in state '"+current_state+"'";
+		} else {
+			global_report="Error in state '"+current_state+"': "+error_text;
+		}
+	}
+
+	this.global_errors.textContent=global_report;
+	
+	if (this.last_error_entry) {
+		this.last_error_entry.errors.textContent=""; // clear last error
+	}
+	
+	if (!error_entry) return; // a bad state name, or what?
+	
+	error_entry.errors.textContent=local_report;
+	
+	this.last_error_entry=error_entry;
+}
+
+state_table_t.prototype.get_entry=function(state_name) 
+{
+	var entries=this.get_entries();
+
+	for(var key in entries)
+	{
+		if(entries[key])
+		{
+			if(entries[key].input.text.value==state_name)
+				return entries[key];
+		}
+	}
+	
 }
 
 state_table_t.prototype.get_entries=function()
@@ -288,6 +331,9 @@ state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 	this.validate_time_m(entry.time);
 	entry.table.left.appendChild(entry.time);
 
+	entry.errors=this.make_error_span();
+	entry.table.right.appendChild(entry.errors);
+	
 	entry.textarea.innerHTML=code;
 	entry.table.right.appendChild(entry.textarea);
 
