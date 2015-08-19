@@ -1,6 +1,7 @@
 windows api (doorways):
 	need:
-		-Ability to alert.
+		-Automatically grow Y size of doorway when inner div is made longer.
+		-Ability to alert, changing color of titlebar and tab.
 
 	completely optional at this point:
 		-Touch events...
@@ -32,7 +33,5 @@ lessons:
 code execution:
 	-need:
 		-rearranging states (dragging and dropping) should stop code execution.
-		-pass robot object and such into the state runner eval code.
-		-show state runner errors somewhere.
 	-questions:
 		-should any change to the state table save (instead of just when you hit run?)
