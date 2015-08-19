@@ -13,6 +13,9 @@ function state_runner_t()
 	this.continue_timeout=null;
 	this.state_list=[];
 	this.kill=true;
+	
+	this.VM_power={};
+	this.VM_sensors={};
 }
 
 state_runner_t.prototype.run=function(state_table)
@@ -26,6 +29,8 @@ state_runner_t.prototype.run=function(state_table)
 	if(!state_table)
 		return;
 
+	state_table.clear_prints();
+
 	this.run_m(state_table);
 }
 
@@ -35,6 +40,20 @@ state_runner_t.prototype.stop=function(state_table)
 	this.kill=true;
 	this.clear_continue_m();
 	state_table.set_active();
+}
+
+// Look up this state in our state list, or return null if it's not listed
+state_runner_t.prototype.find_state=function(state_name)
+{
+	for(var key in this.state_list)
+	{
+		var s=this.state_list[key];
+		if(s && s.name==state_name) {
+			return s;
+		}
+	}
+	// else not found
+	return null;
 }
 
 state_runner_t.prototype.run_m=function(state_table)
@@ -70,8 +89,18 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		if(states[key])
 			VM[states[key].name]=states[key].name;
 
-// Import debug functionality
+// Import all needed I/O functionality
 	VM.console=console;
+	VM.printed_text="";
+	VM.print=function(value) {
+		VM.printed_text+=value+"\n";
+		console.log(value+"\n");
+	};
+	VM.stop=function() { VM.state=null; }
+	
+	VM.sensors=this.VM_sensors;
+	VM.power=this.VM_power;
+	VM.robot={sensors:VM.sensors, power:VM.power};
 
 // eval
 	(new Function("with(this)\n{\n"+code+"\n}")).call(VM);
@@ -89,17 +118,7 @@ state_runner_t.prototype.execute_m=function(state_table)
 			if(!this.state)
 				throw("State is null.");
 
-			var run_state=null;
-
-			for(var key in this.state_list)
-			{
-				if(this.state_list[key]&&this.state_list[key].name==this.state)
-				{
-					run_state=this.state_list[key];
-					break;
-				}
-			}
-
+			var run_state=this.find_state(this.state);
 			if(!run_state)
 				throw("State \""+this.state+"\" not found!");
 
@@ -108,7 +127,9 @@ state_runner_t.prototype.execute_m=function(state_table)
 
 			this.update_continue_m(state_table,run_state);
 
-			var VM=this.make_user_VM(this.state_list[key].code,this.state_list);
+			var VM=this.make_user_VM(run_state.code,this.state_list);
+			
+			state_table.show_prints(VM.printed_text,this.state);
 
 			if(VM.state===null)
 			{
@@ -117,8 +138,11 @@ state_runner_t.prototype.execute_m=function(state_table)
 				return;
 			}
 
-			if(VM.state!==undefined)
+			if(VM.state!==undefined) 
 			{
+				if(!this.find_state(VM.state))
+					throw("Next state \""+VM.state+"\" not found!");
+				
 				this.clear_continue_m();
 				this.state=VM.state;
 			}
@@ -161,6 +185,7 @@ state_runner_t.prototype.continue_m=function(state_table)
 		state_table.onstop_m();
 }
 
+// State run time limiting
 state_runner_t.prototype.update_continue_m=function(state_table,state)
 {
 	var state_time_int=parseInt(state.time,10);

@@ -20,8 +20,8 @@ function state_table_t(div)
 	
 	this.make_error_span=function () {
 		var errors=document.createElement("span");
-		errors.style.color="#a00000";
-		errors.style.background="#ffd0d0";
+		errors.style.color="#800000"; // dark red text
+		errors.style.background="#ffa0a0";  // light red background
 		return errors;
 	}
 	this.global_errors=this.make_error_span();
@@ -117,6 +117,31 @@ state_table_t.prototype.get_states=function()
 	return data;
 }
 
+
+// Debug prints
+state_table_t.prototype.clear_prints=function() 
+{
+	var entries=this.get_entries();
+
+	for(var key in entries)
+	{
+		if(entries[key])
+		{
+			entries[key].prints.textContent="";
+		}
+	}
+}
+
+state_table_t.prototype.show_prints=function(print_text,current_state)
+{
+	var print_entry=this.find_entry(current_state);
+	if (!print_entry) return;
+	
+	print_entry.prints.textContent=print_text;
+}
+
+
+// Error reporting onscreen
 state_table_t.prototype.clear_error=function() 
 {
 	this.show_error(null,null); // hacky way to clear errors
@@ -125,7 +150,7 @@ state_table_t.prototype.clear_error=function()
 state_table_t.prototype.show_error=function(error_text,current_state)
 {
 	var error_entry=null;
-	if (current_state) error_entry=this.get_entry(current_state);
+	if (current_state) error_entry=this.find_entry(current_state);
 	
 	var global_report="", local_report="";
 	if (error_text) {
@@ -141,28 +166,15 @@ state_table_t.prototype.show_error=function(error_text,current_state)
 	
 	if (this.last_error_entry) {
 		this.last_error_entry.errors.textContent=""; // clear last error
+		this.last_error_entry.drag_list.li.style.backgroundColor=""; // clear background
 	}
 	
 	if (!error_entry) return; // a bad state name, or what?
 	
 	error_entry.errors.textContent=local_report;
+	error_entry.drag_list.li.style.backgroundColor="#ffe000"; // light red background
 	
 	this.last_error_entry=error_entry;
-}
-
-state_table_t.prototype.get_entry=function(state_name) 
-{
-	var entries=this.get_entries();
-
-	for(var key in entries)
-	{
-		if(entries[key])
-		{
-			if(entries[key].input.text.value==state_name)
-				return entries[key];
-		}
-	}
-	
 }
 
 state_table_t.prototype.get_entries=function()
@@ -202,6 +214,22 @@ state_table_t.prototype.create_entry=function(state,time,code)
 	return entry;
 }
 
+state_table_t.prototype.find_entry=function(state_name) 
+{
+	var entries=this.get_entries();
+
+	for(var key in entries)
+	{
+		if(entries[key])
+		{
+			if(entries[key].input.text.value==state_name)
+				return entries[key];
+		}
+	}
+	
+	return null;
+}
+
 state_table_t.prototype.remove_entry=function(entry)
 {
 	if(!entry||!entry.drag_list)
@@ -216,12 +244,18 @@ state_table_t.prototype.set_active=function(state)
 
 	for(var key in entries)
 	{
-		if(entries[key])
+		var e=entries[key];
+		if(e)
 		{
-			if(entries[key].input.text.value==state)
-				entries[key].drag_list.li.style.backgroundColor="#337ab7";
-			else
-				entries[key].drag_list.li.style.backgroundColor="";
+			var color="";
+			if(e.input.text.value==state) { // currently running state
+				color="#337ab7";
+			}
+			if (e.errors.textContent!="") { // reporting an error
+				color="#ffd0d0";
+			}
+			
+			e.drag_list.li.style.backgroundColor=color;
 		}
 	}
 }
@@ -282,13 +316,13 @@ state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 	entry.table.element=document.createElement("table");
 	entry.table.row=entry.table.element.insertRow(0);
 	entry.table.left=entry.table.row.insertCell(0);
-	entry.table.right=entry.table.row.insertCell(1);
+	entry.table.code=entry.table.row.insertCell(1);
+	entry.table.right=entry.table.row.insertCell(2);
 	entry.input={};
 	entry.input.div=document.createElement("div");
 	entry.input.glyph=document.createElement("span");
 	entry.input.text=document.createElement("input");
 	entry.time=document.createElement("input");
-	entry.textarea=document.createElement("textarea");
 
 	entry.table.row.style.verticalAlign="middle";
 	entry.table.left.style.paddingRight=10;
@@ -332,10 +366,14 @@ state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 	entry.table.left.appendChild(entry.time);
 
 	entry.errors=this.make_error_span();
-	entry.table.right.appendChild(entry.errors);
+	entry.table.code.appendChild(entry.errors);
 	
+	entry.textarea=document.createElement("textarea");
 	entry.textarea.innerHTML=code;
-	entry.table.right.appendChild(entry.textarea);
+	entry.table.code.appendChild(entry.textarea);
+	
+	entry.prints=document.createElement("span");
+	entry.table.right.appendChild(entry.prints);
 
 	entry.code_editor=CodeMirror.fromTextArea(entry.textarea,
 	{
@@ -346,7 +384,7 @@ state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 		mode:"text/x-javascript"
 	});
 	entry.code_editor.on("change",function(){myself.code_change_m()});
-	entry.code_editor.setSize(320,100);
+	entry.code_editor.setSize(400,100);
 	entry.code_editor_event=function(event){entry.code_editor.refresh();};
 	window.addEventListener("click",entry.code_editor_event);
 

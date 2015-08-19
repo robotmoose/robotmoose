@@ -174,9 +174,14 @@ robot_ui_t.prototype.run_interval=function() {
 		superstar_get(this.robot_name,"sensors",
 			function(sensors) // sensor data has arrived:
 			{
+				myself.sensor_data_count--;
 				myself.widgets.sensors.refresh(sensors);
 				myself.widgets.map.refresh(sensors);
-				myself.sensor_data_count--;
+				
+				myself.state_runner.VM_sensors=sensors;
+				
+				// if (myself.state_runner.VM_power) { pilot upload? }
+				
 			});
 	}
 
