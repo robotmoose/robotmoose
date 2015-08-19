@@ -82,6 +82,9 @@ state_runner_t.prototype.stop_m=function(state_table)
 		if (this.onpilot) this.onpilot(this.VM_power);
 	}
 	
+	// Make sure continue doesn't fire after a stop
+	this.clear_continue_m();
+	
 	state_table.onstop_m();
 }
 
@@ -178,9 +181,12 @@ state_runner_t.prototype.execute_m=function(state_table)
 	}
 }
 
+// Advance forward to the next state
 state_runner_t.prototype.continue_m=function(state_table)
 {
+	// console.log("State advance timer callback");
 	var found=false;
+	var next_state=null;
 	this.continue_timeout=null;
 
 	for(var key in this.state_list)
@@ -193,14 +199,17 @@ state_runner_t.prototype.continue_m=function(state_table)
 			}
 			else if(found)
 			{
-				this.state=this.state_list[key].name;
+				next_state=this.state_list[key].name;
 				break;
 			}
 		}
 	}
+	console.log("State advanced from "+this.state+" to "+next_state+" due to timer");
 
-	if(!found)
+	if(!next_state)
 		this.stop_m(state_table);
+	
+	this.state=next_state;
 }
 
 // State run time limiting
