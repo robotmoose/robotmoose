@@ -16,6 +16,7 @@ function state_table_t(doorway)
 		return null;
 
 	var myself=this;
+	this.old_robot_name=null;
 	this.doorway=doorway;
 	this.div=doorway.content;
 
@@ -40,6 +41,7 @@ function state_table_t(doorway)
 		glyph:document.createElement("span")
 	}
 	this.run_button=document.createElement("input");
+	this.load_button=document.createElement("input");
 	this.add_button=document.createElement("input");
 	this.entries=[];
 
@@ -62,21 +64,21 @@ function state_table_t(doorway)
 	this.experiment.name.value="testing";
 	this.experiment.name.placeholder="Experiment Name";
 	this.experiment.name.className="form-control";
-	this.experiment.name.style.width="180px";
-	this.experiment.name.style.marginRight=10;
+	this.experiment.name.style.width=240;
 	this.experiment.name.spellcheck=false;
 	this.experiment.name.onchange=function(event){myself.update_experiment_m();};
 	this.experiment.name.onkeydown=function(event){myself.update_experiment_m();};
 	this.experiment.name.onkeyup=function(event){myself.update_experiment_m();};
 	this.experiment.name.onkeypress=function(event){myself.update_experiment_m();};
 	this.update_experiment_m();
-	this.experiment.div.appendChild(this.experiment.name);//fixme
+	this.experiment.div.appendChild(this.experiment.name);
 
 	this.experiment.glyph.className="glyphicon form-control-feedback glyphicon glyphicon-remove";
 	this.experiment.div.appendChild(this.experiment.glyph);
 
 	this.run_button.type="button";
 	this.run_button.className="btn btn-primary";
+	this.run_button.style.marginLeft=10;
 	this.run_button.disabled=true;
 	this.run_button.value="Run";
 	this.run_button.title_run="Click here to make this code execute.";
@@ -85,43 +87,63 @@ function state_table_t(doorway)
 	this.run_button.onclick=function(event){myself.run_button_pressed_m();};
 	this.controls_div.appendChild(this.run_button);
 
+	this.load_button.type="button";
+	this.load_button.className="btn btn-primary";
+	this.load_button.style.marginLeft=10;
+	this.load_button.disabled=false;
+	this.load_button.value="Load";
+	this.load_button.title="Click here to open the code with the name in the box to the left.";
+	this.load_button.onclick=function(event){myself.load_button_pressed_m();};
+	this.controls_div.appendChild(this.load_button);
+
 	this.add_button.type="button";
 	this.add_button.className="btn btn-primary";
-	this.add_button.style.marginLeft=10;
-	this.add_button.disabled=true;
+	this.add_button.style.marginRight=10;
+	this.add_button.style.float="right";
+	this.add_button.disabled=false;
 	this.add_button.value="Add State";
 	this.add_button.title="Click here to add a new blank robot state to this list.";
-	this.add_button.onclick=function(event){
-		var state_name="";
-		if (myself.get_states().length==0) state_name="start";
-		myself.create_entry(state_name,"","// JavaScript code\n");
-	};
+	this.add_button.onclick=function(event){myself.add_button_pressed_m();};
 	this.controls_div.appendChild(this.add_button);
 }
 
-state_table_t.prototype.download=function(robot_name)
+state_table_t.prototype.download=function(robot_name,experiment)
 {
+	this.old_robot_name=robot_name;
+
 	for(var key in this.entries)
 		this.remove_entry(this.entries[key]);
-
-	this.run_button.disabled=true;
-	this.add_button.disabled=true;
 
 	if(!robot_name)
 		return;
 
 	var myself=this;
-	this.run_button.disabled=false;
-	this.add_button.disabled=false;
 
-	superstar_get(robot_name,"experiments/"+this.experiment.name.value+"/code",function(obj)//fixme
-	//superstar_get(robot_name,"states",function(obj)//removeme
+	if(experiment)
 	{
-		for(var key in obj)
-			myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
-	});
+		superstar_get(robot_name,"experiments/"+experiment+"/code",function(obj)
+		{
+			for(var key in obj)
+				myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
+		});
+	}
+	else
+	{
+		superstar_get(robot_name,"active_experiment",function(obj)
+		{
+			console.log(obj);
+			myself.experiment.name.value=obj;
+
+			superstar_get(robot_name,"experiments/"+obj+"/code",function(obj)
+			{
+				for(var key in obj)
+					myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
+			});
+		});
+	}
 
 	this.update_states_m();
+	this.update_buttons_m();
 }
 
 state_table_t.prototype.upload=function(robot_name)
@@ -130,8 +152,8 @@ state_table_t.prototype.upload=function(robot_name)
 	if(!robot_name)
 		return;
 
-	superstar_set(robot_name,"experiments/"+this.experiment.name.value+"/code",this.get_states());//fixme
-	//superstar_set(robot_name,"states",this.get_states());//removeme
+	superstar_set(robot_name,"experiments/"+this.experiment.name.value+"/code",this.get_states());
+	superstar_set(robot_name,"active_experiment",this.experiment.name.value);
 }
 
 state_table_t.prototype.get_states=function()
@@ -367,6 +389,24 @@ state_table_t.prototype.run_button_pressed_m=function()
 		this.onstop_m();
 }
 
+state_table_t.prototype.add_button_pressed_m=function()
+{
+	this.onstop_m();
+
+	var state_name="";
+
+	if(this.get_states().length==0)
+		state_name="start";
+
+	this.create_entry(state_name,"","// JavaScript code\n");
+}
+
+state_table_t.prototype.load_button_pressed_m=function()
+{
+	this.onstop_m();
+	this.download(this.old_robot_name,this.experiment.name.value);
+}
+
 state_table_t.prototype.onrun_m=function()
 {
 	if(this.onrun)
@@ -573,23 +613,21 @@ state_table_t.prototype.update_buttons_m=function(valid)
 {
 	var entries=this.get_entries();
 	var valid=true;
-	var count=0;
 
 	for(var key in entries)
 	{
 		if(entries[key])
 		{
-			++count;
-
 			if(!this.validate_state_m(entries[key].input))
 				valid=false;
 		}
 	}
 
-	if(count==0 || this.experiment.name.value.length == 0)
+	if(this.experiment.name.value.length==0)
 		valid=false;
 
 	this.run_button.disabled=!valid;
+	this.load_button.disabled=(this.experiment.name.value.length==0);
 
 	if(this.run_button.value!="Run")
 		this.onstop_m();
