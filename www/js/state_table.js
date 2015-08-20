@@ -30,9 +30,11 @@ function state_table_t(div)
 	this.last_error_entry=null;
 	
 	this.element=document.createElement("div");
+	this.experiment_name_div=document.createElement("div");
 	this.drag_list=new drag_list_t(this.element);
 	this.run_button=document.createElement("input");
 	this.add_button=document.createElement("input");
+	this.experiment_name=document.createElement("input");
 	this.entries=[];
 
 	if(!this.drag_list)
@@ -43,11 +45,12 @@ function state_table_t(div)
 
 	this.element.style.width=640;
 	this.div.appendChild(this.element);
-
+	
 	this.run_button.type="button";
 	this.run_button.className="btn btn-primary";
 	this.run_button.disabled=true;
 	this.run_button.value="Run";
+	this.run_button.style.marginLeft=10;
 	this.run_button.onclick=function(event){myself.run_button_pressed_m();};
 	this.element.appendChild(this.run_button);
 
@@ -62,6 +65,21 @@ function state_table_t(div)
 		myself.create_entry(state_name,"","// JavaScript code\n");
 	};
 	this.element.appendChild(this.add_button);
+	
+	this.experiment_name_div.className="form-group";
+	this.element.appendChild(this.experiment_name_div);
+	
+	this.experiment_name.type="text";
+	this.experiment_name.placeholder="Experiment Name";
+	this.experiment_name.className="form-control";
+	this.experiment_name.style.width="140px";
+	this.experiment_name.spellcheck=false;
+	this.experiment_name.style.float="left";
+	this.experiment_name.onchange=function(event){myself.update_experiment_name_m();};
+	this.experiment_name.onkeydown=function(event){myself.update_experiment_name_m();};
+	this.experiment_name.onkeyup=function(event){myself.update_experiment_name_m();};
+	this.experiment_name.onkeypress=function(event){myself.update_experiment_name_m();};
+	this.experiment_name_div.appendChild(this.experiment_name);
 }
 
 state_table_t.prototype.download=function(robot_name)
@@ -492,13 +510,27 @@ state_table_t.prototype.update_buttons_m=function(valid)
 		}
 	}
 
-	if(count==0)
+	if(count==0 || this.experiment_name.value.length == 0)
 		valid=false;
 
 	this.run_button.disabled=!valid;
 
 	if(this.run_button.value!="Run")
 		this.onstop_m();
+}
+state_table_t.prototype.update_experiment_name_m=function()
+{
+	console.log(this.experiment_name.value.length);
+	if(this.experiment_name.value.length == 0)
+	{
+		this.experiment_name_div.classname = "form-group has-feedback has-error";
+	}
+	else
+	{
+		this.experiment_name_div.classname = "form-group";
+	}
+	
+	this.update_buttons_m();
 }
 
 state_table_t.prototype.code_change_m=function()
