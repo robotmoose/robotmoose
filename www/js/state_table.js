@@ -106,7 +106,7 @@ function state_table_t(doorway)
 	this.controls_div.appendChild(this.add_button);
 }
 
-state_table_t.prototype.download=function(robot_name,experiment)
+state_table_t.prototype.download=function(robot_name,experiment,callback)
 {
 	this.old_robot_name=robot_name;
 
@@ -124,6 +124,9 @@ state_table_t.prototype.download=function(robot_name,experiment)
 		{
 			for(var key in obj)
 				myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
+
+			if(callback)
+				callback();
 		});
 	}
 	else
@@ -137,6 +140,9 @@ state_table_t.prototype.download=function(robot_name,experiment)
 			{
 				for(var key in obj)
 					myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
+
+				if(callback)
+					callback();
 			});
 		});
 	}
@@ -401,8 +407,12 @@ state_table_t.prototype.add_button_pressed_m=function()
 
 state_table_t.prototype.load_button_pressed_m=function()
 {
+	var myself=this;
+
 	this.onstop_m();
-	this.download(this.old_robot_name,this.experiment.name.value);
+
+	this.download(this.old_robot_name,this.experiment.name.value,
+		function(){myself.upload(myself.old_robot_name);});
 }
 
 state_table_t.prototype.onrun_m=function()
