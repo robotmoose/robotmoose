@@ -79,19 +79,8 @@ robot_ui_t.prototype.create_menus=function()
 		"Connect",
 		function(){myself.connect_menu.show();},//null,
 		"glyphicon glyphicon-off",//"glyphicon glyphicon-cog",
-		null
-		/*{
-			"Connect":
-			{
-				onclick:function(){myself.connect_menu.show();},
-				glyph:"glyphicon glyphicon-off"
-			},
-			"Clone":
-			{
-				onclick:function(){myself.clone_menu.show();},
-				glyph:"glyphicon glyphicon-duplicate"
-			}
-		}*/
+		null,
+		"Connect to a new robot over the network"
 	);
 
 	if(this.menu.buttons["Robot"]&&this.menu.buttons["Robot"].drops["Clone"])
@@ -153,12 +142,12 @@ robot_ui_t.prototype.download_gui=function()
 	{
 		myself.doorways=
 		{
-			config:myself.create_doorway("Configure"),
-			pilot:myself.create_doorway("Drive"),
-			sensors:myself.create_doorway("Sensors"),
-			states:myself.create_doorway("Code"),
-			map:myself.create_doorway("Map"),
-			video:myself.create_doorway("Video")
+			config:myself.create_doorway("Configure","Set up robot hardware"),
+			pilot:myself.create_doorway("Drive","Manually drive the robot"),
+			sensors:myself.create_doorway("Sensors","Examine sensor data from robot"),
+			states:myself.create_doorway("Code","Automatically drive the robot"),
+			map:myself.create_doorway("Map","See where the robot thinks it is"),
+			video:myself.create_doorway("Video","Show the robot's video camera")
 		};
 		myself.gui.element.hide_all();
 		myself.gui.element.minimize(myself.doorways.config,false);
@@ -253,12 +242,12 @@ robot_ui_t.prototype.create_widgets=function()
 	}
 }
 
-robot_ui_t.prototype.create_doorway=function(title)
+robot_ui_t.prototype.create_doorway=function(title,tooltip)
 {
 	var doorway=this.gui.element.get_by_title(title);
 
 	if(doorway)
 		return doorway;
 	else
-		return this.gui.element.create(title);
+		return this.gui.element.create(title,undefined,tooltip);
 }

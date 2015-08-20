@@ -77,6 +77,9 @@ function state_table_t(doorway)
 	this.run_button.className="btn btn-primary";
 	this.run_button.disabled=true;
 	this.run_button.value="Run";
+	this.run_button.title_run="Click here to make this code execute.";
+	this.run_button.title=this.run_button.title_run;
+	this.run_button.title_stop="Click to stop this code.";
 	this.run_button.style.marginLeft=10;
 	this.run_button.onclick=function(event){myself.run_button_pressed_m();};
 	this.controls_div.appendChild(this.run_button);
@@ -86,6 +89,7 @@ function state_table_t(doorway)
 	this.add_button.style.marginLeft=10;
 	this.add_button.disabled=true;
 	this.add_button.value="Add State";
+	this.add_button.title="Click here to add a new blank robot state to this list.";
 	this.add_button.onclick=function(event){
 		var state_name="";
 		if (myself.get_states().length==0) state_name="start";
@@ -109,7 +113,8 @@ state_table_t.prototype.download=function(robot_name)
 	this.run_button.disabled=false;
 	this.add_button.disabled=false;
 
-	superstar_get(robot_name,"states",function(obj)
+	var getURL = "experiments/"+this.experiment.name.value + "/code";
+	superstar_get(robot_name,getURL,function(obj)
 	{
 		for(var key in obj)
 		myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
@@ -122,8 +127,8 @@ state_table_t.prototype.upload=function(robot_name)
 {
 	if(!robot_name)
 		return;
-
-	superstar_set(robot_name,"states",this.get_states());
+	var setURL = "experiments/"+this.experiment.name.value + "/code";
+	superstar_set(robot_name,setURL,this.get_states());
 }
 
 state_table_t.prototype.get_states=function()
@@ -365,6 +370,7 @@ state_table_t.prototype.onrun_m=function()
 		this.onrun(this);
 
 	this.run_button.value="Stop";
+	this.run_button.title=this.run_button.title_stop;
 }
 
 state_table_t.prototype.onstop_m=function()
@@ -373,6 +379,7 @@ state_table_t.prototype.onstop_m=function()
 		this.onstop(this);
 
 	this.run_button.value="Run";
+	this.run_button.title=this.run_button.title_run;
 }
 
 state_table_t.prototype.refresh_m=function()

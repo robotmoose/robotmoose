@@ -51,6 +51,7 @@ drag_list_t.prototype.create_entry=function()
 	entry.li.appendChild(entry.table.table);
 
 	entry.move_handle.className="glyphicon glyphicon-move";
+	entry.move_handle.title="Drag here to move this item around in the list";
 	entry.move_handle.style.marginRight=10;
 	entry.move_handle.style.cursor="move";
 	entry.table.left.appendChild(entry.move_handle);
@@ -58,6 +59,7 @@ drag_list_t.prototype.create_entry=function()
 	entry.table.center.appendChild(entry.content);
 
 	entry.close_button.className="close";
+	entry.close_button.title="Click here to remove this item";
 	entry.close_button.style.marginLeft=10;
 	entry.close_button.innerHTML="&times;";
 	entry.close_button.drag_list_t=entry;

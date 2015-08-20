@@ -41,10 +41,11 @@ function robot_menu_t(div)
 	setInterval(function(){$('.hiddenclass').show();},100);
 }
 
-robot_menu_t.prototype.create_button=function(name,onclick,glyph,drops)
+robot_menu_t.prototype.create_button=function(name,onclick,glyph,drops,tooltip)
 {
 	this.buttons[name]={};
 	this.buttons[name].li=document.createElement("li");
+	if (tooltip) this.buttons[name].li.title=tooltip;
 	this.buttons[name].a=document.createElement("a");
 	this.buttons[name].glyph=document.createElement("span");
 	this.buttons[name].text=document.createTextNode(" "+name+" ");
