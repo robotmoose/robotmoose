@@ -17,7 +17,7 @@ function state_table_t(div)
 
 	var myself=this;
 	this.div=div;
-	
+
 	this.make_error_span=function () {
 		var errors=document.createElement("span");
 		errors.style.color="#800000"; // dark red text
@@ -28,13 +28,18 @@ function state_table_t(div)
 	// this.global_errors.textContent="Sample error here";
 	this.div.appendChild(this.global_errors);
 	this.last_error_entry=null;
-	
+
 	this.element=document.createElement("div");
-	this.experiment_name_div=document.createElement("div");
 	this.drag_list=new drag_list_t(this.element);
+	this.controls_div=document.createElement("div");
+	this.experiment=
+	{
+		div:document.createElement("div"),
+		name:document.createElement("input"),
+		glyph:document.createElement("span")
+	}
 	this.run_button=document.createElement("input");
 	this.add_button=document.createElement("input");
-	this.experiment_name=document.createElement("input");
 	this.entries=[];
 
 	if(!this.drag_list)
@@ -45,14 +50,35 @@ function state_table_t(div)
 
 	this.element.style.width=640;
 	this.div.appendChild(this.element);
-	
+
+	this.element.appendChild(this.controls_div);
+
+	this.experiment.div.className="form-group";
+	this.experiment.div.style.float="left";
+	this.controls_div.appendChild(this.experiment.div);
+
+	this.experiment.name.type="text";
+	this.experiment.name.placeholder="Experiment Name";
+	this.experiment.name.className="form-control";
+	this.experiment.name.style.width="180px";
+	this.experiment.name.spellcheck=false;
+	this.experiment.name.onchange=function(event){myself.update_experiment_m();};
+	this.experiment.name.onkeydown=function(event){myself.update_experiment_m();};
+	this.experiment.name.onkeyup=function(event){myself.update_experiment_m();};
+	this.experiment.name.onkeypress=function(event){myself.update_experiment_m();};
+	this.update_experiment_m();
+	this.experiment.div.appendChild(this.experiment.name);
+
+	this.experiment.glyph.className="glyphicon form-control-feedback glyphicon glyphicon-remove";
+	this.experiment.div.appendChild(this.experiment.glyph);
+
 	this.run_button.type="button";
 	this.run_button.className="btn btn-primary";
 	this.run_button.disabled=true;
 	this.run_button.value="Run";
 	this.run_button.style.marginLeft=10;
 	this.run_button.onclick=function(event){myself.run_button_pressed_m();};
-	this.element.appendChild(this.run_button);
+	this.controls_div.appendChild(this.run_button);
 
 	this.add_button.type="button";
 	this.add_button.className="btn btn-primary";
@@ -64,22 +90,7 @@ function state_table_t(div)
 		if (myself.get_states().length==0) state_name="start";
 		myself.create_entry(state_name,"","// JavaScript code\n");
 	};
-	this.element.appendChild(this.add_button);
-	
-	this.experiment_name_div.className="form-group";
-	this.element.appendChild(this.experiment_name_div);
-	
-	this.experiment_name.type="text";
-	this.experiment_name.placeholder="Experiment Name";
-	this.experiment_name.className="form-control";
-	this.experiment_name.style.width="140px";
-	this.experiment_name.spellcheck=false;
-	this.experiment_name.style.float="left";
-	this.experiment_name.onchange=function(event){myself.update_experiment_name_m();};
-	this.experiment_name.onkeydown=function(event){myself.update_experiment_name_m();};
-	this.experiment_name.onkeyup=function(event){myself.update_experiment_name_m();};
-	this.experiment_name.onkeypress=function(event){myself.update_experiment_name_m();};
-	this.experiment_name_div.appendChild(this.experiment_name);
+	this.controls_div.appendChild(this.add_button);
 }
 
 state_table_t.prototype.download=function(robot_name)
@@ -137,7 +148,7 @@ state_table_t.prototype.get_states=function()
 
 
 // Debug prints
-state_table_t.prototype.clear_prints=function() 
+state_table_t.prototype.clear_prints=function()
 {
 	var entries=this.get_entries();
 
@@ -154,13 +165,13 @@ state_table_t.prototype.show_prints=function(print_text,current_state)
 {
 	var print_entry=this.find_entry(current_state);
 	if (!print_entry) return;
-	
+
 	print_entry.prints.textContent=print_text;
 }
 
 
 // Error reporting onscreen
-state_table_t.prototype.clear_error=function() 
+state_table_t.prototype.clear_error=function()
 {
 	this.show_error(null,null); // hacky way to clear errors
 }
@@ -169,7 +180,7 @@ state_table_t.prototype.show_error=function(error_text,current_state)
 {
 	var error_entry=null;
 	if (current_state) error_entry=this.find_entry(current_state);
-	
+
 	var global_report="", local_report="";
 	if (error_text) {
 		local_report="Error here: "+error_text;
@@ -181,17 +192,17 @@ state_table_t.prototype.show_error=function(error_text,current_state)
 	}
 
 	this.global_errors.textContent=global_report;
-	
+
 	if (this.last_error_entry) {
 		this.last_error_entry.errors.textContent=""; // clear last error
 		this.last_error_entry.drag_list.li.style.backgroundColor=""; // clear background
 	}
-	
+
 	if (!error_entry) return; // a bad state name, or what?
-	
+
 	error_entry.errors.textContent=local_report;
 	error_entry.drag_list.li.style.backgroundColor="#ffe000"; // light red background
-	
+
 	this.last_error_entry=error_entry;
 }
 
@@ -232,7 +243,7 @@ state_table_t.prototype.create_entry=function(state,time,code)
 	return entry;
 }
 
-state_table_t.prototype.find_entry=function(state_name) 
+state_table_t.prototype.find_entry=function(state_name)
 {
 	var entries=this.get_entries();
 
@@ -244,7 +255,7 @@ state_table_t.prototype.find_entry=function(state_name)
 				return entries[key];
 		}
 	}
-	
+
 	return null;
 }
 
@@ -272,7 +283,7 @@ state_table_t.prototype.set_active=function(state)
 			if (e.errors.textContent!="") { // reporting an error
 				color="#ffd0d0";
 			}
-			
+
 			e.drag_list.li.style.backgroundColor=color;
 		}
 	}
@@ -385,11 +396,11 @@ state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 
 	entry.errors=this.make_error_span();
 	entry.table.code.appendChild(entry.errors);
-	
+
 	entry.textarea=document.createElement("textarea");
 	entry.textarea.innerHTML=code;
 	entry.table.code.appendChild(entry.textarea);
-	
+
 	entry.prints=document.createElement("span");
 	entry.table.right.appendChild(entry.prints);
 
@@ -510,7 +521,7 @@ state_table_t.prototype.update_buttons_m=function(valid)
 		}
 	}
 
-	if(count==0 || this.experiment_name.value.length == 0)
+	if(count==0 || this.experiment.name.value.length == 0)
 		valid=false;
 
 	this.run_button.disabled=!valid;
@@ -518,18 +529,19 @@ state_table_t.prototype.update_buttons_m=function(valid)
 	if(this.run_button.value!="Run")
 		this.onstop_m();
 }
-state_table_t.prototype.update_experiment_name_m=function()
+state_table_t.prototype.update_experiment_m=function()
 {
-	console.log(this.experiment_name.value.length);
-	if(this.experiment_name.value.length == 0)
+	if(this.experiment.name.value.length == 0)
 	{
-		this.experiment_name_div.classname = "form-group has-feedback has-error";
+		this.experiment.div.className = "form-group has-feedback has-error";
+		this.experiment.glyph.style.visibility="visible";
 	}
 	else
 	{
-		this.experiment_name_div.classname = "form-group";
+		this.experiment.div.className = "form-group";
+		this.experiment.glyph.style.visibility="hidden";
 	}
-	
+
 	this.update_buttons_m();
 }
 
