@@ -7,6 +7,7 @@
 function robot_map_t(div)
 {
 	this.div=div;
+	this.div.title="Shows where the robot thinks it is in the world.  The grid lines are 1 meter apart.  The robot's right and left wheels leave red and purple tracks";
 	var myself=this;
 	this.renderer=new renderer_t(div,function() {myself.setup();}, function() {myself.loop();} );
 	if(!this.renderer.setup()) {
