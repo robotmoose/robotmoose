@@ -10,13 +10,15 @@
 //		onrun() - callback triggered when run button is hit
 //		onstop() - callback triggered when stop button is hit
 
-function state_table_t(div)
+function state_table_t(doorway)
 {
-	if(!div)
+	if(!doorway||!doorway.content)
 		return null;
 
 	var myself=this;
-	this.div=div;
+	this.doorway=doorway;
+	this.div=doorway.content;
+	console.log(this.doorway);
 
 	this.make_error_span=function () {
 		var errors=document.createElement("span");

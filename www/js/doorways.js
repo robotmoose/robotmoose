@@ -210,6 +210,12 @@ doorways_t.prototype.create=function(title,pos)
 
 	doorway.resizer=new resizer_t(doorway.body,{min_size:{width:200,height:100}});
 
+	doorway.resize=function(size)
+	{
+		doorway.resizer.resize(size);
+		myself.move(doorway);
+	};
+
 	this.activate(doorway);
 	this.move(doorway,pos);
 
