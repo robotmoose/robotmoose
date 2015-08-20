@@ -8,24 +8,24 @@
 function state_runner_t()
 {
 	this.execution_interval=30; // milliseconds between runs
-	
+
 	this.state=null;
 	this.continue_state=null;
 	this.continue_timeout=null;
 	this.state_list=[];
 	this.kill=true;
 	this.state_start_time_ms=this.get_time_ms();
-	
-	this.VM_power={}; 
-	this.VM_sensors={}; 
-	this.VM_store={}; 
+
+	this.VM_power={};
+	this.VM_sensors={};
+	this.VM_store={};
 }
 
 state_runner_t.prototype.run=function(state_table)
 {
 	if(!state_table)
 		return;
-	
+
 	// Clear out old state
 	this.state=null;
 	this.continue_state=null;
@@ -40,14 +40,14 @@ state_runner_t.prototype.run=function(state_table)
 
 state_runner_t.prototype.stop=function(state_table)
 {
-	console.log("stopping");
+	//console.log("stopping");
 	this.kill=true;
-	
+
 	// Make sure continue doesn't fire after a stop
 	this.clear_continue_m();
-	
+
 	state_table.set_active(); // no section is active
-	
+
 	if (this.VM_power) { // stop the robot when the code stops running
 		this.VM_power.L=this.VM_power.R=0.0; // hacky!
 		if (this.onpilot) this.onpilot(this.VM_power);
@@ -79,7 +79,7 @@ state_runner_t.prototype.run_m=function(state_table)
 
 	if(this.state_list.length<=0)
 	{
-		console.log("no state_list");
+		//console.log("no state_list");
 		this.stop_m(state_table);
 		return;
 	}
@@ -103,7 +103,7 @@ state_runner_t.prototype.stop_m=function(state_table)
 // Called when beginning to execute a state (either first time, or when switching states)
 state_runner_t.prototype.start_state=function(state_name)
 {
-	console.log("Entering VM state "+state_name);
+	//console.log("Entering VM state "+state_name);
 	this.state_start_time_ms=this.get_time_ms();
 }
 
@@ -130,15 +130,15 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		// console.log(value+"\n");
 	};
 	VM.stop=function() { VM.state=null; }
-	
+
 	VM.time=this.get_time_ms() - this.state_start_time_ms;
-	
+
 	VM.sensors=this.VM_sensors;
-	VM.power=this.VM_power; 
+	VM.power=this.VM_power;
 	VM.store=this.VM_store;
 	VM.power_original=JSON.stringify(VM.power); // hack for change detection
 	VM.robot={sensors:VM.sensors, power:VM.power};
-	
+
 	VM.drive=function(speed) { VM.power.L=VM.power.R=speed; };
 	VM.turnleft =function(speed) { VM.power.L=-speed; VM.power.R=+speed; };
 	VM.turnright=function(speed) { VM.power.L=+speed; VM.power.R=-speed; };
@@ -169,7 +169,7 @@ state_runner_t.prototype.execute_m=function(state_table)
 			this.update_continue_m(state_table,run_state);
 
 			var VM=this.make_user_VM(run_state.code,this.state_list);
-			
+
 			state_table.show_prints(VM.printed_text,this.state);
 
 			if(VM.state===null)
@@ -179,16 +179,16 @@ state_runner_t.prototype.execute_m=function(state_table)
 				return;
 			}
 
-			if(VM.state!==undefined) 
+			if(VM.state!==undefined)
 			{
 				if(!this.find_state(VM.state))
 					throw("Next state \""+VM.state+"\" not found!");
-				
+
 				this.clear_continue_m();
 				this.state=VM.state;
 				this.start_state(VM.state);
 			}
-			
+
 			if (JSON.stringify(VM.power)!=VM.power_original)
 			{ // Send off autopilot's driving commands
 				if (this.onpilot) this.onpilot(VM.power);
@@ -234,7 +234,7 @@ state_runner_t.prototype.continue_m=function(state_table)
 
 	if(!next_state)
 		this.stop_m(state_table);
-	
+
 	this.state=next_state;
 }
 
