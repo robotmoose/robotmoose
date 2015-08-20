@@ -48,6 +48,9 @@ function state_table_t(div)
 	this.run_button.className="btn btn-primary";
 	this.run_button.disabled=true;
 	this.run_button.value="Run";
+	this.run_button.title_run="Click here to make this code run.";
+	this.run_button.title=this.run_button.title_run;
+	this.run_button.title_stop="Click to stop running this code.";
 	this.run_button.onclick=function(event){myself.run_button_pressed_m();};
 	this.element.appendChild(this.run_button);
 
@@ -56,6 +59,7 @@ function state_table_t(div)
 	this.add_button.style.marginLeft=10;
 	this.add_button.disabled=true;
 	this.add_button.value="Add State";
+	this.add_button.title="Click here to add a new blank robot state to this list.";
 	this.add_button.onclick=function(event){
 		var state_name="";
 		if (myself.get_states().length==0) state_name="start";
@@ -281,6 +285,7 @@ state_table_t.prototype.onrun_m=function()
 		this.onrun(this);
 
 	this.run_button.value="Stop";
+	this.run_button.title=this.run_button.title_stop;
 }
 
 state_table_t.prototype.onstop_m=function()
@@ -289,6 +294,7 @@ state_table_t.prototype.onstop_m=function()
 		this.onstop(this);
 
 	this.run_button.value="Run";
+	this.run_button.title=this.run_button.title_run;
 }
 
 state_table_t.prototype.refresh_m=function()

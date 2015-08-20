@@ -165,6 +165,7 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 {
 	// Make arrow div
 	this.arrowDiv=document.createElement("div");
+	this.arrowDiv.title="Click to drive the robot.  Hold down to keep driving.";
 	this.arrowDiv.style.backgroundColor="#808080";
 	this.arrowDiv.style.position="relative";
 	this.arrowDiv.style.width=this.arrowDiv.style.height="200px";

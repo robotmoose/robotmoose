@@ -26,6 +26,7 @@ function config_editor_t(div)
 	this.tabula.select={};
 	this.tabula.select.element=document.createElement("select");
 	this.tabula.select.options=[];
+	this.tabula.select.element.title="Pick a hardware device, then click 'Add'";
 	this.tabula.options=[];
 	this.add_button=document.createElement("input");
 	this.configure_button=document.createElement("input");
@@ -46,6 +47,7 @@ function config_editor_t(div)
 	this.add_button.disabled=true;
 	this.add_button.type="button";
 	this.add_button.value="Add";
+	this.add_button.title="Click here to add this hardware device";
 	this.add_button.onclick=function(event)
 	{
 		var obj=myself.tabula.select.options[myself.tabula.select.element.selectedIndex].tabula;
@@ -59,6 +61,7 @@ function config_editor_t(div)
 	this.configure_button.disabled=true;
 	this.configure_button.type="button";
 	this.configure_button.value="Configure";
+	this.configure_button.title="Click here to send this list to the robot's Arduino.";
 	this.configure_button.onclick=function(event)
 	{
 		if(myself.onconfigure)
@@ -271,6 +274,7 @@ config_editor_t.prototype.create_entry_m=function(entry,type,arg_types,arg_value
 config_editor_t.prototype.create_pin_drop_m=function(value)
 {
 	var drop=document.createElement("select");
+	drop.title="Pick the Arduino pin where you plugged in the wires for this device";
 	drop.style.width=80;
 	drop.className="form-control"
 
@@ -312,6 +316,7 @@ config_editor_t.prototype.create_pin_drop_m=function(value)
 config_editor_t.prototype.create_serial_drop_m=function(value)
 {
 	var drop=document.createElement("select");
+	drop.title="Pick the Arduino serial port plugged into this device (X3 means Arduino pins RX3/TX3)";
 	drop.style.width=80;
 	drop.className="form-control"
 
