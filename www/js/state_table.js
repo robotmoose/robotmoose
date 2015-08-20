@@ -98,7 +98,6 @@ function state_table_t(doorway)
 
 	this.add_button.type="button";
 	this.add_button.className="btn btn-primary";
-	this.add_button.style.marginRight=10;
 	this.add_button.style.float="right";
 	this.add_button.disabled=false;
 	this.add_button.value="Add State";
@@ -131,7 +130,8 @@ state_table_t.prototype.download=function(robot_name,experiment)
 	{
 		superstar_get(robot_name,"active_experiment",function(obj)
 		{
-			myself.experiment.name.value=obj;
+			if(obj&&obj.length>0)
+				myself.experiment.name.value=obj;
 
 			superstar_get(robot_name+"/experiments/"+obj+"/","code",function(obj)
 			{
