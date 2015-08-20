@@ -52,7 +52,7 @@ function doorways_t(div,menu)
 			else
 				myself.hide_all();
 		},
-		"Click here to hide/show all windows."
+		"Click here to hide/show all windows"
 	);
 
 	document.addEventListener("mousemove",function(event){return myself.onmousemove(event);});
@@ -131,7 +131,7 @@ doorways_t.prototype.load=function(data)
 	}
 }
 
-doorways_t.prototype.create=function(title,pos)
+doorways_t.prototype.create=function(title,pos,tooltip)
 {
 	var myself=this;
 
@@ -168,6 +168,7 @@ doorways_t.prototype.create=function(title,pos)
 	doorway.tab.a.href="javascript:void(0);";
 	doorway.tab.a.onclick=function(){myself.activate(this.doorways_t);};
 	doorway.tab.li.appendChild(doorway.tab.a);
+	if (tooltip) doorway.tab.li.title=tooltip;
 
 	doorway.panel.className="panel panel-primary";
 	doorway.panel.style.position="absolute";
@@ -211,7 +212,7 @@ doorways_t.prototype.create=function(title,pos)
 	doorway.resizer=new resizer_t(doorway.body,{min_size:{width:200,height:100}});
 
 	this.activate(doorway);
-	this.move(doorway,pos);
+	if (pos) this.move(doorway,pos);
 
 	this.doorways.push(doorway);
 
@@ -512,6 +513,7 @@ doorways_t.prototype.create_menu_button=function(glyph,onclick,tooltip)
 	button.setAttribute("aria-label","Left Align");
 	button.onclick=onclick;
 	this.menu.appendChild(button);
+	if (tooltip) button.title=tooltip;
 
 	span.className=glyph;
 	span.style.color="#337ab7";

@@ -47,7 +47,7 @@ function config_editor_t(div)
 	this.add_button.disabled=true;
 	this.add_button.type="button";
 	this.add_button.value="Add";
-	this.add_button.title="Click here to add this hardware device";
+	this.add_button.title="Click here to add this hardware device to this list";
 	this.add_button.onclick=function(event)
 	{
 		var obj=myself.tabula.select.options[myself.tabula.select.element.selectedIndex].tabula;
@@ -61,7 +61,7 @@ function config_editor_t(div)
 	this.configure_button.disabled=true;
 	this.configure_button.type="button";
 	this.configure_button.value="Configure";
-	this.configure_button.title="Click here to send this list to the robot's Arduino.";
+	this.configure_button.title="Click here to send this list to the Arduino on the robot";
 	this.configure_button.onclick=function(event)
 	{
 		if(myself.onconfigure)
