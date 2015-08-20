@@ -469,19 +469,27 @@ doorways_t.prototype.constrain=function(doorway)
 	right=doorway.pos.x+width;
 	bottom=doorway.pos.y+height;
 
-	while(right>view_width)
+	while(right>view_width&&width>doorway.resizer.dragging.min_size.width)
 	{
-		doorway.resize({width:parseInt(doorway.body.offsetWidth,10)-1,
-			height:parseInt(doorway.body.offsetHeight,10)});
-		width=doorway.panel.offsetWidth;
+		var size=
+		{
+			width:parseInt(doorway.body.offsetWidth,10)-1,
+			height:parseInt(doorway.body.offsetHeight,10)
+		};
+		doorway.resizer.resize(size);
+		--width;
 		right=doorway.pos.x+width;
 	}
 
-	while(bottom>view_height)
+	while(bottom>view_height&&height>doorway.resizer.dragging.min_size.height)
 	{
-		doorway.resize({width:parseInt(doorway.body.offsetWidth,10),
-			height:parseInt(doorway.body.offsetHeight-1,10)});
-		height=doorway.panel.offsetHeight;
+		var size=
+		{
+			width:parseInt(doorway.body.offsetWidth,10),
+			height:parseInt(doorway.body.offsetHeight-1,10)
+		};
+		doorway.resizer.resize(size);
+		--height;
 		bottom=doorway.pos.y+height;
 	}
 }

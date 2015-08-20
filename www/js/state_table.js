@@ -70,7 +70,7 @@ function state_table_t(doorway)
 	this.experiment.name.onkeyup=function(event){myself.update_experiment_m();};
 	this.experiment.name.onkeypress=function(event){myself.update_experiment_m();};
 	this.update_experiment_m();
-	//this.experiment.div.appendChild(this.experiment.name);//fixme
+	this.experiment.div.appendChild(this.experiment.name);//fixme
 
 	this.experiment.glyph.className="glyphicon form-control-feedback glyphicon glyphicon-remove";
 	this.experiment.div.appendChild(this.experiment.glyph);
@@ -114,8 +114,8 @@ state_table_t.prototype.download=function(robot_name)
 	this.run_button.disabled=false;
 	this.add_button.disabled=false;
 
-	//superstar_get(robot_name,"experiments/"+this.experiment.name.value+"/code",function(obj)//fixme
-	superstar_get(robot_name,"states",function(obj)//removeme
+	superstar_get(robot_name,"experiments/"+this.experiment.name.value+"/code",function(obj)//fixme
+	//superstar_get(robot_name,"states",function(obj)//removeme
 	{
 		for(var key in obj)
 			myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
@@ -130,8 +130,8 @@ state_table_t.prototype.upload=function(robot_name)
 	if(!robot_name)
 		return;
 
-	//superstar_set(robot_name,"experiments/"+this.experiment.name.value+"/code",this.get_states());//fixme
-	superstar_set(robot_name,"states",this.get_states());//removeme
+	superstar_set(robot_name,"experiments/"+this.experiment.name.value+"/code",this.get_states());//fixme
+	//superstar_set(robot_name,"states",this.get_states());//removeme
 }
 
 state_table_t.prototype.get_states=function()
