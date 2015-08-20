@@ -108,7 +108,8 @@ state_table_t.prototype.download=function(robot_name)
 	this.run_button.disabled=false;
 	this.add_button.disabled=false;
 
-	superstar_get(robot_name,"states",function(obj)
+	var getURL = "experiments/"+this.experiment.name.value + "/code";
+	superstar_get(robot_name,getURL,function(obj)
 	{
 		for(var key in obj)
 		myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
@@ -121,8 +122,8 @@ state_table_t.prototype.upload=function(robot_name)
 {
 	if(!robot_name)
 		return;
-
-	superstar_set(robot_name,"states",this.get_states());
+	var setURL = "experiments/"+this.experiment.name.value + "/code";
+	superstar_set(robot_name,setURL,this.get_states());
 }
 
 state_table_t.prototype.get_states=function()
