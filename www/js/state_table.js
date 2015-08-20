@@ -59,6 +59,7 @@ function state_table_t(doorway)
 	this.controls_div.appendChild(this.experiment.div);
 
 	this.experiment.name.type="text";
+	this.experiment.name.value="testing";
 	this.experiment.name.placeholder="Experiment Name";
 	this.experiment.name.className="form-control";
 	this.experiment.name.style.width="180px";

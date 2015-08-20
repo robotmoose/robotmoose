@@ -484,8 +484,6 @@ doorways_t.prototype.constrain=function(doorway)
 		height=doorway.panel.offsetHeight;
 		bottom=doorway.pos.y+height;
 	}
-
-	console.log("Called");
 }
 
 doorways_t.prototype.offset_left=function()
