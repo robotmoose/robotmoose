@@ -138,6 +138,12 @@ robot_ui_t.prototype.download_gui=function()
 
 	var myself=this;
 
+	var clear_out=function(div)
+	{
+		while(div.firstChild)
+			div.removeChild(div.firstChild);
+	}
+
 	superstar_get(this.robot_name,"gui",function(json)
 	{
 		myself.doorways=
@@ -149,6 +155,14 @@ robot_ui_t.prototype.download_gui=function()
 			map:myself.create_doorway("Map","See where the robot thinks it is"),
 			video:myself.create_doorway("Video","Show the robot's video camera")
 		};
+
+		clear_out(myself.doorways.config.content);
+		clear_out(myself.doorways.pilot.content);
+		clear_out(myself.doorways.sensors.content);
+		clear_out(myself.doorways.states.content);
+		clear_out(myself.doorways.map.content);
+		clear_out(myself.doorways.video.content);
+
 		myself.gui.element.hide_all();
 		myself.gui.element.minimize(myself.doorways.config,false);
 
