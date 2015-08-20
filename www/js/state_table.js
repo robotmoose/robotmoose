@@ -63,13 +63,14 @@ function state_table_t(doorway)
 	this.experiment.name.placeholder="Experiment Name";
 	this.experiment.name.className="form-control";
 	this.experiment.name.style.width="180px";
+	this.experiment.name.style.marginRight=10;
 	this.experiment.name.spellcheck=false;
 	this.experiment.name.onchange=function(event){myself.update_experiment_m();};
 	this.experiment.name.onkeydown=function(event){myself.update_experiment_m();};
 	this.experiment.name.onkeyup=function(event){myself.update_experiment_m();};
 	this.experiment.name.onkeypress=function(event){myself.update_experiment_m();};
 	this.update_experiment_m();
-	this.experiment.div.appendChild(this.experiment.name);
+	//this.experiment.div.appendChild(this.experiment.name);//fixme
 
 	this.experiment.glyph.className="glyphicon form-control-feedback glyphicon glyphicon-remove";
 	this.experiment.div.appendChild(this.experiment.glyph);
@@ -81,7 +82,6 @@ function state_table_t(doorway)
 	this.run_button.title_run="Click here to make this code execute.";
 	this.run_button.title=this.run_button.title_run;
 	this.run_button.title_stop="Click to stop this code.";
-	this.run_button.style.marginLeft=10;
 	this.run_button.onclick=function(event){myself.run_button_pressed_m();};
 	this.controls_div.appendChild(this.run_button);
 
@@ -114,11 +114,11 @@ state_table_t.prototype.download=function(robot_name)
 	this.run_button.disabled=false;
 	this.add_button.disabled=false;
 
-	var getURL = "experiments/"+this.experiment.name.value + "/code";
-	superstar_get(robot_name,getURL,function(obj)
+	//superstar_get(robot_name,"experiments/"+this.experiment.name.value+"/code",function(obj)//fixme
+	superstar_get(robot_name,"states",function(obj)//removeme
 	{
 		for(var key in obj)
-		myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
+			myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
 	});
 
 	this.update_states_m();
@@ -126,10 +126,12 @@ state_table_t.prototype.download=function(robot_name)
 
 state_table_t.prototype.upload=function(robot_name)
 {
+	console.log("did it!");
 	if(!robot_name)
 		return;
-	var setURL = "experiments/"+this.experiment.name.value + "/code";
-	superstar_set(robot_name,setURL,this.get_states());
+
+	//superstar_set(robot_name,"experiments/"+this.experiment.name.value+"/code",this.get_states());//fixme
+	superstar_set(robot_name,"states",this.get_states());//removeme
 }
 
 state_table_t.prototype.get_states=function()
