@@ -121,7 +121,7 @@ state_table_t.prototype.download=function(robot_name,experiment)
 
 	if(experiment)
 	{
-		superstar_get(robot_name,"experiments/"+experiment+"/code",function(obj)
+		superstar_get(robot_name+"/experiments/"+experiment+"/","code",function(obj)
 		{
 			for(var key in obj)
 				myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
@@ -134,7 +134,7 @@ state_table_t.prototype.download=function(robot_name,experiment)
 			console.log(obj);
 			myself.experiment.name.value=obj;
 
-			superstar_get(robot_name,"experiments/"+obj+"/code",function(obj)
+			superstar_get(robot_name+"/experiments/"+obj+"/","code",function(obj)
 			{
 				for(var key in obj)
 					myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
@@ -152,7 +152,7 @@ state_table_t.prototype.upload=function(robot_name)
 	if(!robot_name)
 		return;
 
-	superstar_set(robot_name,"experiments/"+this.experiment.name.value+"/code",this.get_states());
+	superstar_set(robot_name+"/experiments/"+this.experiment.name.value+"/","code",this.get_states());
 	superstar_set(robot_name,"active_experiment",this.experiment.name.value);
 }
 
