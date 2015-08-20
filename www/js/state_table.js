@@ -18,7 +18,7 @@ function state_table_t(doorway)
 	var myself=this;
 	this.doorway=doorway;
 	this.div=doorway.content;
-	console.log(this.doorway);
+	// console.log(this.doorway);
 
 	this.make_error_span=function () {
 		var errors=document.createElement("span");
