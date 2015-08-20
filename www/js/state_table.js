@@ -18,7 +18,6 @@ function state_table_t(doorway)
 	var myself=this;
 	this.doorway=doorway;
 	this.div=doorway.content;
-	console.log(this.doorway);
 
 	this.make_error_span=function () {
 		var errors=document.createElement("span");
@@ -230,6 +229,20 @@ state_table_t.prototype.create_entry=function(state,time,code)
 	if(!time)
 		time="";
 
+	var old_size=
+	{
+		body:
+		{
+			offsetWidth:parseInt(this.doorway.body.offsetWidth,10),
+			offsetHeight:parseInt(this.doorway.body.offsetHeight,10),
+			scrollHeight:parseInt(this.doorway.body.scrollHeight,10)
+		},
+		content:
+		{
+			scrollHeight:parseInt(this.doorway.content.scrollHeight,10)
+		}
+	};
+
 	var myself=this;
 	var entry={};
 	entry.drag_list=this.drag_list.create_entry();
@@ -241,6 +254,46 @@ state_table_t.prototype.create_entry=function(state,time,code)
 
 	if(this.run_button.value!="Run")
 		this.onstop_m();
+
+	var new_size=
+	{
+		body:
+		{
+			offsetWidth:parseInt(this.doorway.body.offsetWidth,10),
+			offsetHeight:parseInt(this.doorway.body.offsetHeight,10),
+			scrollHeight:parseInt(this.doorway.body.scrollHeight,10)
+		},
+		content:
+		{
+			scrollHeight:parseInt(this.doorway.content.scrollHeight,10)
+		}
+	};
+
+	var delta_size=
+	{
+		body:
+		{
+			offsetWidth:new_size.body.offsetWidth-old_size.body.offsetWidth,
+			offsetHeight:new_size.body.offsetHeight-old_size.body.offsetHeight,
+			scrollWidth:new_size.body.scrollWidth-old_size.body.scrollWidth,
+			scrollHeight:new_size.body.scrollHeight-old_size.body.scrollHeight
+		},
+		content:
+		{
+			scrollHeight:new_size.content.scrollHeight-old_size.content.scrollHeight
+		}
+	};
+
+	var size=
+	{
+		width:new_size.body.offsetWidth,
+		height:new_size.body.offsetHeight+delta_size.body.scrollHeight
+	};
+
+	if(old_size.content.scrollHeight!=new_size.content.scrollHeight)
+		this.doorway.resize(size);
+
+	this.doorway.body.scrollTop=this.doorway.body.scrollHeight;
 
 	return entry;
 }

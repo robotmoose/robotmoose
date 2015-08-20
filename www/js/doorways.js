@@ -210,11 +210,7 @@ doorways_t.prototype.create=function(title,pos)
 
 	doorway.resizer=new resizer_t(doorway.body,{min_size:{width:200,height:100}});
 
-	doorway.resize=function(size)
-	{
-		doorway.resizer.resize(size);
-		myself.move(doorway);
-	};
+	doorway.resize=function(size){doorway.resizer.resize(size);myself.move(doorway);};
 
 	this.activate(doorway);
 	this.move(doorway,pos);
@@ -468,6 +464,27 @@ doorways_t.prototype.constrain=function(doorway)
 		doorway.pos.y+=y_diff;
 	if(doorway.pos.y<this.offset_top())
 		doorway.pos.y=this.offset_top();
+
+	right=doorway.pos.x+width;
+	bottom=doorway.pos.y+height;
+
+	while(right>view_width)
+	{
+		doorway.resize({width:parseInt(doorway.body.offsetWidth,10)-1,
+			height:parseInt(doorway.body.offsetHeight,10)});
+		width=doorway.panel.offsetWidth;
+		right=doorway.pos.x+width;
+	}
+
+	while(bottom>view_height)
+	{
+		doorway.resize({width:parseInt(doorway.body.offsetWidth,10),
+			height:parseInt(doorway.body.offsetHeight-1,10)});
+		height=doorway.panel.offsetHeight;
+		bottom=doorway.pos.y+height;
+	}
+
+	console.log("Called");
 }
 
 doorways_t.prototype.offset_left=function()
@@ -491,6 +508,29 @@ doorways_t.prototype.offset_top=function()
 		offset=0;
 
 	return offset;
+}
+
+doorways_t.prototype.offset_width=function()
+{
+	var width=parseInt(this.element.offsetWidth);
+
+	if(!width)
+		width=0;
+
+	return width;
+}
+
+doorways_t.prototype.offset_height=function()
+{
+	var height=parseInt(this.element.offsetHeight);
+
+	if(!this.menu_bar)
+		height-=parseInt(this.menu.offsetHeight);
+
+	if(!height)
+		height=0;
+
+	return height;
 }
 
 doorways_t.prototype.update_zindicies=function()
