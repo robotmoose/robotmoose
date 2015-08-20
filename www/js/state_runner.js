@@ -14,23 +14,26 @@ function state_runner_t()
 	this.continue_timeout=null;
 	this.state_list=[];
 	this.kill=true;
+	this.state_start_time_ms=this.get_time_ms();
 	
-	this.VM_power={};
-	this.VM_sensors={};
+	this.VM_power={}; 
+	this.VM_sensors={}; 
+	this.VM_store={}; 
 }
 
 state_runner_t.prototype.run=function(state_table)
 {
+	if(!state_table)
+		return;
+	
+	// Clear out old state
 	this.state=null;
 	this.continue_state=null;
 	this.continue_timeout=null;
 	this.state_list=[];
 	this.kill=false;
-
-	if(!state_table)
-		return;
-
 	state_table.clear_prints();
+	this.VM_store={};
 
 	this.run_m(state_table);
 }
@@ -49,6 +52,11 @@ state_runner_t.prototype.stop=function(state_table)
 		this.VM_power.L=this.VM_power.R=0.0; // hacky!
 		if (this.onpilot) this.onpilot(this.VM_power);
 	}
+}
+
+// Utility function: return time in milliseconds
+state_runner_t.prototype.get_time_ms=function() {
+	return (new Date()).getTime();
 }
 
 // Look up this state in our state list, or return null if it's not listed
@@ -79,16 +87,25 @@ state_runner_t.prototype.run_m=function(state_table)
 	if(this.state==null)
 		this.state=this.state_list[0].name;
 
+	this.start_state(this.state);
+
 	var myself=this;
 	setTimeout(function(){myself.execute_m(state_table);},this.execution_interval);
 }
 
-// General utility: request a stop (put actual functionality into stop, above)
+// Request a stop (put actual functionality into stop, above)
 state_runner_t.prototype.stop_m=function(state_table)
 {
 	state_table.onstop_m();
 }
 
+
+// Called when beginning to execute a state (either first time, or when switching states)
+state_runner_t.prototype.start_state=function(state_name)
+{
+	console.log("Entering VM state "+state_name);
+	this.state_start_time_ms=this.get_time_ms();
+}
 
 // Inner code execution driver: prepare student-visible UI, and eval
 //  Returns the virtual machine object used to wrap user code
@@ -110,14 +127,21 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	VM.printed_text="";
 	VM.print=function(value) {
 		VM.printed_text+=value+"\n";
-		console.log(value+"\n");
+		// console.log(value+"\n");
 	};
 	VM.stop=function() { VM.state=null; }
 	
+	VM.time=this.get_time_ms() - this.state_start_time_ms;
+	
 	VM.sensors=this.VM_sensors;
 	VM.power=this.VM_power; 
+	VM.store=this.VM_store;
 	VM.power_original=JSON.stringify(VM.power); // hack for change detection
 	VM.robot={sensors:VM.sensors, power:VM.power};
+	
+	VM.drive=function(speed) { VM.power.L=VM.power.R=speed; };
+	VM.turnleft =function(speed) { VM.power.L=-speed; VM.power.R=+speed; };
+	VM.turnright=function(speed) { VM.power.L=+speed; VM.power.R=-speed; };
 
 // Basically eval user's code here
 	(new Function("with(this)\n{\n"+code+"\n}")).call(VM);
@@ -139,7 +163,7 @@ state_runner_t.prototype.execute_m=function(state_table)
 			if(!run_state)
 				throw("State \""+this.state+"\" not found!");
 
-			console.log("running state "+this.state);
+			// console.log("running state "+this.state);
 			state_table.set_active(this.state);
 
 			this.update_continue_m(state_table,run_state);
@@ -162,6 +186,7 @@ state_runner_t.prototype.execute_m=function(state_table)
 				
 				this.clear_continue_m();
 				this.state=VM.state;
+				this.start_state(VM.state);
 			}
 			
 			if (JSON.stringify(VM.power)!=VM.power_original)
