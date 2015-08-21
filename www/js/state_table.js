@@ -747,6 +747,7 @@ state_table_t.prototype.update_buttons_m=function(valid)
 	if(this.run_button.value!="Run")
 		this.onstop_m();
 }
+
 state_table_t.prototype.update_experiment_m=function()
 {
 	if(this.experiment.name.value.length == 0)

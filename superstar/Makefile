@@ -25,7 +25,7 @@ netbench_keepalive: netbench_keepalive.cpp
 
 clean:
 	- rm -f superstar
-
+	- rm -f superstar.exe
 
 # Windows make:
 #  cl superstar.cpp mongoose/mongoose.c /I. /Imongoose /EHsc /MT
