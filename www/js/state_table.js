@@ -634,10 +634,18 @@ state_table_t.prototype.remove_entry_m=function(entry)
 		if(this.entries[key]&&this.entries[key]===entry)
 		{
 			window.removeEventListener("click",this.entries[key].code_editor_event);
-			this.entries[key]=null;
+			this.entries[key]=undefined;
 			break;
 		}
 	}
+
+	var new_entries=[];
+
+	for(var key in this.entries)
+		if(this.entries[key])
+			new_entires.push(this.entries[key]);
+
+	this.entries=new_entires;
 
 	this.refresh_m();
 	this.update_states_m();
