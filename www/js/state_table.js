@@ -34,7 +34,8 @@ function state_table_t(doorway)
 	this.last_error_entry=null;
 
 	this.element=document.createElement("div");
-	this.drag_list=new drag_list_t(this.element);
+	this.drag_list_div=document.createElement("div");
+	this.drag_list=new drag_list_t(this.drag_list_div);
 	this.controls_div=document.createElement("div");
 	this.experiment=
 	{
@@ -55,6 +56,8 @@ function state_table_t(doorway)
 
 	this.element.style.width=640;
 	this.div.appendChild(this.element);
+
+	this.element.appendChild(this.drag_list_div);
 
 	this.element.appendChild(this.controls_div);
 
@@ -631,10 +634,18 @@ state_table_t.prototype.remove_entry_m=function(entry)
 		if(this.entries[key]&&this.entries[key]===entry)
 		{
 			window.removeEventListener("click",this.entries[key].code_editor_event);
-			this.entries[key]=null;
+			this.entries[key]=undefined;
 			break;
 		}
 	}
+
+	var new_entries=[];
+
+	for(var key in this.entries)
+		if(this.entries[key])
+			new_entires.push(this.entries[key]);
+
+	this.entries=new_entires;
 
 	this.refresh_m();
 	this.update_states_m();
