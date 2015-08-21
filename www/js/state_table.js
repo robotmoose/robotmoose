@@ -150,7 +150,6 @@ state_table_t.prototype.upload_with_check=function(robot_name,onupload)
 	superstar_get(robot_name+"/experiments/"+myself.experiment.name.value+"/","code",
 	function(obj)
 	{
-		console.log(obj);
 		if(myself.last_experiment&&obj&&obj.length>0&&myself.last_experiment!=myself.experiment.name.value)
 		{
 			myself.overwrite_modal.set_message("This will overwrite the non-empty experiment named \""+
