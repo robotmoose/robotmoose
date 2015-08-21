@@ -20,7 +20,7 @@ function state_table_t(doorway)
 	this.doorway=doorway;
 	this.overwrite_modal=new modal_yesno_t(this.doorway.parent_div,"Warning","");
 	this.div=doorway.content;
-	this.last_experiment=null;
+	this.last_experiment="testing";
 
 	this.make_error_span=function () {
 		var errors=document.createElement("span");
@@ -63,7 +63,7 @@ function state_table_t(doorway)
 	this.controls_div.appendChild(this.experiment.div);
 
 	this.experiment.name.type="text";
-	this.experiment.name.value="testing";
+	this.experiment.name.value=this.last_experiment;
 	this.experiment.name.placeholder="Experiment Name";
 	this.experiment.name.className="form-control";
 	this.experiment.name.style.width=240;
@@ -161,7 +161,7 @@ state_table_t.prototype.download=function(robot_name,skip_get_active,callback)
 		{
 			if(obj&&obj.length>0)
 			{
-				myself.experiment.name.value=obj;
+				myself.last_experiment=myself.experiment.name.value=obj;
 				myself.download_m(robot_name,callback);
 			}
 		});
@@ -450,6 +450,8 @@ state_table_t.prototype.download_m=function(robot_name,callback)
 
 	superstar_get(robot_name+"/experiments/"+this.experiment.name.value+"/","code",function(obj)
 	{
+		myself.last_active=myself.experiment.name.value;
+
 		for(var key in obj)
 			myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
 
