@@ -1,6 +1,5 @@
 windows api (doorways):
 	need:
-		-Automatically grow Y size of doorway when inner div is made longer.
 		-Ability to alert, changing color of titlebar and tab.
 
 	completely optional at this point:
@@ -13,19 +12,10 @@ achievements:
 		-Widget.
 		-Unlock animation.
 
-pictures:
-	how tos
-		-quizbots
-		-
-	hardware element icons
+book keeping:
+	-Documentation...
+	-Lesson plan audit.
+	-Instructional picture audit.
 
-lessons:
-	-basics
-		-blink led
-		-
-	-quizbot
-		-assembly
-		-
-	-tabula
-		-roomba
-		-
+superstar:
+	-delete bash script on the server that allows us to delete stuff on superstar (need authentication?)
