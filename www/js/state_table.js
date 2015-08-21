@@ -124,7 +124,11 @@ state_table_t.prototype.download_with_check=function(robot_name,skip_get_active,
 				{
 					myself.overwrite_modal.set_message("All unsaved changes to the experiment named \""+
 						myself.last_experiment+"\" will be lost. Proceed?");
-					myself.overwrite_modal.onok=function(){myself.download(robot_name,skip_get_active,ondownload);}
+					myself.overwrite_modal.onok=
+						function()
+						{
+							myself.download(robot_name,skip_get_active,ondownload);
+						}
 					myself.overwrite_modal.show();
 				}
 				else
@@ -143,8 +147,7 @@ state_table_t.prototype.download=function(robot_name,skip_get_active,callback)
 {
 	this.old_robot_name=robot_name;
 
-	for(var key in this.entries)
-		this.remove_entry(this.entries[key]);
+	this.clear();
 
 	if(!robot_name)
 		return;
@@ -244,12 +247,8 @@ state_table_t.prototype.clear_prints=function()
 	var entries=this.get_entries();
 
 	for(var key in entries)
-	{
 		if(entries[key])
-		{
 			entries[key].prints.textContent="";
-		}
-	}
 }
 
 state_table_t.prototype.show_prints=function(print_text,current_state)
@@ -440,6 +439,20 @@ state_table_t.prototype.run=function()
 	this.run_button.value="Stop";
 	this.run_button.title=this.run_button.title_stop;
 }
+
+state_table_t.prototype.clear=function()
+{
+	for(var key in this.entries)
+		this.remove_entry(this.entries[key]);
+
+	this.entries=[];
+}
+
+
+
+
+
+
 
 
 
