@@ -200,10 +200,12 @@ config_editor_t.prototype.download_m=function(robot_name)
 			else
 				console.log("Invalid tabula config: "+configs[key].type+"("+configs[key].args+");");
 		}
-		
+
 		// Finally finished downloading--fire onchange
 		if (myself.onchange)
 			myself.onchange(myself);
+
+		myself.refresh_m();
 	});
 }
 
