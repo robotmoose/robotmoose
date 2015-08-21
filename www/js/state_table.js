@@ -106,7 +106,7 @@ function state_table_t(doorway)
 	this.controls_div.appendChild(this.add_button);
 }
 
-state_table_t.prototype.download=function(robot_name,experiment,callback)
+state_table_t.prototype.download=function(robot_name,skip_get_active,callback)
 {
 	this.old_robot_name=robot_name;
 
@@ -118,32 +118,19 @@ state_table_t.prototype.download=function(robot_name,experiment,callback)
 
 	var myself=this;
 
-	if(experiment)
+	if(skip_get_active)
 	{
-		superstar_get(robot_name+"/experiments/"+experiment+"/","code",function(obj)
-		{
-			for(var key in obj)
-				myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
-
-			if(callback)
-				callback();
-		});
+		myself.download_m(robot_name,callback);
 	}
 	else
 	{
 		superstar_get(robot_name,"active_experiment",function(obj)
 		{
 			if(obj&&obj.length>0)
-				myself.experiment.name.value=obj;
-
-			superstar_get(robot_name+"/experiments/"+obj+"/","code",function(obj)
 			{
-				for(var key in obj)
-					myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
-
-				if(callback)
-					callback();
-			});
+				myself.experiment.name.value=obj;
+				myself.download_m(robot_name,callback);
+			}
 		});
 	}
 
@@ -384,7 +371,19 @@ state_table_t.prototype.set_active=function(state)
 
 
 
+state_table_t.prototype.download_m=function(robot_name,callback)
+{
+	var myself=this;
 
+	superstar_get(robot_name+"/experiments/"+this.experiment.name.value+"/","code",function(obj)
+	{
+		for(var key in obj)
+			myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
+
+		if(callback)
+			callback();
+	});
+}
 
 state_table_t.prototype.run_button_pressed_m=function()
 {
@@ -412,8 +411,7 @@ state_table_t.prototype.load_button_pressed_m=function()
 
 	this.onstop_m();
 
-	this.download(this.old_robot_name,this.experiment.name.value,
-		function(){myself.upload(myself.old_robot_name);});
+	this.download(this.old_robot_name,true,function(){myself.upload(myself.old_robot_name);});
 }
 
 state_table_t.prototype.onrun_m=function()
