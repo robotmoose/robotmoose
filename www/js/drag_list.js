@@ -84,11 +84,17 @@ drag_list_t.prototype.remove_entry=function(entry)
 {
 	if(entry)
 	{
+		console.log("drag_list_t::remove_entry");
+
 		for(var key in this.entries)
 		{
 			if(this.entries[key]&&this.entries[key]===entry)
 			{
 				this.ul.removeChild(this.entries[key].li);
+
+				if(this.entries[key].onremove)
+					this.entries[key].onremove(entry);
+
 				this.entries[key]=undefined;
 				break;
 			}

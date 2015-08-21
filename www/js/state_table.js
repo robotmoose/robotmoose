@@ -421,6 +421,8 @@ state_table_t.prototype.remove_entry=function(entry)
 		return;
 
 	this.drag_list.remove_entry(entry.drag_list);
+
+	console.log("state_table_t::remove_entry_m");
 }
 
 state_table_t.prototype.set_active=function(state)
@@ -651,15 +653,17 @@ state_table_t.prototype.remove_entry_m=function(entry)
 
 	for(var key in this.entries)
 		if(this.entries[key])
-			new_entires.push(this.entries[key]);
+			new_entries.push(this.entries[key]);
 
-	this.entries=new_entires;
+	this.entries=new_entries;
 
 	this.refresh_m();
 	this.update_states_m();
 
 	if(this.run_button.value!="Run")
 		this.onstop_m();
+
+	console.log("state_table_t::remove_entry_m");
 }
 
 state_table_t.prototype.update_states_m=function()
