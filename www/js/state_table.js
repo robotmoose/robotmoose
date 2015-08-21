@@ -34,7 +34,8 @@ function state_table_t(doorway)
 	this.last_error_entry=null;
 
 	this.element=document.createElement("div");
-	this.drag_list=new drag_list_t(this.element);
+	this.drag_list_div=document.createElement("div");
+	this.drag_list=new drag_list_t(this.drag_list_div);
 	this.controls_div=document.createElement("div");
 	this.experiment=
 	{
@@ -55,6 +56,8 @@ function state_table_t(doorway)
 
 	this.element.style.width=640;
 	this.div.appendChild(this.element);
+
+	this.element.appendChild(this.drag_list_div);
 
 	this.element.appendChild(this.controls_div);
 
