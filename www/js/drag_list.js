@@ -84,23 +84,18 @@ drag_list_t.prototype.remove_entry=function(entry)
 {
 	if(entry)
 	{
+		if(entry.onremove)
+			entry.onremove(entry);
+
 		for(var key in this.entries)
 		{
 			if(this.entries[key]&&this.entries[key]===entry)
 			{
 				this.ul.removeChild(this.entries[key].li);
-				this.entries[key]=undefined;
+				this.entries[key]=null;
 				break;
 			}
 		}
-
-		var new_entries=[];
-
-		for(var key in this.entries)
-			if(this.entries[key])
-				new_entries.push(this.entries[key]);
-
-		this.entries=new_entries;
 	}
 }
 
