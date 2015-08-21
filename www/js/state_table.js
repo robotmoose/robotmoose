@@ -307,6 +307,14 @@ state_table_t.prototype.get_entries=function()
 			return lhs.drag_list.li.offsetTop-rhs.drag_list.li.offsetTop;
 	});
 
+	var entries=[];
+
+	for(var key in this.entries)
+		if(this.entries[key])
+			entries.push(this.entries[key]);
+
+	this.entries=entries;
+
 	return this.entries;
 }
 
