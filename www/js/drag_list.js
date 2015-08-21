@@ -54,6 +54,12 @@ drag_list_t.prototype.create_entry=function()
 	entry.move_handle.title="Drag here to move this item around in the list";
 	entry.move_handle.style.marginRight=10;
 	entry.move_handle.style.cursor="move";
+	entry.ondrag=null;
+	entry.move_handle.onmousedown=function()
+	{
+		if(entry.ondrag)
+			entry.ondrag();
+	};
 	entry.table.left.appendChild(entry.move_handle);
 
 	entry.table.center.appendChild(entry.content);

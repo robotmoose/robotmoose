@@ -280,6 +280,7 @@ state_table_t.prototype.create_entry=function(state,time,code)
 	var myself=this;
 	var entry={};
 	entry.drag_list=this.drag_list.create_entry();
+	entry.drag_list.ondrag=function(){myself.onstop_m();};
 	entry.drag_list.state_table_t=entry;
 	entry.drag_list.onremove=function(entry){myself.remove_entry_m(entry.state_table_t);};
 	this.create_entry_m(entry,state,time,code);
