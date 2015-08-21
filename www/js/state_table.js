@@ -122,7 +122,7 @@ state_table_t.prototype.download_with_check=function(robot_name,skip_get_active,
 			{
 				if(JSON.stringify(obj)!=JSON.stringify(myself.get_states()))
 				{
-					myself.overwrite_modal.set_message("All unsaved changes to \""+
+					myself.overwrite_modal.set_message("All unsaved changes to the experiment named \""+
 						myself.last_experiment+"\" will be lost. Proceed?");
 					myself.overwrite_modal.onok=function(){myself.download(robot_name,skip_get_active,ondownload);}
 					myself.overwrite_modal.show();
