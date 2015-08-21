@@ -21,21 +21,28 @@ function state_runner_t()
 	this.VM_store={};
 }
 
-state_runner_t.prototype.run=function(state_table)
+state_runner_t.prototype.run=function(robot_name,state_table)
 {
 	if(!state_table)
 		return;
 
-	// Clear out old state
-	this.state=null;
-	this.continue_state=null;
-	this.continue_timeout=null;
-	this.state_list=[];
-	this.kill=false;
-	state_table.clear_prints();
-	this.VM_store={};
+	var myself=this;
 
-	this.run_m(state_table);
+	state_table.upload_with_check(robot_name,function()
+	{
+		state_table.run();
+
+		// Clear out old state
+		myself.state=null;
+		myself.continue_state=null;
+		myself.continue_timeout=null;
+		myself.state_list=[];
+		myself.kill=false;
+		state_table.clear_prints();
+		myself.VM_store={};
+
+		myself.run_m(state_table);
+	});
 }
 
 state_runner_t.prototype.stop=function(state_table)

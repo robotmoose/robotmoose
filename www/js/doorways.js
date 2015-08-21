@@ -157,7 +157,8 @@ doorways_t.prototype.create=function(title,pos,tooltip)
 			x:0,
 			y:0
 		},
-		z:0
+		z:0,
+		parent_div:this.element
 	};
 
 	doorway.tab.li.setAttribute("role","presentation");

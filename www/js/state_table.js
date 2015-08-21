@@ -18,7 +18,9 @@ function state_table_t(doorway)
 	var myself=this;
 	this.old_robot_name=null;
 	this.doorway=doorway;
+	this.overwrite_modal=new modal_yesno_t(this.doorway.parent_div,"Warning","");
 	this.div=doorway.content;
+	this.last_experiment=null;
 
 	this.make_error_span=function () {
 		var errors=document.createElement("span");
@@ -138,13 +140,50 @@ state_table_t.prototype.download=function(robot_name,skip_get_active,callback)
 	this.update_buttons_m();
 }
 
-state_table_t.prototype.upload=function(robot_name)
+state_table_t.prototype.upload_with_check=function(robot_name,onupload)
 {
 	if(!robot_name)
 		return;
 
-	superstar_set(robot_name+"/experiments/"+this.experiment.name.value+"/","code",this.get_states());
-	superstar_set(robot_name,"active_experiment",this.experiment.name.value);
+	var myself=this;
+
+	superstar_get(robot_name+"/experiments/"+myself.experiment.name.value+"/","code",
+	function(obj)
+	{
+		console.log(obj);
+		if(myself.last_experiment&&obj&&obj.length>0&&myself.last_experiment!=myself.experiment.name.value)
+		{
+			myself.overwrite_modal.set_message("This will overwrite the non-empty experiment named \""+
+				myself.experiment.name.value+"\". Proceed?");
+			myself.overwrite_modal.onok=function(){myself.upload(robot_name,onupload);}
+			myself.overwrite_modal.show();
+		}
+		else
+		{
+			myself.upload(robot_name,onupload);
+		}
+	});
+}
+
+state_table_t.prototype.upload=function(robot_name,onupload)
+{
+	if(!robot_name)
+		return;
+
+	var myself=this;
+
+	superstar_set(robot_name+"/experiments/"+this.experiment.name.value+"/","code",this.get_states(),
+	function(obj)
+	{
+		superstar_set(robot_name,"active_experiment",myself.experiment.name.value,
+		function(obj)
+		{
+			myself.last_experiment=myself.experiment.name.value;
+
+			if(onupload)
+				onupload();
+		});
+	});
 }
 
 state_table_t.prototype.get_states=function()
@@ -366,7 +405,11 @@ state_table_t.prototype.set_active=function(state)
 	}
 }
 
-
+state_table_t.prototype.run=function()
+{
+	this.run_button.value="Stop";
+	this.run_button.title=this.run_button.title_stop;
+}
 
 
 
@@ -418,9 +461,6 @@ state_table_t.prototype.onrun_m=function()
 {
 	if(this.onrun)
 		this.onrun(this);
-
-	this.run_button.value="Stop";
-	this.run_button.title=this.run_button.title_stop;
 }
 
 state_table_t.prototype.onstop_m=function()

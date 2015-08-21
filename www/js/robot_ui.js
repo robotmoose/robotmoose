@@ -239,8 +239,7 @@ robot_ui_t.prototype.create_widgets=function()
 		if(myself.robot_name)
 		{
 			myself.state_runner.VM_power=myself.widgets.pilot.pilot.power;
-			myself.widgets.states.upload(myself.robot_name);
-			myself.state_runner.run(myself.widgets.states);
+			myself.state_runner.run(myself.robot_name,myself.widgets.states);
 		}
 	}
 	this.widgets.states.onstop=function()
