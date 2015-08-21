@@ -1050,6 +1050,7 @@ int main(int argc, char *argv[])
 		else if (0 == strcmp(argv[argi], "--sensor")) sensors += argv[++argi]+std::string("\n");
 		else if (0 == strcmp(argv[argi], "--trim")) LRtrim = atof(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--debug")) debug = true;
+		else if (0 == strcmp(argv[argi], "--dev")) superstarURL = "http://test.robotmoose.com" ;
 		else if (0 == strcmp(argv[argi], "--delay_ms")) delay_ms = atoi(argv[++argi]);
 		else if (0 == strcmp(argv[argi], "--sim")) { // no Arduino, for debugging
 			sim = true;
