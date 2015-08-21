@@ -108,6 +108,37 @@ function state_table_t(doorway)
 	this.controls_div.appendChild(this.add_button);
 }
 
+state_table_t.prototype.download_with_check=function(robot_name,skip_get_active,ondownload)
+{
+	if(!robot_name)
+		return;
+
+	var myself=this;
+
+	if(myself.last_experiment)
+	{
+		superstar_get(robot_name+"/experiments/"+myself.last_experiment+"/","code",
+			function(obj)
+			{
+				if(JSON.stringify(obj)!=JSON.stringify(myself.get_states()))
+				{
+					myself.overwrite_modal.set_message("All unsaved changes to \""+
+						myself.last_experiment+"\" will be lost. Proceed?");
+					myself.overwrite_modal.onok=function(){myself.download(robot_name,skip_get_active,ondownload);}
+					myself.overwrite_modal.show();
+				}
+				else
+				{
+					myself.download(robot_name,skip_get_active,ondownload);
+				}
+			});
+	}
+	else
+	{
+		myself.download(robot_name,skip_get_active,ondownload);
+	}
+}
+
 state_table_t.prototype.download=function(robot_name,skip_get_active,callback)
 {
 	this.old_robot_name=robot_name;
@@ -148,20 +179,20 @@ state_table_t.prototype.upload_with_check=function(robot_name,onupload)
 	var myself=this;
 
 	superstar_get(robot_name+"/experiments/"+myself.experiment.name.value+"/","code",
-	function(obj)
-	{
-		if(myself.last_experiment&&obj&&obj.length>0&&myself.last_experiment!=myself.experiment.name.value)
+		function(obj)
 		{
-			myself.overwrite_modal.set_message("This will overwrite the non-empty experiment named \""+
-				myself.experiment.name.value+"\". Proceed?");
-			myself.overwrite_modal.onok=function(){myself.upload(robot_name,onupload);}
-			myself.overwrite_modal.show();
-		}
-		else
-		{
-			myself.upload(robot_name,onupload);
-		}
-	});
+			if(myself.last_experiment&&obj&&obj.length>0&&myself.last_experiment!=myself.experiment.name.value)
+			{
+				myself.overwrite_modal.set_message("This will overwrite the non-empty experiment named \""+
+					myself.experiment.name.value+"\". Proceed?");
+				myself.overwrite_modal.onok=function(){myself.upload(robot_name,onupload);}
+				myself.overwrite_modal.show();
+			}
+			else
+			{
+				myself.upload(robot_name,onupload);
+			}
+		});
 }
 
 state_table_t.prototype.upload=function(robot_name,onupload)
@@ -453,7 +484,11 @@ state_table_t.prototype.load_button_pressed_m=function()
 
 	this.onstop_m();
 
-	this.download(this.old_robot_name,true,function(){myself.upload(myself.old_robot_name);});
+	this.download_with_check(this.old_robot_name,true,
+		function()
+		{
+			myself.upload(myself.old_robot_name);
+		});
 }
 
 state_table_t.prototype.onrun_m=function()

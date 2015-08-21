@@ -28,21 +28,22 @@ state_runner_t.prototype.run=function(robot_name,state_table)
 
 	var myself=this;
 
-	state_table.upload_with_check(robot_name,function()
-	{
-		state_table.run();
+	state_table.upload_with_check(robot_name,
+		function()
+		{
+			state_table.run();
 
-		// Clear out old state
-		myself.state=null;
-		myself.continue_state=null;
-		myself.continue_timeout=null;
-		myself.state_list=[];
-		myself.kill=false;
-		state_table.clear_prints();
-		myself.VM_store={};
+			// Clear out old state
+			myself.state=null;
+			myself.continue_state=null;
+			myself.continue_timeout=null;
+			myself.state_list=[];
+			myself.kill=false;
+			state_table.clear_prints();
+			myself.VM_store={};
 
-		myself.run_m(state_table);
-	});
+			myself.run_m(state_table);
+		});
 }
 
 state_runner_t.prototype.stop=function(state_table)
