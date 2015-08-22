@@ -11,10 +11,12 @@
 */
 
 #define hall_pin  6
-#define led_pin   9
+#define led_pin   13
 
 void setup() {
     Serial.begin(57600);
+    //pinMode(hall_pin, INPUT);
+    pinMode(led_pin, OUTPUT);
     digitalWrite(hall_pin,HIGH); // pullup resistor is powered
     pinMode(hall_pin,INPUT_PULLUP); // enable pullup and input
 }
@@ -22,12 +24,12 @@ void setup() {
 void loop() {
     if (digitalRead(hall_pin)) {
       Serial.println("1");
-      analogWrite(led_pin,800);
+      digitalWrite(led_pin,HIGH);
       //Serial.println(analogRead(A1));
     }
     else {
       Serial.println("0");
-      analogWrite(led_pin,0);
+      digitalWrite(led_pin,LOW);
       //Serial.println(analogRead(A1));
     //delay(50);
     }
