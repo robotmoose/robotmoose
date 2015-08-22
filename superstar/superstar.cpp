@@ -313,7 +313,7 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 
   if(remote_ip=="127.0.0.1")
   {
-		std::cout<<"Local IP detected, attempting to get remote..."<<std::flush;
+		// std::cout<<"Local IP detected, attempting to get remote..."<<std::flush;
 
 		for(int ii=0;ii<conn->num_headers;++ii)
 		{
@@ -325,8 +325,8 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 			}
 		}
 
-		if(remote_ip=="127.0.0.1")
-			std::cout<<"failed."<<std::endl;
+		// if(remote_ip=="127.0.0.1")
+		//	std::cout<<"failed."<<std::endl;
   }
 
   printf("Incoming request: client %s:%d, URI %s\n",remote_ip.c_str(),conn->remote_port,conn->uri);
@@ -453,11 +453,11 @@ void *thread_code(void* data)
 				try
 				{
 					superstar_db.save(backup_filename);
-					std::cout<<"Saved backup file \""+backup_filename+"\"."<<std::endl;
+					// std::cout<<"Saved backup file \""+backup_filename+"\"."<<std::endl;
 				}
 				catch(std::exception& error)
 				{
-					std::cout<<error.what()<<std::endl;
+					std::cout<<"Error saving superstar DB backup file: "<<error.what()<<std::endl;
 				}
 
 				old_time=new_time;
