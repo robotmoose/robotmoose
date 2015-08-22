@@ -151,27 +151,30 @@ function skip_whitespace(str,col,line)
 
 function validate_robot_name(robot_name,on_ok,on_notok)
 {
-	var split=robot_name.split("/");
-
-	if(split.length==2)
+	if(robot_name)
 	{
-		var school=split[0];
-		var robot=split[1];
+		var split=robot_name.split("/");
 
-		superstar_sub("/superstar/.",
-			function(obj)
-			{
-				if(array_find(obj,school))
-					superstar_sub("/superstar/"+school,
-						function(obj)
-						{
-							if(array_find(obj,robot))
-								if(on_ok)
-									on_ok();
-						});
-			});
+		if(split.length==2)
+		{
+			var school=split[0];
+			var robot=split[1];
 
-		return;
+			superstar_sub("/superstar/.",
+				function(obj)
+				{
+					if(array_find(obj,school))
+						superstar_sub("/superstar/"+school,
+							function(obj)
+							{
+								if(array_find(obj,robot))
+									if(on_ok)
+										on_ok();
+							});
+				});
+
+			return;
+		}
 	}
 
 	if(on_notok)
