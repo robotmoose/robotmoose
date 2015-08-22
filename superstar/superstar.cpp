@@ -204,7 +204,14 @@ public:
 		if(path.size()>0&&path[path.size()-1]!='/')
 			path+="/";
 
-		return db[path];
+		db_t::iterator iter=db.find(path);
+		if (iter!=db.end()) {
+			return (*iter).second; // i.e., db[path];
+		}
+		else {
+			static const std::string empty="";
+			return empty;
+		}
 	}
 
 	/**
