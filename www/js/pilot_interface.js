@@ -181,6 +181,32 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	this.drive_power.value="40%";
 	p.appendChild(this.drive_power);
 	
+	//Make pilot auth box 
+	var p_auth=document.createElement("p");
+	p_auth.innerHTML="Authentication Code: ";
+	this.div.appendChild(p_auth);
+	this.pilot_auth=document.createElement("input");
+	this.pilot_auth.type="password";
+	this.pilot_auth.size=20;
+	this.drive_power.placeholder="Enter pilot auth code";
+	this.drive_power.title="Enter pilot auth code here";
+	p_auth.appendChild(this.pilot_auth);
+	
+	var p_auth_cb_p=document.createElement("p");
+	p_auth_cb_p.innerHTML="Show authentication code: ";
+	this.div.appendChild(p_auth_cb_p);
+	this.pilot_auth_cb=document.createElement("input");
+	this.pilot_auth_cb.type="checkbox";
+	this.pilot_auth_cb.title="Show pilot auth code";
+	this.pilot_auth_cb.onclick=function()
+	{
+		if (myself.pilot_auth_cb.checked==true)
+			myself.pilot_auth.type="text";
+		else
+			myself.pilot_auth.type="password";
+	}
+	p_auth_cb_p.appendChild(this.pilot_auth_cb);
+	
 	// Mouse event handlers for arrow div
 	var myself=this;
 	this.mouse_down=0;
