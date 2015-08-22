@@ -148,3 +148,32 @@ function skip_whitespace(str,col,line)
 
 	return {str:str,col:col,line:line};
 }
+
+function validate_robot_name(robot_name,on_ok,on_notok)
+{
+	var split=robot_name.split("/");
+
+	if(split.length==2)
+	{
+		var school=split[0];
+		var robot=split[1];
+
+		superstar_sub("/superstar/.",
+			function(obj)
+			{
+				if(array_find(obj,school))
+					superstar_sub("/superstar/"+school,
+						function(obj)
+						{
+							if(array_find(obj,robot))
+								if(on_ok)
+									on_ok();
+						});
+			});
+
+		return;
+	}
+
+	if(on_notok)
+		on_notok();
+}
