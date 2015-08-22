@@ -42,7 +42,7 @@ function state_table_t(doorway)
 		div:document.createElement("div"),
 		name:document.createElement("input"),
 		glyph:document.createElement("span")
-	}
+	};
 	this.run_button=document.createElement("input");
 	this.load_button=document.createElement("input");
 	this.add_button=document.createElement("input");
@@ -422,7 +422,7 @@ state_table_t.prototype.remove_entry=function(entry)
 
 	this.drag_list.remove_entry(entry.drag_list);
 
-	console.log("state_table_t::remove_entry_m");
+	console.log("state_table_t::remove_entry");
 }
 
 state_table_t.prototype.set_active=function(state)
@@ -455,10 +455,7 @@ state_table_t.prototype.run=function()
 
 state_table_t.prototype.clear=function()
 {
-	for(var key in this.entries)
-		this.remove_entry(this.entries[key]);
-
-	this.entries=[];
+	this.drag_list.clear();
 }
 
 
