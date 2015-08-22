@@ -6,3 +6,5 @@ sudo chown -R no_priv superstar/db.bak
 sudo chgrp -R no_priv superstar/db.bak
 sudo chown -R no_priv superstar/backups
 sudo chgrp -R no_priv superstar/backups
+sudo chown -R no_priv superstar/logs
+sudo chgrp -R no_priv superstar/logs

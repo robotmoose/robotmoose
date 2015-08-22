@@ -18,6 +18,14 @@ function drag_list_t(div)
 
 drag_list_t.prototype.get_entries=function()
 {
+	var new_entries=[];
+
+	for(var key in this.entries)
+		if(this.entries[key])
+			new_entries.push(this.entries[key]);
+
+	this.entries=new_entries;
+
 	this.entries.sort(function(lhs,rhs)
 	{
 		if(lhs&&rhs)
@@ -25,6 +33,16 @@ drag_list_t.prototype.get_entries=function()
 	});
 
 	return this.entries;
+}
+
+drag_list_t.prototype.clear=function()
+{
+	var entries=this.get_entries();
+
+	for(var key in entries)
+		this.remove_entry(entries[key]);
+
+	this.entries=[];
 }
 
 drag_list_t.prototype.create_entry=function()
@@ -86,27 +104,23 @@ drag_list_t.prototype.remove_entry=function(entry)
 	{
 		console.log("drag_list_t::remove_entry");
 
-		for(var key in this.entries)
+		var entries=this.get_entries();
+
+		for(var key in entries)
 		{
-			if(this.entries[key]&&this.entries[key]===entry)
+			if(entries[key]&&entries[key]===entry)
 			{
-				this.ul.removeChild(this.entries[key].li);
+				this.ul.removeChild(entries[key].li);
 
-				if(this.entries[key].onremove)
-					this.entries[key].onremove(entry);
+				if(entries[key].onremove)
+					entries[key].onremove(entry);
 
-				this.entries[key]=undefined;
+				entries[key]=undefined;
 				break;
 			}
 		}
 
-		var new_entries=[];
-
-		for(var key in this.entries)
-			if(this.entries[key])
-				new_entries.push(this.entries[key]);
-
-		this.entries=new_entries;
+		this.get_entries();
 	}
 }
 

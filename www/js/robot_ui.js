@@ -34,16 +34,18 @@ function robot_ui_t(div)
 	this.create_gui();
 
 	var options=parse_uri(location.search);
+	var myself=this;
 
-	if(options.robot)
-	{
-		this.robot_name=options.robot;
-		this.connect_menu.onconnect(this.robot_name);
-	}
-	else
-	{
-		this.connect_menu.show();
-	}
+	validate_robot_name(options.robot,
+		function()
+		{
+			myself.robot_name=options.robot;
+			myself.connect_menu.onconnect(myself.robot_name);
+		},
+		function()
+		{
+			myself.connect_menu.show();
+		});
 }
 
 robot_ui_t.prototype.clone=function(to,from,setting)

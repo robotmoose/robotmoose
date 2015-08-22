@@ -204,7 +204,14 @@ public:
 		if(path.size()>0&&path[path.size()-1]!='/')
 			path+="/";
 
-		return db[path];
+		db_t::iterator iter=db.find(path);
+		if (iter!=db.end()) {
+			return (*iter).second; // i.e., db[path];
+		}
+		else {
+			static const std::string empty="";
+			return empty;
+		}
 	}
 
 	/**
@@ -306,20 +313,20 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 
   if(remote_ip=="127.0.0.1")
   {
-		std::cout<<"Local IP detected, attempting to get remote..."<<std::flush;
+		// std::cout<<"Local IP detected, attempting to get remote..."<<std::flush;
 
 		for(int ii=0;ii<conn->num_headers;++ii)
 		{
 			if(std::string(conn->http_headers[ii].name)=="X-Forwarded-For")
 			{
 				remote_ip=conn->http_headers[ii].value;
-				std::cout<<"success, X-Forwarded-For header found."<<std::endl;
+				// std::cout<<"success, X-Forwarded-For header found."<<std::endl;
 				break;
 			}
 		}
 
-		if(remote_ip=="127.0.0.1")
-			std::cout<<"failed."<<std::endl;
+		// if(remote_ip=="127.0.0.1")
+		//	std::cout<<"failed."<<std::endl;
   }
 
   printf("Incoming request: client %s:%d, URI %s\n",remote_ip.c_str(),conn->remote_port,conn->uri);
@@ -446,11 +453,11 @@ void *thread_code(void* data)
 				try
 				{
 					superstar_db.save(backup_filename);
-					std::cout<<"Saved backup file \""+backup_filename+"\"."<<std::endl;
+					// std::cout<<"Saved backup file \""+backup_filename+"\"."<<std::endl;
 				}
 				catch(std::exception& error)
 				{
-					std::cout<<error.what()<<std::endl;
+					std::cout<<"Error saving superstar DB backup file: "<<error.what()<<std::endl;
 				}
 
 				old_time=new_time;
