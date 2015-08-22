@@ -320,7 +320,7 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 			if(std::string(conn->http_headers[ii].name)=="X-Forwarded-For")
 			{
 				remote_ip=conn->http_headers[ii].value;
-				std::cout<<"success, X-Forwarded-For header found."<<std::endl;
+				// std::cout<<"success, X-Forwarded-For header found."<<std::endl;
 				break;
 			}
 		}
