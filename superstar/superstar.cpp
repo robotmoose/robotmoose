@@ -171,7 +171,29 @@ public:
 		if(path.size()>0&&path[path.size()-1]!='/')
 			path+="/";
 
-		db[path]=new_value;
+		if(path.size()==0)
+			path+="/";
+
+		if(new_value=="")
+		{
+			std::cout<<"Deleting entry \""<<path.substr(0,path.size()-1)<<"\"...";
+			db_t::iterator iter=db.find(path);
+
+			if(iter!=db.end())
+			{
+				std::cout<<"success."<<std::endl;
+				db.erase(iter);
+			}
+			else
+			{
+				std::cout<<"fail (does not exist)."<<std::endl;
+			}
+		}
+		else
+		{
+			std::cout<<"Setting entry "<<path.substr(0,path.size()-1)<<" to "<<new_value<<std::endl;
+			db[path]=new_value;
+		}
 	}
 
 	/**

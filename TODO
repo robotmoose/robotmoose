@@ -16,6 +16,3 @@ book keeping:
 	-Documentation...
 	-Lesson plan audit.
 	-Instructional picture audit.
-
-superstar:
-	-delete bash script on the server that allows us to delete stuff on superstar (need authentication?)
