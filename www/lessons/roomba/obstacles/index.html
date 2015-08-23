@@ -175,31 +175,33 @@
 				<h1>Roomba Motors</h1>
 			</div>
 			<center>
-				<table data-toggle="table">
-					<tr>
-						<td style="vertical-align:top;height:100%;">
-							<div id="code"></div>
-						</td>
-						<td style="vertical-align:top;">
-							<div id="container" style="border:1px solid #000000;"></div>
-						</td>
-					</tr>
-					<tr>
-						<td style="vertical-align:top;height:100%;">
-							<input type="button" class="btn btn-sm btn-primary" id="verify" value="Verify" onclick="verify();"/>
-							<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();"  title="[alt-shift-r]" accesskey="r"  />
-							<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
-							<input type="button" class="btn btn-sm btn-primary" id="reset" value="Reset" onclick="reset();"/>
-						</td>
-						<td style="vertical-align:top;">
-							Left: <span id="show_left"></span>
-								<input type="range" id="drive_left" min="-500" max="500" value="0" oninput="drive_update();"/>
-							Right: <span id="show_right"></span>
-								<input type="range"id="drive_right" min="-500" max="500" value="0" oninput="drive_update();"/><br/>
-							<p id="status"></p>
-						</td>
-					</tr>
-				</table>
+				<div class="nohighlight">
+					<table data-toggle="table">
+						<tr>
+							<td style="vertical-align:top;height:100%;">
+								<div id="code"></div>
+							</td>
+							<td style="vertical-align:top;">
+								<div id="container" style="border:1px solid #000000;"></div>
+							</td>
+						</tr>
+						<tr>
+							<td style="vertical-align:top;height:100%;">
+								<input type="button" class="btn btn-sm btn-primary" id="verify" value="Verify" onclick="verify();"/>
+								<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();"  title="[alt-shift-r]" accesskey="r"  />
+								<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
+								<input type="button" class="btn btn-sm btn-primary" id="reset" value="Reset" onclick="reset();"/>
+							</td>
+							<td style="vertical-align:top;">
+								Left: <span id="show_left"></span>
+									<input type="range" id="drive_left" min="-500" max="500" value="0" oninput="drive_update();"/>
+								Right: <span id="show_right"></span>
+									<input type="range"id="drive_right" min="-500" max="500" value="0" oninput="drive_update();"/><br/>
+								<p id="status"></p>
+							</td>
+						</tr>
+					</table>
+				</div>
 			</center>
 
 		</div>

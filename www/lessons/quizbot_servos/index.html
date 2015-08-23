@@ -147,29 +147,31 @@
 				<h1>Quizbot Servos</h1>
 			</div>
 			<center>
-				<table data-toggle="table">
-					<tr>
-						<td style="vertical-align:top;height:100%;">
-							<div id="code"></div>
-						</td>
-						<td style="vertical-align:top;">
-							<div id="container" style="border:1px solid #000000;"></div>
-						</td>
-					</tr>
-					<tr>
-						<td style="vertical-align:top;height:100%;">
-							<input type="button" class="btn btn-sm btn-primary" id="verify" value="Verify" onclick="verify();"/>
-							<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();"  title="[alt-shift-r]" accesskey="r"  />
-							<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
-						</td>
-						<td style="vertical-align:top;">
-							Body: <span id="show_twist"></span>
-								<input type="range" id="twist" min="0" max="180" value="90" oninput="twist_update();"/>
-							Neck: <span id="show_nod"></span>
-								<input type="range"id="nod" min="0" max="180" value="40" oninput="nod_update();"/><br/>
-						</td>
-					</tr>
-				</table>
+				<div class="nohighlight">
+					<table data-toggle="table">
+						<tr>
+							<td style="vertical-align:top;height:100%;">
+								<div id="code"></div>
+							</td>
+							<td style="vertical-align:top;">
+								<div id="container" style="border:1px solid #000000;"></div>
+							</td>
+						</tr>
+						<tr>
+							<td style="vertical-align:top;height:100%;">
+								<input type="button" class="btn btn-sm btn-primary" id="verify" value="Verify" onclick="verify();"/>
+								<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();"  title="[alt-shift-r]" accesskey="r"  />
+								<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
+							</td>
+							<td style="vertical-align:top;">
+								Body: <span id="show_twist"></span>
+									<input type="range" id="twist" min="0" max="180" value="90" oninput="twist_update();"/>
+								Neck: <span id="show_nod"></span>
+									<input type="range"id="nod" min="0" max="180" value="40" oninput="nod_update();"/><br/>
+							</td>
+						</tr>
+					</table>
+				</div>
 			</center>
 
 			<div class="well">
