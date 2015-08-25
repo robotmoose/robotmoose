@@ -17,4 +17,10 @@ std::string to_lower(std::string str);
 
 std::string strip_whitespace(std::string str);
 
+bool to_bool(const std::string& str);
+
+int to_int(const std::string& str);
+
+double to_double(const std::string& str);
+
 #endif

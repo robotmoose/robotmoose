@@ -6,10 +6,21 @@
 #include "ini.h"
 #include "string_util.h"
 
-robot_config_t::robot_config_t():name("test/demo"),superstar("http://robotmoose.com"),
-	baudrate(57600),motors(""),marker(""),sensors(""),trim(1.0),debug(false),delay_ms(10),
-	sim(false)
-{}
+robot_config_t::robot_config_t()
+{
+	keys_m["robot"]="test/demo";                 // superstar robot name
+	keys_m["superstar"]="http://robotmoose.com"; // superstar server
+	keys_m["baudrate"]="57600";                  // serial comms to Arduino
+	keys_m["motors"]="";                         // Arduino firmware device name
+	keys_m["marker"]="";                         // computer vision marker file
+	keys_m["sensors"]="";                        // All our sensors
+	keys_m["trim"]="1.0";                        // proportional relation between left and right "motor" output
+	keys_m["debug"]="false";                     // more output, more mess, but more data
+	keys_m["delay_ms"]="10";                     // milliseconds to wait in control loop (be kind to CPU, network)
+	keys_m["sim"]="false";                       // use without an arduino (for testing)
+
+	validate();
+}
 
 void robot_config_t::from_file(const std::string& filename)
 {
@@ -17,113 +28,99 @@ void robot_config_t::from_file(const std::string& filename)
 
 	for(ini_t::const_iterator iter=ini.begin();iter!=ini.end();++iter)
 	{
-		if(iter->first=="robot")
-			name=iter->second;
-		else if(iter->first=="superstar")
-			superstar=iter->second;
-		else if(iter->first=="baudrate")
-			baudrate=atoi(iter->second.c_str());
-		else if(iter->first=="motors")
-			motors+=iter->second+"\n";
-		else if(iter->first=="marker")
-			marker=iter->second;
-		else if(iter->first=="sensors")
-			sensors+=iter->second+"\n";
-		else if(iter->first=="trim")
-			trim=atof(iter->second.c_str());
-		else if(iter->first=="debug")
-		{
-			debug=true;
-
-			if(iter->second=="false"||iter->second=="0"||iter->second=="")
-				debug=false;
-		}
-		else if(iter->first=="delay_ms")
-			delay_ms=atoi(iter->second.c_str());
-		else if(iter->first=="sim")
-		{
-			sim=true;
-
-			if(iter->second=="false"||iter->second=="0"||iter->second=="")
-				sim=false;
-
-			if(sim)
-			{
-				delay_ms=100;
-				baudrate=0;
-			}
-		}
+		if(keys_m.count(to_lower(iter->first))>0)
+			keys_m[to_lower(iter->first)]=to_lower(iter->second);
 		else
 			throw std::runtime_error("Unrecognized ini argument \""+iter->first+"\".\n");
 	}
 
-	for(size_t ii=0;ii<name.size();++ii)
-		if(name[ii]=='\\')
-			name[ii]='/';
-
-	if(superstar.size()>0&&superstar[superstar.size()-1]!='/')
-			superstar+='/';
+	validate();
 }
 
 void robot_config_t::from_cli(int argc,char* argv[])
 {
-	for(int argi = 1; argi<argc; argi++)
+	for(int ii=1;ii<argc;++ii)
 	{
-		if      (0 == strcmp(argv[argi], "--robot"))      {name = argv[++argi];}
-		else if (0 == strcmp(argv[argi], "--superstar"))  superstar = argv[++argi];
-		else if (0 == strcmp(argv[argi], "--local"))      superstar = "http://localhost:8081";
-		else if (0 == strcmp(argv[argi], "--baudrate"))   baudrate = atoi(argv[++argi]);
-		else if (0 == strcmp(argv[argi], "--motor"))      motors += argv[++argi]+std::string("\n");
-		else if (0 == strcmp(argv[argi], "--marker"))     marker = argv[++argi];
-		else if (0 == strcmp(argv[argi], "--sensor"))     sensors += argv[++argi]+std::string("\n");
-		else if (0 == strcmp(argv[argi], "--trim"))       trim = atof(argv[++argi]);
-		else if (0 == strcmp(argv[argi], "--debug"))      debug = true;
-		else if (0 == strcmp(argv[argi], "--dev"))        superstar = "http://test.robotmoose.com" ;
-		else if (0 == strcmp(argv[argi], "--delay_ms"))   delay_ms = atoi(argv[++argi]);
-		else if (0 == strcmp(argv[argi], "--sim"))        // no Arduino, for debugging
+		std::string original_key=argv[ii];
+		std::string key=original_key;
+
+		if(key.size()>1&&key[0]=='-'&&key[1]=='-')
 		{
-			sim=true;
-			delay_ms=100;
-			baudrate=0;
+			key=key.substr(2,key.size()-2);
+			std::string value="true";
+
+			if(ii+1<argc)
+			{
+				std::string temp=argv[ii+1];
+
+				if(!(temp.size()>1&&temp[0]=='-'&&temp[1]=='-'))
+				{
+					value=temp;
+					++ii;
+				}
+			}
+
+			if(keys_m.count(key)>0)
+				keys_m[to_lower(key)]=to_lower(value);
+			else
+				throw std::runtime_error("Unrecognized cli argument \""+original_key+"\".\n");
 		}
 		else
-			throw std::runtime_error("Unrecognized command line argument \""+std::string(argv[argi])+"\".\n");
+		{
+			throw std::runtime_error("Unrecognized cli argument \""+std::string(argv[ii])+"\".\n");
+		}
 	}
 
-	for(size_t ii=0;ii<name.size();++ii)
-		if(name[ii]=='\\')
-			name[ii]='/';
-
-	if(superstar.size()>0&&superstar[superstar.size()-1]!='/')
-		superstar+='/';
+	validate();
 }
 
 void robot_config_t::to_file(const std::string& filename) const
 {
 	ini_t ini;
-	ini["robot"]=to_lower(name);
-	ini["superstar"]=to_lower(superstar);
-	ini["baudrate"]=to_lower(to_string(baudrate));
-	ini["motors"]=to_lower(motors);
-	ini["marker"]=to_lower(marker);
-	ini["sensors"]=to_lower(sensors);
-	ini["trim"]=to_lower(to_string(trim));
-	ini["debug"]=to_lower(to_string(debug));
-	ini["delay_ms"]=to_lower(to_string(delay_ms));
-	ini["sim"]=to_lower(to_string(sim));
+
+	for(key_t::const_iterator iter=keys_m.begin();iter!=keys_m.end();++iter)
+		ini[iter->first]=to_lower(iter->second);
+
 	write_ini(filename,ini);
 }
-
-bool robot_config_t::is_valid() const
+std::string robot_config_t::get(const std::string& key)
 {
+	if(keys_m.count(key)>0)
+		return keys_m[key];
+
+	return "";
+}
+
+void robot_config_t::validate()
+{
+	for(key_t::const_iterator iter=keys_m.begin();iter!=keys_m.end();++iter)
+		keys_m[iter->first]=to_lower(iter->second);
+
+	for(size_t ii=0;ii<keys_m["robot"].size();++ii)
+		if(keys_m["robot"][ii]=='\\')
+			keys_m["robot"][ii]='/';
+
+	if(keys_m["superstar"].size()>0&&keys_m["superstar"][keys_m["superstar"].size()-1]!='/')
+		keys_m["superstar"]+='/';
+
+	if(to_bool(keys_m["sim"]))
+	{
+		keys_m["delay_ms"]="100";
+		keys_m["baudrate"]="0";
+	}
+
 	size_t slashes=0;
 
-	for(size_t ii=0;ii<name.size();++ii)
-		if(name[ii]=='/')
+	for(size_t ii=0;ii<keys_m["robot"].size();++ii)
+		if(keys_m["robot"][ii]=='/')
 			++slashes;
 
 	if(slashes!=1)
-		throw std::runtime_error("Invalid robot name \""+name+"\" - should be in the format \"school/name\".");
-
-	return false;
+		throw std::runtime_error("Invalid robot name \""+keys_m["robot"]+"\" - should be in the format \"school/name\".");
 }
+
+/*void robot_config_t::print()
+{
+	for(key_t::const_iterator iter=keys_m.begin();iter!=keys_m.end();++iter)
+		std::cout<<"\""<<iter->first<<"\":\""<<to_lower(iter->second)<<"\""<<std::endl;;
+}*/

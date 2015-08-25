@@ -32,3 +32,21 @@ std::string strip_whitespace(std::string str)
 
 	return str;
 }
+
+bool to_bool(const std::string& str)
+{
+	if(str=="false"||str=="0"||str=="")
+		return false;
+
+	return true;
+}
+
+int to_int(const std::string& str)
+{
+	return atoi(str.c_str());
+}
+
+double to_double(const std::string& str)
+{
+	return atof(str.c_str());
+}

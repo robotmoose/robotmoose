@@ -1040,29 +1040,29 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	sim=config.sim;
-	debug=config.debug;
+	sim=to_bool(config.get("sim"));
+	debug=to_bool(config.get("debug"));
 
-	std::cout<<"Connecting to superstar at "<<config.superstar<<std::endl;
+	std::cout<<"Connecting to superstar at "<<config.get("superstar")<<std::endl;
 
-	if(config.baudrate>0)
-		Serial.Set_baud(config.baudrate);
+	if(to_int(config.get("baudrate"))>0)
+		Serial.Set_baud(to_int(config.get("baudrate")));
 
-	backend=new robot_backend(config.superstar,config.name);
-	backend->LRtrim=config.trim;
-	backend->debug=config.debug;
-	backend->tabula_setup(config.sensors+config.motors);
+	backend=new robot_backend(config.get("superstar"),config.get("robot"));
+	backend->LRtrim=to_double(config.get("trim"));
+	backend->debug=debug;
+	backend->tabula_setup(config.get("sensors")+"\n"+config.get("motors"));
 
 	// talk to robot via backend
 	while(true)
 	{
 		backend->do_network();
 		backend->send_serial();
-		moose_sleep_ms(config.delay_ms);
+		moose_sleep_ms(to_int(config.get("delay_ms")));
 		backend->read_serial();
 
-		if (config.marker!="")
-			backend->location.update_vision(config.marker.c_str());
+		if(config.get("marker")!="")
+			backend->location.update_vision(config.get("marker").c_str());
 	}
 
 	return 0;

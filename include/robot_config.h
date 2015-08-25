@@ -6,6 +6,8 @@
 class robot_config_t
 {
 	public:
+		typedef std::map<std::string,std::string> key_t;
+		/*
 		std::string name;       // superstar robot name
 		std::string superstar;  // superstar server
 		int baudrate;           // serial comms to Arduino
@@ -16,13 +18,22 @@ class robot_config_t
 		bool debug;             // more output, more mess, but more data
 		int delay_ms;           // milliseconds to wait in control loop (be kind to CPU, network)
 		bool sim;               // no arduino, testing purposes
+		*/
 
 		robot_config_t();
 
 		void from_file(const std::string& filename);
 		void from_cli(int argc,char* argv[]);
 		void to_file(const std::string& filename) const;
-		bool is_valid() const;
+
+		std::string get(const std::string& key);
+
+		void validate();
+
+		//void print();
+
+	private:
+		key_t keys_m;
 };
 
 #endif
