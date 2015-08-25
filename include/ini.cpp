@@ -1,27 +1,19 @@
 #include "ini.h"
 
-#include <cctype>
 #include <fstream>
 #include <stdexcept>
 #include <vector>
 
-static std::string strip_whitespace(std::string str)
-{
-	while(str.size()>0&&isspace(str[0])!=0)
-		str=str.substr(1,str.size()-1);
-
-	while(str.size()>0&&isspace(str[str.size()-1])!=0)
-		str=str.substr(0,str.size()-1);
-
-	return str;
-}
+#include "string_util.h"
 
 ini_t read_ini(const std::string& filename)
 {
+	ini_t ini;
+
 	std::ifstream istr(filename.c_str());
 
 	if(!istr)
-		throw std::runtime_error("Could not open \""+filename+"\" for reading.");
+		return ini;
 
 	std::vector<std::string> lines;
 	std::string temp;
@@ -43,10 +35,11 @@ ini_t read_ini(const std::string& filename)
 
 	istr.close();
 
-	ini_t ini;
-
 	for(size_t ii=0;ii<lines.size();++ii)
 	{
+		if(lines.size()>0&&lines[ii][0]=='#')
+			continue;
+
 		std::string key;
 
 		for(size_t jj=0;jj<lines[ii].size();++jj)
@@ -62,8 +55,8 @@ ini_t read_ini(const std::string& filename)
 		for(size_t jj=key.size()+1;jj<lines[ii].size();++jj)
 			value+=lines[ii][jj];
 
-		key=strip_whitespace(key);
-		value=strip_whitespace(value);
+		key=to_lower(strip_whitespace(key));
+		value=to_lower(strip_whitespace(value));
 
 		ini[key]=value;
 	}

@@ -15,6 +15,13 @@
 #include <stdint.h>  // for unit8-16 and whatnot
 #endif
 
+//String helper:
+#include "../include/string_util.h"
+
+// Config file/cli read/write:
+#include "../include/ini.h"
+#include "../include/robot_config.h"
+
 // Arduino comms:
 #include "arduino/serial_packet.h" // serial comms format
 #include "arduino/tabula_control.h" // sensor and command formatting
@@ -31,6 +38,9 @@
 #endif
 
 /* Do linking right here */
+#include "../include/ini.cpp"
+#include "../include/robot_config.cpp"
+#include "../include/string_util.cpp"
 #include "../include/serial.cpp"
 #include "../include/osl/socket.cpp"
 #include "../include/osl/webservice.cpp"
@@ -489,7 +499,7 @@ private:
 
 	// All supported tabula devices, with their argument list.
 	json::Array all_dev_types;
-	
+
 	// All the configured device strings, as parsed by setup_devices
 	std::vector<std::string> robot_config_devices;
 
@@ -691,7 +701,7 @@ void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 		std::string dev=robot_config_devices[i];
 		std::cout<<"  To Arduino: "<<dev<<"\n";
 		port.write(&dev[0],dev.size());
-		
+
 		// Wait for device creation confirmation from Arduino
 		std::string status="";
 		do {
@@ -1017,71 +1027,42 @@ robot_backend *backend=NULL; // the singleton robot
 
 int main(int argc, char *argv[])
 {
-	double LRtrim=1.0;
-	std::string superstarURL = "http://robotmoose.com/"; // superstar server
-	std::string robotName = "test/demo"; // superstar robot name
-	std::string configMotor; // Arduino firmware device name
-	std::string markerFile=""; // computer vision marker file
-	std::string sensors=""; // All our sensors
-	int baudrate=57600;  // serial comms to Arduino
-	int delay_ms=10; // milliseconds to wait in control loop (be kind to CPU, network)
-	for (int argi = 1; argi<argc; argi++) {
-		if (0 == strcmp(argv[argi], "--robot")) {
-			robotName = argv[++argi];
+	robot_config_t config;
 
-			// Replace back slashes \ with forward slashes /
-			char *fwdSlash=&robotName[0];
-			while (NULL!=(fwdSlash=strchr(fwdSlash,'\\'))) *fwdSlash++='/';
-
-			// Check if there's any slashes--there should be, for the school name
-			if (NULL==strchr(&robotName[0],'/')) {
-				printf("ERROR: Your robot name needs a school first, like   uaf/myrobot\n");
-				exit(1);
-			}
-
-			// Lowercase the robot names, for consistency:
-			for (char *letter=&robotName[0];*letter!=0;letter++) *letter=tolower(*letter);
-		}
-		else if (0 == strcmp(argv[argi], "--superstar")) superstarURL = argv[++argi];
-		else if (0 == strcmp(argv[argi], "--local")) superstarURL = "http://localhost:8081";
-		else if (0 == strcmp(argv[argi], "--baudrate")) baudrate = atoi(argv[++argi]);
-		else if (0 == strcmp(argv[argi], "--motor")) configMotor = argv[++argi];
-		else if (0 == strcmp(argv[argi], "--marker")) markerFile = argv[++argi];
-		else if (0 == strcmp(argv[argi], "--sensor")) sensors += argv[++argi]+std::string("\n");
-		else if (0 == strcmp(argv[argi], "--trim")) LRtrim = atof(argv[++argi]);
-		else if (0 == strcmp(argv[argi], "--debug")) debug = true;
-		else if (0 == strcmp(argv[argi], "--dev")) superstarURL = "http://test.robotmoose.com" ;
-		else if (0 == strcmp(argv[argi], "--delay_ms")) delay_ms = atoi(argv[++argi]);
-		else if (0 == strcmp(argv[argi], "--sim")) { // no Arduino, for debugging
-			sim = true;
-			delay_ms=100;
-			baudrate=0;
-		}
-		else {
-			printf("Unrecognized command line argument '%s'\n", argv[argi]);
-			exit(1);
-		}
+	try
+	{
+		config.from_file("config.ini");
+		config.from_cli(argc,argv);
+	}
+	catch(std::exception& error)
+	{
+		std::cout<<"ERROR! "<<error.what()<<std::endl;
+		return 1;
 	}
 
-	std::cout<<"Connecting to superstar at "<<superstarURL<<std::endl;
-	if (baudrate) Serial.Set_baud(baudrate);
-	backend=new robot_backend(superstarURL, robotName);
-	backend->LRtrim=LRtrim;
-	backend->debug = debug; // more output, more mess, but more data
+	sim=config.sim;
+	debug=config.debug;
 
-	std::string robot_config=sensors+configMotor;
+	std::cout<<"Connecting to superstar at "<<config.superstar<<std::endl;
 
-	backend->tabula_setup(robot_config);
+	if(config.baudrate>0)
+		Serial.Set_baud(config.baudrate);
 
-	// backend->send_config(robot_config); //<- this overwrites the web version
+	backend=new robot_backend(config.superstar,config.name);
+	backend->LRtrim=config.trim;
+	backend->debug=config.debug;
+	backend->tabula_setup(config.sensors+config.motors);
 
-	while (1) { // talk to robot via backend
+	// talk to robot via backend
+	while(true)
+	{
 		backend->do_network();
 		backend->send_serial();
-		moose_sleep_ms(delay_ms);
-
+		moose_sleep_ms(config.delay_ms);
 		backend->read_serial();
-		if (markerFile!="") backend->location.update_vision(markerFile.c_str());
+
+		if (config.marker!="")
+			backend->location.update_vision(config.marker.c_str());
 	}
 
 	return 0;
