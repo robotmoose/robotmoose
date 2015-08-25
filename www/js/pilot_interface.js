@@ -289,8 +289,7 @@ pilot_interface_t.prototype.get_pilot_power=function() {
 	var maxPower=1.0;
 
 	var powerUI=0.2;
-	var powerUIdom=this.drive.slider;
-	if (powerUIdom) powerUI=parseFloat(powerUIdom.value)*0.01;
+	if (this.drive&&this.drive.slider) powerUI=parseFloat(this.drive.slider.value)*0.01;
 	if (isNaN(powerUI)) powerUI=0.2;
 	else if (powerUI<maxPower) { maxPower=powerUI; }
 
