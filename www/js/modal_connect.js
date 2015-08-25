@@ -9,6 +9,7 @@ function modal_connect_t(div)
 	this.modal=new modal_t(div);
 	this.school_select=document.createElement("select");
 	this.robot_select=document.createElement("select");
+	this.robot_auth=document.createElement("input");
 	this.connect_button=document.createElement("input");
 	this.cancel_button=document.createElement("input");
 
@@ -31,7 +32,16 @@ function modal_connect_t(div)
 	this.robot_select.className="form-control";
 	this.robot_select.onchange=function(){myself.update_disables_m();};
 	this.modal.get_content().appendChild(this.robot_select);
-
+	
+	this.modal.get_content().appendChild(document.createElement("br"));
+	
+	this.robot_auth.className="form-control";
+	this.robot_auth.type="text";
+	this.robot_auth.placeholder="Enter robot authentication";
+	this.modal.get_content().appendChild(this.robot_auth);
+	
+	this.modal.get_content().appendChild(document.createElement("br"));
+	
 	this.connect_button.className="btn btn-primary";
 	this.connect_button.disabled=true;
 	this.connect_button.type="button";
@@ -40,7 +50,7 @@ function modal_connect_t(div)
 	{
 		if(myself.onconnect)
 			myself.onconnect(myself.school_select.options[myself.school_select.selectedIndex].text+
-				"/"+myself.robot_select.options[myself.robot_select.selectedIndex].text);
+				"/"+myself.robot_select.options[myself.robot_select.selectedIndex].text,myself.robot_auth.value);
 
 		myself.hide();
 	};
