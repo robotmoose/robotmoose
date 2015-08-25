@@ -78,6 +78,11 @@ function pilot_interface_t(div)
 
 	this.div=div;
 
+	this.element=document.createElement("div");
+	this.element.style.display="table";
+	this.element.style.margin="auto auto";
+	this.div.appendChild(this.element);
+
 	// Keyboard driving
 	this.keyboardIsDriving=false;
 	this.keyInput=new input_t(function() {myself.pilot_keyboard()},window);
@@ -87,19 +92,19 @@ function pilot_interface_t(div)
 pilot_interface_t.prototype.reconfigure=function(config_editor)
 {
 	var entries=config_editor.get_entries();
-	
+
 	// Check if we need to reconfigure at all
 	var entries_string="";
 	for(var key in entries) if(entries[key]) entries_string+=entries[key].type+",";
 	if (entries_string==this.last_entries_string) return; // no changes to report
 	this.last_entries_string=entries_string;
-	
+
 	// Clear out existing pilot GUI elements from our div
-	while (this.div.firstChild) {
-		this.div.removeChild(this.div.firstChild);
+	while (this.element.firstChild) {
+		this.element.removeChild(this.element.firstChild);
 	}
 	// this.pilot.power=emptyPower(); //<- cleaner, but loses servo positions on reconfigure
-	
+
 	// Add pilot GUI elements for each configured device
 	var servos=0, pwms=0, blinks=0;
 	for(var key in entries)
@@ -113,17 +118,17 @@ pilot_interface_t.prototype.reconfigure=function(config_editor)
 		case "sabertooth2":
 			this.make_drive(entries[key]);
 			break;
-		
+
 		case "servo":
 			this.make_slider(entries[key],"servo",servos, 0,180);
 			servos++;
 			break;
-		
+
 		case "pwm":
 			this.make_slider(entries[key],"pwm",pwms, 0,255);
 			pwms++;
 			break;
-		
+
 		default: // ignore unknown object
 			break;
 		};
@@ -135,14 +140,14 @@ pilot_interface_t.prototype.make_slider=function(config_entry,name,number, minva
 {
 	var myself=this;
 	var pilotpower=myself.pilot.power;
-	if (!pilotpower[name]) pilotpower[name]=[]; 
+	if (!pilotpower[name]) pilotpower[name]=[];
 	var value=pilotpower[name][number];
 	if (!value) value=0.0;
-	
+
 	var p=document.createElement("p");
 	var label_name=document.createTextNode(name+"["+number+"] = ");
 	var label_value=document.createTextNode(""+(0xffFFffFF&value));
-	
+
 	var slider=document.createElement("input");
 	slider.type="range";
 	slider.min=minval;
@@ -153,65 +158,109 @@ pilot_interface_t.prototype.make_slider=function(config_entry,name,number, minva
 		myself.pilot_send();
 		label_value.nodeValue=""+(0xffFFffFF&pilotpower[name][number]);
 	}
-	
+
 	p.appendChild(label_name);
 	p.appendChild(label_value);
 	p.appendChild(slider);
-	this.div.appendChild(p);
+	this.element.appendChild(p);
 }
 
 // Add GUI elements for driving around (arrows)
 pilot_interface_t.prototype.make_drive=function(config_entry)
 {
+	var column_left_width=160;
+	var column_right_width=160;
+	var column_padding=10;
+
 	// Make arrow div
 	this.arrowDiv=document.createElement("div");
 	this.arrowDiv.title="Click to drive the robot.  Hold down to keep driving.";
 	this.arrowDiv.style.backgroundColor="#808080";
 	this.arrowDiv.style.position="relative";
-	this.arrowDiv.style.width=this.arrowDiv.style.height="200px";
-	this.div.appendChild(this.arrowDiv);
-	
-	// Drive power input textbox
-	var p=document.createElement("p");
-	p.innerHTML="Drive power: ";
-	this.div.appendChild(p);
-	this.drive_power=document.createElement("input");
-	this.drive_power.type="text";
-	this.drive_power.size=8;
-	this.drive_power.value="40%";
-	p.appendChild(this.drive_power);
-	
-	//Make pilot auth box 
-	var p_auth=document.createElement("p");
-	p_auth.innerHTML="Authentication Code: ";
-	this.div.appendChild(p_auth);
-	this.pilot_auth=document.createElement("input");
-	this.pilot_auth.type="password";
-	this.pilot_auth.size=20;
-	this.drive_power.placeholder="Enter pilot auth code";
-	this.drive_power.title="Enter pilot auth code here";
-	p_auth.appendChild(this.pilot_auth);
-	
-	var p_auth_cb_p=document.createElement("p");
-	p_auth_cb_p.innerHTML="Show authentication code: ";
-	this.div.appendChild(p_auth_cb_p);
-	this.pilot_auth_cb=document.createElement("input");
-	this.pilot_auth_cb.type="checkbox";
-	this.pilot_auth_cb.title="Show pilot auth code";
-	this.pilot_auth_cb.onclick=function()
+	this.arrowDiv.style.width=this.arrowDiv.style.height=column_left_width+column_padding+column_right_width;
+	this.element.appendChild(this.arrowDiv);
+
+	// Drive power input
+	var starting_percent=40;
+	this.drive=
 	{
-		if (myself.pilot_auth_cb.checked==true)
-			myself.pilot_auth.type="text";
+		div:document.createElement("div"),
+		label:document.createElement("label"),
+		slider:document.createElement("input")
+	};
+
+	this.drive.div.className="form-group";
+	this.drive.div.style.marginTop=column_padding;
+	this.element.appendChild(this.drive.div);
+
+	this.drive.label.style.width=column_left_width;
+	this.drive.label.style.float="left";
+	this.drive.label.style.marginRight=column_padding;
+	this.drive.slider.onchange=function(){myself.update_drive_text();}
+	this.drive.slider.oninput=function(){myself.update_drive_text();}
+	this.drive.div.appendChild(this.drive.label);
+
+	this.drive.slider.type="range";
+	this.drive.slider.size=8;
+	this.drive.slider.min=0;
+	this.drive.slider.max=100;
+	this.drive.slider.step=1;
+	this.drive.slider.value=starting_percent;
+	this.drive.slider.style.width=column_right_width;
+	this.drive.div.appendChild(this.drive.slider);
+
+	this.update_drive_text();
+
+	//Make pilot auth box
+	this.auth=
+	{
+		div:document.createElement("div"),
+		label:document.createElement("label"),
+		input:document.createElement("input"),
+		checkbox:
+		{
+			box:document.createElement("input"),
+			label:document.createElement("label")
+		}
+	};
+
+	this.auth.div.className="form-group";
+	this.element.appendChild(this.auth.div);
+
+	this.auth.label.innerHTML="Authentication Code:";
+	this.auth.label.style.width=column_left_width;
+	this.auth.label.style.float="left";
+	this.auth.label.style.marginRight=column_padding;
+	this.auth.div.appendChild(this.auth.label);
+
+	this.auth.input.type="password";
+	this.auth.input.className="form-control";
+	this.auth.input.title="Enter pilot auth code here";
+	this.auth.input.style.width=column_right_width;
+	this.auth.div.appendChild(this.auth.input);
+
+	this.auth.checkbox.box.type="checkbox";
+	this.auth.checkbox.box.title="Show pilot auth code";
+	this.auth.checkbox.box.style.float="left";
+	this.auth.checkbox.box.style.marginRight=6;
+	this.auth.checkbox.box.style.marginLeft=column_left_width+column_padding
+	this.auth.checkbox.box.onclick=function()
+	{
+		if(myself.auth.checkbox.box.checked)
+			myself.auth.input.type="text";
 		else
-			myself.pilot_auth.type="password";
+			myself.auth.input.type="password";
 	}
-	p_auth_cb_p.appendChild(this.pilot_auth_cb);
-	
+	this.element.appendChild(this.auth.checkbox.box);
+
+	this.auth.checkbox.label.innerHTML="Show";
+	this.element.appendChild(this.auth.checkbox.label);
+
 	// Mouse event handlers for arrow div
 	var myself=this;
 	this.mouse_down=0;
 	this.mouse_in_div=0;
-	this.arrowDiv.onmousedown=function(evt) { myself.pilot_mouse(evt,1); myself.div.click(); };
+	this.arrowDiv.onmousedown=function(evt) { myself.pilot_mouse(evt,1); myself.element.click(); };
 	this.arrowDiv.ondragstart=function(evt) { myself.pilot_mouse(evt,1); };
 	this.arrowDiv.onmouseup=function(evt) { myself.pilot_mouse(evt,-1); };
 	this.arrowDiv.onmouseenter=function(evt) { myself.pilot_mouse(evt,0,+1); };
@@ -229,13 +278,18 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	this.arrowDiv.appendChild(img);
 }
 
+pilot_interface_t.prototype.update_drive_text=function()
+{
+	this.drive.label.innerHTML="Drive power ("+this.drive.slider.value+"%):";
+}
+
 
 // Return the drive power the user has currently selected
 pilot_interface_t.prototype.get_pilot_power=function() {
 	var maxPower=1.0;
 
 	var powerUI=0.2;
-	var powerUIdom=this.drive_power;
+	var powerUIdom=this.drive.slider;
 	if (powerUIdom) powerUI=parseFloat(powerUIdom.value)*0.01;
 	if (isNaN(powerUI)) powerUI=0.2;
 	else if (powerUI<maxPower) { maxPower=powerUI; }
@@ -250,8 +304,8 @@ pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_d
 	if (mouse_in_del) this.mouse_in_div=mouse_in_del;
 
 	if (mouse_down_del==1) this.mouse_down=1;
-	if (mouse_down_del==-1) this.mouse_down=-1;	
-	
+	if (mouse_down_del==-1) this.mouse_down=-1;
+
 // Allow user to set maximum power
 	var maxPower=this.get_pilot_power();
 
