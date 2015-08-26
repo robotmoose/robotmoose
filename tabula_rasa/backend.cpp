@@ -1040,6 +1040,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	std::cout<<"TESTING\t"<<to_double(config.get("trim"))<<std::endl;
+
 	sim=to_bool(config.get("sim"));
 	debug=to_bool(config.get("debug"));
 

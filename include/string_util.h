@@ -23,4 +23,10 @@ int to_int(const std::string& str);
 
 double to_double(const std::string& str);
 
+bool is_bool(std::string str);
+
+bool is_int(std::string str);
+
+bool is_double(std::string str);
+
 #endif
