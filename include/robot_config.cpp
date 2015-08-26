@@ -18,6 +18,8 @@ robot_config_t::robot_config_t()
 	keys_m["debug"]="false";                     // more output, more mess, but more data
 	keys_m["delay_ms"]="10";                     // milliseconds to wait in control loop (be kind to CPU, network)
 	keys_m["sim"]="false";                       // use without an arduino (for testing)
+	keys_m["local"]="false";                     // use local server shortcut
+	keys_m["dev"]="false";                       // use dev server shortcut
 
 	validate();
 }
@@ -100,14 +102,20 @@ void robot_config_t::validate()
 		if(keys_m["robot"][ii]=='\\')
 			keys_m["robot"][ii]='/';
 
-	if(keys_m["superstar"].size()>0&&keys_m["superstar"][keys_m["superstar"].size()-1]!='/')
-		keys_m["superstar"]+='/';
-
 	if(to_bool(keys_m["sim"]))
 	{
 		keys_m["delay_ms"]="100";
 		keys_m["baudrate"]="0";
 	}
+
+	if(to_bool(keys_m["local"]))
+		keys_m["superstar"]="http://localhost:8081";
+
+	if(to_bool(keys_m["dev"]))
+		keys_m["superstar"]="http://test.robotmoose.com";
+
+	if(keys_m["superstar"].size()>0&&keys_m["superstar"][keys_m["superstar"].size()-1]!='/')
+		keys_m["superstar"]+='/';
 
 	size_t slashes=0;
 
