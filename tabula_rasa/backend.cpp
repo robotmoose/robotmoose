@@ -1027,44 +1027,42 @@ robot_backend *backend=NULL; // the singleton robot
 
 int main(int argc, char *argv[])
 {
-	robot_config_t config;
-
 	try
 	{
+		robot_config_t config;
+
 		config.from_file("config.ini");
 		config.from_cli(argc,argv);
+
+		sim=to_bool(config.get("sim"));
+		debug=to_bool(config.get("debug"));
+
+		std::cout<<"Connecting to superstar at "<<config.get("superstar")<<std::endl;
+
+		if(to_int(config.get("baudrate"))>0)
+			Serial.Set_baud(to_int(config.get("baudrate")));
+
+		backend=new robot_backend(config.get("superstar"),config.get("robot"));
+		backend->LRtrim=to_double(config.get("trim"));
+		backend->debug=debug;
+		backend->tabula_setup(config.get("sensors")+"\n"+config.get("motors"));
+
+		// talk to robot via backend
+		while(true)
+		{
+			backend->do_network();
+			backend->send_serial();
+			moose_sleep_ms(to_int(config.get("delay_ms")));
+			backend->read_serial();
+
+			if(config.get("marker")!="")
+				backend->location.update_vision(config.get("marker").c_str());
+		}
 	}
 	catch(std::exception& error)
 	{
 		std::cout<<"ERROR! "<<error.what()<<std::endl;
 		return 1;
-	}
-
-	std::cout<<"TESTING\t"<<to_double(config.get("trim"))<<std::endl;
-
-	sim=to_bool(config.get("sim"));
-	debug=to_bool(config.get("debug"));
-
-	std::cout<<"Connecting to superstar at "<<config.get("superstar")<<std::endl;
-
-	if(to_int(config.get("baudrate"))>0)
-		Serial.Set_baud(to_int(config.get("baudrate")));
-
-	backend=new robot_backend(config.get("superstar"),config.get("robot"));
-	backend->LRtrim=to_double(config.get("trim"));
-	backend->debug=debug;
-	backend->tabula_setup(config.get("sensors")+"\n"+config.get("motors"));
-
-	// talk to robot via backend
-	while(true)
-	{
-		backend->do_network();
-		backend->send_serial();
-		moose_sleep_ms(to_int(config.get("delay_ms")));
-		backend->read_serial();
-
-		if(config.get("marker")!="")
-			backend->location.update_vision(config.get("marker").c_str());
 	}
 
 	return 0;
