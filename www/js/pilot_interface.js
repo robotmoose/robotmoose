@@ -341,7 +341,7 @@ pilot_interface_t.prototype.download=function(robot)
 
 pilot_interface_t.prototype.upload=function(robot)
 {
-	superstar_set(robot.name,"pilot",this.pilot);
+	superstar_set(robot.name,"pilot",this.pilot,null,robot.auth);
 }
 
 // This is a simple placeholder, to get things working for now:

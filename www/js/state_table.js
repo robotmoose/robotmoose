@@ -211,17 +211,19 @@ state_table_t.prototype.upload=function(robot,onupload)
 	var myself=this;
 
 	superstar_set(robot.name+"/experiments/"+this.experiment.name.value+"/","code",this.get_states(),
-	function(obj)
-	{
-		superstar_set(robot.name,"active_experiment",myself.experiment.name.value,
 		function(obj)
 		{
-			myself.last_experiment=myself.experiment.name.value;
+			superstar_set(robot.name,"active_experiment",myself.experiment.name.value,
+				function(obj)
+				{
+					myself.last_experiment=myself.experiment.name.value;
 
-			if(onupload)
-				onupload();
-		});
-	});
+					if(onupload)
+						onupload();
+				},
+				robot.auth);
+		},
+		robot.auth);
 }
 
 state_table_t.prototype.get_states=function()

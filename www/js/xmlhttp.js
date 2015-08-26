@@ -62,7 +62,7 @@ function send_request(method,path,request,uri,on_reply,on_error,data,content_typ
  Use superstar to set path/element=newObject
  and then call onFinished.
 */
-function superstar_set(path,element,newObject,onFinished)
+function superstar_set(path,element,newObject,onFinished,auth)
 {
 	send_request("GET", "/superstar/"+path, element,
 		"?set=" + encodeURIComponent(JSON.stringify(newObject)),

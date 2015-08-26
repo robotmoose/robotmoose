@@ -164,7 +164,7 @@ robot_ui_t.prototype.upload_gui=function()
 
 	if(this.robot&&this.robot.name&&this.gui.old!=stringified)
 	{
-		superstar_set(this.robot.name,"gui",save);
+		superstar_set(this.robot.name,"gui",save,null,this.robot.auth);
 		this.gui.old=stringified;
 	}
 }

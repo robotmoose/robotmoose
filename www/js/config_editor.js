@@ -82,7 +82,7 @@ config_editor_t.prototype.download=function(robot)
 	superstar_get(robot.name,"options",function(options)
 	{
 		myself.get_options_m(options);
-		myself.download_m(robot.name);
+		myself.download_m(robot);
 	});
 }
 
@@ -118,7 +118,7 @@ config_editor_t.prototype.upload=function(robot)
 		}
 	}
 
-	superstar_set(robot.name,"config",data);
+	superstar_set(robot.name,"config",data,null,robot.auth);
 }
 
 config_editor_t.prototype.get_entries=function()
