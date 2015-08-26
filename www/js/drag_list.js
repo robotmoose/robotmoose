@@ -102,8 +102,6 @@ drag_list_t.prototype.remove_entry=function(entry)
 {
 	if(entry)
 	{
-		console.log("drag_list_t::remove_entry");
-
 		var entries=this.get_entries();
 
 		for(var key in entries)

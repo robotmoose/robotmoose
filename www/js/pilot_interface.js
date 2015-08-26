@@ -211,51 +211,6 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 
 	this.update_drive_text();
 
-	//Make pilot auth box
-	this.auth=
-	{
-		div:document.createElement("div"),
-		label:document.createElement("label"),
-		input:document.createElement("input"),
-		checkbox:
-		{
-			box:document.createElement("input"),
-			label:document.createElement("label")
-		}
-	};
-
-	this.auth.div.className="form-group";
-	this.element.appendChild(this.auth.div);
-
-	this.auth.label.innerHTML="Authentication Code:";
-	this.auth.label.style.width=column_left_width;
-	this.auth.label.style.float="left";
-	this.auth.label.style.marginRight=column_padding;
-	this.auth.div.appendChild(this.auth.label);
-
-	this.auth.input.type="password";
-	this.auth.input.className="form-control";
-	this.auth.input.title="Enter pilot auth code here";
-	this.auth.input.style.width=column_right_width;
-	this.auth.div.appendChild(this.auth.input);
-
-	this.auth.checkbox.box.type="checkbox";
-	this.auth.checkbox.box.title="Show pilot auth code";
-	this.auth.checkbox.box.style.float="left";
-	this.auth.checkbox.box.style.marginRight=6;
-	this.auth.checkbox.box.style.marginLeft=column_left_width+column_padding
-	this.auth.checkbox.box.onclick=function()
-	{
-		if(myself.auth.checkbox.box.checked)
-			myself.auth.input.type="text";
-		else
-			myself.auth.input.type="password";
-	}
-	this.element.appendChild(this.auth.checkbox.box);
-
-	this.auth.checkbox.label.innerHTML="Show";
-	this.element.appendChild(this.auth.checkbox.label);
-
 	// Mouse event handlers for arrow div
 	var myself=this;
 	this.mouse_down=0;
@@ -379,14 +334,14 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 
 
 // It's not clear a pilot needs to download data, but it's easy:
-pilot_interface_t.prototype.download=function(robot_name)
+pilot_interface_t.prototype.download=function(robot)
 {
-	superstar_get(robot_name,"pilot",function(newPilot) { this.pilot=newPilot; });
+	superstar_get(robot.name,"pilot",function(newPilot) { this.pilot=newPilot; });
 }
 
-pilot_interface_t.prototype.upload=function(robot_name)
+pilot_interface_t.prototype.upload=function(robot)
 {
-	superstar_set(robot_name,"pilot",this.pilot);
+	superstar_set(robot.name,"pilot",this.pilot);
 }
 
 // This is a simple placeholder, to get things working for now:

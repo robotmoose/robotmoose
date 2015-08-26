@@ -72,23 +72,23 @@ function config_editor_t(div)
 	this.element.appendChild(this.configure_button);
 }
 
-config_editor_t.prototype.download=function(robot_name)
+config_editor_t.prototype.download=function(robot)
 {
-	if(!robot_name)
+	if(!robot||!robot.name)
 		return;
 
 	var myself=this;
 
-	superstar_get(robot_name,"options",function(options)
+	superstar_get(robot.name,"options",function(options)
 	{
 		myself.get_options_m(options);
-		myself.download_m(robot_name);
+		myself.download_m(robot.name);
 	});
 }
 
-config_editor_t.prototype.upload=function(robot_name)
+config_editor_t.prototype.upload=function(robot)
 {
-	if(!robot_name)
+	if(!robot||!robot.name)
 		return;
 
 	this.get_entries();
@@ -118,7 +118,7 @@ config_editor_t.prototype.upload=function(robot_name)
 		}
 	}
 
-	superstar_set(robot_name,"config",data);
+	superstar_set(robot.name,"config",data);
 }
 
 config_editor_t.prototype.get_entries=function()
@@ -165,9 +165,9 @@ config_editor_t.prototype.remove_entry=function(entry)
 
 
 
-config_editor_t.prototype.download_m=function(robot_name)
+config_editor_t.prototype.download_m=function(robot)
 {
-	if(!robot_name)
+	if(!robot||!robot.name)
 		return;
 
 	var myself=this;
@@ -177,7 +177,7 @@ config_editor_t.prototype.download_m=function(robot_name)
 
 	this.entries=[];
 
-	superstar_get(robot_name,"config",function(obj)
+	superstar_get(robot.name,"config",function(obj)
 	{
 		if (obj==null) { // backend not connected, make fake config object
 			obj={counter:0};

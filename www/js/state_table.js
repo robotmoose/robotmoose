@@ -17,6 +17,7 @@ function state_table_t(doorway)
 
 	var myself=this;
 	this.old_robot_name=null;
+	this.old_robot_auth=null;
 	this.doorway=doorway;
 	this.overwrite_modal=new modal_yesno_t(this.doorway.parent_div,"Warning","");
 	this.div=doorway.content;
@@ -111,16 +112,16 @@ function state_table_t(doorway)
 	this.controls_div.appendChild(this.add_button);
 }
 
-state_table_t.prototype.download_with_check=function(robot_name,skip_get_active,ondownload)
+state_table_t.prototype.download_with_check=function(robot,skip_get_active,ondownload)
 {
-	if(!robot_name)
+	if(!robot||!robot.name)
 		return;
 
 	var myself=this;
 
 	if(myself.last_experiment)
 	{
-		superstar_get(robot_name+"/experiments/"+myself.last_experiment+"/","code",
+		superstar_get(robot.name+"/experiments/"+myself.last_experiment+"/","code",
 			function(obj)
 			{
 				if(JSON.stringify(obj)!=JSON.stringify(myself.get_states()))
@@ -130,45 +131,46 @@ state_table_t.prototype.download_with_check=function(robot_name,skip_get_active,
 					myself.overwrite_modal.onok=
 						function()
 						{
-							myself.download(robot_name,skip_get_active,ondownload);
+							myself.download(robot,skip_get_active,ondownload);
 						}
 					myself.overwrite_modal.show();
 				}
 				else
 				{
-					myself.download(robot_name,skip_get_active,ondownload);
+					myself.download(robot,skip_get_active,ondownload);
 				}
 			});
 	}
 	else
 	{
-		myself.download(robot_name,skip_get_active,ondownload);
+		myself.download(robot,skip_get_active,ondownload);
 	}
 }
 
-state_table_t.prototype.download=function(robot_name,skip_get_active,callback)
+state_table_t.prototype.download=function(robot,skip_get_active,callback)
 {
-	this.old_robot_name=robot_name;
+	this.old_robot_name=robot.name;
+	this.old_robot_auth=robot.auth;
 
 	this.clear();
 
-	if(!robot_name)
+	if(!robot||!robot.name)
 		return;
 
 	var myself=this;
 
 	if(skip_get_active)
 	{
-		myself.download_m(robot_name,callback);
+		myself.download_m(robot,callback);
 	}
 	else
 	{
-		superstar_get(robot_name,"active_experiment",function(obj)
+		superstar_get(robot.name,"active_experiment",function(obj)
 		{
 			if(obj&&obj.length>0)
 			{
 				myself.last_experiment=myself.experiment.name.value=obj;
-				myself.download_m(robot_name,callback);
+				myself.download_m(robot,callback);
 			}
 		});
 	}
@@ -177,41 +179,41 @@ state_table_t.prototype.download=function(robot_name,skip_get_active,callback)
 	this.update_buttons_m();
 }
 
-state_table_t.prototype.upload_with_check=function(robot_name,onupload)
+state_table_t.prototype.upload_with_check=function(robot,onupload)
 {
-	if(!robot_name)
+	if(!robot||!robot.name)
 		return;
 
 	var myself=this;
 
-	superstar_get(robot_name+"/experiments/"+myself.experiment.name.value+"/","code",
+	superstar_get(robot.name+"/experiments/"+myself.experiment.name.value+"/","code",
 		function(obj)
 		{
 			if(myself.last_experiment&&obj&&obj.length>0&&myself.last_experiment!=myself.experiment.name.value)
 			{
 				myself.overwrite_modal.set_message("This will overwrite the non-empty experiment named \""+
 					myself.experiment.name.value+"\". Proceed?");
-				myself.overwrite_modal.onok=function(){myself.upload(robot_name,onupload);}
+				myself.overwrite_modal.onok=function(){myself.upload(robot,onupload);}
 				myself.overwrite_modal.show();
 			}
 			else
 			{
-				myself.upload(robot_name,onupload);
+				myself.upload(robot,onupload);
 			}
 		});
 }
 
-state_table_t.prototype.upload=function(robot_name,onupload)
+state_table_t.prototype.upload=function(robot,onupload)
 {
-	if(!robot_name)
+	if(!robot||!robot.name)
 		return;
 
 	var myself=this;
 
-	superstar_set(robot_name+"/experiments/"+this.experiment.name.value+"/","code",this.get_states(),
+	superstar_set(robot.name+"/experiments/"+this.experiment.name.value+"/","code",this.get_states(),
 	function(obj)
 	{
-		superstar_set(robot_name,"active_experiment",myself.experiment.name.value,
+		superstar_set(robot.name,"active_experiment",myself.experiment.name.value,
 		function(obj)
 		{
 			myself.last_experiment=myself.experiment.name.value;
@@ -421,8 +423,6 @@ state_table_t.prototype.remove_entry=function(entry)
 		return;
 
 	this.drag_list.remove_entry(entry.drag_list);
-
-	console.log("state_table_t::remove_entry");
 }
 
 state_table_t.prototype.set_active=function(state)
@@ -467,11 +467,11 @@ state_table_t.prototype.clear=function()
 
 
 
-state_table_t.prototype.download_m=function(robot_name,callback)
+state_table_t.prototype.download_m=function(robot,callback)
 {
 	var myself=this;
 
-	superstar_get(robot_name+"/experiments/"+this.experiment.name.value+"/","code",function(obj)
+	superstar_get(robot.name+"/experiments/"+this.experiment.name.value+"/","code",function(obj)
 	{
 		myself.last_active=myself.experiment.name.value;
 
@@ -509,10 +509,12 @@ state_table_t.prototype.load_button_pressed_m=function()
 
 	this.onstop_m();
 
-	this.download_with_check(this.old_robot_name,true,
+	var old_robot={name:myself.old_robot_name,auth:myself.old_robot_auth}
+
+	this.download_with_check(old_robot,true,
 		function()
 		{
-			myself.upload(myself.old_robot_name);
+			myself.upload(old_robot);
 		});
 }
 
@@ -659,8 +661,6 @@ state_table_t.prototype.remove_entry_m=function(entry)
 
 	if(this.run_button.value!="Run")
 		this.onstop_m();
-
-	console.log("state_table_t::remove_entry_m");
 }
 
 state_table_t.prototype.update_states_m=function()

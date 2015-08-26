@@ -21,14 +21,14 @@ function state_runner_t()
 	this.VM_store={};
 }
 
-state_runner_t.prototype.run=function(robot_name,state_table)
+state_runner_t.prototype.run=function(robot,state_table)
 {
 	if(!state_table)
 		return;
 
 	var myself=this;
 
-	state_table.upload_with_check(robot_name,
+	state_table.upload_with_check(robot,
 		function()
 		{
 			state_table.run();

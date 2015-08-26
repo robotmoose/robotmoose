@@ -13,14 +13,16 @@ function robot_ui_t(div)
 		return null;
 
 	this.div=div;
-	this.cloned=false;
-	this.robot_name=null;
+	this.robot=
+	{
+		name:null,
+		auth:null
+	};
 	this.disconnected_text="<font style='color:red;'>Not connected.</font>";
 
 	this.state_runner=new state_runner_t();
 	this.menu=null;
 	this.connect_menu=null;
-	this.clone_menu=null;
 	this.gui=
 	{
 		element:null,
@@ -39,32 +41,13 @@ function robot_ui_t(div)
 	validate_robot_name(options.robot,
 		function()
 		{
-			myself.robot_name=options.robot;
-			myself.connect_menu.onconnect(myself.robot_name);
+			myself.robot.name=options.robot;
+			myself.connect_menu.onconnect(myself.robot.name,myself.robot.auth);
 		},
 		function()
 		{
 			myself.connect_menu.show();
 		});
-}
-
-robot_ui_t.prototype.clone=function(to,from,setting)
-{
-	var myself=this;
-	superstar_get(from,setting,function(obj)
-	{
-		superstar_set(to,setting,obj,function(obj){myself.cloned=true;});
-	});
-}
-
-robot_ui_t.prototype.clone_reconnect=function(robot_name)
-{
-	var myself=this;
-
-	if(this.cloned)
-		this.connect_menu.onconnect(robot_name);
-	else
-		setTimeout(function(){myself.clone_reconnect(robot_name);},50);
 }
 
 robot_ui_t.prototype.create_menus=function()
@@ -73,7 +56,6 @@ robot_ui_t.prototype.create_menus=function()
 
 	this.menu=new robot_menu_t(div);
 	this.connect_menu=new modal_connect_t(div);
-	this.clone_menu=new modal_clone_t(div);
 
 	this.menu.get_status_area().innerHTML=this.disconnected_text;
 	this.menu.create_button
@@ -85,43 +67,18 @@ robot_ui_t.prototype.create_menus=function()
 		"Connect to a new robot over the network"
 	);
 
-	if(this.menu.buttons["Robot"]&&this.menu.buttons["Robot"].drops["Clone"])
-		this.menu.buttons["Robot"].drops["Clone"].disable();
-
-	this.connect_menu.onconnect=function(robot_name)
+	this.connect_menu.onconnect=function(robot_name,robot_auth)
 	{
 		if(robot_name)
 		{
-			myself.robot_name=null;
+			myself.robot.name=null;
 			clearInterval(myself.gui.interval);
 			myself.gui.interval=null;
-			myself.robot_name=robot_name;
-			myself.menu.get_status_area().innerHTML="Connected to \""+myself.robot_name+"\"";
-
-			if(myself.menu.buttons["Robot"]&&myself.menu.buttons["Robot"].drops["Clone"])
-				myself.menu.buttons["Robot"].drops["Clone"].enable();
+			myself.robot.name=robot_name;
+			myself.robot.auth=robot_auth;
+			myself.menu.get_status_area().innerHTML="Connected to \""+myself.robot.name+"\"";
 
 			myself.download_gui();
-		}
-	};
-	myself.clone_menu.clone_target=myself.robot_name;
-	myself.clone_menu.onclone=function(robot_name,settings,options)
-	{
-		if(myself.clone_menu.clone_target)
-		{
-			for(var key in settings)
-				myself.clone(robot_name,myself.clone_menu.clone_target,settings[key]);
-
-			var connect_to_clone=false;
-
-			for(var key in options)
-			{
-				if(options[key]=="connect_to_clone")
-					myself.connect_to_clone=true;
-			}
-
-			if(connect_to_clone)
-				myself.clone_reconnect(robot_name);
 		}
 	};
 }
@@ -135,7 +92,7 @@ robot_ui_t.prototype.create_gui=function()
 
 robot_ui_t.prototype.download_gui=function()
 {
-	if(!this.robot_name)
+	if(!this.robot||!this.robot.name)
 		return;
 
 	var myself=this;
@@ -146,7 +103,7 @@ robot_ui_t.prototype.download_gui=function()
 			div.removeChild(div.firstChild);
 	}
 
-	superstar_get(this.robot_name,"gui",function(json)
+	superstar_get(this.robot.name,"gui",function(json)
 	{
 		myself.doorways=
 		{
@@ -170,11 +127,10 @@ robot_ui_t.prototype.download_gui=function()
 
 		myself.gui.element.load(json);
 		myself.create_widgets();
-		myself.clone_menu.clone_target=myself.robot_name;
 
 		for(var key in myself.widgets)
 			if(myself.widgets[key].download)
-				myself.widgets[key].download(myself.robot_name);
+				myself.widgets[key].download(myself.robot);
 
 		myself.gui.interval=setInterval(function(){myself.run_interval();},100);
 	});
@@ -187,7 +143,7 @@ robot_ui_t.prototype.run_interval=function() {
 	if (myself.sensor_data_count<2)
 	{ // request more sensor data
 		this.sensor_data_count++;
-		superstar_get(this.robot_name,"sensors",
+		superstar_get(this.robot.name,"sensors",
 			function(sensors) // sensor data has arrived:
 			{
 				myself.sensor_data_count--;
@@ -206,9 +162,9 @@ robot_ui_t.prototype.upload_gui=function()
 	var save=this.gui.element.save();
 	var stringified=JSON.stringify(save);
 
-	if(this.robot_name&&this.gui.old!=stringified)
+	if(this.robot&&this.robot.name&&this.gui.old!=stringified)
 	{
-		superstar_set(this.robot_name,"gui",save);
+		superstar_set(this.robot.name,"gui",save);
 		this.gui.old=stringified;
 	}
 }
@@ -233,27 +189,27 @@ robot_ui_t.prototype.create_widgets=function()
 
 	this.widgets.config.onconfigure=function() // allow configuration upload
 	{
-		if(myself.robot_name)
-			myself.widgets.config.upload(myself.robot_name);
+		if(myself.robot&&myself.robot.name)
+			myself.widgets.config.upload(myself.robot);
 	}
 	this.widgets.states.onrun=function()
 	{
-		if(myself.robot_name)
+		if(myself.robot.name)
 		{
 			myself.state_runner.VM_power=myself.widgets.pilot.pilot.power;
-			myself.state_runner.run(myself.robot_name,myself.widgets.states);
+			myself.state_runner.run(myself.robot,myself.widgets.states);
 		}
 	}
 	this.widgets.states.onstop=function()
 	{
-		if(myself.robot_name)
+		if(myself.robot.name)
 			myself.state_runner.stop(myself.widgets.states);
 	}
 	this.widgets.pilot.onpilot=myself.state_runner.onpilot=function(power)
 	{
-		console.log("Pilot data upload: "+myself.robot_name);
-		if(myself.robot_name)
-			myself.widgets.pilot.upload(myself.robot_name);
+		console.log("Pilot data upload: "+myself.robot.name);
+		if(myself.robot.name)
+			myself.widgets.pilot.upload(myself.robot);
 	}
 }
 

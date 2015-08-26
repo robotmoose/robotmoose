@@ -1,5 +1,5 @@
 //Members
-//		onconnect(selected_robot) - triggered when connect button is hit
+//		onconnect(selected_robot,auth) - triggered when connect button is hit
 
 function modal_connect_t(div)
 {
@@ -32,16 +32,16 @@ function modal_connect_t(div)
 	this.robot_select.className="form-control";
 	this.robot_select.onchange=function(){myself.update_disables_m();};
 	this.modal.get_content().appendChild(this.robot_select);
-	
+
 	this.modal.get_content().appendChild(document.createElement("br"));
-	
+
 	this.robot_auth.className="form-control";
 	this.robot_auth.type="text";
 	this.robot_auth.placeholder="Enter robot authentication";
 	this.modal.get_content().appendChild(this.robot_auth);
-	
+
 	this.modal.get_content().appendChild(document.createElement("br"));
-	
+
 	this.connect_button.className="btn btn-primary";
 	this.connect_button.disabled=true;
 	this.connect_button.type="button";
