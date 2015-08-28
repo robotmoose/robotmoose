@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="latest.js"></script>
+
+		<script>
+			var webrtc;
+
+			function start()
+			{
+				webrtc=new SimpleWebRTC
+				({
+					localVideoEl:document.getElementById("localVideo"),
+					remoteVideosEl:document.getElementById("remoteVideos"),
+					autoRequestMedia:true
+				});
+
+				webrtc.on('readyToCall',function(){webrtc.joinRoom('test1234');});
+			}
+		</script>
+
+	</head>
+	<body onload="start();">
+		<video style="width:320px;height:240px;background-color:red;" id="localVideo"></video>
+		<div style="width:320px;height:240px;background-color:blue;" id="remoteVideos"></div>
+	</body>
+</html>
