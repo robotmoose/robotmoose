@@ -180,7 +180,7 @@ robot_ui_t.prototype.create_widgets=function()
 		pilot:new pilot_interface_t(this.doorways.pilot.content),
 		sensors:new tree_viewer_t(this.doorways.sensors.content,{}),
 		map:new robot_map_t(this.doorways.map.content,{}),
-		video:new video_gruveo_t(this.doorways.video.content)
+		video:new video_webrtc_t(this.doorways.video.content)
 	};
 
 	this.widgets.config.onchange=function() { // recreate pilot GUI when configuration changes

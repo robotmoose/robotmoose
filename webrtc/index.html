@@ -1,27 +1,74 @@
 <!DOCTYPE html>
-<html>
-	<head>
+<html style="margin:0px;padding:0px;width:100%;height:100%;">
+	<head style="margin:0px;padding:0px;width:100%;height:100%;">
 		<script src="latest.js"></script>
+		<script src="http://robotmoose.com/js/input_validation.js"></script>
+		<script src="http://robotmoose.com/js/uri.js"></script>
+		<script src="http://robotmoose.com/js/utility.js"></script>
+		<script src="http://robotmoose.com/js/xmlhttp.js"></script>
+
+		<style>
+			head
+			{
+				overflow:none;
+			}
+
+			body
+			{
+				overflow:none;
+			}
+		</style>
+
+		<div style="overflow:hidden;margin:0px;padding:0px;width:100%;height:100%;background-color:red;" id="remote"></div>
 
 		<script>
 			var webrtc;
 
-			function start()
-			{
-				webrtc=new SimpleWebRTC
-				({
-					localVideoEl:document.getElementById("localVideo"),
-					remoteVideosEl:document.getElementById("remoteVideos"),
-					autoRequestMedia:true
+			var uri=parse_uri(location.search);
+			var remote_div=remote_div=document.getElementById("remote");
+
+			webrtc=new SimpleWebRTC
+			({
+				//localVideoEl:document.getElementById("local"),
+				remoteVideosEl:remote_div,
+				autoRequestMedia:true,
+				peerConnectionConfig:
+				{
+					iceServers:
+					[
+						//{"url": "stun:robotmoose.com:3478"},
+						{"url": "stun:stun.l.google.com:19302"}
+					]
+				},
+				localVideo:
+				{
+					mirror:false
+				},
+			});
+
+			validate_robot_name(uri.robot,
+				function()
+				{
+					webrtc.on('videoAdded',function(video,peer)
+						{
+							remote_div.style.backgroundColor="white";
+							video.style.padding="0px";
+							video.style.margin="0px";
+							video.style.width="100%";
+							video.style.height="100%";
+						});
+
+					webrtc.on('readyToCall',function()
+						{
+							webrtc.joinRoom(uri.robot);
+						});
+				},
+				function()
+				{
+					console.log("Invalid robot name \""+uri.robot+"\".");
 				});
-
-				webrtc.on('readyToCall',function(){webrtc.joinRoom('test1234');});
-			}
 		</script>
-
 	</head>
-	<body onload="start();">
-		<video style="width:320px;height:240px;background-color:red;" id="localVideo"></video>
-		<div style="width:320px;height:240px;background-color:blue;" id="remoteVideos"></div>
+	<body style="margin:0px;padding:0px;width:100%;height:100%;">
 	</body>
 </html>

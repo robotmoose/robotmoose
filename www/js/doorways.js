@@ -27,6 +27,7 @@ function doorways_t(div,menu)
 	this.doorways=[];
 	this.menu=document.createElement("ul");
 
+	this.element.style.overflow="none";
 	this.div.appendChild(this.element);
 
 	this.menu.className="nav nav-tabs";
