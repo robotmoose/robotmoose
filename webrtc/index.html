@@ -1,35 +1,49 @@
 <!DOCTYPE html>
 <html style="margin:0px;padding:0px;width:100%;height:100%;">
-	<head style="margin:0px;padding:0px;width:100%;height:100%;">
+	<head>
 		<script src="latest.js"></script>
 		<script src="http://robotmoose.com/js/input_validation.js"></script>
 		<script src="http://robotmoose.com/js/uri.js"></script>
 		<script src="http://robotmoose.com/js/utility.js"></script>
 		<script src="http://robotmoose.com/js/xmlhttp.js"></script>
 
+		<div id="remote_div"></div>
+
 		<style>
 			head
 			{
 				overflow:none;
+				margin:0px;
+				padding:0px;
+				width:100%;
+				height:100%;
 			}
 
 			body
 			{
 				overflow:none;
+				margin:0px;
+				padding:0px;
+				width:100%;
+				height:100%;
 			}
 		</style>
 
-		<div style="overflow:hidden;margin:0px;padding:0px;width:100%;height:100%;background-color:red;" id="remote"></div>
-
 		<script>
-			var webrtc;
+			var remote_div=document.getElementById("remote_div");
+			remote_div.style.overflow="hidden";
+			remote_div.style.margin="0px";
+			remote_div.style.padding="0px";
+			remote_div.style.width="100%";
+			remote_div.style.height="100%";
+			remote_div.style.backgroundColor="red";
 
 			var uri=parse_uri(location.search);
-			var remote_div=remote_div=document.getElementById("remote");
+			var peers=[];
 
-			webrtc=new SimpleWebRTC
+			var webrtc=new SimpleWebRTC
 			({
-				//localVideoEl:document.getElementById("local"),
+				localVideoEl:null,
 				remoteVideosEl:remote_div,
 				autoRequestMedia:true,
 				peerConnectionConfig:
@@ -51,11 +65,40 @@
 				{
 					webrtc.on('videoAdded',function(video,peer)
 						{
+							console.log("Adding video");
+							console.log(peer);
+
 							remote_div.style.backgroundColor="white";
 							video.style.padding="0px";
 							video.style.margin="0px";
 							video.style.width="100%";
 							video.style.height="100%";
+							peers.push(peer);
+
+							if(peers.length==1)
+							{
+								remote_div.appendChild(video);
+								console.log("Empty video, setting as first one.");
+							}
+						});
+
+					webrtc.on('videoRemoved',function(video,peer)
+						{
+							console.log("Removing video");
+							console.log(peer);
+
+							var new_peers=[];
+
+							for(var key in peers)
+								if(peers[key]===peer)
+									peers[key]=undefined;
+								else
+									new_peers.push(peers[key]);
+
+							peers=new_peers;
+
+							if(peers.length==0)
+								remote_div.style.backgroundColor="red";
 						});
 
 					webrtc.on('readyToCall',function()
@@ -69,6 +112,6 @@
 				});
 		</script>
 	</head>
-	<body style="margin:0px;padding:0px;width:100%;height:100%;">
+	<body>
 	</body>
 </html>

@@ -287,6 +287,13 @@ pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_d
 		mousePower.L=mousePower.R=0.0;
 		str+=" (click to send)";
 	}
+
+	if(!this.mouse_in_div)
+	{
+		mouse.Power.L=0;
+		mouse.Power.R=0;
+	}
+
 	this.pilot.power.L=mousePower.L;
 	this.pilot.power.R=mousePower.R;
 	this.pilot_send();
@@ -299,7 +306,8 @@ pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_d
 // FIXME: Add proportional control
 pilot_interface_t.prototype.pilot_keyboard=function()
 {
-	if (this.mouse_in_div<1) return; // skip keystroke
+	if (this.mouse_in_div<1)
+		return;
 
 	// console.log("Keyboard activity");
 	var maxPower=this.get_pilot_power();
@@ -324,8 +332,13 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 	if(keyDown('w','W')) forward+=1.0;
 	if(keyDown(' ')) turn=forward=0.0; // stop!
 
-	if (turn==0.0 && forward==0.0) this.keyboardIsDriving=false;
-	else this.keyboardIsDriving=true;
+	if(!keyDown('a','A')&&!keyDown('d','D')&&!keyDown('s','S')&&!keyDown('w','W'))
+		forward=turn=0;
+
+	if (turn==0.0 && forward==0.0)
+		this.keyboardIsDriving=false;
+	else
+		this.keyboardIsDriving=true;
 
 	this.pilot.power.L=clamp(maxPower*(forward+turn),-maxPower,+maxPower);
 	this.pilot.power.R=clamp(maxPower*(forward-turn),-maxPower,+maxPower);

@@ -81,8 +81,20 @@
 		-ms-user-select:none;
 		user-select:none;
 	}
-	.navbar .navbar-collapse
+
+	@media (min-width: 768px)
 	{
-		text-align: center;
+		.navbar .navbar-nav
+		{
+			display:inline-block;
+			float:none;
+			vertical-align:top;
+		}
+
+		.navbar .navbar-collapse
+		{
+			text-align:center;
+		}
 	}
+}
 </style>
