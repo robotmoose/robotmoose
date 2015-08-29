@@ -7,7 +7,8 @@
 		<script src="http://robotmoose.com/js/utility.js"></script>
 		<script src="http://robotmoose.com/js/xmlhttp.js"></script>
 
-		<div id="remote_div"></div>
+		<div id="outer_div"></div>
+		<div id="remote_div" style="height:0px;"></div>
 
 		<style>
 			head
@@ -30,16 +31,102 @@
 		</style>
 
 		<script>
+			//onclick - function to call when clicked.
+			function hover_div_t(div,side)
+			{
+				if(!div)
+					return null;
+
+				this.div=div;
+				var myself=this;
+
+				this.el=document.createElement("div");
+				this.el.style.top=0;
+				this.el.style.float=side;
+				this.el.style.margin="0px";
+				this.el.style.padding="0px";
+				this.el.style.width="100px";
+				this.el.style.height="100%";
+				this.el.style.backgroundColor="black";
+				this.el.style.opacity=0.1;
+				this.el.style.cursor="pointer";
+				this.el.onclick=function(){if(myself.onclick)myself.onclick();}
+				this.el.onmouseenter=function(){myself.el.style.opacity=0.5;}
+				this.el.onmouseleave=function(){myself.el.style.opacity=0.1;}
+				this.div.appendChild(this.el);
+			}
+
+			function video_hide(index)
+			{
+				objs[index].v.style.height="0px";
+				objs[index].v.style.visibility="hidden";
+			}
+
+			function video_show(index)
+			{
+				if(index<objs.length&&index>=0)
+				{
+					objs[index].v.style.height="100%";
+					objs[index].v.style.visibility="visible";
+				}
+			}
+
+			function video_hide_all()
+			{
+				for(var ii=0;ii<objs.length;++ii)
+					video_hide(ii);
+			}
+
+			hover_div_t.prototype.remove=function()
+			{
+				this.div.removeChild(this.el);
+			}
+
+			var outer_div=document.getElementById("outer_div");
+			outer_div.style.position="absolute";
+			outer_div.style.top=0;
+			outer_div.style.overflow="hidden";
+			outer_div.style.margin="0px";
+			outer_div.style.padding="0px";
+			outer_div.style.width="100%";
+			outer_div.style.height="100%";
+
 			var remote_div=document.getElementById("remote_div");
+			remote_div.style.pointerEvents="none";
+			remote_div.style.zIndex=0;
 			remote_div.style.overflow="hidden";
 			remote_div.style.margin="0px";
 			remote_div.style.padding="0px";
 			remote_div.style.width="100%";
 			remote_div.style.height="100%";
-			remote_div.style.backgroundColor="red";
 
 			var uri=parse_uri(location.search);
-			var peers=[];
+			var index=0;
+			var objs=[];
+
+			var left_hover=new hover_div_t(outer_div,"left");
+			left_hover.onclick=function()
+			{
+				if(index-1>=0)
+					--index;
+				else if(objs.length>0)
+					index=objs.length-1;
+
+				video_hide_all();
+
+				video_show(index);
+			};
+			var right_hover=new hover_div_t(outer_div,"right");
+			right_hover.onclick=function()
+			{
+				if(index+1<objs.length)
+					++index;
+				else if(objs.length>0)
+					index=0;
+
+				video_hide_all();
+				video_show(index);
+			};
 
 			var webrtc=new SimpleWebRTC
 			({
@@ -65,39 +152,35 @@
 				{
 					webrtc.on('videoAdded',function(video,peer)
 						{
-							console.log("Adding video");
-							console.log(peer);
-
 							remote_div.style.backgroundColor="white";
 							video.style.padding="0px";
 							video.style.margin="0px";
 							video.style.width="100%";
 							video.style.height="100%";
-							peers.push(peer);
+							video.style.visibility="hidden";
+							video.style.height="0px";
+							var obj={};
+							obj.p=peer;
+							obj.v=video;
+							objs.push(obj);
 
-							if(peers.length==1)
-							{
-								remote_div.appendChild(video);
-								console.log("Empty video, setting as first one.");
-							}
+							if(objs.length==1)
+								video_show(0);
 						});
 
 					webrtc.on('videoRemoved',function(video,peer)
 						{
-							console.log("Removing video");
-							console.log(peer);
+							var new_objs=[];
 
-							var new_peers=[];
-
-							for(var key in peers)
-								if(peers[key]===peer)
-									peers[key]=undefined;
+							for(var key in objs)
+								if(objs[key].p===peer)
+									objs[key]=undefined;
 								else
-									new_peers.push(peers[key]);
+									new_objs.push(objs[key]);
 
-							peers=new_peers;
+							objs=new_objs;
 
-							if(peers.length==0)
+							if(objs.length==0)
 								remote_div.style.backgroundColor="red";
 						});
 
