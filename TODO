@@ -16,3 +16,9 @@ book keeping:
 	-Documentation...
 	-Lesson plan audit.
 	-Instructional picture audit.
+
+webrtc:
+	-get doorways to pass mouse to screen switcher
+
+state_table:
+	-make states resizable.

@@ -7,8 +7,8 @@
 		<script src="http://robotmoose.com/js/utility.js"></script>
 		<script src="http://robotmoose.com/js/xmlhttp.js"></script>
 
-		<div id="outer_div"></div>
-		<div id="remote_div" style="height:0px;"></div>
+		<div id="remote_div" style="margin:0px;padding:0px;width:100%;height:100%;overflow:hidden;"></div>
+		<div id="outer_div" style="margin:0px;padding:0px;width:100%;height:100%;overflow:hidden;"></div>
 
 		<style>
 			head
@@ -43,8 +43,7 @@
 				this.el=document.createElement("div");
 				this.el.style.top=0;
 				this.el.style.float=side;
-				this.el.style.margin="0px";
-				this.el.style.padding="0px";
+				this.el.style.margin=this.el.style.padding="0px";
 				this.el.style.width="100px";
 				this.el.style.height="100%";
 				this.el.style.backgroundColor="black";
@@ -54,6 +53,11 @@
 				this.el.onmouseenter=function(){myself.el.style.opacity=0.5;}
 				this.el.onmouseleave=function(){myself.el.style.opacity=0.1;}
 				this.div.appendChild(this.el);
+			}
+
+			hover_div_t.prototype.remove=function()
+			{
+				this.div.removeChild(this.el);
 			}
 
 			function video_hide(index)
@@ -77,28 +81,56 @@
 					video_hide(ii);
 			}
 
-			hover_div_t.prototype.remove=function()
+			function create_video(video,peer)
 			{
-				this.div.removeChild(this.el);
+				if(uri.doorways)
+					outer_div.style.height=remote_div.style.height="90%";
+
+				remote_div.style.backgroundColor="white";
+				video.style.position="absolute";
+				video.style.top=video.style.height=video.style.padding=video.style.margin="0px";
+				video.style.left="0px";
+				video.style.width="100%";
+				video.style.visibility="hidden";
+				var obj={};
+				obj.p=peer;
+				obj.v=video;
+				objs.push(obj);
+
+				if(objs.length==1)
+					video_show(0);
+			}
+
+			function remove_video(video,peer)
+			{
+				var new_objs=[];
+
+				for(var key in objs)
+					if(objs[key].p===peer)
+						objs[key]=undefined;
+					else
+						new_objs.push(objs[key]);
+
+				objs=new_objs;
+
+				if(objs.length==0)
+					remote_div.style.backgroundColor="red";
+
+				while(index>=objs.length&&index>0)
+					--index;
+
+				video_show(index);
 			}
 
 			var outer_div=document.getElementById("outer_div");
 			outer_div.style.position="absolute";
 			outer_div.style.top=0;
-			outer_div.style.overflow="hidden";
-			outer_div.style.margin="0px";
-			outer_div.style.padding="0px";
-			outer_div.style.width="100%";
-			outer_div.style.height="100%";
 
 			var remote_div=document.getElementById("remote_div");
+			remote_div.style.position="absolute";
+			remote_div.style.top=0;
 			remote_div.style.pointerEvents="none";
-			remote_div.style.zIndex=0;
-			remote_div.style.overflow="hidden";
-			remote_div.style.margin="0px";
-			remote_div.style.padding="0px";
-			remote_div.style.width="100%";
-			remote_div.style.height="100%";
+			remote_div.style.verticalAlign="middle";
 
 			var uri=parse_uri(location.search);
 			var index=0;
@@ -137,8 +169,8 @@
 				{
 					iceServers:
 					[
-						//{"url": "stun:robotmoose.com:3478"},
-						{"url": "stun:stun.l.google.com:19302"}
+						{"url": "stun:stun.l.google.com:19302"},
+						{"url": "stun:robotmoose.com:3478"}
 					]
 				},
 				localVideo:
@@ -150,44 +182,9 @@
 			validate_robot_name(uri.robot,
 				function()
 				{
-					webrtc.on('videoAdded',function(video,peer)
-						{
-							remote_div.style.backgroundColor="white";
-							video.style.padding="0px";
-							video.style.margin="0px";
-							video.style.width="100%";
-							video.style.height="100%";
-							video.style.visibility="hidden";
-							video.style.height="0px";
-							var obj={};
-							obj.p=peer;
-							obj.v=video;
-							objs.push(obj);
-
-							if(objs.length==1)
-								video_show(0);
-						});
-
-					webrtc.on('videoRemoved',function(video,peer)
-						{
-							var new_objs=[];
-
-							for(var key in objs)
-								if(objs[key].p===peer)
-									objs[key]=undefined;
-								else
-									new_objs.push(objs[key]);
-
-							objs=new_objs;
-
-							if(objs.length==0)
-								remote_div.style.backgroundColor="red";
-						});
-
-					webrtc.on('readyToCall',function()
-						{
-							webrtc.joinRoom(uri.robot);
-						});
+					webrtc.on('videoAdded',create_video);
+					webrtc.on('videoRemoved',remove_video);
+					webrtc.on('readyToCall',function(){webrtc.joinRoom(uri.robot);});
 				},
 				function()
 				{
