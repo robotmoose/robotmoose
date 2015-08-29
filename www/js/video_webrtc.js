@@ -48,7 +48,12 @@ video_webrtc_t.prototype.download=function(robot,link)
 	this.frame.style.padding="0px";
 	this.frame.style.margin="0px";
 	this.frame.style.overflow="hidden";
-	this.frame.style.pointerEvents="none";
+
+	if(this.obj.active)
+		this.frame.style.pointerEvents="all";
+	else
+		this.frame.style.pointerEvents="none";
+
 	this.div.appendChild(this.frame);
 }
 
