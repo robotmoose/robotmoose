@@ -1,14 +1,22 @@
-function video_webrtc_t(div)
+function video_webrtc_t(obj)
 {
-	if(!div)
+	if(!obj)
 		return null;
 
-	this.div=div;
+	this.obj=obj;
+	var myself=this;
+
+	this.obj.onactivate=function(){myself.pointer_events(true);};
+	this.obj.ondeactivate=function(){myself.pointer_events(false);};
+	this.obj.resizer.onresizing=function(){myself.pointer_events(false);};
+
+	this.div=document.createElement("div");
 	this.div.style.width="100%";
 	this.div.style.height="100%";
 	this.div.style.overflow="hidden";
+	this.div.onclick=function(event){myself.obj.body.onclick(event);};
+	this.obj.content.appendChild(this.div);
 
-	var myself=this;
 	this.robot=null;
 
 	this.select=document.createElement("select");
@@ -16,7 +24,7 @@ function video_webrtc_t(div)
 	this.select.className="form-control";
 	this.select.onchange=function(){myself.download(null,myself.select.options[this.selectedIndex].video_link);};
 
-	this.default_link="http://www.robotmoose.com/webrtc/";
+	this.default_link="http://robotmoose.com/webrtc/";
 	this.create_option("webRTC",this.default_link);
 	this.create_option("gruveo","https://www.gruveo.com/embed/");
 }
@@ -50,5 +58,12 @@ video_webrtc_t.prototype.create_option=function(name,link)
 	option.video_link=link;
 	option.text=name;
 	this.select.appendChild(option);
+}
 
+video_webrtc_t.prototype.pointer_events=function(value)
+{
+	this.frame.style.pointerEvents="none";
+
+	if(value&&!this.obj.resizer.dragging.on)
+		this.frame.style.pointerEvents="all";
 }

@@ -1,3 +1,5 @@
+//onresizing() - callback called when resizing is started.
+
 function resizer_t(div,options)
 {
 	if(!div)
@@ -74,6 +76,9 @@ resizer_t.prototype.onmousedown=function(event)
 
 		this.dragging.offset.x=offset_left;
 		this.dragging.offset.y=offset_top;
+
+		if(this.onresizing)
+			this.onresizing();
 	}
 
 	return false;
@@ -119,6 +124,10 @@ resizer_t.prototype.onmousemove=function(event)
 resizer_t.prototype.onmouseup=function(event)
 {
 	this.dragging.on=false;
+
+	if(this.onresized)
+		this.onresized();
+
 	return false;
 }
 

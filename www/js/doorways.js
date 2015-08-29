@@ -1,3 +1,6 @@
+//onactivate() - callback called when doorway is activated.
+//ondeactivate() - callback called when doorway is deactivated.
+
 function doorways_t(div,menu)
 {
 	if(!div)
@@ -314,6 +317,9 @@ doorways_t.prototype.activate=function(doorway)
 	doorway.panel.style.zIndex=this.doorways.length+1;
 	doorway.tab.li.className="active";
 	this.update_zindicies();
+
+	if(doorway.onactivate)
+		doorway.onactivate();
 }
 
 doorways_t.prototype.deactivate=function(doorway)
@@ -325,6 +331,9 @@ doorways_t.prototype.deactivate=function(doorway)
 	doorway.active=false;
 	doorway.panel.className="panel panel-default";
 	doorway.tab.li.className="";
+
+	if(doorway.ondeactivate)
+		doorway.ondeactivate();
 }
 
 doorways_t.prototype.remove_all=function()

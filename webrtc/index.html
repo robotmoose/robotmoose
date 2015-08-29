@@ -7,7 +7,7 @@
 		<script src="http://robotmoose.com/js/utility.js"></script>
 		<script src="http://robotmoose.com/js/xmlhttp.js"></script>
 
-		<div id="remote_div" style="margin:0px;padding:0px;width:100%;height:100%;overflow:hidden;"></div>
+		<!--<div id="remote_div" style="margin:0px;padding:0px;width:100%;height:100%;overflow:hidden;"></div>-->
 		<div id="outer_div" style="margin:0px;padding:0px;width:100%;height:100%;overflow:hidden;"></div>
 
 		<style>
@@ -62,28 +62,28 @@
 
 			function video_hide(index)
 			{
-				objs[index].v.style.height="0px";
-				objs[index].v.style.visibility="hidden";
+				//objs[index].v.style.height="0px";
+				//objs[index].v.style.visibility="hidden";
 			}
 
 			function video_show(index)
 			{
-				if(index<objs.length&&index>=0)
+				/*if(index<objs.length&&index>=0)
 				{
 					objs[index].v.style.height="100%";
 					objs[index].v.style.visibility="visible";
-				}
+				}*/
 			}
 
 			function video_hide_all()
 			{
-				for(var ii=0;ii<objs.length;++ii)
-					video_hide(ii);
+				//for(var ii=0;ii<objs.length;++ii)
+				//	video_hide(ii);
 			}
 
 			function create_video(video,peer)
 			{
-				if(uri.doorways)
+				/*if(uri.doorways)
 					outer_div.style.height=remote_div.style.height="90%";
 
 				remote_div.style.backgroundColor="white";
@@ -98,12 +98,12 @@
 				objs.push(obj);
 
 				if(objs.length==1)
-					video_show(0);
+					video_show(0);*/
 			}
 
 			function remove_video(video,peer)
 			{
-				var new_objs=[];
+				/*var new_objs=[];
 
 				for(var key in objs)
 					if(objs[key].p===peer)
@@ -119,20 +119,20 @@
 				while(index>=objs.length&&index>0)
 					--index;
 
-				video_show(index);
+				video_show(index);*/
 			}
 
 			var outer_div=document.getElementById("outer_div");
 			outer_div.style.position="absolute";
 			outer_div.style.top=0;
 
-			var remote_div=document.getElementById("remote_div");
+			/*var remote_div=document.getElementById("remote_div");
 			remote_div.style.position="absolute";
 			remote_div.style.top=0;
 			remote_div.style.pointerEvents="none";
-			remote_div.style.verticalAlign="middle";
+			remote_div.style.verticalAlign="middle";*/
 
-			var uri=parse_uri(location.search);
+			//var uri=parse_uri(location.search);
 			var index=0;
 			var objs=[];
 
@@ -160,7 +160,7 @@
 				video_show(index);
 			};
 
-			var webrtc=new SimpleWebRTC
+			/*var webrtc=new SimpleWebRTC
 			({
 				localVideoEl:null,
 				remoteVideosEl:remote_div,
@@ -189,7 +189,7 @@
 				function()
 				{
 					console.log("Invalid robot name \""+uri.robot+"\".");
-				});
+				});*/
 		</script>
 	</head>
 	<body>
