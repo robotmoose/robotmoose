@@ -25,7 +25,7 @@ function video_widget_t(obj)
 	this.select.onchange=function(){myself.download(null,myself.select.options[this.selectedIndex].video_link);};
 
 	this.default_link="http://robotmoose.com/webrtc/";
-	this.create_option("None",null);
+	this.create_option("Off",null);
 	this.create_option("WebRTC",this.default_link);
 	this.create_option("Gruveo","https://www.gruveo.com/embed/");
 }
