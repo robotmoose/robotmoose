@@ -65,10 +65,10 @@ void loop() {
     }
     Total = count1 + count2;
     
-    Serial.print("Count1 = ");
-    Serial.println(count1);
-    Serial.print("Count2 = ");
-    Serial.println(count2);
+    //Serial.print("Count1 = ");
+    //Serial.println(count1);
+    //Serial.print("Count2 = ");
+    //Serial.println(count2);
     Serial.print("Total = ");
     Serial.println(Total);
 }
