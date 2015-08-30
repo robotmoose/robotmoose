@@ -32,16 +32,14 @@ function video_widget_t(obj)
 
 video_widget_t.prototype.download=function(robot,link)
 {
+	if(robot!=null)
+		this.robot=robot;
+
 	if(this.frame)
 	{
 		this.div.removeChild(this.frame);
 		this.frame=null;
 	}
-
-	if(robot==null)
-		return;
-
-	this.robot=robot;
 
 	if(link)
 	{
