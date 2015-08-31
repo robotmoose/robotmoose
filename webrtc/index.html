@@ -131,6 +131,7 @@
 			remote_div.style.top=0;
 			remote_div.style.pointerEvents="none";
 			remote_div.style.verticalAlign="middle";
+			remote_div.style.backgroundColor="red";
 
 			var uri=parse_uri(location.search);
 			var index=0;
@@ -169,8 +170,8 @@
 				{
 					iceServers:
 					[
-						{"url": "stun:stun.l.google.com:19302"},
-						{"url": "stun:robotmoose.com:3478"}
+						{"url": "stun:robotmoose.com:3478"},
+						{"url": "stun:stun.l.google.com:19302"}
 					]
 				},
 				localVideo:
