@@ -7,8 +7,10 @@
 		<script src="http://robotmoose.com/js/utility.js"></script>
 		<script src="http://robotmoose.com/js/xmlhttp.js"></script>
 
-		<div id="remote_div" style="margin:0px;padding:0px;width:100%;height:100%;overflow:hidden;"></div>
-		<div id="outer_div" style="margin:0px;padding:0px;width:100%;height:100%;overflow:hidden;"></div>
+		<div id="remote_div" style="margin:0px;padding:0px;width:100%;height:80%;overflow:hidden;"></div>
+		<div id="switching_div" style="margin:0px;padding:0px;width:100%;height:80%;overflow:hidden;"></div>
+		<div id="chat_window" style="margin:0px;padding:0px;width:100%;height:20%;position:absolute;bottom:0;"></div>
+		
 
 		<style>
 			head
@@ -60,6 +62,50 @@
 				this.div.removeChild(this.el);
 			}
 
+			function chat_div_t(div)
+			{
+				if(!div)
+					return null;
+				this.div=div;
+				var myself=this;
+				
+				this.nick=document.createElement("input");
+				this.nick.type="text";
+				this.nick.placeholder="Enter Chat Nickname";
+				this.nick.onchange=function(){myself.validate();};
+				this.nick.style.marginRight="10px";
+				
+				this.chat_box=document.createElement("input");
+				this.chat_box.type="textarea";
+				this.chat_box.placeholder="Enter Chat Message";
+				this.chat_box.style.width="80%";
+				this.chat_box.onchange=function(){myself.validate();};
+				this.chat_box.style.marginRight="10px";
+				
+				this.send_button=document.createElement("input");
+				this.send_button.type="button";
+				this.send_button.value="Send";
+				this.send_button.disabled=true;
+				
+				
+				this.chat_area=document.createElement("div");
+				
+				
+				this.div.appendChild(this.chat_area);
+				this.div.appendChild(this.nick);
+				this.div.appendChild(this.chat_box);
+				this.div.appendChild(this.send_button);
+				
+				
+			}
+			chat_div_t.prototype.validate=function()
+			{
+				if(this.nick.value!=0&&this.chat_box.value!=0)
+					this.send_button.disabled=false;
+				else if(this.nick.value==0||this.chat_box.value==0)
+					this.send_button.disabled=true;
+				
+			}
 			function video_hide(index)
 			{
 				objs[index].v.style.height="0px";
@@ -83,8 +129,11 @@
 
 			function create_video(video,peer)
 			{
+				webrtc.sendToAll("chat",{data:"New video!"});
+				//peer.send('chat',{data: '!!!!!!!!!!! sent via A'});
+				
 				if(uri.doorways)
-					outer_div.style.height=remote_div.style.height="90%";
+					switching_div.style.height=remote_div.style.height="90%";
 
 				remote_div.style.backgroundColor="white";
 				video.style.position="absolute";
@@ -122,9 +171,9 @@
 				video_show(index);
 			}
 
-			var outer_div=document.getElementById("outer_div");
-			outer_div.style.position="absolute";
-			outer_div.style.top=0;
+			var switching_div=document.getElementById("switching_div");
+			switching_div.style.position="absolute";
+			switching_div.style.top=0;
 
 			var remote_div=document.getElementById("remote_div");
 			remote_div.style.position="absolute";
@@ -137,7 +186,7 @@
 			var index=0;
 			var objs=[];
 
-			var left_hover=new hover_div_t(outer_div,"left");
+			var left_hover=new hover_div_t(switching_div,"left");
 			left_hover.onclick=function()
 			{
 				if(index-1>=0)
@@ -149,7 +198,7 @@
 
 				video_show(index);
 			};
-			var right_hover=new hover_div_t(outer_div,"right");
+			var right_hover=new hover_div_t(switching_div,"right");
 			right_hover.onclick=function()
 			{
 				if(index+1<objs.length)
@@ -160,7 +209,7 @@
 				video_hide_all();
 				video_show(index);
 			};
-
+			var chat_window=new chat_div_t(document.getElementById("chat_window"));
 			var webrtc=new SimpleWebRTC
 			({
 				localVideoEl:null,
@@ -180,17 +229,27 @@
 				},
 			});
 
-			validate_robot_name(uri.robot,
-				function()
-				{
+			//validate_robot_name(uri.robot,
+				//function()
+				//{
 					webrtc.on('videoAdded',create_video);
 					webrtc.on('videoRemoved',remove_video);
 					webrtc.on('readyToCall',function(){webrtc.joinRoom(uri.robot);});
-				},
-				function()
-				{
+					webrtc.on('message',function(message)
+						{
+							if (message.type === 'offer')
+							{
+							}
+							else if (message.type === 'chat')
+							{
+								console.log(message.payload.data); 
+							}
+						});
+				//},
+				//function()
+				/*{
 					console.log("Invalid robot name \""+uri.robot+"\".");
-				});
+				});*/
 		</script>
 	</head>
 	<body>
