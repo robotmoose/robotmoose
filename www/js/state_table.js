@@ -55,7 +55,8 @@ function state_table_t(doorway)
 		this.element=null;
 	}
 
-	this.element.style.width=640;
+	this.element.style.width="auto";
+	this.element.style.minWidth=640;
 	this.div.appendChild(this.element);
 
 	this.element.appendChild(this.drag_list_div);
@@ -350,6 +351,7 @@ state_table_t.prototype.create_entry=function(state,time,code)
 	var myself=this;
 	var entry={};
 	entry.drag_list=this.drag_list.create_entry();
+	entry.drag_list.li.style.minWidth=740;
 	entry.drag_list.ondrag=function(){myself.onstop_m();};
 	entry.drag_list.state_table_t=entry;
 	entry.drag_list.onremove=function(entry){myself.remove_entry_m(entry.state_table_t);};
@@ -628,7 +630,7 @@ state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 		mode:"text/x-javascript"
 	});
 	entry.code_editor.on("change",function(){myself.code_change_m()});
-	entry.code_editor.setSize(400,100);
+	entry.code_editor.setSize(500);
 	entry.code_editor_event=function(event){entry.code_editor.refresh();};
 	window.addEventListener("click",entry.code_editor_event);
 
