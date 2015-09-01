@@ -17,8 +17,11 @@ book keeping:
 	-Lesson plan audit.
 	-Instructional picture audit.
 
-webrtc:
-	-get doorways to pass mouse to screen switcher
+backend:
+	-Fix disconnect reconnect problem.
 
-state_table:
-	-make states resizable.
+ui:
+	-Ability to create a ui in a new widget.
+
+webrtc:
+	-Add chat window.
