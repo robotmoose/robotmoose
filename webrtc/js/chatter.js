@@ -109,8 +109,20 @@ chatter_t.prototype.send_m=function()
 {
 	if(!this.send_button.disabled)
 	{
-		this.webrtc.sendToAll("chat",{name:this.name_box.value,message:this.send_box.value});
+		var message=
+		{
+			type:"chat",
+			payload:
+			{
+				name:this.name_box.value,
+				message:this.send_box.value
+			}
+		};
+
+		this.webrtc.sendToAll("chat",message.payload);
 		this.send_box.value="";
+
+		this.receive(message);
 	}
 
 	this.validate_m();

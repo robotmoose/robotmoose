@@ -47,9 +47,12 @@ video_manager_t.prototype.create=function(video,peer,uri)
 	video.style.width="100%";
 	video.style.visibility="hidden";
 
+	var myself=this;
+
 	var obj={};
 	obj.p=peer;
 	obj.v=video;
+	obj.p.handleMessage=function(message){if(myself.onreceive)myself.onreceive(message);}
 
 	this.objs.push(obj);
 
@@ -65,7 +68,7 @@ video_manager_t.prototype.remove=function(video,peer)
 		if(this.objs[key].p===peer)
 			this.objs[key]=undefined;
 		else
-			new_objs.push(objs[key]);
+			new_objs.push(this.objs[key]);
 
 	this.objs=new_objs;
 
