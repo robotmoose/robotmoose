@@ -1,255 +1,35 @@
 <!DOCTYPE html>
-<html style="margin:0px;padding:0px;width:100%;height:100%;">
-	<head>
-		<script src="latest.js"></script>
+<html style="margin:0px;padding:0px;width:100%;height:100%;overflow:none;">
+	<head style="margin:0px;padding:0px;width:100%;height:100%;overflow:none;">
 		<script src="http://robotmoose.com/js/input_validation.js"></script>
 		<script src="http://robotmoose.com/js/uri.js"></script>
 		<script src="http://robotmoose.com/js/utility.js"></script>
 		<script src="http://robotmoose.com/js/xmlhttp.js"></script>
 
-		<div id="remote_div" style="margin:0px;padding:0px;width:100%;height:80%;overflow:hidden;"></div>
-		<div id="switching_div" style="margin:0px;padding:0px;width:100%;height:80%;overflow:hidden;"></div>
+		<script src="/latest.js"></script>
+		<script src="/js/chatter.js"></script>
+		<script src="/js/hover_handle.js"></script>
+		<script src="/js/video_manager.js"></script>
+
+		<div id="video" style="margin:0px;padding:0px;width:100%;height:80%;position:absolute;top:0;"></div>
 		<div id="chat_window" style="margin:0px;padding:0px;width:100%;height:20%;position:absolute;bottom:0;"></div>
-		
-
-		<style>
-			head
-			{
-				overflow:none;
-				margin:0px;
-				padding:0px;
-				width:100%;
-				height:100%;
-			}
-
-			body
-			{
-				overflow:none;
-				margin:0px;
-				padding:0px;
-				width:100%;
-				height:100%;
-			}
-		</style>
 
 		<script>
-			//onclick - function to call when clicked.
-			function hover_div_t(div,side)
-			{
-				if(!div)
-					return null;
-
-				this.div=div;
-				var myself=this;
-
-				this.el=document.createElement("div");
-				this.el.style.top=0;
-				this.el.style.float=side;
-				this.el.style.margin=this.el.style.padding="0px";
-				this.el.style.width="100px";
-				this.el.style.height="100%";
-				this.el.style.backgroundColor="black";
-				this.el.style.opacity=0.1;
-				this.el.style.cursor="pointer";
-				this.el.onclick=function(){if(myself.onclick)myself.onclick();}
-				this.el.onmouseenter=function(){myself.el.style.opacity=0.5;}
-				this.el.onmouseleave=function(){myself.el.style.opacity=0.1;}
-				this.div.appendChild(this.el);
-			}
-
-			hover_div_t.prototype.remove=function()
-			{
-				this.div.removeChild(this.el);
-			}
-			
-			//Add chat box at bottom of video 
-			function chat_div_t(div)
-			{
-				if(!div)
-					return null;
-				this.div=div;
-				var myself=this;
-				this.msg=0; //Messages Recieved 
-				
-				this.nick=document.createElement("input");
-				this.nick.type="text";
-				this.nick.placeholder="Enter Chat Nickname";
-				this.nick.onchange=function(){myself.validate();};
-				this.nick.onkeypress=function(){myself.validate();};
-				this.nick.onkeyup=function(){myself.validate();};
-				this.nick.onkeydown=function(){myself.validate();};
-				this.nick.style.marginRight="10px";
-				
-				this.chat_box=document.createElement("input");
-				this.chat_box.type="text";
-				this.chat_box.placeholder="Enter Chat Message";
-				this.chat_box.style.width="75%";
-				this.chat_box.onchange=function(){myself.validate();};
-				this.chat_box.onkeypress=function(){myself.validate();};
-				this.chat_box.onkeyup=function(){myself.validate();};
-				this.chat_box.onkeydown=function(){myself.validate();};
-				this.chat_box.style.marginRight="10px";
-				
-				this.send_button=document.createElement("input");
-				this.send_button.type="button";
-				this.send_button.value="Send";
-				this.send_button.disabled=true;
-				this.send_button.onclick=function(){myself.send();};
-				
-				
-				this.chat_area=document.createElement("div"); //Messages will be appended here
-				
-				
-				this.div.appendChild(this.chat_area);
-				this.div.appendChild(this.nick);
-				this.div.appendChild(this.chat_box);
-				this.div.appendChild(this.send_button);
-				
-				
-			}
-
-			chat_div_t.prototype.validate=function()
-			{
-				if(this.nick.value!=0&&this.chat_box.value!=0)
-					this.send_button.disabled=false;
-				else if(this.nick.value==0||this.chat_box.value==0)
-					this.send_button.disabled=true;
-				
-			}
-			//FIXME: Only sending to local session. See webrtc.on message handler LN273
-			chat_div_t.prototype.send=function()
-			{
-				console.log("Chat send called : ");
-				var myself=this;
-				
-				this.msg=myself.nick.value + ": "+ myself.chat_box.value;
-				webrtc.sendToAll("chat",{data:this.msg} );
-				//webrtc.sendDToAll("text chat", "chat",this.msg );
-				console.log("sent message: "+ this.msg);
-				
-			}
-			
-			chat_div_t.prototype.receive=function(message)
-			{
-				var myself=this;
-				if(message.type === 'chat')
-				{
-					this.latest_msg=document.createElement("input");
-					this.latest_msg.value=message.payload.data;
-					this.latest_msg.readOnly=true; // Disables editing of received messages
-				
-					myself.chat_area.appendChild(this.latest_msg);
-					console.log(message);
-				}
-			}
-			function video_hide(index)
-			{
-				objs[index].v.style.height="0px";
-				objs[index].v.style.visibility="hidden";
-			}
-
-			function video_show(index)
-			{
-				if(index<objs.length&&index>=0)
-				{
-					objs[index].v.style.height="100%";
-					objs[index].v.style.visibility="visible";
-				}
-			}
-
-			function video_hide_all()
-			{
-				for(var ii=0;ii<objs.length;++ii)
-					video_hide(ii);
-			}
-
-			function create_video(video,peer)
-			{
-				webrtc.sendToAll("chat",{data:"New video!"});
-				//peer.send('chat',{data: '!!!!!!!!!!! sent via A'});
-				
-				if(uri.doorways)
-					switching_div.style.height=remote_div.style.height="90%";
-
-				remote_div.style.backgroundColor="white";
-				video.style.position="absolute";
-				video.style.top=video.style.height=video.style.padding=video.style.margin="0px";
-				video.style.left="0px";
-				video.style.width="100%";
-				video.style.visibility="hidden";
-				var obj={};
-				obj.p=peer;
-				obj.v=video;
-				objs.push(obj);
-
-				if(objs.length==1)
-					video_show(0);
-			}
-
-			function remove_video(video,peer)
-			{
-				var new_objs=[];
-
-				for(var key in objs)
-					if(objs[key].p===peer)
-						objs[key]=undefined;
-					else
-						new_objs.push(objs[key]);
-
-				objs=new_objs;
-
-				if(objs.length==0)
-					remote_div.style.backgroundColor="red";
-
-				while(index>=objs.length&&index>0)
-					--index;
-
-				video_show(index);
-			}
-
-			var switching_div=document.getElementById("switching_div");
-			switching_div.style.position="absolute";
-			switching_div.style.top=0;
-
-			var remote_div=document.getElementById("remote_div");
-			remote_div.style.position="absolute";
-			remote_div.style.top=0;
-			remote_div.style.pointerEvents="none";
-			remote_div.style.verticalAlign="middle";
-			remote_div.style.backgroundColor="red";
-
 			var uri=parse_uri(location.search);
-			var index=0;
-			var objs=[];
 
-			var left_hover=new hover_div_t(switching_div,"left");
-			left_hover.onclick=function()
-			{
-				if(index-1>=0)
-					--index;
-				else if(objs.length>0)
-					index=objs.length-1;
+			var video_manager_div=document.getElementById("video");
+			var video_manager=new video_manager_t(video_manager_div);
 
-				video_hide_all();
+			var left_hover=new hover_handle_t(video_manager.switching_div,"left");
+			left_hover.onclick=function(){video_manager.left();};
 
-				video_show(index);
-			};
-			var right_hover=new hover_div_t(switching_div,"right");
-			right_hover.onclick=function()
-			{
-				if(index+1<objs.length)
-					++index;
-				else if(objs.length>0)
-					index=0;
+			var right_hover=new hover_handle_t(video_manager.switching_div,"right");
+			right_hover.onclick=function(){video_manager.right();};
 
-				video_hide_all();
-				video_show(index);
-			};
-			var chat_window=new chat_div_t(document.getElementById("chat_window"));
 			var webrtc=new SimpleWebRTC
 			({
 				localVideoEl:null,
-				remoteVideosEl:remote_div,
+				remoteVideosEl:video_manager.remote_div,
 				autoRequestMedia:true,
 				peerConnectionConfig:
 				{
@@ -265,30 +45,32 @@
 				},
 			});
 
-			validate_robot_name(uri.robot,
-				function()
-				{
-					webrtc.on('videoAdded',create_video);
-					webrtc.on('videoRemoved',remove_video);
-					webrtc.on('readyToCall',function(){webrtc.joinRoom(uri.robot);});
-					webrtc.on('message',function(message)
-					{
-						/*if(chat_window.msg==0) // Debugging code to check if joining room fixed recieving issue 
-						 {
-							 webrtc.joinRoom(uri.robot);
-							 chat_window.msg=1;
-						 }*/
-						 
-						 chat_window.receive(message)
-					});
-					
-				},
-				function()
-				{
-					console.log("Invalid robot name \""+uri.robot+"\".");
-				});
+			var chatter_div=document.getElementById("chat_window");
+			var chatter=new chatter_t(chatter_div,webrtc);
+
+			function setup_webrtc()
+			{
+				webrtc.on('videoAdded',function(video,peer){video_manager.create(video,peer,uri);});
+				webrtc.on('videoRemoved',function(video,peer){video_manager.remove(video,peer);});
+				webrtc.on('readyToCall',function(){webrtc.joinRoom(uri.robot);});
+				webrtc.on('message',function(message){chatter.receive(message)});
+			}
+
+			if(false)
+			{
+				validate_robot_name
+				(
+					uri.robot,
+					function(){setup_webrtc();},
+					function(){console.log("Invalid robot name \""+uri.robot+"\".");}
+				);
+			}
+			else
+			{
+				setup_webrtc();
+			}
 		</script>
 	</head>
-	<body>
+	<body style="margin:0px;padding:0px;width:100%;height:100%;overflow:none;">
 	</body>
 </html>
