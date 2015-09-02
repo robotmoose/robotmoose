@@ -1,4 +1,5 @@
 #!/bin/bash
+cd `dirname $0`
 sudo git pull
 sudo chown -R www-data ../
 sudo chgrp -R itest ../
