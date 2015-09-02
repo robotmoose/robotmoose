@@ -62,7 +62,7 @@
 
 			function setup_webrtc()
 			{
-				webrtc.on("videoAdded",function(video,peer){video_manager.create(video,peer,uri);});
+				webrtc.on("videoAdded",function(video,peer){video_manager.create(video,peer);});
 				webrtc.on("videoRemoved",function(video,peer){video_manager.remove(video,peer);});
 				webrtc.on("readyToCall",function(){webrtc.joinRoom(uri.robot);});
 			}

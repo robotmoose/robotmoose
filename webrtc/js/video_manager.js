@@ -32,11 +32,8 @@ function video_manager_t(div)
 	this.objs=[];
 }
 
-video_manager_t.prototype.create=function(video,peer,uri)
+video_manager_t.prototype.create=function(video,peer)
 {
-	if(uri&&uri.doorways)
-		this.switching_div.style.height=remote_div.style.height="90%";
-
 	this.remote_div.style.backgroundColor="white";
 	video.style.position="absolute";
 	video.style.top="0px";
