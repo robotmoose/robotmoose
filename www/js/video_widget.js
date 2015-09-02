@@ -44,7 +44,7 @@ video_widget_t.prototype.download=function(robot,link)
 	if(link)
 	{
 		this.frame=document.createElement("iframe");
-		this.frame.src=link+"?robot="+this.robot.name+"&doorways=true";
+		this.frame.src=link+"?robot="+this.robot.name;
 		this.frame.style.width="100%";
 		this.frame.style.height="100%";
 		this.frame.style.border="none";
