@@ -69,6 +69,7 @@
 					return null;
 				this.div=div;
 				var myself=this;
+				this.msg=0; //Messages Recieved 
 				
 				this.nick=document.createElement("input");
 				this.nick.type="text";
@@ -115,27 +116,31 @@
 					this.send_button.disabled=true;
 				
 			}
-
+			//FIXME: Only sending to local session. See webrtc.on message handler LN273
 			chat_div_t.prototype.send=function()
 			{
 				console.log("Chat send called : ");
 				var myself=this;
 				
 				this.msg=myself.nick.value + ": "+ myself.chat_box.value;
-				webrtc.sendToAll("chat",{data:myself.msg});
-				console.log(myself.msg);
+				webrtc.sendToAll("chat",{data:this.msg} );
+				//webrtc.sendDToAll("text chat", "chat",this.msg );
+				console.log("sent message: "+ this.msg);
 				
 			}
 			
 			chat_div_t.prototype.receive=function(message)
 			{
 				var myself=this;
+				if(message.type === 'chat')
+				{
+					this.latest_msg=document.createElement("input");
+					this.latest_msg.value=message.payload.data;
+					this.latest_msg.readOnly=true; // Disables editing of received messages
 				
-				this.latest_msg=document.createElement("input");
-				this.latest_msg.value=message.payload.data;
-				this.latest_msg.readOnly=true; // Disables editing of received messages
-				
-				myself.chat_area.appendChild(this.latest_msg);
+					myself.chat_area.appendChild(this.latest_msg);
+					console.log(message);
+				}
 			}
 			function video_hide(index)
 			{
@@ -160,7 +165,7 @@
 
 			function create_video(video,peer)
 			{
-				//webrtc.sendToAll("chat",{data:"New video!"});
+				webrtc.sendToAll("chat",{data:"New video!"});
 				//peer.send('chat',{data: '!!!!!!!!!!! sent via A'});
 				
 				if(uri.doorways)
@@ -267,17 +272,16 @@
 					webrtc.on('videoRemoved',remove_video);
 					webrtc.on('readyToCall',function(){webrtc.joinRoom(uri.robot);});
 					webrtc.on('message',function(message)
-						{
-							if (message.type === 'offer')
-							{
-							}
-							else if (message.type === 'chat')
-							{
-								console.log("Message received :");
-								console.log(message);
-								chat_window.receive(message);
-							}
-						});
+					{
+						/*if(chat_window.msg==0) // Debugging code to check if joining room fixed recieving issue 
+						 {
+							 webrtc.joinRoom(uri.robot);
+							 chat_window.msg=1;
+						 }*/
+						 
+						 chat_window.receive(message)
+					});
+					
 				},
 				function()
 				{
