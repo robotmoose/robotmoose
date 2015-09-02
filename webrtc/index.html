@@ -61,7 +61,8 @@
 			{
 				this.div.removeChild(this.el);
 			}
-
+			
+			//Add chat box at bottom of video 
 			function chat_div_t(div)
 			{
 				if(!div)
@@ -73,22 +74,29 @@
 				this.nick.type="text";
 				this.nick.placeholder="Enter Chat Nickname";
 				this.nick.onchange=function(){myself.validate();};
+				this.nick.onkeypress=function(){myself.validate();};
+				this.nick.onkeyup=function(){myself.validate();};
+				this.nick.onkeydown=function(){myself.validate();};
 				this.nick.style.marginRight="10px";
 				
 				this.chat_box=document.createElement("input");
-				this.chat_box.type="textarea";
+				this.chat_box.type="text";
 				this.chat_box.placeholder="Enter Chat Message";
-				this.chat_box.style.width="80%";
+				this.chat_box.style.width="75%";
 				this.chat_box.onchange=function(){myself.validate();};
+				this.chat_box.onkeypress=function(){myself.validate();};
+				this.chat_box.onkeyup=function(){myself.validate();};
+				this.chat_box.onkeydown=function(){myself.validate();};
 				this.chat_box.style.marginRight="10px";
 				
 				this.send_button=document.createElement("input");
 				this.send_button.type="button";
 				this.send_button.value="Send";
 				this.send_button.disabled=true;
+				this.send_button.onclick=function(){myself.send();};
 				
 				
-				this.chat_area=document.createElement("div");
+				this.chat_area=document.createElement("div"); //Messages will be appended here
 				
 				
 				this.div.appendChild(this.chat_area);
@@ -98,6 +106,7 @@
 				
 				
 			}
+
 			chat_div_t.prototype.validate=function()
 			{
 				if(this.nick.value!=0&&this.chat_box.value!=0)
@@ -105,6 +114,28 @@
 				else if(this.nick.value==0||this.chat_box.value==0)
 					this.send_button.disabled=true;
 				
+			}
+
+			chat_div_t.prototype.send=function()
+			{
+				console.log("Chat send called : ");
+				var myself=this;
+				
+				this.msg=myself.nick.value + ": "+ myself.chat_box.value;
+				webrtc.sendToAll("chat",{data:myself.msg});
+				console.log(myself.msg);
+				
+			}
+			
+			chat_div_t.prototype.receive=function(message)
+			{
+				var myself=this;
+				
+				this.latest_msg=document.createElement("input");
+				this.latest_msg.value=message.payload.data;
+				this.latest_msg.readOnly=true; // Disables editing of received messages
+				
+				myself.chat_area.appendChild(this.latest_msg);
 			}
 			function video_hide(index)
 			{
@@ -129,7 +160,7 @@
 
 			function create_video(video,peer)
 			{
-				webrtc.sendToAll("chat",{data:"New video!"});
+				//webrtc.sendToAll("chat",{data:"New video!"});
 				//peer.send('chat',{data: '!!!!!!!!!!! sent via A'});
 				
 				if(uri.doorways)
@@ -229,9 +260,9 @@
 				},
 			});
 
-			//validate_robot_name(uri.robot,
-				//function()
-				//{
+			validate_robot_name(uri.robot,
+				function()
+				{
 					webrtc.on('videoAdded',create_video);
 					webrtc.on('videoRemoved',remove_video);
 					webrtc.on('readyToCall',function(){webrtc.joinRoom(uri.robot);});
@@ -242,14 +273,16 @@
 							}
 							else if (message.type === 'chat')
 							{
-								console.log(message.payload.data); 
+								console.log("Message received :");
+								console.log(message);
+								chat_window.receive(message);
 							}
 						});
-				//},
-				//function()
-				/*{
+				},
+				function()
+				{
 					console.log("Invalid robot name \""+uri.robot+"\".");
-				});*/
+				});
 		</script>
 	</head>
 	<body>
