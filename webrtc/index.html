@@ -54,9 +54,9 @@
 			if(show_chat)
 			{
 				var chatter_div=document.getElementById("chat_window");
-				var chatter=new chatter_t(video_manager_div,webrtc);
-				//video_manager_div.style.height="80%";
-				//chatter_div.style.height="20%";
+				var chatter=new chatter_t(chatter_div,webrtc);
+				video_manager_div.style.height="80%";
+				chatter_div.style.height="20%";
 				video_manager.onreceive=function(message){chatter.receive(message);}
 			}
 
