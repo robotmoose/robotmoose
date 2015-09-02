@@ -67,19 +67,12 @@
 				webrtc.on("readyToCall",function(){webrtc.joinRoom(uri.robot);});
 			}
 
-			if(false)
-			{
-				validate_robot_name
-				(
-					uri.robot,
-					function(){setup_webrtc();},
-					function(){console.log("Invalid robot name \""+uri.robot+"\".");}
-				);
-			}
-			else
-			{
-				setup_webrtc();
-			}
+			validate_robot_name
+			(
+				uri.robot,
+				function(){setup_webrtc();},
+				function(){console.log("Invalid robot name \""+uri.robot+"\".");}
+			);
 		</script>
 	</head>
 	<body style="margin:0px;padding:0px;width:100%;height:100%;overflow:none;">
