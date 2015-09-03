@@ -10,17 +10,35 @@ function video_widget_t(obj)
 	this.obj.ondeactivate=function(){myself.pointer_events(false);};
 	this.obj.resizer.onresizing=function(){myself.pointer_events(false);};
 
-	this.div=document.createElement("div");
-	this.div.style.width="100%";
-	this.div.style.height="100%";
-	this.div.style.overflow="hidden";
-	this.div.onclick=function(event){myself.obj.body.onclick(event);};
-	this.obj.content.appendChild(this.div);
+	this.table=document.createElement("table");
+	this.table.style.margin="0px";
+	this.table.style.padding="0px";
+	this.table.style.width="100%";
+	this.table.style.height="100%";
+	this.top_row=this.table.insertRow(0);
+	this.top_row.style.margin="0px";
+	this.top_row.style.padding="0px";
+	this.top_row.style.width="100%";
+	this.top=this.top_row.insertCell(0);
+	this.top.style.margin="0px";
+	this.top.style.padding="0px";
+	this.top.style.width="100%";
+	this.bottom_row=this.table.insertRow(1);
+	this.bottom_row.style.margin="0px";
+	this.bottom_row.style.padding="0px";
+	this.bottom_row.style.width="100%";
+	this.bottom_row.style.height="100%";
+	this.bottom=this.bottom_row.insertCell(0);
+	this.bottom.style.margin="0px";
+	this.bottom.style.padding="0px";
+	this.bottom.style.width="100%";
+	this.bottom.style.height="100%";
+	this.obj.content.appendChild(this.table);
 
 	this.robot=null;
 
 	this.select=document.createElement("select");
-	this.div.appendChild(this.select);
+	this.top.appendChild(this.select);
 	this.select.className="form-control";
 	this.select.onchange=function(){myself.download(null,myself.select.options[this.selectedIndex].video_link);};
 
@@ -37,7 +55,7 @@ video_widget_t.prototype.download=function(robot,link)
 
 	if(this.frame)
 	{
-		this.div.removeChild(this.frame);
+		this.bottom.removeChild(this.frame);
 		this.frame=null;
 	}
 
@@ -48,8 +66,6 @@ video_widget_t.prototype.download=function(robot,link)
 		this.frame.style.width="100%";
 		this.frame.style.height="100%";
 		this.frame.style.border="none";
-		this.frame.style.padding="0px";
-		this.frame.style.margin="0px";
 		this.frame.style.overflow="hidden";
 
 		if(this.obj.active)
@@ -57,7 +73,7 @@ video_widget_t.prototype.download=function(robot,link)
 		else
 			this.frame.style.pointerEvents="none";
 
-		this.div.appendChild(this.frame);
+		this.bottom.appendChild(this.frame);
 	}
 }
 

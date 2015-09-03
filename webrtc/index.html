@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html style="margin:0px;padding:0px;width:100%;height:100%;overflow:none;">
-	<head style="margin:0px;padding:0px;width:100%;height:100%;overflow:none;">
+<html style="margin:0px;padding:0px;width:100%;overflow:hidden;">
+	<head style="margin:0px;padding:0px;width:100%;height:100%;overflow:hidden;">
 		<script src="http://robotmoose.com/js/input_validation.js"></script>
 		<script src="http://robotmoose.com/js/uri.js"></script>
 		<script src="http://robotmoose.com/js/utility.js"></script>
@@ -60,6 +60,11 @@
 				video_manager.onreceive=function(message){chatter.receive(message);}
 			}
 
+			var doorways=false;
+
+			if(uri.doorways)
+				doorways=(uri.doorways.toLowerCase()!="false"&&uri.doorways.toLowerCase()!="0");
+
 			function setup_webrtc()
 			{
 				webrtc.on("videoAdded",function(video,peer){video_manager.create(video,peer);});
@@ -75,6 +80,6 @@
 			);
 		</script>
 	</head>
-	<body style="margin:0px;padding:0px;width:100%;height:100%;overflow:none;">
+	<body style="margin:0px;padding:0px;width:100%;height:100%;overflow:hidden;">
 	</body>
 </html>
