@@ -1,7 +1,7 @@
 #include <Servo.h>
 
 Servo tilt;
-int tilt_pin=4;
+int tilt_pin=9;
 int tilt_forward=38;
 int tilt_amount=10;
 
@@ -12,7 +12,7 @@ int pan_amount=30;
 
 char* question="  What is 9*8?";
 char* answers[3]={"    1  72","    2  81","    3  17"};
-char correct_answer='1';
+int correct_answer=1;
 
 void setup()
 {
@@ -31,9 +31,9 @@ void setup()
 
 void loop()
 {
-  char answer=Serial.read();
+  int answer=Serial.parseInt();
 
-  if(answer!=-1)
+  if(answer>0)
   {
     if(answer==correct_answer)
     {
@@ -45,7 +45,7 @@ void loop()
       Serial.println("  Incorrect! :(");
       nod_no();
     }
-
+  
     face_forward();
     delay(500);
   }
