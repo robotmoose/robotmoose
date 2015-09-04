@@ -181,7 +181,7 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	this.element.appendChild(this.arrowDiv);
 
 	// Drive power input
-	var starting_percent=40;
+	var starting_percent=20;
 	this.drive=
 	{
 		div:document.createElement("div"),
