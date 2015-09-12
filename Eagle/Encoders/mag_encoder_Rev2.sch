@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="7.3.0">
+<eagle version="7.4.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -787,9 +787,6 @@ In this library the device names are the same as the pin names of the symbols, t
 </library>
 <library name="Clayton">
 <packages>
-<package name="MOUNTING_SCREW-3MM">
-<pad name="P$1" x="0" y="0" drill="3.2" diameter="5.65"/>
-</package>
 <package name="3_PIN_JST-XH">
 <wire x1="0" y1="0" x2="2.45" y2="0" width="0.127" layer="21"/>
 <wire x1="2.45" y1="0" x2="7.45" y2="0" width="0.127" layer="21"/>
@@ -805,12 +802,6 @@ In this library the device names are the same as the pin names of the symbols, t
 </package>
 </packages>
 <symbols>
-<symbol name="VIA">
-<pin name="P$1" x="0" y="0" length="point"/>
-<circle x="0" y="0" radius="1.54501875" width="0.254" layer="94"/>
-<text x="-2.286" y="1.778" size="1.27" layer="95">&gt;NAME</text>
-<text x="-2.286" y="-3.048" size="1.27" layer="96">&gt;VALUE</text>
-</symbol>
 <symbol name="3_PIN_JST-XH">
 <wire x1="0" y1="5" x2="2.5" y2="5" width="0.254" layer="94"/>
 <wire x1="2.5" y1="5" x2="7.5" y2="5" width="0.254" layer="94"/>
@@ -826,21 +817,6 @@ In this library the device names are the same as the pin names of the symbols, t
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="MOUNTING_SCREW-3MM">
-<gates>
-<gate name="G$1" symbol="VIA" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="MOUNTING_SCREW-3MM">
-<connects>
-<connect gate="G$1" pin="P$1" pad="P$1"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-</devices>
-</deviceset>
 <deviceset name="3_PIN_JST-XH">
 <description>3-pin JST XH Shrouded Header, top entry, 2.5 mm pitch</description>
 <gates>
@@ -881,7 +857,6 @@ In this library the device names are the same as the pin names of the symbols, t
 <part name="SUPPLY3" library="supply2" deviceset="GND" device=""/>
 <part name="U$1" library="Clayton" deviceset="3_PIN_JST-XH" device=""/>
 <part name="SUPPLY4" library="supply2" deviceset="GND" device=""/>
-<part name="U$3" library="Clayton" deviceset="MOUNTING_SCREW-3MM" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -898,7 +873,6 @@ In this library the device names are the same as the pin names of the symbols, t
 <instance part="SUPPLY3" gate="GND" x="71.12" y="38.1"/>
 <instance part="U$1" gate="G$1" x="91.44" y="66.04" rot="R270"/>
 <instance part="SUPPLY4" gate="GND" x="83.82" y="38.1"/>
-<instance part="U$3" gate="G$1" x="91.44" y="86.36"/>
 </instances>
 <busses>
 </busses>

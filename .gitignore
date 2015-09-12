@@ -24,6 +24,7 @@ sensors/imu/show_IMU/ogl/glew.o
 superstar/auth
 superstar/backups
 superstar/db.bak
+superstar/log
 superstar/logs
 superstar/netbench
 superstar/netbench.exe
