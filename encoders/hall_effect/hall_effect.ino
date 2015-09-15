@@ -15,7 +15,7 @@
 
 */
 
-#define hall_pin  6
+#define hall_pin  2
 #define led_pin   13
 int count1; int count2; int Total; int flag;
 
