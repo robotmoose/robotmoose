@@ -19,7 +19,12 @@ function state_runner_t()
 	this.VM_power={};
 	this.VM_sensors={};
 	this.VM_store={};
+	this.VM_UI=null;
 }
+
+state_runner_t.prototype.set_UI=function (UI_builder) {
+	this.VM_UI=UI_builder;
+};
 
 state_runner_t.prototype.run=function(robot,state_table)
 {
@@ -111,6 +116,7 @@ state_runner_t.prototype.stop_m=function(state_table)
 // Called when beginning to execute a state (either first time, or when switching states)
 state_runner_t.prototype.start_state=function(state_name)
 {
+	this.VM_UI.start_state(state_name);
 	//console.log("Entering VM state "+state_name);
 	this.state_start_time_ms=this.get_time_ms();
 }
@@ -150,6 +156,21 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	VM.drive=function(speed) { VM.power.L=VM.power.R=speed; };
 	VM.turnleft =function(speed) { VM.power.L=-speed; VM.power.R=+speed; };
 	VM.turnright=function(speed) { VM.power.L=+speed; VM.power.R=-speed; };
+	
+	// UI construction:
+	VM.UI=this.VM_UI;
+	VM.button=function(name,next_state,opts) {
+		var ret=VM.UI.element(name,"button",opts);
+		if (next_state && ret.oneshot) {
+			console.log("UI advancing to state "+next_state+" from button "+name);
+			VM.state=next_state;
+			ret.oneshot=false;
+		}
+		return ret.value; // mouse up/down boolean
+	};
+	VM.label=function(name,opts) {
+		var ret=VM.UI.element(name,"label",opts);
+	};
 
 // Basically eval user's code here
 	(new Function("with(this)\n{\n"+code+"\n}")).call(VM);

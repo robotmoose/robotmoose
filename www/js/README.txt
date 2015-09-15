@@ -1,3 +1,6 @@
+The place to start:
+   robot_ui.js: Builds main piloting GUI
+
 
 
 3d.js: Mike's wrapper around THREE.js
