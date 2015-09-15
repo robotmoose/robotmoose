@@ -18,7 +18,6 @@ sudo apt-get install git make g++ freeglut3-dev arduino
 
 Now clone our software repository:
 ```
-cd
 git clone https://github.com/robotmoose/robotmoose
 ```
 
