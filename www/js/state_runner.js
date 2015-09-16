@@ -168,6 +168,10 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		}
 		return ret.value; // mouse up/down boolean
 	};
+	VM.checkbox=function(name, opts) {
+		var ret=VM.UI.element(name,"checkbox",opts);
+		return ret.dom.checked;
+	};
 	VM.label=function(name,opts) {
 		var ret=VM.UI.element(name,"label",opts);
 	};

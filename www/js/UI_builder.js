@@ -1,3 +1,4 @@
+
 /**
  User Interface builder:
    Allows robot control code to create buttons and labels at runtime.
@@ -78,6 +79,13 @@ UI_builder_t.prototype.create_element=function(name,type,opts) {
 		e.dom.onmouseleave=function(evt) { e.value=false; }
 		e.dom.onmouseup=function(evt) { e.value=false; }
 		break;
+		
+	case "checkbox":
+		e.dom=document.createElement("input");
+		e.dom.type="checkbox";
+		e.label = document.createTextNode(" " + name); // Checkbox label
+		break;
+		
 	case "label":
 		e.dom=document.createTextNode(name);
 		break;
@@ -90,6 +98,7 @@ UI_builder_t.prototype.create_element=function(name,type,opts) {
 	
 	// Add to UI panel
 	this.div.appendChild(e.dom);
+	if (e.label) this.div.appendChild(e.label); // If the element has a label 
 	if (opts.same_line!=true) {
 		this.div.appendChild(document.createElement("br")); // newline
 	}
