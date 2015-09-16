@@ -80,10 +80,12 @@ int x=0;
 
 void setup()
 {
-  pinMode(SS_PIN, OUTPUT);
   pinMode(OK, OUTPUT);
-  pinMode(CHARGE_INPUT, INPUT);
   pinMode(POWER, OUTPUT);
+  digitalWrite(OK, HIGH); // Set OK signal to HIGH
+  digitalWrite(POWER, HIGH); // Allow Arduino to stay powered
+  pinMode(SS_PIN, OUTPUT);
+  pinMode(CHARGE_INPUT, INPUT);
   pinMode(CHARGE_RELAY, OUTPUT);
   digitalWrite(SS_PIN, HIGH); // Chip Deselect
 
