@@ -4,7 +4,7 @@
 
 // ITEST Battery Management System for Layla telepresence platform. This BMS system is based on the Linear LTC6803-2 chip.
 
-#include <SPI.h> 
+#include <SPI.h>
 #include <Wire.h>
 #include <stdlib.h>
 #include "percentage.h"
@@ -42,7 +42,7 @@
 // Configuration Registers for measure mode
 
 #define CFGR0       0xE1
-byte CFGR1=0x00;   
+byte CFGR1=0x00;
 #define CFGR2       0x00
 #define CFGR3       0xFF
 #define CFGR4       0x00
@@ -54,7 +54,7 @@ byte CFGR1=0x00;
 #define CHARGE_INPUT  7    // Will be pulled high when AC power is available
 #define CHARGE_RELAY  9    // Set to high to turn on charging relay
 #define POWER         6    // Power pin for BMS shield
-#define ADDRESS       0x80 // Designate Chip address: 10000000
+#define ADDRESS       0x02 // Designate Chip address: 10000000
 #define OK            8    // OK signal for system power
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -92,13 +92,13 @@ void setup()
   SPI.setDataMode(SPI_MODE3);
   SPI.setClockDivider(SPI_CLOCK_DIV16);
 
-  SPI.begin();          // Start SPI 
+  SPI.begin();          // Start SPI
   Serial.begin(115200);   // Open serial port
   Serial.println("Setup Done");
 //---------------------------------------------------------------------------------------------------------------------
 
 // I2C configs
- Wire.begin(2);                // join i2c bus with address #2
+ Wire.begin(ADDRESS);          // join i2c bus
  Wire.onRequest(requestEvent); // register event
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -229,14 +229,14 @@ void setCFGR1( float cellVoltage[], byte & CFGR1 )
 }
 
 void Charge()    // Function to turn on charging and cell balancing
-{ 
+{
   // Artificially set to test if statements:
   //cellVoltage[0] = 3.3;
   //cellVoltage[1] = 3.1;
-  //cellVoltage[2]=  3.2;                   
+  //cellVoltage[2]=  3.2;
   //digitalWrite(CHARGE_INPUT, HIGH);
-  
-  
+
+
   //Sets CFGR1 to manage cell discharging
   setCFGR1(cellVoltage, CFGR1);
   SetConfig();
@@ -269,7 +269,7 @@ void BatteryCritical()
   // Artificially set to test if statements:
   //cellVoltage[0] = 4.5;
   //cellVoltage[1] = 4.5;
-  //cellVoltage[2]=  4.5; 
+  //cellVoltage[2]=  4.5;
   if ((cellVoltage[0] + cellVoltage[1] + cellVoltage[2]) == 0)
   {
     digitalWrite(OK, LOW);
@@ -290,7 +290,7 @@ void BatteryCritical()
       Serial.println("Battery is AT OR BELOW MINIMUM VOLTAGE!\nSYSTEM OK pin set to LOW.");
     }
   }
-  else 
+  else
   {
     digitalWrite(OK, HIGH);
     Serial.println("Battery level is above minimum.\nSYSTEM OK pin set to HIGH.");
@@ -342,7 +342,7 @@ byte calcPECbyte(byte m) // Calculate PEC from single byte
 }
 
 byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number of bytes currently in packet[]
-{         
+{
   int z;
   byte PECpacket = 0x41;  // initialize PECpacket
   if (!made_table) {  // Check and make sure lookup table is generated
@@ -359,7 +359,7 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
 
 void requestEvent()
 {
-  byte data [2] = {(byte)Percentage(cellVoltTotal), setChargeByte()};
+  byte data [2] = {(byte)Percentage(cellVoltTotal), setChargeByte()|0xC0};
   Wire.write(data, 2);
   //Serial.print("I2C Request Performed: ");
 }
@@ -384,10 +384,10 @@ void loop()
   AvgerageCell();
   totalCell();
   Charge();
-  
+
   Serial.print("Charge flag: ");
   Serial.println(chargeflag,3);
-  
+
   for(int i=0; i<3; i++)
   {
     Serial.print("Cell ");
@@ -399,15 +399,15 @@ void loop()
   Serial.print("Average Cell Voltage: ");
   Serial.print(AvgCellVolts,3);
   Serial.println(" V");
-  
+
   Serial.print("Total Cell Voltages: ");
   Serial.print(cellVoltTotal,3);
   Serial.println(" V");
-  
+
   Serial.print("Battery Percentage: ");
   Serial.print(Percentage(cellVoltTotal));
   Serial.println(" %");
-  
+
   Serial.println("-------------------------------------");
   //yedelay(1200);
 }

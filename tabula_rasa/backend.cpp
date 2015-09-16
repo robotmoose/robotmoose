@@ -658,6 +658,10 @@ void robot_backend::setup_devices(std::string robot_config)
 		else if (device=="heartbeat") {
 			sensors.push_back(new json_sensor<int,uint8_t>(json_path("heartbeats")));
 		}
+		else if (device=="bms") {
+			sensors.push_back(new json_sensor<int,uint8_t>(json_path("battery","charge")));
+			sensors.push_back(new json_sensor<int,uint8_t>(json_path("battery","state")));
+		}
 		else std::cout<<"Arduino backend: ignoring unknown device '"<<device<<"'\n";
 	}
 

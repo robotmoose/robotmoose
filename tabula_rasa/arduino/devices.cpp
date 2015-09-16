@@ -16,7 +16,7 @@ class servo_device : public action {
 public:
 	Servo s; // the Servo
 	tabula_command<unsigned char> deg; // commanded degree orientation
-	
+
 	virtual void loop() {
 		s.write(deg);
 	}
@@ -35,10 +35,10 @@ class pwm_pin : public action {
 public:
 	int pin; // I/O pin used
 	tabula_command<unsigned char> pwm; // commanded PWM strength
-	
+
 	virtual void loop() {
 		analogWrite(pin,pwm.get());
-	}	
+	}
 };
 
 REGISTER_TABULA_DEVICE(pwm,"P",
@@ -56,10 +56,10 @@ class analog_sensor : public action {
 public:
 	int pin; // I/O pin used
 	tabula_sensor<uint16_t> value; // read-in value
-	
+
 	virtual void loop() {
 		value=analogRead(pin);
-	}	
+	}
 };
 
 REGISTER_TABULA_DEVICE(analog,"P",
@@ -85,18 +85,22 @@ public:
 
 	virtual void loop() {
 		Wire.requestFrom(bms_addr, numbytes);
-		while(Wire.available() <= 2 && Wire.available() >= 1)    // slave may send less than requested
+
+		for(int ii=0;ii<2;++ii)
 		{
-			byte x = Wire.read(); // receive a byte as character
-			// Serial.print(x);   // print the character
-			// Serial.println("");
-			if (x&0xC0) { // high bits are set--this is a state report
-				state=x; 
-			} else {
-				charge=x;
+			byte x=Wire.read();
+
+			switch(ii)
+			{
+				case 0:
+					charge=x;
+					break;
+				case 1:
+					state=x;
+					break;
 			}
 		}
-	}	
+	}
 };
 
 REGISTER_TABULA_DEVICE(bms,"",
@@ -104,7 +108,7 @@ REGISTER_TABULA_DEVICE(bms,"",
 	BMS *device=new BMS();
 	actions_1s.add(device);
 )
-    
+
 /*
 // Watch sensor or command values on serial port (in ASCII)
 template <class T>
@@ -112,7 +116,7 @@ class sensor_watcher : public action { public:
 	virtual void loop() {
 		Serial.print(F("Sensors: "));
 		tabula_sensor_storage.print<T>();
-	}	
+	}
 };
 REGISTER_TABULA_DEVICE(sensors8,"", actions_1s.add(new sensor_watcher<unsigned char>());  )
 REGISTER_TABULA_DEVICE(sensors16,"", actions_1s.add(new sensor_watcher<int16_t>());  )
@@ -122,7 +126,7 @@ class command_watcher : public action { public:
 	virtual void loop() {
 		Serial.print(F("Commands: "));
 		tabula_command_storage.print<T>();
-	}	
+	}
 };
 REGISTER_TABULA_DEVICE(commands8,"", actions_1s.add(new command_watcher<unsigned char>());  )
 REGISTER_TABULA_DEVICE(commands16,"", actions_1s.add(new command_watcher<int16_t>());  )
@@ -145,11 +149,11 @@ class latency_monitor : public action {
 public:
   typedef unsigned short milli_t;
   milli_t the_time() { return micros()>>10; }
-  
+
   milli_t worst; // worst latency measured so far
   milli_t last; // time at last loop call
   tabula_sensor<unsigned char> latency;
-  void loop() { 
+  void loop() {
     milli_t cur=the_time();
     milli_t d=cur-last;
     if (d>worst) worst=d;
@@ -178,17 +182,17 @@ public:
 	NeatoLDS<Stream> n;
 	tabula_sensor<NeatoLDSbatch> batch;
 	int neatoMotorPin;
-	neato(Stream &s,int motorPin_) 
+	neato(Stream &s,int motorPin_)
 		:n(s), neatoMotorPin(motorPin_)
 	{
-		
+
 	}
-	
-	void loop() { 
+
+	void loop() {
 		// Incoming comms
 		int leash=1000; // bound maximum latency
 		while (n.read()) { if (--leash<0) break; }
-				
+
 		// Outgoing comms--copy over the last batch
 		batch=n.lastBatch;
 
