@@ -83,7 +83,7 @@ class roomba_t
 
 		roomba_t(roomba_serial_t& serial);
 		
-		void setup();
+		void setup(int BRC_pin);
 
 		void start();
 		void stop();

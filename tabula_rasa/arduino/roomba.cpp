@@ -79,25 +79,38 @@ roomba_t::roomba_t(roomba_serial_t& serial):serial_m(&serial),leds_m(0),
   memset(&sensor_packet_m,0,sizeof(sensor_packet_m));
 }
 
-void roomba_t::setup() 
+void roomba_t::setup(int BRC_pin) 
 {
+	// Bring baud rate control (BRC) pin low
+	//  This wakes up the Open Interface so it listens for serial
+	pinMode(BRC_pin,OUTPUT);
+	digitalWrite(BRC_pin,HIGH); // BRC seems to be edge-triggered
+	roomba_delay(ROOMBA_SYNC_TIME);
+	digitalWrite(BRC_pin,LOW);
+	
 	for (int attempt=0;attempt<10;attempt++) 
 	{
 		sensor_packet_m.mode=0;
-		reset();
+		roomba_delay(ROOMBA_SYNC_TIME);
 		start();
 		set_mode(roomba_t::FULL);
 		set_led_clean(255,0xff); // orange == 128
 		led_update();
 		set_receive_sensors(true);
-		for (int wait=0;wait<10;wait++) {
+		for (int wait=0;wait<20;wait++) {
 			update();
 			if (sensor_packet_m.mode!=0) { // success!
+				digitalWrite(BRC_pin,HIGH);
 				return;
 			}
 			roomba_delay(100);
 		}
+		
+		// Well, that didn't work.  Try reset command.
+		reset();
 	}
+	
+	digitalWrite(BRC_pin,HIGH);
 }
 
 void roomba_t::start()
