@@ -9,6 +9,7 @@ Digi-Key Part Number	839-1094-ND
 DIN Yellow: Roomba ground -> black jumper
 DIN Pink(ish): Roomba RX -> red jumper, Arduino TX
 DIN Black (thick, no lettering): Roomba TX -> blue jumper, Arduino RX
+DIN ??? : Roomba BRC -> white jumper, Arduino pin 2
 
 
 Not used:
