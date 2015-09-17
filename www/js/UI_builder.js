@@ -85,6 +85,16 @@ UI_builder_t.prototype.create_element=function(name,type,opts) {
 		e.dom.type="checkbox";
 		e.label = document.createTextNode(" " + name); // Checkbox label
 		break;
+	
+	case "slider":
+		e.dom=document.createElement("input");
+		e.dom.type="range";
+		e.dom.min = opts.min || -1;
+		e.dom.max = opts.max || 1;
+		e.dom.value = opts.value || 0;
+		e.dom.step = opts.step;
+		this.div.appendChild(document.createTextNode(name));
+		break;
 		
 	case "label":
 		e.dom=document.createTextNode(name);
