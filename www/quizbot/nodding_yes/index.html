@@ -1,0 +1,141 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - Quizbot</title>
+	</head>
+
+	<body role="document">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>Quizbot Nodding Yes</h1>
+			</div>
+
+			<center>
+				<img src="/images/quizbot.jpg"/ title="Quizbot connected to an Arduino MCU">
+			</center>
+			<br>
+
+			<div class="well">
+				<h4>Step 1:</h4>
+				Start by playing with the Sliders in the Drive tab. Figure out which one controls the Servo that moves the head up and down.
+				<br/><br/>
+				<center><img src="/quizbot/nodding_yes/images/01.png"></img></center>
+				<br/>
+
+				<h4>Step 2:</h4>
+				On our example, the up down Servo is on Pin 9 (or the top Slider). If yours is on the bottom Slider, you can swap it in two ways:
+				<br/><br/>
+				You could change the Hardware, and switch Pins.
+				<br/><br/>
+				Or, you could swap the order of the Servos in the Configure tab by dragging the Cross, and clicking the Configure button again, like below.
+				<center><img src="/quizbot/nodding_yes/images/02.png"></img></center>
+				<br/>
+
+				<h4>Step 3:</h4>
+				Since the up down Servo is Pin 9, we will swap ours back, but leave yours swapped if it is Pin 19.
+				<br/><br/>
+				<center><img src="/quizbot/nodding_yes/images/01.png"></img></center>
+				<br/>
+
+				<h4>Step 4:</h4>
+				Now we will switch to the Code tab.
+				<br/><br/>
+				Now would be a good time to resize your window so you can see all of the Code window.
+				<br/><br/>
+				<center><img src="/quizbot/nodding_yes/images/03.png"></img></center>
+				<br/>
+
+				<h4>Step 5:</h4>
+				Let's start off by setting the name of the Experiment. Let's call it nod_yes
+				<br/><br/>
+				<center><img src="/quizbot/nodding_yes/images/04.png"></img></center>
+				<br/>
+
+				<h4>Step 6:</h4>
+				Next, use the "start" State to center the Servos.
+				<br/><br/>
+				The Servo centers used on our Quizbot are 30, for the up down Servo, and 90 for the left right Servo.
+				<br/><br/>
+				These are more than likely different for your Quizbot!
+				<br/><br/>
+				<center><img src="/quizbot/nodding_yes/images/05.png"></img></center>
+				<br/>
+
+				<h4>Step 7:</h4>
+				Save and Run the Experiment by clicking the Run button.
+				<br/><br/>
+				Your Servos should now be centered!
+				<br/><br/>
+				<center><img src="/quizbot/nodding_yes/images/06.png"></img></center>
+				<br/>
+
+
+
+
+				<h4>Step 8:</h4>
+				Hit the Stop button. Add a new State by hitting the Add State button. Name this State "up".
+				<br/><br/>
+				<center><img src="/quizbot/nodding_yes/images/07.png"></img></center>
+				<br/>
+
+				<h4>Step 9:</h4>
+				Change the Run Time in the start State to 1000. This makes the start State run for 1000 ms (or 1 second).
+				<br/><br/>
+				Change the code in the up State to make the up down Servo move up.
+				<br/><br/>
+				<center><img src="/quizbot/nodding_yes/images/08.png"></img></center>
+				<br/>
+
+				<h4>Step 10:</h4>
+				Save and Run the Experiment by clicking the Run button.
+				<br/><br/>
+				The Quizbot should now center for 1000 ms, and then move up.
+				<br/><br/>
+				<center><img src="/quizbot/nodding_yes/images/09.png"></img></center>
+				<br/>
+
+				<h4>Step 11:</h4>
+				Hit the Stop button. Add a new State by clicking the Add State button. Call this State "down".
+				<br/><br/>
+				Copy and paste the code from the up State, and make the code move the up down Servo down.
+				<br/><br/>
+				Finally, set the Run Time for the up State to 1000 ms.
+				<br/><br/>
+				<center><img src="/quizbot/nodding_yes/images/10.png"></img></center>
+				<br/>
+
+				<h4>Step 12:</h4>
+				Save and Run the Experiment by clicking the Run button.
+				<br/><br/>
+				The Quizbot should now center for 1000 ms, move up for 1000 ms, and, finally, move down.
+				<br/><br/>
+				<center><img src="/quizbot/nodding_yes/images/11.png"></img></center>
+				<br/>
+
+				<h4>Step 13:</h4>
+				Hit the Stop button. Add one last State by clicking the Add State button. Call this State "stop".
+				<br/><br/>
+				Copy the code from the start State into this state. Set the Run Time for the down State to 1000 ms.
+				<br/><br/>
+				<center><img src="/quizbot/nodding_yes/images/12.png"></img></center>
+				<br/>
+
+				<h4>Step 14:</h4>
+				Save and Run the Experiment by clicking the Run button.
+				<br/><br/>
+				The Quizbot should now center for 1000 ms, move up for 1000 ms, move down for 1000 ms, and, finally, center.
+				<br/><br/>
+				<center><img src="/quizbot/nodding_yes/images/13.png"></img></center>
+				<br/>
+
+				<h4>Challenge:</h4>
+				Can you make a new Experiment named shake_no that shakes Quizbot's head no?
+				<br/><br/>
+
+				<center><a href="/quizbot/nodding_yes_3_times/"><h4>Next: Nodding Yes 3 Times</h4></a></center>
+				<br/>
+			</div>
+		</div>
+	</body>
+</html>
