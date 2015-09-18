@@ -89,9 +89,9 @@ UI_builder_t.prototype.create_element=function(name,type,opts) {
 	case "slider":
 		e.dom=document.createElement("input");
 		e.dom.type="range";
-		e.dom.min = opts.min || -1;
-		e.dom.max = opts.max || 1;
-		e.dom.value = opts.value || 0;
+		e.dom.min = opts.min;
+		e.dom.max = opts.max;
+		e.dom.defaultValue = opts.start;
 		e.dom.step = opts.step;
 		this.div.appendChild(document.createTextNode(name));
 		break;
