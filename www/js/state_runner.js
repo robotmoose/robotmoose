@@ -172,6 +172,16 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		var ret=VM.UI.element(name,"checkbox",opts);
 		return ret.dom.checked;
 	};
+	
+	VM.slider=function(name,min,start,max,opts){
+		opts = opts ||{};
+		opts.min = min;
+		opts.defaultValue = start;
+		opts.max = max;
+		opts.step = Math.abs(max - min)/100;
+		var ret=VM.UI.element(name,"slider",opts);
+		return parseFloat(ret.dom.value);
+	};
 	VM.label=function(name,opts) {
 		var ret=VM.UI.element(name,"label",opts);
 	};
