@@ -107,13 +107,13 @@ robot_ui_t.prototype.download_gui=function()
 	{
 		myself.doorways=
 		{
-			config:myself.create_doorway("Configure","Set up robot hardware"),
-			pilot:myself.create_doorway("Drive","Manually drive the robot"),
-			sensors:myself.create_doorway("Sensors","Examine sensor data from robot"),
-			states:myself.create_doorway("Code","Automatically drive the robot"),
-			map:myself.create_doorway("Map","See where the robot thinks it is"),
-			video:myself.create_doorway("Video","Show the robot's video camera"),
-			UI:myself.create_doorway("UI","Customized robot user interface")
+			config:myself.create_doorway("Configure","Set up robot hardware","CONFIG HELP"),
+			pilot:myself.create_doorway("Drive","Manually drive the robot","PILOT HELP"),
+			sensors:myself.create_doorway("Sensors","Examine sensor data from robot","SENSORS HELP"),
+			states:myself.create_doorway("Code","Automatically drive the robot","STATES HELP"),
+			map:myself.create_doorway("Map","See where the robot thinks it is","MAP HELP"),
+			video:myself.create_doorway("Video","Show the robot's video camera","VIDEO HELP"),
+			UI:myself.create_doorway("UI","Customized robot user interface","UI HELP")
 		};
 
 		clear_out(myself.doorways.config.content);
@@ -219,12 +219,15 @@ robot_ui_t.prototype.create_widgets=function()
 	}
 }
 
-robot_ui_t.prototype.create_doorway=function(title,tooltip)
+robot_ui_t.prototype.create_doorway=function(title,tooltip,help_text)
 {
 	var doorway=this.gui.element.get_by_title(title);
+
+	if(!help_text)
+		help_text="";
 
 	if(doorway)
 		return doorway;
 	else
-		return this.gui.element.create(title,undefined,tooltip);
+		return this.gui.element.create(title,undefined,tooltip,help_text);
 }
