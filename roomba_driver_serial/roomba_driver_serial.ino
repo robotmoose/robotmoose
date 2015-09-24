@@ -1,6 +1,6 @@
 #include "roomba.h"
 
-roomba_t roomba(Serial);
+roomba_t roomba(Serial1);
 int speed=50;
 
 void setup()
