@@ -8,27 +8,18 @@ void setup()
   Serial.begin(57600);
   roomba.reset();
   roomba.set_mode(roomba_t::SAFE);
+
+  roomba.drive(speed,speed);
+  delay(4000);
+  roomba.drive(speed,-speed);
+  delay(6000);
+  roomba.drive(speed,speed);
+  delay(4000);
+  roomba.drive(-speed,speed);
+  delay(6000);
+  roomba.drive(0,0);
 }
 
 void loop()
 {
-  int command=Serial.read();
-  
-  switch(command)
-  {
-    case 'f':
-      roomba.drive(speed,speed);
-      break;
-    case 'b':
-      roomba.drive(-speed,-speed);
-      break;
-    case 'l':
-      //Make it go left.
-      break;
-    case 'r':
-      //Make it go right.
-      break;
-    default:
-      roomba.drive(0,0);
-  }
 }
