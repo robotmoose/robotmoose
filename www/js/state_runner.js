@@ -168,19 +168,21 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		}
 		return ret.value; // mouse up/down boolean
 	};
-	VM.checkbox=function(name, opts) {
+	// Make a checkbox with a label
+	VM.checkbox=function(name, opts) { 
 		var ret=VM.UI.element(name,"checkbox",opts);
-		return ret.dom.checked;
+		return ret.dom.checked; // checked/unchecked boolean
 	};
-	
+	// Make a slider with a label
 	VM.slider=function(name,min,start,max,opts){
 		opts = opts ||{};
-		opts.min = min;
-		opts.defaultValue = start;
+		opts.min = min; 
+		opts.defaultValue = start;  // starting value
 		opts.max = max;
-		opts.step = Math.abs(max - min)/100;
+		var numSteps = 100; // number of slider steps
+		opts.step = Math.abs(max - min)/numSteps; //slider step size 
 		var ret=VM.UI.element(name,"slider",opts);
-		return parseFloat(ret.dom.value);
+		return parseFloat(ret.dom.value); // returns value of slider
 	};
 	VM.label=function(name,opts) {
 		var ret=VM.UI.element(name,"label",opts);
