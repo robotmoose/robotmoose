@@ -475,6 +475,7 @@ function arduino_emulator_t()
 
 				myself.commands.length=0;
 				myself.json.setup();
+				myself.json.fixed_loop=function(){myself.json.delay(1);myself.json.loop();};
 
 				var call_loop=function(controller,data)
 				{
@@ -482,7 +483,7 @@ function arduino_emulator_t()
 					myself.commands.length=0;
 
 					// Run user's loop function
-					myself.json.loop();
+					myself.json.fixed_loop();
 
 					// Call ourselves afterwards (weird recursive closure!)
 					myself.add_command(call_loop);
