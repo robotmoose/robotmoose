@@ -64,18 +64,21 @@ BIN_DIR=.
 BIN_FILE=$(BIN_DIR)/main
 
 #Builds
-all: main.cpp main upload
+all:
+	@echo "Run 'make mega' or 'make uno'."
 
-main.cpp: arduino.ino
-	cp $< $@
-
-main: main.cpp $(MAIN_SRC) *.h
+mega:
+	cp arduino.ino main.cpp
 	$(COMPILER2560) $(DIRS) $(CFLAGS) $(INCLUDE) $(MAIN_SRC) $(ARDUINO_SRC) -o $(BIN_DIR)/$@.elf
 	$(LINKER) -R .eeprom -O ihex $(BIN_FILE).elf $(BIN_FILE).hex
-
-upload: main
 	$(PROG2560) -P$(PROGRAM_PORT) -Uflash:w:$(BIN_FILE).hex $(PFLAGS)
+	@rm -rf main.cpp
+
+uno:
+	$(COMPILER328) $(DIRS) $(CFLAGS) $(INCLUDE) $(MAIN_SRC) $(ARDUINO_SRC) -o $(BIN_DIR)/$@.elf
+	$(LINKER) -R .eeprom -O ihex $(BIN_FILE).elf $(BIN_FILE).hex
+	$(PROG328) -P$(PROGRAM_PORT) -Uflash:w:$(BIN_FILE).hex $(PFLAGS)
+	@rm -rf main.cpp
 
 clean:
-	@rm -rf $(BIN_DIR)/main.hex
-
+	@rm -rf $(BIN_DIR)/mega.hex $(BIN_DIR)/uno.hex main.cpp
