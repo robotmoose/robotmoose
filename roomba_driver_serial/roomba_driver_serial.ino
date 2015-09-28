@@ -9,7 +9,6 @@ void setup()
   Serial3.begin(115200);
   roomba.setup(2);
   Serial.println("Roomba Started");
-  roomba.set_mode(roomba_t::SAFE);
 }
 
 void loop()
@@ -40,6 +39,10 @@ void loop()
       case 's':
         Serial.println("Stopping");
         roomba.drive(0,0);
+        break;
+      default:
+        Serial.println("Safe Mode");
+        roomba.set_mode(roomba_t::SAFE);
         break;
     }
   }
