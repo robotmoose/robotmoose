@@ -23,28 +23,42 @@
 				stop_button=document.getElementById("stop");
 				editor.create(document.getElementById("code"));
 				editor.set_value(
-					"//Need this to use roomba\n"+
 					"#include \"roomba.h\"\n"+
 					"\n"+
-					"roomba_t roomba(Serial);\n"+
+					"roomba_t roomba(Serial3);\n"+
+					"int speed=50;\n"+
 					"\n"+
 					"void setup()\n"+
 					"{\n"+
-					"\t//Things written in here happen once\n"+
-					"\troomba.start();\n"+
+					"  Serial.begin(115200);\n"+
+					"  Serial3.begin(115200);\n"+
+					"  roomba.setup(2);\n"+
+					"  Serial.println(\"Roomba Started\");\n"+
 					"}\n"+
 					"\n"+
 					"void loop()\n"+
 					"{\n"+
-					"\t//Things written in here keep happening\n"+
-					"\troomba_sensor_t robot=roomba.get_sensors();\n"+
-					"\tif (robot.floor[0] > 500) { // floor exists!  Drive forward\n"+
-					"\t\troomba.drive(400,400);\n"+
-					"\t}\n"+
-					"\telse { // no floor?!\n"+
-					"\t\troomba.drive(-20,-20); // back up slowly\n"+
-					"\t}\n"+
-					"\tdelay(100);\n"+
+					"  roomba.update();\n"+
+					"  roomba_sensor_t robot=roomba.get_sensors();\n"+
+					"\n"+
+					"  Serial.print(\"Floor:  \");\n"+
+					"\n"+
+					"  for(int ii=0;ii<4;++ii)\n"+
+					"  {\n"+
+					"    Serial.print(robot.floor[ii]);\n"+
+					"    Serial.print(\"\t\");\n"+
+					"  }\n"+
+					"\n"+
+					"  Serial.println(\"\");\n"+
+					"  \n"+
+					"  if(robot.floor[2]>50)\n"+
+					"  {\n"+
+					"    roomba.drive(100,100);\n"+
+					"  }\n"+
+					"  else\n"+
+					"  {\n"+
+					"    roomba.drive(-20,-20);\n"+
+					"  }\n"+
 					"}"
 					);
 				editor.set_size(480,460);

@@ -41,6 +41,11 @@ arduino_roomba_t.prototype.start=function()
 	);
 };
 
+arduino_roomba_t.prototype.setup=function(pin)
+{
+	this.start();
+};
+
 arduino_roomba_t.prototype.stop=function()
 {
 	var myself=this;
@@ -389,6 +394,129 @@ function arduino_emulator_t()
 	}
 
 	myself.Serial=
+	{
+		available:function(){return false;},
+		begin:function(speed,config){},
+		end:function(){},
+		flush:function(){},
+		peek:function(){return 0;},
+
+		print:function(text)
+		{
+			myself.add_command(
+				function(controller,data) {
+					console.log(data.value);
+				}
+				,{"value":text}
+			);
+		},
+
+		println:function(text)
+		{
+			myself.add_command(
+				function(controller,data) {
+					console.log(data.value);
+				}
+				,{"value":text}
+			);
+		},
+
+		read:function(){return 0},
+
+		write:function(text)
+		{
+			myself.add_command(
+				function(controller,data) {
+					console.log(data.value);
+				}
+				,{"value":text}
+			);
+		}
+	};
+
+	myself.Serial1=
+	{
+		available:function(){return false;},
+		begin:function(speed,config){},
+		end:function(){},
+		flush:function(){},
+		peek:function(){return 0;},
+
+		print:function(text)
+		{
+			myself.add_command(
+				function(controller,data) {
+					console.log(data.value);
+				}
+				,{"value":text}
+			);
+		},
+
+		println:function(text)
+		{
+			myself.add_command(
+				function(controller,data) {
+					console.log(data.value);
+				}
+				,{"value":text}
+			);
+		},
+
+		read:function(){return 0},
+
+		write:function(text)
+		{
+			myself.add_command(
+				function(controller,data) {
+					console.log(data.value);
+				}
+				,{"value":text}
+			);
+		}
+	};
+
+	myself.Serial2=
+	{
+		available:function(){return false;},
+		begin:function(speed,config){},
+		end:function(){},
+		flush:function(){},
+		peek:function(){return 0;},
+
+		print:function(text)
+		{
+			myself.add_command(
+				function(controller,data) {
+					console.log(data.value);
+				}
+				,{"value":text}
+			);
+		},
+
+		println:function(text)
+		{
+			myself.add_command(
+				function(controller,data) {
+					console.log(data.value);
+				}
+				,{"value":text}
+			);
+		},
+
+		read:function(){return 0},
+
+		write:function(text)
+		{
+			myself.add_command(
+				function(controller,data) {
+					console.log(data.value);
+				}
+				,{"value":text}
+			);
+		}
+	};
+
+	myself.Serial3=
 	{
 		available:function(){return false;},
 		begin:function(speed,config){},
