@@ -23,15 +23,17 @@
 				stop_button=document.getElementById("stop");
 				editor.create(document.getElementById("code"));
 				editor.set_value(
-					"//Need this to use roomba\n"+
 					"#include \"roomba.h\"\n"+
 					"\n"+
-					"roomba_t roomba(Serial);\n"+
+					"roomba_t roomba(Serial3);\n"+
+					"int speed=50;\n"+
 					"\n"+
 					"void setup()\n"+
 					"{\n"+
-					"\t//Things written in here happen once\n"+
-					"\troomba.start();\n"+
+					"  Serial.begin(115200);\n"+
+					"  Serial3.begin(115200);\n"+
+					"  roomba.setup(2);\n"+
+					"  Serial.println(\"Roomba Started\");\n"+
 					"}\n"+
 					"\n"+
 					"void loop()\n"+
