@@ -39,6 +39,7 @@
 					"void loop()\n"+
 					"{\n"+
 					"\t//Things written in here keep happening\n"+
+					"\troomba.update();\n"+
 					"\troomba_sensor_t robot=roomba.get_sensors();\n"+
 					"\troomba.drive(-10,-10); // back up slowly by default\n"+
 					"\tif (robot.floor[0]>500) { // floor exists!  Drive forward\n"+
