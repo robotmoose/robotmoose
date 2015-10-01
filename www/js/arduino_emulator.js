@@ -579,6 +579,9 @@ function arduino_emulator_t()
 				this.HIGH=true;
 				this.LOW=false;
 				this.Serial=myself.Serial;
+				this.Serial1=myself.Serial1;
+				this.Serial2=myself.Serial2;
+				this.Serial3=myself.Serial3;
 				this.constrain=myself.constrain;
 				this.map=myself.map;
 				this.pinMode=myself.pinMode;
