@@ -305,7 +305,7 @@ CodeMirror.defineMode("clike", function(config, parserConfig) {
                     "charAt compareTo concat endsWith equals equalsIgnoreCase getBytes indexOf " +
                     "lastIndexOf length replace setCharAt startsWith substring toCharArray " +
                     "toLowerCase toUpperCase trim begin end available peek flush SerialEvent " +
-                    "attachInterrupt detachInterrupt interrupts noInterrupts Serial " +
+                    "attachInterrupt detachInterrupt interrupts noInterrupts Serial Serial1 Serial2 Serial3 " +
                     "array analogReference tone noTone shiftOut shiftIn pulseIn read " +
                     "Stream millis micros delayMicroseconds write receive byte String string word " +
                     "lowByte highByte bitRead bitWrite bitSet bitClear bit print println delay " +
