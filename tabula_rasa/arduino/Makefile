@@ -70,16 +70,16 @@ all:
 mega:
 	cp arduino.ino main.cpp
 	$(COMPILER2560) $(DIRS) $(CFLAGS) $(INCLUDE) $(MAIN_SRC) $(ARDUINO_SRC) -o $(BIN_DIR)/$@.elf
-	$(LINKER) -R .eeprom -O ihex $(BIN_FILE).elf $(BIN_FILE).hex
-	$(PROG2560) -P$(PROGRAM_PORT) -Uflash:w:$(BIN_FILE).hex $(PFLAGS)
+	$(LINKER) -R .eeprom -O ihex $(BIN_DIR)/$@.elf $(BIN_DIR)/$@.hex
+	$(PROG2560) -P$(PROGRAM_PORT) -Uflash:w:$(BIN_DIR)/$@.hex $(PFLAGS)
 	@rm -rf main.cpp
 
 uno:
 	cp arduino.ino main.cpp
 	$(COMPILER328) $(DIRS) $(CFLAGS) $(INCLUDE) $(MAIN_SRC) $(ARDUINO_SRC) -o $(BIN_DIR)/$@.elf
-	$(LINKER) -R .eeprom -O ihex $(BIN_FILE).elf $(BIN_FILE).hex
-	$(PROG328) -P$(PROGRAM_PORT) -Uflash:w:$(BIN_FILE).hex $(PFLAGS)
+	$(LINKER) -R .eeprom -O ihex $(BIN_DIR)/$@.elf $(BIN_DIR)/$@.hex
+	$(PROG328) -P$(PROGRAM_PORT) -Uflash:w:$(BIN_DIR)/$@.hex $(PFLAGS)
 	@rm -rf main.cpp
 
 clean:
-	@rm -rf $(BIN_DIR)/mega.hex $(BIN_DIR)/uno.hex main.cpp
+	@rm -rf $(BIN_DIR)/mega.elf $(BIN_DIR)/uno.elf $(BIN_DIR)/mega.hex $(BIN_DIR)/uno.hex main.cpp
