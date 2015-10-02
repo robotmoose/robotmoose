@@ -36,7 +36,7 @@ DIRS=$(INCLUDE_DIR) -I. -I$(SHARED_DIR) -I$(SRC_DIR)  $(LIB_DIR)
 OPTS=-Os  # optimize for size, to fit on an Uno
 CFLAGS=-Wno-sign-compare -Wno-unused-variable -Wall -lm $(OPTS) -Wl,--gc-sections -ffunction-sections \
 	-fdata-sections -DUSB_VID=null -DUSB_PID=null -DARDUINO=103 -Wno-strict-aliasing
-# -std=c++11 
+# -std=c++11
 
 #Device Flags
 CLOCK=16000000UL
@@ -75,6 +75,7 @@ mega:
 	@rm -rf main.cpp
 
 uno:
+	cp arduino.ino main.cpp
 	$(COMPILER328) $(DIRS) $(CFLAGS) $(INCLUDE) $(MAIN_SRC) $(ARDUINO_SRC) -o $(BIN_DIR)/$@.elf
 	$(LINKER) -R .eeprom -O ihex $(BIN_FILE).elf $(BIN_FILE).hex
 	$(PROG328) -P$(PROGRAM_PORT) -Uflash:w:$(BIN_FILE).hex $(PFLAGS)
