@@ -35,14 +35,14 @@
 // Charge function parameters
 
 #define ABS_max           4.2  // Max Cell voltage: DO NOT CHARGE HIGHER
-#define max_working       4.001  // Discharge cells higher than this value
+#define max_working       4.15  // Discharge cells higher than this value
 #define low_cell_working  3.500  // Warning Voltage
 #define ABS_min           3.200  //E-Stop or risk damage
 
 // Configuration Registers for measure mode
 
 #define CFGR0       0xE1
-byte CFGR1=0x00;
+byte CFGR1=0x00;              
 #define CFGR2       0x00
 #define CFGR3       0xFF
 #define CFGR4       0x00
@@ -55,7 +55,7 @@ byte CFGR1=0x00;
 #define CHARGE_RELAY  9    // Set to high to turn on charging relay
 #define POWER         6    // Power pin for BMS shield
 #define ADDRESS       0x02 // Designate Chip address: 10000000
-#define OK            8    // OK signal for system power
+#define OK_PIN        8    // OK signal for system power
 
 //---------------------------------------------------------------------------------------------------------------------
 // Calculation Variables
@@ -64,7 +64,8 @@ unsigned int RawData[6];       // Raw data from voltage registers
 float cellVoltage[3];          // Calculated voltages for each cell
 float AvgCellVolts;
 float cellVoltTotal;
-int chargeflag;
+byte chargeflag;               // 1 if charging, 0 otherwise
+byte ok_flag;                  // 1 if OK pin set to high, 0 otherwise
 
 // PEC Variables
 static byte crc8_table[256];   // 8-bit table for PEC calc
@@ -76,13 +77,13 @@ byte packet[18]={0};           // used for PEC calc
 //byte PECpacketREAD;          // value that PECpacket should be as read from 6803
 //---------------------------------------------------------------------------------------------------------------------
 
-int x=0;
+//int x=0;
 
 void setup()
 {
-  pinMode(OK, OUTPUT);
+  pinMode(OK_PIN, OUTPUT);
   pinMode(POWER, OUTPUT);
-  digitalWrite(OK, HIGH); // Set OK signal to HIGH
+  digitalWrite(OK_PIN, HIGH); // Set OK signal to HIGH
   digitalWrite(POWER, HIGH); // Allow Arduino to stay powered
   pinMode(SS_PIN, OUTPUT);
   pinMode(CHARGE_INPUT, INPUT);
@@ -274,7 +275,8 @@ void BatteryCritical()
   //cellVoltage[2]=  4.5;
   if ((cellVoltage[0] + cellVoltage[1] + cellVoltage[2]) == 0)
   {
-    digitalWrite(OK, LOW);
+    digitalWrite(OK_PIN, LOW);
+    ok_flag = 0;
     Serial.println("Battery is DISCONNECTED!\nSYSTEM OK pin set to LOW.");
   }
   else if ((cellVoltage[0] <= ABS_min) || (cellVoltage[1] <= ABS_min) || (cellVoltage[2] <= ABS_min))
@@ -282,19 +284,22 @@ void BatteryCritical()
   {
     if (digitalRead(CHARGE_INPUT) == LOW)
     {
-      digitalWrite(OK, LOW); //Set the OK signal low
+      digitalWrite(OK_PIN, LOW); //Set the OK signal low
+      ok_flag = 0;
       digitalWrite(POWER, LOW); //Set the BMS power to off
       Serial.println("Battery is AT OR BELOW MINIMUM VOLTAGE!\nSYSTEM OK pin set to LOW.");
     }
     else if (digitalRead(CHARGE_INPUT == HIGH))
     {
-      digitalWrite(OK, LOW);
+      digitalWrite(OK_PIN, LOW);
+      ok_flag = 0;
       Serial.println("Battery is AT OR BELOW MINIMUM VOLTAGE!\nSYSTEM OK pin set to LOW.");
     }
   }
   else
   {
-    digitalWrite(OK, HIGH);
+    digitalWrite(OK_PIN, HIGH);
+    ok_flag = 1;
     Serial.println("Battery level is above minimum.\nSYSTEM OK pin set to HIGH.");
   }
 }
@@ -345,12 +350,12 @@ byte calcPECbyte(byte m) // Calculate PEC from single byte
 
 byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number of bytes currently in packet[]
 {
-  int z;
+  //int z;
   byte PECpacket = 0x41;  // initialize PECpacket
   if (!made_table) {  // Check and make sure lookup table is generated
     init_crc8();  // Generate Table
   }
-  for (z = 0; z < np; z ++) {
+  for (int z = 0; z < np; z ++) {
     PECpacket = crc8_table[(PECpacket) ^ packet[z]];
   }
   return PECpacket;
@@ -359,16 +364,34 @@ byte calcPECpacket(byte np) // Calculate PEC for an array of bytes. np is number
 //---------------------------------------------------------------------------------------------------------------------
 // I2C communication code
 
+// Upon I2C request, sends a packet containing battery percentage and charge/discharge information.
 void requestEvent()
 {
-  byte data [2] = {(byte)Percentage(cellVoltTotal), setChargeByte()|0xC0};
-  Wire.write(data, 2);
-  //Serial.print("I2C Request Performed: ");
+  byte header = 0xCC;
+  float charge_percent = Percentage(cellVoltTotal);
+  byte charge_byte = getChargeByte();
+  
+  byte data[ 3*sizeof(byte) ] = { header, (byte)charge_percent, charge_byte };
+  // Packet begins with a byte header of 0xCC
+  // Next sizeof(float) bytes are a float containing the battery percentage
+  // The last byte contains charging and discharging info. Check getChargeByte() description for format.
+  
+  Wire.write( data, 3*sizeof(byte) );
+  /*Wire.write( header );
+  Wire.write( (byte *)&charge_percent, sizeof(float) );
+  Wire.write( charge_byte );*/
 }
 
-byte setChargeByte()
+// Returns a byte with charging and discharging information
+// Bit 0 is 1 if cell #1 is discharging, 0 otherwise
+// Bit 1 is 1 if cell #2 is discharging, 0 otherwise
+// Bit 2 is 1 if cell #3 is discharging, 0 otherwise
+// Bit 3 is 1 if the battery is charging, 0 otherwise
+// Bit 4 is 1 if BMS is OK, 0 otherwise.
+// Bits 5-7 are unused
+byte getChargeByte()
 {
-  return ((chargeflag << 3) | CFGR1);
+  return 0x00 | (ok_flag << 4) | ((chargeflag << 3) | CFGR1);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
