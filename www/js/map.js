@@ -12,7 +12,10 @@ function robot_map_t(div)
 	this.renderer=new renderer_t(div,function() {myself.setup();}, function() {myself.loop();} );
 	if(!this.renderer.setup()) {
 		var p=document.createElement("p");
-		p.innerHTML="Is WebGL enabled?";
+		p.innerHTML="<p><H3>WebGl seems to be disabled</H3></p> "
+		p.innerHTML+="<p><b>Firefox:</b> Go to about:config in your address bar,search for webgl and check if webgl.disabled is false</p>";
+		p.innerHTML+="<p><b>Chrome:</b> <ol><li><b>Is hardware acceleration enabled?</b> Type chrome://settings, show advanced settings -> under system > check Use hardware acceleration when available</li><b><li>Check WebGl:</b> Type Chrome://flags into the address bar and confirm that Disable WebGl is gray</li></ol></p>";
+		p.innerHTML+= "<p><b>Safari:</b> <ol><li>Go to Safari's Preferences</li><li>Select the Advanced tab</li><li>Check the Show Develop menu in mneu bat checkbox</li><li>In the Develop menu, check Enable WebGl</li></ol></p>";
 		div.appendChild(p);
 		this.renderer=null;
 	}
