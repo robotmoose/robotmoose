@@ -63,6 +63,9 @@ state_runner_t.prototype.stop=function(state_table)
 
 	if (this.VM_power) { // stop the robot when the code stops running
 		this.VM_power.L=this.VM_power.R=0.0; // hacky!
+		for (var idx in this.VM_power.pwm) {
+			this.VM_power.pwm[idx]=0;
+		}
 		if (this.onpilot) this.onpilot(this.VM_power);
 	}
 }
