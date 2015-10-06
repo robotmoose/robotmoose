@@ -107,13 +107,13 @@ robot_ui_t.prototype.download_gui=function()
 	{
 		myself.doorways=
 		{
-			config:myself.create_doorway("Configure","Set up robot hardware","CONFIG HELP"),
-			pilot:myself.create_doorway("Drive","Manually drive the robot","PILOT HELP"),
-			sensors:myself.create_doorway("Sensors","Examine sensor data from robot","SENSORS HELP"),
-			states:myself.create_doorway("Code","Automatically drive the robot","STATES HELP"),
-			map:myself.create_doorway("Map","See where the robot thinks it is","MAP HELP"),
-			video:myself.create_doorway("Video","Show the robot's video camera","VIDEO HELP"),
-			UI:myself.create_doorway("UI","Customized robot user interface","UI HELP")
+			config:myself.create_doorway("Configure","Set up robot hardware",null),
+			pilot:myself.create_doorway("Drive","Manually drive the robot",null),
+			sensors:myself.create_doorway("Sensors","Examine sensor data from robot",null),
+			states:myself.create_doorway("Code","Automatically drive the robot",null),
+			map:myself.create_doorway("Map","See where the robot thinks it is",null),
+			video:myself.create_doorway("Video","Show the robot's video camera",null),
+			UI:myself.create_doorway("UI","Customized robot user interface",null)
 		};
 
 		clear_out(myself.doorways.config.content);
