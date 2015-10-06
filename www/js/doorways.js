@@ -205,16 +205,19 @@ doorways_t.prototype.create=function(title,pos,tooltip,help_text)
 	};
 	doorway.bar.appendChild(doorway.minimize);
 
-	doorway.help_button.className="glyphicon glyphicon-question-sign";
-	doorway.help_button.style.cursor="pointer";
-	doorway.help_button.style.float="right";
-	doorway.help_button.style.marginRight=5;
-	doorway.help_button.doorways_t=doorway;
-	doorway.help_button.onclick=function(event)
+	if(doorway.help_text)
 	{
-		doorway.help_window.show();
-	};
-	doorway.bar.appendChild(doorway.help_button);
+		doorway.help_button.className="glyphicon glyphicon-question-sign";
+		doorway.help_button.style.cursor="pointer";
+		doorway.help_button.style.float="right";
+		doorway.help_button.style.marginRight=5;
+		doorway.help_button.doorways_t=doorway;
+		doorway.help_button.onclick=function(event)
+		{
+			doorway.help_window.show();
+		};
+		doorway.bar.appendChild(doorway.help_button);
+	}
 
 	doorway.heading.className="panel-title";
 	doorway.heading.innerHTML=title;
