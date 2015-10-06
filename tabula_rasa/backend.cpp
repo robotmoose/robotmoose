@@ -65,6 +65,11 @@ void moose_sleep_ms(int delay_ms)
 #endif
 }
 
+void clean_exit(const char *why) {
+	fprintf(stderr,"Backend exiting: %s\n",why);
+	exit(1);
+}
+
 int tabula_serial_begin(int baudrate) {
 	std::vector<std::string> ports=Serial.port_list();
 
@@ -728,6 +733,8 @@ void robot_backend::read_sensors(const A_packet& current_p)
 	if (current_p.length!=tabula_sensor_storage.count) {
 		printf("Device and backend mismatch!  Arduino sensors %d bytes, backend sensors %d bytes!\n",
 			(int)current_p.length,(int)tabula_sensor_storage.count);
+		printf("Do you need to flash the Arduino again?");
+		clean_exit("Arduino does not match backend");
 	}
 	else {
 		memcpy(tabula_sensor_storage.array,current_p.data,current_p.length);
@@ -746,7 +753,10 @@ void robot_backend::read_serial(void) {
 			if (debug) printf("P");
 			if (debug) printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data);
 			if (p.command == 0) printf("    Arduino sent echo request %d bytes, '%.*s'\n", p.length, p.length, p.data);
-			else if (p.command==0xE) printf("ERROR sent from Arduino: %d bytes, '%.*s'\n", p.length, p.length, p.data);
+			else if (p.command==0xE) {
+				printf("ERROR sent from Arduino: %d bytes, '%.*s'\n", p.length, p.length, p.data);
+				clean_exit("Arduino sent error report");
+			}
 			else if (p.command == 0xC)
 			{
 				if (debug) printf("    Arduino sent sensor data: %d bytes, '%.*s'\n", p.length, p.length, p.data);
@@ -784,10 +794,8 @@ std::string robot_backend::superstar_send_get(const std::string &path)
 			std::cout<<"Reconnected to superstar!\n";
 		}
 	}
-	std::cout<<"NETWORK ERROR talking to superstar.\n";
-	std::cout<<"Exiting...\n";
-	exit(1);
-	// return "";
+	clean_exit("NETWORK ERROR talking to superstar.  Do you have wireless?");
+	return "network error";
 }
 
 /**
@@ -832,38 +840,38 @@ void robot_backend::read_network(const std::string &read_json)
 		for (unsigned int i=0;i< commands.size();i++) commands[i]->do_command(pilot);
 
 #ifndef	_WIN32
-
+		//  On UNIX systems, run shell scripts from script/ directory
+		static std::string last_cmd_arg="";
+		static bool startup=true;
+		std::string cmd_arg="";
 		if(pilot["cmd"].GetType()==json::ObjectVal)
 		{
-			// Script execution magic
-			static std::string last_cmd_arg="";
 			std::string run=pilot["cmd"]["run"];
 			std::string arg=pilot["cmd"]["arg"];
 
-			if (run.find_first_of("./\\\"")==std::string::npos) { // looks clean
-				std::string cmd_arg=run+arg;
-				if (last_cmd_arg!=cmd_arg) { // new script command: run it
+			if (run.size()>0 && run.find_first_of("./\\\"")==std::string::npos) { // looks clean
+				cmd_arg=run+arg;
+				if (last_cmd_arg!=cmd_arg && !startup) { // new script command: run it
 
-					std::string path="./"+run;
+					// std::string path="./"+run;
 					printf("RUNNING SCRIPT: '%s' with arg '%s'\n",
-						path.c_str(),arg.c_str());
+						run.c_str(),arg.c_str());
 
 					if (fork()==0) {
-						if (chdir("../layla/backend/scripts")!=0) {
+						if (chdir("script")!=0) {
 							printf("SCRIPT chdir FAILED\n");
 						}
-
 						else {
-							execl(path.c_str(),path.c_str(),arg.c_str(),(char *)NULL);
+							execl("logger","logger",run.c_str(),arg.c_str(),(char *)NULL);
 							perror("SCRIPT EXECUTE FAILED\n");
 						}
 						exit(0);
 					}
 				}
-
-				last_cmd_arg=cmd_arg;
 			}
 		}
+		startup=false;
+		last_cmd_arg=cmd_arg;
 
 #endif
 

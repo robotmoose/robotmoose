@@ -201,7 +201,7 @@ robot_ui_t.prototype.create_widgets=function()
 		myself.widgets.UI.run();
 		if(myself.robot.name)
 		{
-			myself.state_runner.VM_power=myself.widgets.pilot.pilot.power;
+			myself.state_runner.VM_pilot=myself.widgets.pilot.pilot;
 			myself.state_runner.run(myself.robot,myself.widgets.states);
 		}
 	}
