@@ -41,7 +41,12 @@ You'll need to log out and log back in to be in the new group.
 Now plug in the Arduino and flash the firmware at robotmoose/tabula_rasa/arduino, using either the Arduino IDE or the Makefile there:
 ```
 cd ~/robotmoose/tabula_rasa/arduino
-make
+make mega
+```
+or, if using an UNO:
+```
+cd ~/robotmoose/tabula_rasa/arduino
+make uno
 ```
 You can doublecheck the installation by opening the Arduino as a serial port at 57600 baud, and you should get a welcome message.
 
