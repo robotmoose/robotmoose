@@ -16,7 +16,7 @@ function state_runner_t()
 	this.kill=true;
 	this.state_start_time_ms=this.get_time_ms();
 
-	this.VM_power={};
+	this.VM_pilot=null; // e.g., power commands, shared with manual drive
 	this.VM_sensors={};
 	this.VM_store={};
 	this.VM_UI=null;
@@ -61,9 +61,13 @@ state_runner_t.prototype.stop=function(state_table)
 
 	state_table.set_active(); // no section is active
 
-	if (this.VM_power) { // stop the robot when the code stops running
-		this.VM_power.L=this.VM_power.R=0.0; // hacky!
-		if (this.onpilot) this.onpilot(this.VM_power);
+	if (this.VM_pilot) { // stop the robot when the code stops running
+		this.VM_pilot.power.L=this.VM_pilot.power.R=0.0; // stop drive
+		this.VM_pilot.cmd=undefined; // stop scripts
+		for (var idx in this.VM_pilot.power.pwm) {
+			this.VM_pilot.power.pwm[idx]=0; // stop PWM
+		}
+		if (this.onpilot) this.onpilot(this.VM_pilot);
 	}
 }
 
@@ -88,6 +92,7 @@ state_runner_t.prototype.find_state=function(state_name)
 
 state_runner_t.prototype.run_m=function(state_table)
 {
+	this.run_start_time_ms=this.get_time_ms();
 	this.state_list=state_table.get_states();
 
 	if(this.state_list.length<=0)
@@ -145,17 +150,22 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	};
 	VM.stop=function() { VM.state=null; }
 
-	VM.time=this.get_time_ms() - this.state_start_time_ms;
+	var time_ms=this.get_time_ms();
+	VM.time=time_ms - this.state_start_time_ms; // time in state (ms)
+	VM.time_run=time_ms - this.run_start_time_ms; // time since "Run" (ms)
+	
+	VM.pilot=this.VM_pilot;
+	VM.pilot.cmd=undefined; // don't re-send scripts
+	VM.script=function(cmd,arg) { VM.pilot.cmd={"run":cmd, "arg":arg}; }
+	
+	VM.pilot_original=JSON.stringify(VM.pilot); // hack for change detection
 
 	VM.sensors=this.VM_sensors;
-	VM.power=this.VM_power;
+	VM.power=this.VM_pilot.power;
 	VM.store=this.VM_store;
-	VM.power_original=JSON.stringify(VM.power); // hack for change detection
 	VM.robot={sensors:VM.sensors, power:VM.power};
 
-	VM.drive=function(speed) { VM.power.L=VM.power.R=speed; };
-	VM.turnleft =function(speed) { VM.power.L=-speed; VM.power.R=+speed; };
-	VM.turnright=function(speed) { VM.power.L=+speed; VM.power.R=-speed; };
+	VM.drive=function(speedL,speedR) { VM.power.L=speedL; VM.power.R=speedR; }
 	
 	// UI construction:
 	VM.UI=this.VM_UI;
@@ -234,9 +244,9 @@ state_runner_t.prototype.execute_m=function(state_table)
 				this.start_state(VM.state);
 			}
 
-			if (JSON.stringify(VM.power)!=VM.power_original)
+			if (JSON.stringify(VM.pilot)!=VM.pilot_original)
 			{ // Send off autopilot's driving commands
-				if (this.onpilot) this.onpilot(VM.power);
+				if (this.onpilot) this.onpilot(VM.pilot);
 			}
 
 			var myself=this;
