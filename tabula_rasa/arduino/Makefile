@@ -13,7 +13,11 @@ ifeq ($(shell uname),Darwin)
 	PROGRAM_PORT=$(shell echo /dev/tty.usb*)
 else
 	#LINUX
-	PROGRAM_PORT=/dev/ttyACM0
+	PROGRAM_PORT=$(shell echo /dev/ttyACM*)
+
+	ifneq (,$(findstring ACM*,$(PROGRAM_PORT)))
+		PROGRAM_PORT=$(shell echo /dev/ttyUSB*)
+	endif
 endif
 
 #Builders
