@@ -1,6 +1,6 @@
 CXX=g++
 OPTS=-O
-CFLAGS=$(OPTS) -Wall -I../include 
+CFLAGS=$(OPTS) -Wall -I../include -static -static-libstdc++ -static-libgcc
 # CFLAGS+=-DLISTEN80
 LIBS=
 
