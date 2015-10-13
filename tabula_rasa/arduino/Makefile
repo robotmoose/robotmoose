@@ -10,9 +10,11 @@
 #STUFF YOU GOTTA CHANGE...
 ifeq ($(shell uname),Darwin)
 	#MAC
+	ARDUINO_IDE=/Applications/Arduino.app/Contents/Java
 	PROGRAM_PORT=$(shell echo /dev/tty.usb*)
 else
 	#LINUX
+	ARDUINO_IDE=/usr/share/arduino
 	PROGRAM_PORT=$(shell echo /dev/ttyACM*)
 
 	ifneq (,$(findstring ACM*,$(PROGRAM_PORT)))
@@ -26,7 +28,6 @@ LINKER=avr-objcopy
 PROGRAMMER=avrdude
 
 #Search Directories
-ARDUINO_IDE=/usr/share/arduino
 ARDUINO_DIR=$(ARDUINO_IDE)/hardware/arduino
 ARD_LIB_DIR=$(ARDUINO_IDE)/libraries
 INCLUDE_DIR=-I$(ARDUINO_DIR)/cores -I$(ARDUINO_DIR)/cores/arduino
