@@ -33,7 +33,7 @@ INCLUDE_DIR=-I$(ARDUINO_DIR)/cores -I$(ARDUINO_DIR)/cores/arduino
 ATMEGA328_INCLUDE_DIR=-I$(ARDUINO_DIR)/variants/standard
 ATMEGA2560_INCLUDE_DIR=-I$(ARDUINO_DIR)/variants/mega
 LIB_DIR=-I$(ARD_LIB_DIR)/Servo -I$(ARD_LIB_DIR)/SoftwareSerial -I$(ARD_LIB_DIR)/Wire -Ipatched
-LIB_SRC=$(ARD_LIB_DIR)/Servo/Servo.cpp patched/SoftwareSerial.cpp $(ARD_LIB_DIR)/Wire/Wire.cpp patched/twi.cpp
+LIB_SRC=$(ARD_LIB_DIR)/Servo/Servo.cpp patched/SoftwareSerial.cpp $(ARD_LIB_DIR)/Wire/Wire.cpp patched/twi.cpp Adafruit_NeoPixel.cpp
 DIRS=$(INCLUDE_DIR) -I. -I$(SHARED_DIR) -I$(SRC_DIR)  $(LIB_DIR)
 
 #Compiler Flags
