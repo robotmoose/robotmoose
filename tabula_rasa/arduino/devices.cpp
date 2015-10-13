@@ -9,6 +9,7 @@
 #include "tabula_control.h"
 #include "tabula_config.h"
 #include <stdint.h>
+#include <Adafruit_NeoPixel.h>
 
 
 // Servo output example:
@@ -27,6 +28,29 @@ REGISTER_TABULA_DEVICE(servo,"P",
 	servo_device *device=new servo_device();
 	device->s.attach(pin);
 	src.command_index("deg",F("commanded orientation in degrees"),device->deg.get_index());
+	actions_10ms.add(device);
+)
+
+//NeoPixel
+class neo_pixel: public action {
+public:
+	Adafruit_NeoPixel npix;
+	neo_pixel(const int pin): npix(10, pin, NEO_GRB + NEO_KHZ800){}//hardcoded for testing
+
+
+	virtual void loop(){
+		for(int i=0; i<10; i++)
+		{
+			npix.setPixelColor(i, npix.Color(0, 0, 255));
+		}
+		npix.show();
+	}
+};
+
+REGISTER_TABULA_DEVICE(neo_pixel,"P",
+	int pin=src.read_pin();
+	neo_pixel *device=new neo_pixel(pin);
+	device->npix.begin();
 	actions_10ms.add(device);
 )
 
