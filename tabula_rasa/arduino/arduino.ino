@@ -2,6 +2,7 @@
 #include <Servo.h>
 #include <Wire.h>
 #include "tabula_config.h"
+#include <Adafruit_NeoPixel.h>
 
 void setup()
 {
