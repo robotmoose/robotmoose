@@ -10,11 +10,9 @@
 #STUFF YOU GOTTA CHANGE...
 ifeq ($(shell uname),Darwin)
 	#MAC
-	ARDUINO_IDE=/Applications/Arduino.app/Contents/Java
 	PROGRAM_PORT=$(shell echo /dev/tty.usb*)
 else
 	#LINUX
-	ARDUINO_IDE=/usr/share/arduino
 	PROGRAM_PORT=$(shell echo /dev/ttyACM*)
 
 	ifneq (,$(findstring ACM*,$(PROGRAM_PORT)))
@@ -28,19 +26,20 @@ LINKER=avr-objcopy
 PROGRAMMER=avrdude
 
 #Search Directories
+ARDUINO_IDE=arduino
 ARDUINO_DIR=$(ARDUINO_IDE)/hardware/arduino
 ARD_LIB_DIR=$(ARDUINO_IDE)/libraries
 INCLUDE_DIR=-I$(ARDUINO_DIR)/cores -I$(ARDUINO_DIR)/cores/arduino
 ATMEGA328_INCLUDE_DIR=-I$(ARDUINO_DIR)/variants/standard
 ATMEGA2560_INCLUDE_DIR=-I$(ARDUINO_DIR)/variants/mega
-LIB_DIR=-I$(ARD_LIB_DIR)/Servo -I$(ARD_LIB_DIR)/SoftwareSerial -I$(ARD_LIB_DIR)/Wire -Ipatched
-LIB_SRC=$(ARD_LIB_DIR)/Servo/Servo.cpp patched/SoftwareSerial.cpp $(ARD_LIB_DIR)/Wire/Wire.cpp patched/twi.cpp Adafruit_NeoPixel.cpp
+LIB_DIR=-I$(ARD_LIB_DIR)/Servo -I$(ARD_LIB_DIR)/SoftwareSerial -I$(ARD_LIB_DIR)/Wire -I$(ARD_LIB_DIR)/Adafruit_NeoPixel -Ipatched
+LIB_SRC=$(ARD_LIB_DIR)/Servo/Servo.cpp patched/SoftwareSerial.cpp $(ARD_LIB_DIR)/Wire/Wire.cpp patched/twi.cpp $(ARD_LIB_DIR)/Adafruit_NeoPixel/Adafruit_NeoPixel.cpp
 DIRS=$(INCLUDE_DIR) -I. -I$(SHARED_DIR) -I$(SRC_DIR)  $(LIB_DIR)
 
 #Compiler Flags
 OPTS=-Os  # optimize for size, to fit on an Uno
 CFLAGS=-Wno-sign-compare -Wno-unused-variable -Wall -lm $(OPTS) -Wl,--gc-sections -ffunction-sections \
-	-fdata-sections -DUSB_VID=null -DUSB_PID=null -DARDUINO=103 -Wno-strict-aliasing
+	-fdata-sections -DUSB_VID=null -DUSB_PID=null -DARDUINO=103 -Wno-strict-aliasing -Wno-reorder
 # -std=c++11
 
 #Device Flags
