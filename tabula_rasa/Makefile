@@ -1,6 +1,6 @@
 CXX=g++
 OPTS=-O
-CFLAGS=$(OPTS) -Wall -static -static-libstdc++ -static-libgcc
+CFLAGS=$(OPTS) -Wall
 LIBS=
 
 ifeq ($(OS),Windows_NT)
