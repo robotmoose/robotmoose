@@ -122,7 +122,9 @@ uint8_t twi_readFrom(uint8_t address, uint8_t* data, uint8_t length, uint8_t sen
   }
 
   // wait until twi is ready, become master receiver
+  unsigned long x=millis();
   while(TWI_READY != twi_state){
+    if(millis()-x > 10) return 0;
     continue;
   }
   twi_state = TWI_MRX;
@@ -158,8 +160,10 @@ uint8_t twi_readFrom(uint8_t address, uint8_t* data, uint8_t length, uint8_t sen
     // send start condition
     TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT) | _BV(TWSTA);
 
+  x=millis();
   // wait for read operation to complete
   while(TWI_MRX == twi_state){
+    if(millis()-x > 10) return 0;
     continue;
   }
 
@@ -199,7 +203,9 @@ uint8_t twi_writeTo(uint8_t address, uint8_t* data, uint8_t length, uint8_t wait
   }
 
   // wait until twi is ready, become master transmitter
+  unsigned long x=millis();
   while(TWI_READY != twi_state){
+    if(millis()-x > 10) return 0;
     continue;
   }
   twi_state = TWI_MTX;

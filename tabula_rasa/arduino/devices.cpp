@@ -102,7 +102,9 @@ public:
 	enum { bms_addr = 2 }; // Address of BMS on I2C
 
 	// Packet is 1 byte header, 4 byte float for battery percent, 1 byte for charge/discharge info  
-	enum { numbytes = (3*sizeof(byte)) }; // # of bytes to request from BMS
+	enum { numbytes = 3 }; // # of bytes to request from BMS
+
+	char data[numbytes];
 
 	BMS() {
 		charge=0;
@@ -110,39 +112,32 @@ public:
 	}
 
 	virtual void loop() {
-		Wire.requestFrom(bms_addr, numbytes);
-
-		uint32_t battery_percent=0;
+		Wire.requestFrom(bms_addr, numbytes, true);
 		if( Wire.available() ){
-		if( Wire.read() == 0xCC ) // If the I2C packet header is 0xCC
-		{   
-			// Read in float for battery percent from I2C
-			/*for(int i=0; i<sizeof(float); ++i)
+			if( Wire.read() == 0xCC ) // If the I2C packet header is 0xCC
 			{
-				battery_percent = battery_percent | (Wire.read() << sizeof(char)*i);
-			}
-			charge = (float)battery_percent; // Convert float for battery percent from I2C*/
-			charge = Wire.read();
+				if( Wire.available() ) charge = Wire.read();
 
-			// Bit 0 is 1 if cell #1 is discharging, 0 otherwise
-			// Bit 1 is 1 if cell #2 is discharging, 0 otherwise
-			// Bit 2 is 1 if cell #3 is discharging, 0 otherwise
-			// Bit 3 is 1 if the battery is charging, 0 otherwise
-			// Bit 4 is 1 if BMS is OK, 0 otherwise.
-			// Bits 5-7 are unused	
-			state = Wire.read();
+				// Bit 0 is 1 if cell #1 is discharging, 0 otherwise
+				// Bit 1 is 1 if cell #2 is discharging, 0 otherwise
+				// Bit 2 is 1 if cell #3 is discharging, 0 otherwise
+				// Bit 3 is 1 if the battery is charging, 0 otherwise
+				// Bit 4 is 1 if BMS is OK, 0 otherwise.
+				// Bits 5-7 are unused	
+				if( Wire.available() ) state = Wire.read();
+			}
+			else
+			{
+				charge = 0;
+				state = 0;
+			}
 		}
-		else
-		{
-			charge = 54;
-			state = 107;
-		}
-	}
 	}
 };
 
 REGISTER_TABULA_DEVICE(bms,"",
-        Wire.begin();
+    Wire.begin();
+    Wire.setTimeout(100);
 	BMS *device=new BMS();
 	actions_1s.add(device);
 )
