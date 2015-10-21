@@ -1043,7 +1043,7 @@ int main(int argc, char *argv[])
 	{
 		robot_config_t config;
 
-		config.from_file("config.ini");
+		config.from_file("config.txt");
 		config.from_cli(argc,argv);
 
 		sim=to_bool(config.get("sim"));
