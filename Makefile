@@ -8,7 +8,8 @@ all: Mac
 
 Mac: 
 	rm -fr $(top)
-	cd tabula_rasa; make
+	cd superstar; make clean all
+	cd tabula_rasa; make clean all
 	mkdir $(top)
 	mkdir $(top)/tabula_rasa
 	cp -r tabula_rasa/arduino $(top)/tabula_rasa/
