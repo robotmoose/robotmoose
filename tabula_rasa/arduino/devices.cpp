@@ -32,10 +32,10 @@ REGISTER_TABULA_DEVICE(servo,"P",
 )
 
 //NeoPixel
-class neo_pixel: public action {
+class neopixel: public action {
 public:
 	Adafruit_NeoPixel npix;
-	neo_pixel(const int pin): npix(10, pin, NEO_GRB + NEO_KHZ800){}//hardcoded for testing
+	neopixel(const int count,const int pin): npix(count, pin, NEO_GRB + NEO_KHZ800){}//hardcoded for testing
 
 
 	virtual void loop(){
@@ -47,9 +47,10 @@ public:
 	}
 };
 
-REGISTER_TABULA_DEVICE(neo_pixel,"P",
+REGISTER_TABULA_DEVICE(neopixel,"PC",
 	int pin=src.read_pin();
-	neo_pixel *device=new neo_pixel(pin);
+	int count=src.read_int();
+	neopixel *device=new neopixel(count,pin);
 	device->npix.begin();
 	actions_10ms.add(device);
 )
