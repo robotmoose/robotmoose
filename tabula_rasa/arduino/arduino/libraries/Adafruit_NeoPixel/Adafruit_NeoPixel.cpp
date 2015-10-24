@@ -133,6 +133,8 @@ void Adafruit_NeoPixel::show(void) {
   // state, computes 'pin high' and 'pin low' values, and writes these back
   // to the PORT register as needed.
 
+
+// This loses serial data--NOT OK!  (OSL 2015-10)
   noInterrupts(); // Need 100% focus on instruction timing
 
 

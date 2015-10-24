@@ -1,9 +1,7 @@
 robot=test/demo
 superstar=http://robotmoose.com
 #baudrate=57600
-#motors=
 #marker=
-#sensors=
 #trim=1.0
 #debug=
 #delay_ms=10

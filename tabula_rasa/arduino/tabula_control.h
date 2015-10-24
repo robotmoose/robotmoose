@@ -75,11 +75,20 @@ private: // do NOT copy or assign these objects
 extern tabula_control_storage tabula_sensor_storage;
 extern tabula_control_storage tabula_command_storage;
 
+// Mark class as not being copy or assignable
+class tabula_nocopy {
+public:
+	tabula_nocopy() {}
+private:
+	tabula_nocopy(const tabula_nocopy &src);
+	void operator=(const tabula_nocopy &src);
+};
+
 /**
  This represents one value of type T of sensor data.
 */
 template <class T>
-class tabula_sensor {
+class tabula_sensor : public tabula_nocopy {
 	int index;
 public:
 	/// Reserve our index in the global sensor storage array.
@@ -103,7 +112,7 @@ public:
  This represents one command value of type T.
 */
 template <class T>
-class tabula_command {
+class tabula_command : public tabula_nocopy {
 	int index;
 public:
 	/// Reserve our index in the global array.

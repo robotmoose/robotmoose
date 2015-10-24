@@ -206,19 +206,77 @@ public:
 
 
 /**
+ One entry in the list of json path steps--a field or array name
+*/
+class json_path_fragment {
+public:
+	std::string field; // field name
+	int index; // array index, or -1 if not an array
+	json_path_fragment(const std::string &f,int index_=-1) 
+		:field(f), index(index_) {}
+	
+	// Index this json value by our field name (r/o const)
+	const json::Value *index_read(const json::Value *cur) const {
+		cur=&((*cur)[field]);
+		
+		if (index>=0) {
+			cur=&cur->ToArray()[index];
+		}
+		
+		return cur;
+	}
+	// Index this json value by our field name (r/w, creates)
+	json::Value *index_write(json::Value *cur,bool islast) const {
+		if (!cur->HasKey(field)) { // missing intermediate
+			if (index!=-1) // array next time
+				(*cur)[field]=json::Array();
+			else // normal intermediate object
+				(*cur)[field]=json::Object();	
+		}
+		cur=&((*cur)[field]);
+		
+		if (index>=0) {
+			json::Array &a=cur->ToArray();
+			if ((int)a.size()<=index) { // need to lengthen array
+				while ((int)a.size()<=index) 
+					if (islast) a.push_back(json::Value());
+					else a.push_back(json::Object());
+			}
+			cur=&a[index];
+		}
+		
+		return cur;
+	}
+};
+
+/**
  This is the location of one field in a JSON object,
    for example, robot.foo.bar[3] stored as {"foo","bar"}, 3
 */
 class json_path {
 public:
-	std::vector<std::string> path;
-	int index; // array index, or -1 if not an array
-	json_path(const std::string &rootField,int index_=-1)
-		:index(index_) {path.push_back(rootField);}
-	json_path(const std::string &rootField,const std::string &sub1Field,int index_=-1)
-		:index(index_) {path.push_back(rootField); path.push_back(sub1Field); }
-	json_path(const std::string &rootField,const std::string &sub1Field,const std::string &sub2Field,int index_=-1)
-		:index(index_) {path.push_back(rootField); path.push_back(sub1Field); path.push_back(sub2Field); }
+	std::vector<json_path_fragment> path;
+	json_path(const char *rootField)
+	{
+		path.push_back(json_path_fragment(rootField));
+	}
+	json_path(const std::string &rootField,int index_)
+	{
+		path.push_back(json_path_fragment(rootField,index_));
+	}
+	
+	json_path(const json_path &parent,const std::string &sub1Field,int index_=-1)
+		:path(parent.path) 
+	{ 
+		path.push_back(json_path_fragment(sub1Field,index_)); 
+	}
+	
+	json_path(const json_path &parent,const std::string &sub1Field,const std::string &sub2Field,int index_=-1)
+		:path(parent.path) 
+	{ 
+		path.push_back(json_path_fragment(sub1Field)); 
+		path.push_back(json_path_fragment(sub2Field,index_)); 
+	}
 
 	// Index this json root object down to our path.
 	//  This read-only version will not create missing parts of the path,
@@ -226,10 +284,7 @@ public:
 	const json::Value &in(const json::Value &root) const {
 		const json::Value *cur=&root; // use pointers because we can't re-seat references
 		for (unsigned int i=0;i<path.size();i++) {
-			cur=&((*cur)[path[i]]);
-		}
-		if (index!=-1) {
-			cur=&cur->ToArray()[index];
+			cur=path[i].index_read(cur);
 		}
 		return *cur;
 	}
@@ -237,24 +292,13 @@ public:
 	// Index this json root object down to our path.
 	//  This read-write version will create enclosing fields.
 	json::Value &in(json::Value &root) const {
+			//std::cout<<"Indexing {\n";
 		json::Value *cur=&root; // use pointers because we can't re-seat references
 		for (unsigned int i=0;i<path.size();i++) {
-			if (!cur->HasKey(path[i])) { // missing intermediate
-				if (i==path.size()-1 && index!=-1) // array last time
-					(*cur)[path[i]]=json::Array();
-				else // normally intermediate object
-					(*cur)[path[i]]=json::Object();
-			}
-			cur=&((*cur)[path[i]]);
+			//std::cout<<"	Indexing at path "<<path[i].field<<"\n";
+			cur=path[i].index_write(cur,i==path.size()-1);
 		}
-
-		if (index!=-1) {
-			json::Array &a=cur->ToArray();
-			if ((int)a.size()<=index) { // need to lengthen array
-				while ((int)a.size()<=index) a.push_back(json::Value());
-			}
-			cur=&a[index];
-		}
+			//std::cout<<"} Indexing done\n";
 		return *cur;
 	}
 };
@@ -453,6 +497,12 @@ uint8_t json_command_conversion<int,uint8_t>(const int &v) {
 	else return (uint8_t)iv;
 }
 
+// Wraparound conversion to unsigned char [0..255]
+template <>
+int8_t json_command_conversion<int,int8_t>(const int &v) {
+	return (int8_t)v;
+}
+
 
 /**
  Read this command from JSON, optionally convert it,
@@ -468,14 +518,19 @@ public:
 
 	virtual void do_command(json::Value &pilot_root)
 	{
-		json::Value &pilot_raw=path.in(pilot_root); // read commanded value from pilot
 		deviceT d=0;
-		if (pilot_raw.IsNumeric()) {
-			jsonT j=pilot_raw; // convert to number
-			j*=scaleFactor;
-			d=json_command_conversion<jsonT,deviceT>(j);
+		try {
+			json::Value &pilot_raw=path.in(pilot_root); // read commanded value from pilot
+			if (pilot_raw.IsNumeric()) {
+				jsonT j=pilot_raw; // convert to number
+				j*=scaleFactor;
+				d=json_command_conversion<jsonT,deviceT>(j);
+			}
+		} catch (std::runtime_error &e) {
+			// not available from pilot or malformed--ignore value.
+			std::cout<<"Ignoring pilot json error "<<e.what()<<"\n";
 		}
-
+		
 		// Write value into command array
 		*(deviceT *)&tabula_command_storage.array[command.get_index()]=d;
 	}
@@ -587,6 +642,7 @@ void robot_backend::setup_devices(std::string robot_config)
 	int servos=0;
 	int pwms=0;
 	int blinks=0;
+	int neopixels=0;
 
 	// Parse lines of the configuration outselves, to
 	//   find the command and sensor fields and match them to JSON
@@ -656,6 +712,18 @@ void robot_backend::setup_devices(std::string robot_config)
 		}
 		else if (device=="pwm") {
 			commands.push_back(new json_command<int,uint8_t>(json_path("power","pwm",pwms++)));
+		}
+		else if (device=="neopixel") {
+			json_path np("power","neopixel",neopixels++);
+			commands.push_back(new json_command<int,uint8_t>(json_path(np,"color","r")));
+			commands.push_back(new json_command<int,uint8_t>(json_path(np,"color","g")));
+			commands.push_back(new json_command<int,uint8_t>(json_path(np,"color","b")));
+			commands.push_back(new json_command<int,uint8_t>(json_path(np,"accent","r")));
+			commands.push_back(new json_command<int,uint8_t>(json_path(np,"accent","g")));
+			commands.push_back(new json_command<int,uint8_t>(json_path(np,"accent","b")));
+			commands.push_back(new json_command<int, int8_t>(json_path(np,"phase")));
+			commands.push_back(new json_command<int,uint8_t>(json_path(np,"repeat")));
+			commands.push_back(new json_command<int,uint8_t>(json_path(np,"state")));
 		}
 		else if (device=="blink") {
 			commands.push_back(new json_command<int,uint8_t>(json_path("power","blink",blinks++)));
@@ -756,6 +824,9 @@ void robot_backend::read_serial(void) {
 			else if (p.command==0xE) {
 				printf("ERROR sent from Arduino: %d bytes, '%.*s'\n", p.length, p.length, p.data);
 				clean_exit("Arduino sent error report");
+			}
+			else if (p.command==0xD) {
+				printf("DEBUG sent from Arduino: %d bytes, '%.*s'\n", p.length, p.length, p.data);
 			}
 			else if (p.command == 0xC)
 			{
@@ -938,6 +1009,7 @@ void robot_backend::tabula_setup(std::string config)
 		all_dev_types.push_back("pwm P");
 		all_dev_types.push_back("create2 S");
 		all_dev_types.push_back("neato SP");
+		all_dev_types.push_back("neopixel PC");
 		all_dev_types.push_back("bts PPPP");
 		all_dev_types.push_back("bms");
 	}
@@ -1057,7 +1129,9 @@ int main(int argc, char *argv[])
 		backend=new robot_backend(config.get("superstar"),config.get("robot"));
 		backend->LRtrim=to_double(config.get("trim"));
 		backend->debug=debug;
-		backend->tabula_setup(config.get("sensors")+"\n"+config.get("motors"));
+		
+		// Manually configuring Arduino (not via web) is a bad idea...
+		// backend->tabula_setup(config.get("sensors")+"\n"+config.get("motors"));
 
 		// talk to robot via backend
 		while(true)

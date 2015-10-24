@@ -81,8 +81,8 @@ public:
 				void(*reset)()=0;
 				reset();
 			}
-			else { // unknown request type
-				channel.pkt.write_packet(0xE,1,"?");
+			else { // unknown request type--send debug
+				channel.pkt.write_packet(0xD,12,"bad req type");
 			}
 		}
 	}
@@ -90,7 +90,7 @@ public:
 	// The PC has command data for us.  Send back sensor data.
 	void handle_command_packet(A_packet &p) {
 		if (p.length!=tabula_command_storage.count) {
-			channel.pkt.write_packet(0xE,4,"Clen");
+			channel.pkt.write_packet(0xD,11,"bad cmd len");
 			return;
 		}
 		memcpy(tabula_command_storage.array,p.data,p.length);

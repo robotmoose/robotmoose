@@ -31,21 +31,56 @@ REGISTER_TABULA_DEVICE(servo,"P",
 	actions_10ms.add(device);
 )
 
-//NeoPixel
+//NeoPixel: array of individually addressible LEDs
 class neopixel: public action {
 public:
+	// rgb main color
+	tabula_command<unsigned char> color_r;
+	tabula_command<unsigned char> color_g;
+	tabula_command<unsigned char> color_b;
+	
+	// rgb accent color
+	tabula_command<unsigned char> accent_r;
+	tabula_command<unsigned char> accent_g;
+	tabula_command<unsigned char> accent_b;
+	
+	// start position
+	tabula_command<unsigned char> phase;
+	// repetition count
+	tabula_command<unsigned char> repeat;
+	// random state bits (TBD!)
+	tabula_command<unsigned char> state;
+	
+	// number of neopixels
 	int count;
+	
 	Adafruit_NeoPixel npix;
-	neopixel(const int count_,const int pin)
-		:count(count_), npix(count, pin, NEO_GRB + NEO_KHZ800)
-	{
+	neopixel(const int pin,const int count_)
+		:color_r(255), color_g(0), color_b(0),
+		accent_r(255), accent_g(255), accent_b(255),
+		phase(4), repeat(8), state(0),
+		count(count_), npix(count, pin, NEO_GRB + NEO_KHZ800)
+		
+	{	
 		npix.begin();
 	}
 
 	virtual void loop(){
+		// Don't trash memory on allocation failure:
+		if (npix.numPixels()==0) return; // mem allocation failure
+		uint32_t color=npix.Color(color_r,color_g,color_b);
+		uint32_t accent=npix.Color(accent_r,accent_g,accent_b);
+		int p=phase%count;
+		if (repeat>1) p=p%repeat; // wraparound
 		for(int i=0; i<count; i++)
 		{
-			npix.setPixelColor(i, npix.Color(0, 0, 255));
+			uint32_t c=color;
+			if (p--==0) {  // one-pixel accent
+				c=accent; 
+				if (repeat>1) p=repeat-1; 
+			}
+			// FIXME: add bits to state for blur, persistence of vision, etc
+			npix.setPixelColor(i, c);
 		}
 		npix.show();
 	}
@@ -54,9 +89,11 @@ public:
 REGISTER_TABULA_DEVICE(neopixel,"PC",
 	int pin=src.read_pin();
 	int count=src.read_int();
-	if (count>200) count=200;
-	neopixel *device=new neopixel(count,pin);
-	actions_10ms.add(device);
+	if (count>100) count=100; // limit RAM usage
+	neopixel *device=new neopixel(pin,count);
+// Tradeoff: every 10ms is smoother color animation.
+//   Every 100ms loses less serial data due to interrupts off.
+	actions_100ms.add(device);
 )
 
 // Simple "pwm_pin" PWM output pin example:
