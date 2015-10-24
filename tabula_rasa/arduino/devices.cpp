@@ -34,12 +34,16 @@ REGISTER_TABULA_DEVICE(servo,"P",
 //NeoPixel
 class neopixel: public action {
 public:
+	int count;
 	Adafruit_NeoPixel npix;
-	neopixel(const int count,const int pin): npix(count, pin, NEO_GRB + NEO_KHZ800){}//hardcoded for testing
-
+	neopixel(const int count_,const int pin)
+		:count(count_), npix(count, pin, NEO_GRB + NEO_KHZ800)
+	{
+		npix.begin();
+	}
 
 	virtual void loop(){
-		for(int i=0; i<10; i++)
+		for(int i=0; i<count; i++)
 		{
 			npix.setPixelColor(i, npix.Color(0, 0, 255));
 		}
@@ -50,8 +54,8 @@ public:
 REGISTER_TABULA_DEVICE(neopixel,"PC",
 	int pin=src.read_pin();
 	int count=src.read_int();
+	if (count>200) count=200;
 	neopixel *device=new neopixel(count,pin);
-	device->npix.begin();
 	actions_10ms.add(device);
 )
 
