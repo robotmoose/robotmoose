@@ -44,8 +44,8 @@ public:
 	tabula_command<unsigned char> accent_g;
 	tabula_command<unsigned char> accent_b;
 	
-	// start position
-	tabula_command<unsigned char> phase;
+	// start position (phase)
+	tabula_command<unsigned char> start;
 	// repetition count
 	tabula_command<unsigned char> repeat;
 	// random state bits (TBD!)
@@ -58,7 +58,7 @@ public:
 	neopixel(const int pin,const int count_)
 		:color_r(255), color_g(0), color_b(0),
 		accent_r(255), accent_g(255), accent_b(255),
-		phase(4), repeat(8), state(0),
+		start(4), repeat(8), state(0),
 		count(count_), npix(count, pin, NEO_GRB + NEO_KHZ800)
 		
 	{	
@@ -70,7 +70,7 @@ public:
 		if (npix.numPixels()==0) return; // mem allocation failure
 		uint32_t color=npix.Color(color_r,color_g,color_b);
 		uint32_t accent=npix.Color(accent_r,accent_g,accent_b);
-		int p=phase%count;
+		int p=start%count;
 		if (repeat>1) p=p%repeat; // wraparound
 		for(int i=0; i<count; i++)
 		{

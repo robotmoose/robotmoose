@@ -721,7 +721,7 @@ void robot_backend::setup_devices(std::string robot_config)
 			commands.push_back(new json_command<int,uint8_t>(json_path(np,"accent","r")));
 			commands.push_back(new json_command<int,uint8_t>(json_path(np,"accent","g")));
 			commands.push_back(new json_command<int,uint8_t>(json_path(np,"accent","b")));
-			commands.push_back(new json_command<int, int8_t>(json_path(np,"phase")));
+			commands.push_back(new json_command<int, int8_t>(json_path(np,"start")));
 			commands.push_back(new json_command<int,uint8_t>(json_path(np,"repeat")));
 			commands.push_back(new json_command<int,uint8_t>(json_path(np,"state")));
 		}
