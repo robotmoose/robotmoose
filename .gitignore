@@ -40,5 +40,7 @@ tabula_rasa/backend.dSYM
 tabula_rasa/backend.exe
 tabula_rasa/tester
 tabula_rasa/tester.exe
+tabula_rasa/arduino/uno.hex
+tabula_rasa/arduino/mega.hex
 www/blog
 www/latest.tar.gz

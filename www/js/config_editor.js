@@ -240,7 +240,14 @@ config_editor_t.prototype.create_entry_m=function(entry,type,arg_types,arg_value
 		if(arg_values)
 			value=arg_values[ii];
 
-		if(arg_types[ii]=='P')
+		if(arg_types[ii]=='C')
+		{
+			if(!is_count(value))
+				value=null;
+
+			drop=this.create_count_drop_m(value);
+		}
+		else if(arg_types[ii]=='P')
 		{
 			if(!is_pin(value))
 				value=null;
@@ -273,6 +280,32 @@ config_editor_t.prototype.create_entry_m=function(entry,type,arg_types,arg_value
 	this.refresh_m();
 }
 
+config_editor_t.prototype.create_count_drop_m=function(value)
+{
+	var drop=document.createElement("select");
+	drop.title="Pick the number of components.";
+	drop.style.width=100;
+	drop.className="form-control"
+
+	var title_option=document.createElement("option");
+	title_option.text="Count";
+	title_option.selected=true;
+	drop.add(title_option);
+
+	for(var ii=1;ii<=200;++ii)
+	{
+		var option=document.createElement("option");
+		option.text=""+ii;
+
+		if(value&&option.text.toLowerCase()==value+"")
+			option.selected=true;
+
+		drop.add(option);
+	}
+
+	return drop;
+}
+
 config_editor_t.prototype.create_pin_drop_m=function(value)
 {
 	var drop=document.createElement("select");
@@ -285,7 +318,7 @@ config_editor_t.prototype.create_pin_drop_m=function(value)
 	title_option.selected=true;
 	drop.add(title_option);
 
-	for(var ii=2;ii<=21;++ii)
+	for(var ii=3;ii<=21;++ii)
 	{
 		var option=document.createElement("option");
 		option.text=""+ii;

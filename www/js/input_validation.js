@@ -52,6 +52,14 @@ function is_int(str)
 	return true;
 }
 
+function is_count(arg)
+{
+	if(!arg)
+		return false;
+
+	return (arg.length>0&&is_int(arg)&&arg>0);
+}
+
 function is_pin(arg)
 {
 	if(!arg)
@@ -59,7 +67,7 @@ function is_pin(arg)
 
 	arg=arg.toLowerCase();
 
-	return ((arg.length>0&&is_int(arg)&&arg>1)||
+	return ((arg.length>0&&is_int(arg)&&arg>2)||
 		(arg.length>0&&arg[0]=='a'&&is_int(arg.substr(1,arg.length-1))));
 }
 
