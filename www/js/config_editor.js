@@ -271,7 +271,11 @@ config_editor_t.prototype.create_entry_m=function(entry,type,arg_types,arg_value
 		{
 			drop.onchange=function(){myself.refresh_m()};
 			entry.args.push(drop);
-			entry.table.cells[ii+1].appendChild(drop);
+
+			if(drop.div)
+				entry.table.cells[ii+1].appendChild(drop.div);
+			else
+				entry.table.cells[ii+1].appendChild(drop);
 		}
 		else
 		{
@@ -290,10 +294,25 @@ config_editor_t.prototype.create_count_drop_m=function(value)
 	var drop=document.createElement("input");
 	drop.type="number";
 	drop.className="form-control";
+	drop.style.paddingRight=4;
 	drop.setAttribute("min","1");
 	drop.setAttribute("max","200");
 	drop.setAttribute("step","1");
 	drop.setAttribute("value","1");
+
+	drop.div=document.createElement("div");
+	drop.div.className="form-group has-feedback";
+	drop.div.style.margin=drop.div.style.padding=0;
+	drop.div.appendChild(drop);
+
+	drop.onclick=drop.onkeyup=drop.onkeydown=function()
+	{
+		this.div.className="form-group has-feedback";
+
+		if(!drop.valueAsNumber)
+			this.div.className+=" has-error";
+	};
+
 	return drop;
 }
 
@@ -301,7 +320,7 @@ config_editor_t.prototype.create_pin_drop_m=function(value)
 {
 	var drop=document.createElement("select");
 	drop.title="Pick the Arduino pin where you plugged in the wires for this device";
-	drop.style.width=80;
+	drop.style.width=120;
 	drop.className="form-control"
 
 	var title_option=document.createElement("option");
@@ -334,7 +353,20 @@ config_editor_t.prototype.create_pin_drop_m=function(value)
 		drop.add(option);
 	}
 
-	var myself=this;
+	drop.div=document.createElement("div");
+	drop.div.className="form-group has-feedback";
+	drop.div.style.margin=drop.div.style.padding=0;
+	drop.div.appendChild(drop);
+
+	drop.onclick=drop.onkeyup=drop.onkeydown=function()
+	{
+		this.div.className="form-group has-feedback";
+
+		if(this.selectedIndex==0)
+			this.div.className+=" has-error";
+	};
+
+	drop.click();
 
 	return drop;
 }
@@ -343,7 +375,7 @@ config_editor_t.prototype.create_serial_drop_m=function(value)
 {
 	var drop=document.createElement("select");
 	drop.title="Pick the Arduino serial port plugged into this device (X3 means Arduino pins RX3/TX3)";
-	drop.style.width=80;
+	drop.style.width=120;
 	drop.className="form-control"
 
 	var title_option=document.createElement("option");
@@ -365,7 +397,20 @@ config_editor_t.prototype.create_serial_drop_m=function(value)
 		drop.add(option);
 	}
 
-	var myself=this;
+	drop.div=document.createElement("div");
+	drop.div.className="form-group has-feedback";
+	drop.div.style.margin=drop.div.style.padding=0;
+	drop.div.appendChild(drop);
+
+	drop.onclick=drop.onkeyup=drop.onkeydown=function()
+	{
+		this.div.className="form-group has-feedback";
+
+		if(this.selectedIndex==0)
+			this.div.className+=" has-error";
+	};
+
+	drop.click();
 
 	return drop;
 }
@@ -587,7 +632,8 @@ config_editor_t.prototype.refresh_m=function()
 			{
 				for(var drop in this.entries[key].args)
 				{
-					if(this.entries[key].args[drop].selectedIndex==0)
+					if((this.entries[key].args[drop].type=="select-one"&&this.entries[key].args[drop].selectedIndex==0)||
+						(this.entries[key].args[drop].type=="number")&&!this.entries[key].args[drop].valueAsNumber)
 					{
 						configureable=false;
 						break;
