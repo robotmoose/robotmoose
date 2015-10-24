@@ -1012,6 +1012,7 @@ void robot_backend::tabula_setup(std::string config)
 		all_dev_types.push_back("neopixel PC");
 		all_dev_types.push_back("bts PPPP");
 		all_dev_types.push_back("bms");
+		all_dev_types.push_back("neopixel PC");
 	}
 	send_options();
 }
