@@ -107,7 +107,12 @@ config_editor_t.prototype.upload=function(robot)
 
 			for(var ii=0;ii<this.entries[key].args.length;++ii)
 			{
-				str+=this.entries[key].args[ii].options[this.entries[key].args[ii].selectedIndex].value;
+				if(this.entries[key].args[ii].type=="select-one")
+					str+=this.entries[key].args[ii].options[this.entries[key].args[ii].selectedIndex].value;
+				else if(this.entries[key].args[ii].type=="number")
+					str+=this.entries[key].args[ii].value;
+				else
+					throw "Unsupported type!";
 
 				if(ii+1!=this.entries[key].args.length)
 					str+=",";
