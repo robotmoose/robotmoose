@@ -475,28 +475,29 @@ doorways_t.prototype.constrain=function(doorway)
 	if(!doorway)
 		return;
 
-	var view_width=window.innerWidth;
-	var view_height=window.innerHeight;
+	//var view_width=window.innerWidth;
+	//var view_height=window.innerHeight;
 
-	var width=doorway.panel.offsetWidth;
-	var height=doorway.panel.offsetHeight;
+	//var width=doorway.panel.offsetWidth;
+	//var height=doorway.panel.offsetHeight;
 
-	var right=doorway.pos.x+width;
-	var bottom=doorway.pos.y+height;
+	//var right=doorway.pos.x+width;
+	//var bottom=doorway.pos.y+height;
 
-	var x_diff=view_width-right;
-	var y_diff=view_height-bottom;
+	//var x_diff=view_width-right;
+	//var y_diff=view_height-bottom;
 
-	if(x_diff<0)
-		doorway.pos.x+=x_diff;
+	//if(x_diff<0)
+	//	doorway.pos.x+=x_diff;
 	if(doorway.pos.x<this.offset_left())
 		doorway.pos.x=this.offset_left();
 
-	if(y_diff<0)
-		doorway.pos.y+=y_diff;
+	//if(y_diff<0)
+	//	doorway.pos.y+=y_diff;
 	if(doorway.pos.y<this.offset_top())
 		doorway.pos.y=this.offset_top();
 
+	/*
 	right=doorway.pos.x+width;
 	bottom=doorway.pos.y+height;
 
@@ -522,7 +523,7 @@ doorways_t.prototype.constrain=function(doorway)
 		doorway.resizer.resize(size);
 		--height;
 		bottom=doorway.pos.y+height;
-	}
+	}*/
 }
 
 doorways_t.prototype.offset_left=function()
