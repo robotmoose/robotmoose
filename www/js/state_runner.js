@@ -153,11 +153,11 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	var time_ms=this.get_time_ms();
 	VM.time=time_ms - this.state_start_time_ms; // time in state (ms)
 	VM.time_run=time_ms - this.run_start_time_ms; // time since "Run" (ms)
-	
+
 	VM.pilot=this.VM_pilot;
 	VM.pilot.cmd=undefined; // don't re-send scripts
 	VM.script=function(cmd,arg) { VM.pilot.cmd={"run":cmd, "arg":arg}; }
-	
+
 	VM.pilot_original=JSON.stringify(VM.pilot); // hack for change detection
 
 	VM.sensors=this.VM_sensors;
@@ -166,7 +166,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	VM.robot={sensors:VM.sensors, power:VM.power};
 
 	VM.drive=function(speedL,speedR) { VM.power.L=speedL; VM.power.R=speedR; }
-	
+
 	// UI construction:
 	VM.UI=this.VM_UI;
 	VM.button=function(name,next_state,opts) {
@@ -179,18 +179,18 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		return ret.value; // mouse up/down boolean
 	};
 	// Make a checkbox with a label
-	VM.checkbox=function(name, opts) { 
+	VM.checkbox=function(name, opts) {
 		var ret=VM.UI.element(name,"checkbox",opts);
 		return ret.dom.checked; // checked/unchecked boolean
 	};
 	// Make a slider with a label
 	VM.slider=function(name,min,start,max,opts){
 		opts = opts ||{};
-		opts.min = min; 
+		opts.min = min;
 		opts.defaultValue = start;  // starting value
 		opts.max = max;
 		var numSteps = 100; // number of slider steps
-		opts.step = Math.abs(max - min)/numSteps; //slider step size 
+		opts.step = Math.abs(max - min)/numSteps; //slider step size
 		var ret=VM.UI.element(name,"slider",opts);
 		return parseFloat(ret.dom.value); // returns value of slider
 	};
