@@ -1132,7 +1132,7 @@ int main(int argc, char *argv[])
 		backend->debug=debug;
 		
 		// Manually configuring Arduino (not via web) is a bad idea...
-		// backend->tabula_setup(config.get("sensors")+"\n"+config.get("motors"));
+		backend->tabula_setup(config.get("sensors")+"\n"+config.get("motors"));
 
 		// talk to robot via backend
 		while(true)
