@@ -13,6 +13,8 @@ function UI_builder_t(div) {
 
 	// Elements is a hash indexed by the element's name+type:
 	this.elements={};
+	
+	this.stop();
 }
 
 

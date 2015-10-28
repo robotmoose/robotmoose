@@ -1,0 +1,74 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - Quizbot</title>
+	</head>
+
+	<body role="document">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>Quizbot: Asking Questions with Code</h1>
+			</div>
+
+			<center>
+				<img src="/images/quizbot.jpg"/ title="Quizbot connected to an Arduino MCU" style="width:100%;max-width:640px;">
+			</center>
+			<br>
+
+			<div class="well">
+				<h4>Step 1:</h4>
+				<ul>
+				<li>Connect to your quizbot to the internet with the backend program
+				<li>Connect to your robot at RobotMoose.com's <a href="/pilot">Robots page</a>
+				<li>Open the Code tab, and make a new state called "ask".
+				<li>Enter this code to make a new label appear in the User Interface (UI) tab.  This is how you'll have the quizbot ask you a question!
+				</ul>
+				<center><img src="images/01.png" style="width:100%;max-width:877px;"></center>
+				
+				<br/><br />
+				
+				
+				<h4>Step 2:</h4>
+				You can add a button to the UI by calling this code. 
+				We'll be using buttons to provide the user with answers.
+				</ul>
+				<center><img src="images/02.png" style="width:100%;max-width:877px;"></center>
+				
+				<br/><br />
+				
+				
+				<h4>Step 3:</h4>
+				When the button is clicked, you can tell the button what state to go to. 
+				Here, we added a state called "move".
+				This is where we'll make the robot move in response to the questions.
+				</ul>
+				<center><img src="images/03.png" style="width:100%;max-width:877px;"></center>
+				
+				<br/><br />
+				
+				
+				<h4>Step 4:</h4>
+				Set the servo power values in each state to make the robot move!
+				</ul>
+				<center><img src="images/04.png" style="width:100%;max-width:877px;"></center>
+				
+				<br/><br />
+				
+				<h4>Step 5:</h4>
+				Add a timeout to the move state, and a loop state to make the quizbot go back to the ask state, to ask another question.
+				<center><img src="images/05.png" style="width:100%;max-width:877px;"></center>
+				
+				<br/><br />
+				
+
+				<h4>Challenge:</h4>
+				How would you add more possible answers?
+				Can you make the Quizbot <a href="/quizbot/nodding_yes">nod its head yes</a> for correct answers, and shake no for incorrect answers?
+				<br/><br/>
+
+				<br/>
+			</div>
+		</div>
+	</body>
+</html>

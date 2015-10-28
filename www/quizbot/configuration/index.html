@@ -17,13 +17,46 @@
 			<br>
 
 			<div class="well">
+			
 				<h4>Step 1:</h4>
-				After you have plugged in your Quizbot to your computer and made it to robotmoose.com's <a href="http://robotmoose.com/pilot/">Robots</a> page, click the Configure tab.
+				<ul>
+				<li>
+				First download the RobotMoose control software for your 
+					<a href="/downloads/RobotMoose_MacOS_latest.zip">Mac</a> or 
+					<a href="http://github.com/robotmoose/robotmoose">Linux</a> 
+					computer
+				<li>Open the RobotMoose and tabula_rasa folders
+				<li>Open config.txt and give your robot a name:
+				<ul>
+					<li>robot=<i>YourSchool</i>/<i>YourTeam</i></a>
+				</ul>
+				<li>Save config.txt
+				<li>Plug your Quizbot into your computer
+				<ul>
+					<li>If you haven't used your arduino on the web, open the arduino folder and use the Arduino IDE to upload our code.  (In the classrooms, we've done this for you already!)
+				</ul>
+				<li>Run the "backend" program.  It should show the heartbeats number changing, like this:
+				<pre>
+Robot name: test/quizbot
+Outgoing sensors: {"heartbeats":19,"location":{"ID":0}}
+Incoming pilot commands: [{},{}]
+
+Superstar:	0.4 ms/request, 3e+03 req/sec
+</pre>
+				<li>Leave the backend running: it connects your Arduino to the internet.
+				<li>On a different computer, go to robotmoose.com's <a href="http://robotmoose.com/pilot/">Robots page</a>, find your school and robot name, and Connect to your robot!
+				</ul>
+				<br/>
+				
+			
+				<h4>Step 2:</h4>
+				Check the Sensors tab to see your robot's heartbeats.
+				To set up your servos, first click the Configure tab.
 				<br/><br/>
 				<center><img src="/quizbot/configuration/images/configure_01.png"></img></center>
 				<br/>
 
-				<h4>Step 2:</h4>
+				<h4>Step 3:</h4>
 				The Configure tab enables us to tell the Arduino what it has connected to it.
 				<br/><br/>
 				Our Quizbot has two Servos. Select Servo from the drop down menu and click the Add button twice.
@@ -31,7 +64,7 @@
 				<center><img src="/quizbot/configuration/images/configure_02.png"></img></center>
 				<br/>
 
-				<h4>Step 3:</h4>
+				<h4>Step 4:</h4>
 				Now we select the Pins on the Arduino that each Servo is plugged into.
 				<br/><br/>
 				For this example, the Servos are plugged into Pins 9 and 10.
@@ -39,19 +72,19 @@
 				<center><img src="/quizbot/configuration/images/configure_04.png"></img></center>
 				<br/>
 
-				<h4>Step 4:</h4>
+				<h4>Step 5:</h4>
 				Once the Pins are selected, we can now Configure the Quizbot by clicking the Configure button.
 				<br/><br/>
 				<center><img src="/quizbot/configuration/images/configure_06.png"></img></center>
 				<br/>
 
-				<h4>Step 5:</h4>
+				<h4>Step 6:</h4>
 				Now that we have Configured the Quizbot, we can check if the Servos work by switching to the Drive tab.
 				<br/><br/>
 				<center><img src="/quizbot/configuration/images/configure_07.png"></img></center>
 				<br/>
 
-				<h4>Step 6:</h4>
+				<h4>Step 7:</h4>
 				Since we added two Servos, we now have two Sliders in the Drive window.
 				<br/><br/>
 				Drag them around and make sure that your Servos move correctly.
