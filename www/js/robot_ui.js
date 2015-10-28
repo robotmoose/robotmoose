@@ -96,6 +96,27 @@ robot_ui_t.prototype.download_gui=function()
 		return;
 
 	var myself=this;
+	
+	var help_text_states = 
+	//"<h3> Code Examples </h3>"
+	"<h4>Basic</h4>"
+	+ "print(\"This will appear to the right of the state\") <br>"
+	+ "stop() <br>"
+	+ "state = state1 // <i>Runs the state named \"state1\"</i><br>"
+	+ "<h4>UI</h4>"
+	+ "label(\"This will appear in the UI\")<br>"
+	+ "button(\"Press me\", state1)<br>"
+	+ "slider(\"Slider!\", -1.0, 0.0, 1.0) <br>"
+	//+ "print(slider(\"Slider!\", -1.0, 0.0, 1.0)) <br>"
+	+ "checkbox(\"Would you like to check this box?\")<br>"
+	//+ "if (checkbox(\"Would you like to check this box?\")) { print(\"Yes!\") } <br>"
+	+ "<h4>Drive</h4>"
+	+ "drive(-0.5, 0.5)  // <i>Sets the speed of the left and right wheels</i><br>"
+	+ "<br><a href=\"/lessons/ui/\" title=\"UI Examples\"> <h4>Advanced</h4> </a>";
+	//+ "<h4> Sensors </h4>"
+	//+ "sensors.location.x - <i> Robot location in x-coordinate</i><br>"
+	//+ "sensors.location.angle - <i> Direction robot is facing </i><br>"
+	//+ "sensors.floor[2] - <i> Floor sensor 2 </i><br>";
 
 	var clear_out=function(div)
 	{
@@ -110,7 +131,7 @@ robot_ui_t.prototype.download_gui=function()
 			config:myself.create_doorway("Configure","Set up robot hardware",null),
 			pilot:myself.create_doorway("Drive","Manually drive the robot",null),
 			sensors:myself.create_doorway("Sensors","Examine sensor data from robot",null),
-			states:myself.create_doorway("Code","Automatically drive the robot",null),
+			states:myself.create_doorway("Code","Automatically drive the robot",help_text_states),
 			map:myself.create_doorway("Map","See where the robot thinks it is",null),
 			video:myself.create_doorway("Video","Show the robot's video camera",null),
 			UI:myself.create_doorway("UI","Customized robot user interface",null)

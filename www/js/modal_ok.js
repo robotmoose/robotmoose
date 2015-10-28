@@ -38,9 +38,12 @@ modal_ok_t.prototype.hide=function()
 
 modal_ok_t.prototype.set_message=function(message)
 {
+	/*
 	if(this.message)
 		this.modal.get_content().removeChild(this.message);
 
 	this.message=document.createTextNode(message);
-	this.modal.get_content().appendChild(this.message);
+	this.modal.get_content().appendChild(this.message); */
+	this.modal.get_content().innerHTML = message; 
+	// using innerHTML instead of createTextNode to allow for line breaks and hyperlinks
 }
