@@ -9,7 +9,8 @@ function robot_map_t(div)
 	this.div=div;
 	this.div.title="Shows where the robot thinks it is in the world.  The grid lines are 1 meter apart.  The robot's right and left wheels leave red and purple tracks";
 	var myself=this;
-	this.renderer=new renderer_t(div,function() {myself.setup();}, function() {myself.loop();} );
+	this.need_redraw=true;
+	this.renderer=new renderer_t(div,function() {myself.setup();}, function() {return myself.loop();} );
 	if(!this.renderer.setup()) {
 		var p=document.createElement("p");
 		p.innerHTML="<p>WebGl seems to be disabled: <a target=_blank href=https://get.webgl.org>Click here to test</a><br> <u>If disabled, Try the following steps:</u></p> "
@@ -48,9 +49,11 @@ robot_map_t.prototype.setup=function() {
 	console.log("Set up renderer");
 }
 
+// Updated sensor data is available:
 robot_map_t.prototype.refresh=function(sensors) {
 	if (this.renderer===null) return;
 	this.sensors=sensors;
+	this.need_redraw=true;
 }
 
 robot_map_t.prototype.loop=function() {
@@ -78,6 +81,9 @@ robot_map_t.prototype.loop=function() {
 			this.last_lidar_change=sensors.lidar.change;
 		}
 	}
+	var need_redraw=this.need_redraw;
+	this.need_redraw=false;
+	return need_redraw;
 }
 
 

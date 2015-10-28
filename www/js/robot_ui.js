@@ -170,8 +170,12 @@ robot_ui_t.prototype.run_interval=function() {
 			function(sensors) // sensor data has arrived:
 			{
 				myself.sensor_data_count--;
-				myself.widgets.sensors.refresh(sensors);
-				myself.widgets.map.refresh(sensors);
+				
+				if (!myself.doorways.sensors.minimized)
+					myself.widgets.sensors.refresh(sensors);
+				
+				if (!myself.doorways.map.minimized)
+					myself.widgets.map.refresh(sensors);
 
 				myself.state_runner.VM_sensors=sensors;
 			});

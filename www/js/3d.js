@@ -259,10 +259,12 @@ function renderer_t(div,setup_func,loop_func)
 	myself.loop=function()
 	{
 		myself.dt=myself.clock.getDelta();
-		myself.user_loop(myself.dt);
+		var do_redraw=myself.user_loop(myself.dt);
 		myself.controls.update(myself.dt);
-		requestAnimationFrame(myself.loop);
-		myself.viewport.render(myself.scene,myself.camera);
+		if (do_redraw !== false) {
+			myself.viewport.render(myself.scene,myself.camera);
+		}
+		requestAnimationFrame(myself.loop); // call loop again
 	};
 
 	myself.load_texture=function(filename)
