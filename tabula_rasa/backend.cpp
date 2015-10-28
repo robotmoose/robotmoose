@@ -600,6 +600,9 @@ public:
 	// Configure these devices
 	void setup_devices(std::string robot_config);
 
+	// Pull arduino's firmware options
+	void get_arduino_options(SerialPort &port);
+
 	/** Talk to this real Arudino device over this serial port.
 	    Run this robot configuration. */
 	void setup_arduino(SerialPort &port,std::string robot_config);
@@ -746,7 +749,7 @@ void robot_backend::setup_devices(std::string robot_config)
 		(int)tabula_command_storage.count,(int)tabula_sensor_storage.count);
 }
 
-void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
+void robot_backend::get_arduino_options(SerialPort &port) 
 {
 	std::cout.flush();
 
@@ -754,7 +757,7 @@ void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 		(std::cout<<"Arduino startup: ").flush();
 		std::string start=getline_serial(port);
 		std::cout<<start<<"\n";
-		if (start[0]=='9') break;
+		if (start.find("tabula device names")!=std::string::npos) break;
 	}
 
 	// Pull Arduino's current options list
@@ -771,8 +774,11 @@ void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 		if (option!="serial_controller ")
 			all_dev_types.push_back(option);
 	}
+}
 
-	// Now dump configuration to Arduino
+void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
+{
+	// Dump configuration to Arduino
 	for (unsigned int i=0;i<robot_config_devices.size();i++) {
 		// Send device to Arduino
 		std::string dev=robot_config_devices[i];
@@ -876,6 +882,9 @@ void robot_backend::do_network()
 {
 	double start=time_in_seconds();
 
+	std::cout << "\033[2J\033[1;1H"; // clear screen	
+	std::cout<<"Robot name: "<<robotName<<"\n";
+
 	std::string send_json=send_network();
 	std::cout<<"Outgoing sensors: "<<send_json<<"\n";
 
@@ -890,6 +899,7 @@ void robot_backend::do_network()
 	double elapsed=time_in_seconds()-start;
 	double per=elapsed;
 	std::cout<<"Superstar:	"<<std::setprecision(1)<<per*1.0e3<<" ms/request, "<<1.0/per<<" req/sec\n\n";
+	std::cout.flush();
 }
 
 /** Read this pilot data from superstar, and store into ourselves */
@@ -993,6 +1003,7 @@ std::string robot_backend::send_network(void)
 
 void robot_backend::tabula_setup(std::string config)
 {
+	config+="\nheartbeat();\n";
 	config+="\nserial_controller();\n";
 	setup_devices(config);
 
@@ -1000,8 +1011,9 @@ void robot_backend::tabula_setup(std::string config)
 	{
 		std::cout<<"Uploading new config to arduino!"<<std::endl;
 		Serial.Close();
-		sleep(1);
+		// sleep(1);
 		tabula_serial_begin(Serial.Get_baud());
+		get_arduino_options(Serial);
 		setup_arduino(Serial,config);
 	} else { // sim mode: fake a bunch of options
 		all_dev_types.push_back("analog P");
@@ -1012,7 +1024,6 @@ void robot_backend::tabula_setup(std::string config)
 		all_dev_types.push_back("neopixel PC");
 		all_dev_types.push_back("bts PPPP");
 		all_dev_types.push_back("bms");
-		all_dev_types.push_back("neopixel PC");
 	}
 	send_options();
 }
@@ -1114,6 +1125,20 @@ int main(int argc, char *argv[])
 {
 	try
 	{
+		// MacOS runs double-clicked programs from homedir,  
+		//   so cd to directory where this program lives.
+		std::string exe_name=argv[0];
+		std::cout<<"Executable name: "<<exe_name<<"\n";
+		std::string dir_name=exe_name;
+		while (dir_name.length()>0) {
+			char c=*dir_name.rbegin(); // last letter
+			if (c=='/' || c=='\\') break;
+			else dir_name=dir_name.substr(0,dir_name.length()-1);
+		}
+		std::cout<<"Directory name: "<<dir_name<<"\n";
+		if (chdir(dir_name.c_str())) { /* ignore chdir errors */ }
+		
+		
 		robot_config_t config;
 
 		config.from_file("config.txt");
