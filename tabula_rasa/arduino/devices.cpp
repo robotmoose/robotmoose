@@ -10,6 +10,7 @@
 #include "tabula_config.h"
 #include <stdint.h>
 #include <Adafruit_NeoPixel.h>
+#include "digitalWriteFast.h"
 
 
 // Servo output example:
@@ -292,4 +293,41 @@ REGISTER_TABULA_DEVICE(neato,"SP",
 	int motorPin=src.read_pin();
 	neato *n=new neato(*s,motorPin);
 	actions_1ms.add(n);
+)
+
+#include "hallEffect.h"
+class hallEffect_sensor : public action {
+public:
+	
+	int hallPin; // Hall effect sensor pin
+	//hallEffect sensor(hallPin);
+	uint16_t _count;
+	bool _reading;
+	bool _oldReading;
+	
+	hallEffect_sensor():_count(0),_reading(false)
+	{}
+ 
+	tabula_sensor<uint16_t> value; // read-in value
+	virtual void setup()
+	{ 
+		pinMode(hallPin,INPUT_PULLUP);
+	}
+	virtual void loop() 
+	{
+	  _oldReading = _reading;
+	  _reading = digitalRead(hallPin);
+	  if(_reading!=_oldReading)
+            _count++;
+	  value = _count;
+	}
+};
+
+REGISTER_TABULA_DEVICE(hallEffect_sensor,"P",
+	int hallPin=src.read_pin();
+	pinMode(hallPin,INPUT_PULLUP);
+	hallEffect_sensor *device=new hallEffect_sensor();
+	device->hallPin=hallPin;
+	src.sensor_index("value",F("Counts"),device->value.get_index());
+	actions_10ms.add(device);
 )
