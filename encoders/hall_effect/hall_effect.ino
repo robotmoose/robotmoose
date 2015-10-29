@@ -17,58 +17,36 @@
 
 #define hall_pin  2
 #define led_pin   13
-int count1; int count2; int Total; int flag;
+
+int count1 = 0;
+int previousCount = 0;
+bool high=false; // Keep track of hall_pin state
+bool oldStatus; //hall_pin state for previus loop
 
 void setup()
 {
     Serial.begin(9600);
-    digitalWrite(hall_pin,HIGH); // pullup resistor is powered
+    
     pinMode(hall_pin,INPUT_PULLUP); // enable pullup and input
-    pinMode(led_pin, OUTPUT);
-    Total = 0;
-    count1 = 0;
-    count2 = 0;
-    flag = digitalRead(hall_pin);
-    Serial.println("-------------------------");
+    //pinMode(led_pin, OUTPUT);
+    /*Serial.println("-------------------------");
     Serial.println("Initializing...");
-    Serial.print("Hall Effect Sensor = ");
-    Serial.println(flag);
     Serial.println("-------------------------");
-    delay(2000);
-    //pinMode(relay, OUTPUT);
+    delay(2000);*/
 }
 
 void loop() {
-  
-    if (digitalRead(hall_pin)) {
-      //Serial.println("1");
-      digitalWrite(led_pin,HIGH);
-      if (flag == 0) {
-          count1 = count1 + 1;
-          flag = 1;
-      }
       
-      //Serial.print("flag = ");
-      //Serial.println(flag);
-    }
-    
-    else {
-      //Serial.println("0");
-      digitalWrite(led_pin,LOW);
-      if (flag == 1) {
-          count2 = count2 + 1;
-          flag = 0;
-      }
-      
-      //Serial.print("flag = ");
-      //Serial.println(flag);
-    }
-    Total = count1 + count2;
-    
-    //Serial.print("Count1 = ");
-    //Serial.println(count1);
-    //Serial.print("Count2 = ");
-    //Serial.println(count2);
-    Serial.print("Total = ");
-    Serial.println(Total);
+      oldStatus = high;	
+      high=digitalRead(hall_pin);
+     
+       if(high!=oldStatus)
+        {
+	  //digitalWrite(led_pin,HIGH); 
+          ++count1;    
+        }
+        
+    /*Serial.print("Count1 = ");
+    Serial.println(count1);*/
 }
+
