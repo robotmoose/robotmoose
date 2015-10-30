@@ -1,4 +1,6 @@
 <b>ITEST Encoder Board</b>
 <p>
 This folder contains all the revisions for the ITEST encoder sensor board to add magnetic encoders to the Layla platform.
+
+AH175 is a latching-type sensor, that needs a flux reversal to register a count.  This gives it a more square duty cycle than the magnitude-sensitive part, which has basically the same layout.
 </p>
