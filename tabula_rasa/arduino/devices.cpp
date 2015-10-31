@@ -9,7 +9,7 @@
 #include "tabula_control.h"
 #include "tabula_config.h"
 #include <stdint.h>
-#include <Adafruit_NeoPixel.h>
+#include "NeoPixel.h"
 #include "digitalWriteFast.h"
 
 
@@ -295,7 +295,7 @@ REGISTER_TABULA_DEVICE(neato,"SP",
 	actions_1ms.add(n);
 )
 
-#include "hallEffect.h"
+// #include "hallEffect.h"
 class hallEffect_sensor : public action {
 public:
 	

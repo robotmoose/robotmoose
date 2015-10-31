@@ -32,7 +32,7 @@
   <http://www.gnu.org/licenses/>.
   -------------------------------------------------------------------------*/
 
-#include "Adafruit_NeoPixel.h"
+#include "NeoPixel.h"
 
 // Constructor when length, pin and type are known at compile-time:
 Adafruit_NeoPixel::Adafruit_NeoPixel(uint16_t n, uint8_t p, neoPixelType t) :
