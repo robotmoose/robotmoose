@@ -1,0 +1,81 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - API</title>
+	</head>
+	<body onload="initialize();" role="document">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>RobotMoose API (Application Programming Interface)</h1>
+			</div>
+			<div class="well">
+				<h4>Basic User Interface (UI)</h4>
+				button("string", state1)
+				<ul>
+					<li>string is button's title, pressing the button will run the state named state1</li>
+				</ul>
+				<br><br>
+				checkbox("string")
+				<ul>
+					<li>string is the checkbox's title</li>
+				</ul>
+				<br><br>
+				label("string")
+				<ul>
+					<li>string will appear in the UI window</li>
+				</ul>
+				<br><br>
+				print("string")
+				<ul>
+					<li>string will appear to the right side of the state in the code editor</li>
+				</ul>
+				<br><br>
+				slider("string", -1.0, 0.0, 1.0)
+				<ul>
+					<li>creates a slider in the UI titled string, with range -1.0 to 1.0 and default slider placement at 0.0</li>
+				</ul>
+				<br><br>
+				state = state1
+				<ul>
+					<li>runs the state named state1</li>
+				</ul>
+				<br><br>
+				store.var=j
+				<ul>
+					<li>stores a variable named var, initialized to value j</li>
+				</ul>
+				<br><br>
+				<h4>Create2</h4>
+				drive(i, j)
+				<ul>
+					<li>sets the speed of the left wheel to i, sets the speed of the right wheel to j (range is 0.0 to 1.0)</li>
+				</ul>
+				<br><br>
+				stop()
+				<ul>
+					<li>stops the robot</li>
+				</ul>
+				<br><br>
+				<h4>PWM (Pulse Width Modulation)</h4>
+				power.pwm[i] = j
+				<ul>
+					<li>sets the value of pwm[i] to j (range is 0 to 255)</li>
+				</ul>
+				<br><br>
+				<h4>Servos</h4>
+				power.servo[i] = j
+				<ul>
+					<li>moves servo[i] to position j (in degrees, range is 0 to 180)</li>
+				</ul>
+				<br><br>
+				<h4>Control Flow</h4>
+				if(expression)<br>&nbsp&nbsp&nbsp statement1<br>else<br>&nbsp&nbsp&nbsp statement2
+				<ul>
+					<li>if expression evaluates to true, executes statement1, otherwise executes statement2</li>
+				</ul>
+				<br><br>
+			</div>
+		</div>
+	</body>
+</html>
