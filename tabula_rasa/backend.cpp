@@ -572,11 +572,15 @@ public:
 	double LRtrim;
 	bool debug;
 	int config_counter;
+	bool _timeout;
+	int _serialOpen;
+	bool gotData;
 
 	robot_backend(std::string superstarURL, std::string robotName_)
 		:parseURL(superstarURL), superstar(parseURL.host,0,parseURL.port),
 		robotName(robotName_), pkt(0), LRtrim(1.0),config_counter(-1234)
 	{
+		gotData=false;
 		//stop();
 	}
 	~robot_backend() {
@@ -610,7 +614,10 @@ public:
 	/** Send pilot commands to robot. */
 	void send_serial();
 	/** Read anything the robot wants to send to us. */
-	void read_serial(void);
+	void read_serial();
+	
+	/** Try to reconnect if arduino is unplugged*/
+	void reconnect (std::string config, SerialPort &port);
 };
 
 // Read a line of ASCII from this serial port.
@@ -818,13 +825,17 @@ void robot_backend::read_sensors(const A_packet& current_p)
 /** Read anything the robot wants to send to us. */
 void robot_backend::read_serial(void) {
 	if (pkt==0) return; // simulation only
+	
+	int got_data=0;
+	
 	while (Serial.available()) { // read any robot response
 		if (debug) printf("v");
-		int16_t got_data=0;
+
 		A_packet p;
-		while (-1==pkt->read_packet(p)) { }
+		while (-1==pkt->read_packet(p)) { gotData = true;}
 		if (p.valid) {
-			if (debug) printf("P");
+			//if (debug) 
+			std::cout<<"P";
 			if (debug) printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data);
 			if (p.command == 0) printf("    Arduino sent echo request %d bytes, '%.*s'\n", p.length, p.length, p.data);
 			else if (p.command==0xE) {
@@ -842,6 +853,18 @@ void robot_backend::read_serial(void) {
 			else printf("    Arduino sent unknown packet 0x%X command %d bytes, '%.*s'\n", p.command, p.length, p.length, p.data);
 		}
 	}
+	if(gotData)
+	{
+		_timeout=0;
+		_serialOpen = 1;
+		std::cout<<"Timeout: "<<_timeout<<std::endl;
+	}
+	else 
+	{
+		_timeout++;
+		std::cout<<"Timeout: "<<_timeout<<std::endl;
+	}
+	
 }
 
 /** Send data to the robot over serial connection */
@@ -1119,6 +1142,21 @@ void robot_backend::send_options(void)
 	printf("Send Time:	%.1f ms/request, %.1f req/sec\n", per*1.0e3, 1.0 / per);
 }
 
+void robot_backend::reconnect (std::string config, SerialPort &Serial)
+{
+	
+	while(tabula_serial_begin(Serial.Get_baud())!=0)
+	{
+		setup_devices(config);
+		std::cout<<"Attempting to Reconnect"<<std::endl;
+		Serial.Close();
+		// sleep(1);
+		tabula_serial_begin(Serial.Get_baud());
+	}
+		get_arduino_options(Serial);
+		setup_arduino(Serial,config);
+}
+
 robot_backend *backend=NULL; // the singleton robot
 
 int main(int argc, char *argv[])
@@ -1166,11 +1204,20 @@ int main(int argc, char *argv[])
 			backend->send_serial();
 			moose_sleep_ms(to_int(config.get("delay_ms")));
 			backend->read_serial();
-
-			if(config.get("marker")!="")
-				backend->location.update_vision(config.get("marker").c_str());
+			
+			if((backend->_timeout)!=0)
+			{	
+				std::cout<<"Disconnected"<<std::endl;
+				backend->reconnect(config.get("sensors")+"\n"+config.get("motors"),Serial);
+			}
+		}
+		
+		if(config.get("marker")!="")
+		{
+			backend->location.update_vision(config.get("marker").c_str());
 		}
 	}
+
 	catch(std::exception& error)
 	{
 		std::cout<<"ERROR! "<<error.what()<<std::endl;
