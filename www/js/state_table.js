@@ -684,7 +684,7 @@ state_table_t.prototype.validate_state_m=function(input)
 	while(input.text.value.length>0&&!is_ident(input.text.value))
 		input.text.value=input.text.value.substr(0,input.text.value.length-1);
 
-	var valid=input.text.value.length>0;
+	var valid=input.text.value.length>0&&input.text.value!="state";
 
 	var entries=this.get_entries();
 	var counts={};
