@@ -3,20 +3,22 @@
 #dedicated box as a cron job.
 #TO DO: Email errors to predefined people
 
-#! /bin/bash
-
+#!/bin/bash
+errorFile="email.txt"
 checkMake()
 	{
 		if [ $? -ne 0 ]
 		then
-		echo "Failed to Compile $2"
+		echo -e "Failed to Compile $2" >> email.txt 
+		else
+		echo -e "Compiled $2" >> email.txt 
 		fi
 	}
 pull=$(git pull 2>&1)
-if [ "$pull" == "Already up-to-date." ]; then
-	echo "Nothing to pull"
+#if [ "$pull" == "Already up-to-date." ]; then
+#	echo "Nothing to pull"
 
-else
+#else
 	cd ../../../tabula_rasa/arduino
 	if [ $# -lt 1 ]
 	then
@@ -44,5 +46,5 @@ else
 	checkMake result superstar
 	
 	
-fi
+#fi
 	
