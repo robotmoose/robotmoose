@@ -15,7 +15,7 @@ endif
 all: backend
 
 backend: backend.cpp
-	$(CXX) $(CFLAGS) $< -o $@ $(LIBS)
+	$(CXX) $(CFLAGS) $< -o $@ $(LIBS) 
 
 clean:
 	- rm -rf backend backend.exe
