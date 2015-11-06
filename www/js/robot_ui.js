@@ -112,11 +112,19 @@ robot_ui_t.prototype.download_gui=function()
 	//+ "if (checkbox(\"Would you like to check this box?\")) { print(\"Yes!\") } <br>"
 	+ "<h4>Drive</h4>"
 	+ "drive(-0.5, 0.5)  // <i>Sets the speed of the left and right wheels</i><br>"
-	+ "<br><a href=\"/lessons/ui/\" title=\"UI Examples\"> <h4>Advanced</h4> </a>";
+	+ "<br><a href=\"/api/\" title=\"API\"> <h4>Advanced</h4> </a>";
 	//+ "<h4> Sensors </h4>"
 	//+ "sensors.location.x - <i> Robot location in x-coordinate</i><br>"
 	//+ "sensors.location.angle - <i> Direction robot is facing </i><br>"
 	//+ "sensors.floor[2] - <i> Floor sensor 2 </i><br>";
+	
+	var help_text_ui = 
+	"Run your Code to add elements to the UI <br>"
+	+ "<h4>UI elements:</h4>"
+	+ "label(\"This will appear in the UI\")<br>"
+	+ "button(\"Press me\", state1)<br>"
+	+ "slider(\"Slider!\", -1.0, 0.0, 1.0) <br>"
+	+ "checkbox(\"Would you like to check this box?\")<br>"
 
 	var clear_out=function(div)
 	{
@@ -134,7 +142,7 @@ robot_ui_t.prototype.download_gui=function()
 			states:myself.create_doorway("Code","Automatically drive the robot",help_text_states),
 			map:myself.create_doorway("Map","See where the robot thinks it is",null),
 			video:myself.create_doorway("Video","Show the robot's video camera",null),
-			UI:myself.create_doorway("UI","Customized robot user interface",null)
+			UI:myself.create_doorway("UI","Customized robot user interface",help_text_ui)
 		};
 
 		clear_out(myself.doorways.config.content);
