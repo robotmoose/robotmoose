@@ -14,6 +14,9 @@
 
 #ifdef _WIN32
 #include <stdint.h>  // for unit8-16 and whatnot
+#include <direct.h>
+
+#define chdir _chdir
 #endif
 
 //String helper:
@@ -213,17 +216,17 @@ class json_path_fragment {
 public:
 	std::string field; // field name
 	int index; // array index, or -1 if not an array
-	json_path_fragment(const std::string &f,int index_=-1) 
+	json_path_fragment(const std::string &f,int index_=-1)
 		:field(f), index(index_) {}
-	
+
 	// Index this json value by our field name (r/o const)
 	const json::Value *index_read(const json::Value *cur) const {
 		cur=&((*cur)[field]);
-		
+
 		if (index>=0) {
 			cur=&cur->ToArray()[index];
 		}
-		
+
 		return cur;
 	}
 	// Index this json value by our field name (r/w, creates)
@@ -232,20 +235,20 @@ public:
 			if (index!=-1) // array next time
 				(*cur)[field]=json::Array();
 			else // normal intermediate object
-				(*cur)[field]=json::Object();	
+				(*cur)[field]=json::Object();
 		}
 		cur=&((*cur)[field]);
-		
+
 		if (index>=0) {
 			json::Array &a=cur->ToArray();
 			if ((int)a.size()<=index) { // need to lengthen array
-				while ((int)a.size()<=index) 
+				while ((int)a.size()<=index)
 					if (islast) a.push_back(json::Value());
 					else a.push_back(json::Object());
 			}
 			cur=&a[index];
 		}
-		
+
 		return cur;
 	}
 };
@@ -265,18 +268,18 @@ public:
 	{
 		path.push_back(json_path_fragment(rootField,index_));
 	}
-	
+
 	json_path(const json_path &parent,const std::string &sub1Field,int index_=-1)
-		:path(parent.path) 
-	{ 
-		path.push_back(json_path_fragment(sub1Field,index_)); 
+		:path(parent.path)
+	{
+		path.push_back(json_path_fragment(sub1Field,index_));
 	}
-	
+
 	json_path(const json_path &parent,const std::string &sub1Field,const std::string &sub2Field,int index_=-1)
-		:path(parent.path) 
-	{ 
-		path.push_back(json_path_fragment(sub1Field)); 
-		path.push_back(json_path_fragment(sub2Field,index_)); 
+		:path(parent.path)
+	{
+		path.push_back(json_path_fragment(sub1Field));
+		path.push_back(json_path_fragment(sub2Field,index_));
 	}
 
 	// Index this json root object down to our path.
@@ -531,7 +534,7 @@ public:
 			// not available from pilot or malformed--ignore value.
 			std::cout<<"Ignoring pilot json error "<<e.what()<<"\n";
 		}
-		
+
 		// Write value into command array
 		*(deviceT *)&tabula_command_storage.array[command.get_index()]=d;
 	}
@@ -616,7 +619,7 @@ public:
 	void send_serial();
 	/** Read anything the robot wants to send to us. */
 	void read_serial();
-	
+
 	/** Try to reconnect if arduino is unplugged*/
 	void reconnect (std::string config, SerialPort &port);
 };
@@ -757,7 +760,7 @@ void robot_backend::setup_devices(std::string robot_config)
 		(int)tabula_command_storage.count,(int)tabula_sensor_storage.count);
 }
 
-void robot_backend::get_arduino_options(SerialPort &port) 
+void robot_backend::get_arduino_options(SerialPort &port)
 {
 	std::cout.flush();
 
@@ -826,16 +829,16 @@ void robot_backend::read_sensors(const A_packet& current_p)
 /** Read anything the robot wants to send to us. */
 void robot_backend::read_serial(void) {
 	if (pkt==0) return; // simulation only
-	
+
 	int got_data=0;
-	
+
 	while (Serial.available()) { // read any robot response
 		if (debug) printf("v");
 
 		A_packet p;
 		while (-1==pkt->read_packet(p)) { gotData = true;}
 		if (p.valid) {
-			//if (debug) 
+			//if (debug)
 			std::cout<<"P";
 			if (debug) printf("Arduino sent packet type %x (%d bytes):\n",p.command,got_data);
 			if (p.command == 0) printf("    Arduino sent echo request %d bytes, '%.*s'\n", p.length, p.length, p.data);
@@ -860,12 +863,12 @@ void robot_backend::read_serial(void) {
 		_serialOpen = 1;
 		std::cout<<"Timeout: "<<_timeout<<std::endl;
 	}
-	else 
+	else
 	{
 		_timeout++;
 		std::cout<<"Timeout: "<<_timeout<<std::endl;
 	}
-	
+
 }
 
 /** Send data to the robot over serial connection */
@@ -906,7 +909,7 @@ void robot_backend::do_network()
 {
 	double start=time_in_seconds();
 
-	std::cout << "\033[2J\033[1;1H"; // clear screen	
+	std::cout << "\033[2J\033[1;1H"; // clear screen
 	std::cout<<"Robot name: "<<robotName<<"\n";
 
 	std::string send_json=send_network();
@@ -1145,7 +1148,7 @@ void robot_backend::send_options(void)
 
 void robot_backend::reconnect (std::string config, SerialPort &Serial)
 {
-	
+
 	while(tabula_serial_begin(Serial.Get_baud())!=0)
 	{
 		setup_devices(config);
@@ -1164,7 +1167,7 @@ int main(int argc, char *argv[])
 {
 	try
 	{
-		// MacOS runs double-clicked programs from homedir,  
+		// MacOS runs double-clicked programs from homedir,
 		//   so cd to directory where this program lives.
 		std::string exe_name=argv[0];
 		std::cout<<"Executable name: "<<exe_name<<"\n";
@@ -1176,8 +1179,8 @@ int main(int argc, char *argv[])
 		}
 		std::cout<<"Directory name: "<<dir_name<<"\n";
 		if (chdir(dir_name.c_str())) { /* ignore chdir errors */ }
-		
-		
+
+
 		robot_config_t config;
 
 		config.from_file("config.txt");
@@ -1194,7 +1197,7 @@ int main(int argc, char *argv[])
 		backend=new robot_backend(config.get("superstar"),config.get("robot"));
 		backend->LRtrim=to_double(config.get("trim"));
 		backend->debug=debug;
-		
+
 		// Manually configuring Arduino (not via web) is a bad idea...
 		backend->tabula_setup(config.get("sensors")+"\n"+config.get("motors"));
 
@@ -1205,14 +1208,14 @@ int main(int argc, char *argv[])
 			backend->send_serial();
 			moose_sleep_ms(to_int(config.get("delay_ms")));
 			backend->read_serial();
-			
+
 			if((backend->_timeout)!=0)
-			{	
+			{
 				std::cout<<"Disconnected"<<std::endl;
 				backend->reconnect(config.get("sensors")+"\n"+config.get("motors"),Serial);
 			}
 		}
-		
+
 		if(config.get("marker")!="")
 		{
 			backend->location.update_vision(config.get("marker").c_str());
