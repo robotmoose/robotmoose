@@ -16,10 +16,31 @@ function state_runner_t()
 	this.kill=true;
 	this.state_start_time_ms=this.get_time_ms();
 
+	var myself=this;
+	this.VM={};
 	this.VM_pilot=null; // e.g., power commands, shared with manual drive
+	this.VM_pilot_last="???";
 	this.VM_sensors={};
 	this.VM_store={};
 	this.VM_UI=null;
+	
+	// Send off the pilot data, if it has changed
+	myself.pilot_flush=function() {
+		console.log("Pilot flush: "+myself.VM_pilot.power.L);
+		var pilot_cur=JSON.stringify(myself.VM_pilot);
+		if (pilot_cur!=myself.VM_pilot_last)
+		{ // Send off autopilot's driving commands
+			myself.VM_pilot_last=pilot_cur;
+			if (myself.onpilot) myself.onpilot(myself.VM_pilot);
+		}
+	}
+	
+	// Commit all changed data
+	myself.do_writes=function(VM) {
+		myself.pilot_flush();
+		
+		VM.state_written=VM.state;
+	}
 	
 	/**
 	 seq is used to sequence commands, including delays.
@@ -30,11 +51,12 @@ function state_runner_t()
 	this.VM_seq={};
 	var seq=this.VM_seq;
 	
-	// State storage for blocking functions:
-	seq.state={};
+	// Storage for blocking functions.  Index is by code_count.
+	seq.store=[];
 	
 	// Restart the sequence for a new run
 	seq.reset=function() {
+		seq.advance_ready=false;
 		seq.code_count=0; // source code phase (counts up every time through code)
 		seq.exec_count=0; // active runtime phase (counts up only after delays)
 		seq.exec_start_count=-1; // trails exec_count by 1
@@ -44,25 +66,27 @@ function state_runner_t()
 	// Check if we are we currently active (running)
 	seq.current=function() { return seq.code_count==seq.exec_count; };
 	
-	// Start a phase.  Returns 1 if this is the actual start of the phase.
-	seq.start=function() {
+	// Mark start of a potentially blocking phase. 
+	//  Returns state storage for this phase.
+	seq.block_start=function(VM) {
 		if (seq.current() && seq.exec_start_count<seq.exec_count) 
 		{ // This is the first run of the new phase
 			seq.exec_start_count=seq.exec_count;
-			return true;
+			seq.store[seq.code_count]={}; // new empty object
+			
+			// Commit user's actions before blocking
+			myself.do_writes(VM);
 		}
-		return false;
+		return seq.store[seq.code_count];
 	}
 	
-	// Advance to the next phase, because this phase is over.
+	// Advance to the next piece of code
 	seq.advance=function() {
-		if (seq.current()) {
-			seq.exec_count++;
-		}			
+		seq.advance_ready=true;		
 	}
 	
-	// Finish a phase.  This advances to the next phase.
-	seq.finish=function() {
+	// Mark end of blocking section
+	seq.block_end=function() {
 		seq.code_count++; // increment count for each phase
 	}
 }
@@ -178,6 +202,7 @@ state_runner_t.prototype.start_state=function(state_name)
 //  Returns the virtual machine object used to wrap user code
 state_runner_t.prototype.make_user_VM=function(code,states)
 {
+	var myself=this;
 	var VM={}; // virtual machine with everything the user can access
 
 // Block access to all parent-created members (e.g., inherited locals)
@@ -213,18 +238,21 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	VM.time_run=time_ms - this.run_start_time_ms; // time since "Run" (ms)
 	
 	VM.delay=function(ms) {
-		if (VM.sequencer.start()) 
-		{ // starting a delay
-			VM.sequencer.state.delay_end_time=VM.time+ms;
+		var t=VM.sequencer.block_start(VM);
+		if (VM.sequencer.current()) {
+			if (!t.time)  
+			{ // starting a delay
+				t.time=VM.time+ms;
+			}
+			if (VM.time >= t.time) 
+			{ // done with delay
+				VM.sequencer.advance();
+			}
 		}
-		if (VM.sequencer.current() && VM.time >= VM.sequencer.state.delay_end_time) 
-		{ // done with delay
-			VM.sequencer.advance();
-		}
-		VM.sequencer.finish();
+		VM.sequencer.block_end();
 	}
 
-	VM.pilot=this.VM_pilot;
+	VM.pilot=JSON.parse(JSON.stringify(this.VM_pilot));
 	VM.pilot.cmd=undefined; // don't re-send scripts
 	VM.script=function(cmd,arg) { 
 		if (VM.sequencer.current()) {
@@ -232,18 +260,94 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		}
 	};
 
-	VM.pilot_original=JSON.stringify(VM.pilot); // hack for change detection
-
 	VM.sensors=this.VM_sensors;
 	VM.power=this.VM_pilot.power;
 	VM.store=this.VM_store;
 	VM.robot={sensors:VM.sensors, power:VM.power};
 
+	// Simple instantanious drive:
 	VM.drive=function(speedL,speedR) { 
 		if (VM.sequencer.current()) {
 			VM.power.L=speedL; VM.power.R=speedR; 
 		}
 	}
+	
+	// Drive forward specified distance (cm)
+	VM.forward=function(target,speed) {
+		if (!target) target=10; // centimeters
+		if (!speed) speed=0.4; // moderate speed
+		
+		var t=VM.sequencer.block_start(VM);
+		if (VM.sequencer.current()) {
+			var p=new vec3(VM.sensors.location.x,VM.sensors.location.y,0.0);
+			if (!t.start)  
+			{ // starting a move
+				t.start=p;
+			}
+			if (target<0) { // drive backwards
+				target=-target;
+				speed=-speed;
+			}
+			var dist=target - 100.0*p.distanceTo(t.start);
+			var slow_dist=10.0; // scale back on approach
+			if (dist<slow_dist) speed*=0.1+0.9*dist/slow_dist; 
+			console.log("Forward: distance: "+dist+" -> speed "+speed);
+			VM.power.L=VM.power.R=speed;
+			if (dist <= 0.0) 
+			{ // done with move
+				VM.power.L=VM.power.R=0.0;
+				VM.sequencer.advance();
+			}
+			// Commit these new power values:
+			myself.do_writes(VM);
+		}
+		VM.sequencer.block_end();
+	}
+	VM.backward=function(target,speed) { 
+		if (!target) target=10; // centimeters
+		VM.forward(-target,speed); 
+	}
+	
+	// Turn right (clockwise) specified distance (deg)
+	VM.right=function(target,speed) {
+		if (!target) target=90; // degrees
+		if (!speed) speed=0.3; 
+		
+		var t=VM.sequencer.block_start(VM);
+		if (VM.sequencer.current()) {
+			var a=VM.sensors.location.angle;
+			if (!t.target)  
+			{ // starting turn: compute target angle
+				t.target=a-target;
+			}
+			var dist=a-t.target;
+			while (dist>+180.0) dist-=360.0; // reduce mod 360
+			while (dist<-180.0) dist+=360.0;
+			if (target<0) { // drive backwards to turn other way
+				speed=-speed;
+				dist=-dist;
+			}
+			
+			var slow_dist=40.0; // scale back on approach
+			if (dist<slow_dist) speed*=0.1+0.9*dist/slow_dist; 
+			console.log("Turn: distance: "+dist+" -> speed "+speed);
+			VM.power.L=+speed; VM.power.R=-speed;
+			if (dist <= 0.0) 
+			{ // done with move
+				VM.power.L=VM.power.R=0.0;
+				VM.sequencer.advance();
+			}
+			// Commit these new power values:
+			myself.do_writes(VM);
+		}
+		VM.sequencer.block_end();
+	}
+	VM.left=function(target,speed) { 
+		if (!target) target=90; // degrees
+		VM.right(-target,speed); 
+	}
+
+
 
 	// UI construction:
 	VM.UI=this.VM_UI;
@@ -278,6 +382,9 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 
 // Basically eval user's code here
 	(new Function("with(this)\n{\n"+code+"\n}")).call(VM);
+	
+	if (VM.sequencer.current()) this.do_writes(VM);
+	
 	return VM;
 }
 
@@ -302,29 +409,30 @@ state_runner_t.prototype.execute_m=function(state_table)
 			this.update_continue_m(state_table,run_state);
 
 			var VM=this.make_user_VM(run_state.code,this.state_list);
-
+			
 			state_table.show_prints(VM.printed_text,this.state);
+			
+			if (VM.sequencer.advance_ready) 
+			{ // Switch to next phase
+				VM.sequencer.advance_ready=false;
+				VM.sequencer.exec_count++;
+			}
 
-			if(VM.state===null)
+			if(VM.state_written===null)
 			{
 				//user stopped
 				this.stop_m(state_table);
 				return;
 			}
 
-			if(VM.state!==undefined)
+			if(VM.state_written!==undefined)
 			{
-				if(!this.find_state(VM.state))
-					throw("Next state \""+VM.state+"\" not found!");
+				if(!this.find_state(VM.state_written))
+					throw("Next state \""+VM.state_written+"\" not found!");
 
 				this.clear_continue_m();
-				this.state=VM.state;
-				this.start_state(VM.state);
-			}
-
-			if (JSON.stringify(VM.pilot)!=VM.pilot_original)
-			{ // Send off autopilot's driving commands
-				if (this.onpilot) this.onpilot(VM.pilot);
+				this.state=VM.state_written;
+				this.start_state(VM.state_written);
 			}
 
 			var myself=this;
