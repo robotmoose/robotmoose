@@ -31,7 +31,7 @@ function config_editor_t(div)
 	this.add_button=document.createElement("input");
 	this.configure_button=document.createElement("input");
 
-	this.element.style.width=480;
+	this.element.style.width=640;
 	this.div.appendChild(this.element);
 
 	this.add_div.className="form-inline";
