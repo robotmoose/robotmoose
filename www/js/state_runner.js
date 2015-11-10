@@ -20,6 +20,51 @@ function state_runner_t()
 	this.VM_sensors={};
 	this.VM_store={};
 	this.VM_UI=null;
+	
+	/**
+	 seq is used to sequence commands, including delays.
+	 The trick is executing code before and after the delay,
+	 but we disable side effects on the part of the code (the "phase")
+	 that is not currently active.
+	*/
+	this.VM_seq={};
+	var seq=this.VM_seq;
+	
+	// State storage for blocking functions:
+	seq.state={};
+	
+	// Restart the sequence for a new run
+	seq.reset=function() {
+		seq.code_count=0; // source code phase (counts up every time through code)
+		seq.exec_count=0; // active runtime phase (counts up only after delays)
+		seq.exec_start_count=-1; // trails exec_count by 1
+	};
+	seq.reset();
+	
+	// Check if we are we currently active (running)
+	seq.current=function() { return seq.code_count==seq.exec_count; };
+	
+	// Start a phase.  Returns 1 if this is the actual start of the phase.
+	seq.start=function() {
+		if (seq.current() && seq.exec_start_count<seq.exec_count) 
+		{ // This is the first run of the new phase
+			seq.exec_start_count=seq.exec_count;
+			return true;
+		}
+		return false;
+	}
+	
+	// Advance to the next phase, because this phase is over.
+	seq.advance=function() {
+		if (seq.current()) {
+			seq.exec_count++;
+		}			
+	}
+	
+	// Finish a phase.  This advances to the next phase.
+	seq.finish=function() {
+		seq.code_count++; // increment count for each phase
+	}
 }
 
 state_runner_t.prototype.set_UI=function (UI_builder) {
@@ -60,6 +105,8 @@ state_runner_t.prototype.stop=function(state_table)
 	this.clear_continue_m();
 
 	state_table.set_active(); // no section is active
+
+	this.VM_seq.reset(); // reset sequencer
 
 	if (this.VM_pilot) { // stop the robot when the code stops running
 		this.VM_pilot.power.L=this.VM_pilot.power.R=0.0; // stop drive
@@ -122,6 +169,7 @@ state_runner_t.prototype.stop_m=function(state_table)
 state_runner_t.prototype.start_state=function(state_name)
 {
 	this.VM_UI.start_state(state_name);
+	this.VM_seq.reset();
 	//console.log("Entering VM state "+state_name);
 	this.state_start_time_ms=this.get_time_ms();
 }
@@ -141,22 +189,48 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		if(states[key])
 			VM[states[key].name]=states[key].name;
 
+// Sequencer
+	VM.sequencer=this.VM_seq;
+	VM.sequencer.code_count=0;
+
 // Import all needed I/O functionality
 	VM.console=console;
 	VM.printed_text="";
 	VM.print=function(value) {
-		VM.printed_text+=value+"\n";
-		// console.log(value+"\n");
+		if (VM.sequencer.current()) {
+			VM.printed_text+=value+"\n";
+			// console.log(value+"\n");
+		}
 	};
-	VM.stop=function() { VM.state=null; }
+	VM.stop=function() { 
+		if (VM.sequencer.current()) {
+			VM.state=null; 
+		}
+	}
 
 	var time_ms=this.get_time_ms();
 	VM.time=time_ms - this.state_start_time_ms; // time in state (ms)
 	VM.time_run=time_ms - this.run_start_time_ms; // time since "Run" (ms)
+	
+	VM.delay=function(ms) {
+		if (VM.sequencer.start()) 
+		{ // starting a delay
+			VM.sequencer.state.delay_end_time=VM.time+ms;
+		}
+		if (VM.sequencer.current() && VM.time >= VM.sequencer.state.delay_end_time) 
+		{ // done with delay
+			VM.sequencer.advance();
+		}
+		VM.sequencer.finish();
+	}
 
 	VM.pilot=this.VM_pilot;
 	VM.pilot.cmd=undefined; // don't re-send scripts
-	VM.script=function(cmd,arg) { VM.pilot.cmd={"run":cmd, "arg":arg}; }
+	VM.script=function(cmd,arg) { 
+		if (VM.sequencer.current()) {
+			VM.pilot.cmd={"run":cmd, "arg":arg}; 
+		}
+	};
 
 	VM.pilot_original=JSON.stringify(VM.pilot); // hack for change detection
 
@@ -165,7 +239,11 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	VM.store=this.VM_store;
 	VM.robot={sensors:VM.sensors, power:VM.power};
 
-	VM.drive=function(speedL,speedR) { VM.power.L=speedL; VM.power.R=speedR; }
+	VM.drive=function(speedL,speedR) { 
+		if (VM.sequencer.current()) {
+			VM.power.L=speedL; VM.power.R=speedR; 
+		}
+	}
 
 	// UI construction:
 	VM.UI=this.VM_UI;
