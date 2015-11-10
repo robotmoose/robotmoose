@@ -322,7 +322,7 @@ return highCell;
 // Following PEC code by Dale (KiloOne) on Endless Sphere
 // http://endless-sphere.com/forums/viewtopic.php?f=14&t=40962
 
-static void init_crc8() // Generate PEC lookup table
+void init_crc8() // Generate PEC lookup table
 {
   int z,j;
   byte cr;
