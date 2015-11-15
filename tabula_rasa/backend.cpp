@@ -576,15 +576,14 @@ public:
 	double LRtrim;
 	bool debug;
 	int config_counter;
-	bool _timeout;
-	int _serialOpen;
 	bool gotData;
+	std::string last_config;
 
 	robot_backend(std::string superstarURL, std::string robotName_)
 		:parseURL(superstarURL), superstar(parseURL.host,0,parseURL.port),
-		robotName(robotName_), pkt(0), LRtrim(1.0),config_counter(-1234)
+		robotName(robotName_), pkt(0), LRtrim(1.0),config_counter(-1234),
+		gotData(false),last_config("")
 	{
-		gotData=false;
 		//stop();
 	}
 	~robot_backend() {
@@ -609,11 +608,11 @@ public:
 	void setup_devices(std::string robot_config);
 
 	// Pull arduino's firmware options
-	void get_arduino_options(SerialPort &port);
+	void get_arduino_options();
 
 	/** Talk to this real Arudino device over this serial port.
 	    Run this robot configuration. */
-	void setup_arduino(SerialPort &port,std::string robot_config);
+	void setup_arduino(std::string robot_config);
 
 	/** Send pilot commands to robot. */
 	void send_serial();
@@ -621,11 +620,11 @@ public:
 	void read_serial();
 
 	/** Try to reconnect if arduino is unplugged*/
-	void reconnect (std::string config, SerialPort &port);
+	void reconnect ();
 };
 
 // Read a line of ASCII from this serial port.
-std::string getline_serial(SerialPort &port) {
+std::string getline_serial() {
 	std::string ret="";
 	while (true) {
 		int c=Serial.read();
@@ -760,46 +759,46 @@ void robot_backend::setup_devices(std::string robot_config)
 		(int)tabula_command_storage.count,(int)tabula_sensor_storage.count);
 }
 
-void robot_backend::get_arduino_options(SerialPort &port)
+void robot_backend::get_arduino_options()
 {
 	std::cout.flush();
 
 	while (true) { // wait for Arduino to boot
 		(std::cout<<"Arduino startup: ").flush();
-		std::string start=getline_serial(port);
+		std::string start=getline_serial();
 		std::cout<<start<<"\n";
 		if (start.find("tabula device names")!=std::string::npos) break;
 	}
 
 	// Pull Arduino's current options list
-	port.write("list\n",5);
-	std::string count_str=getline_serial(port);
+	Serial.write("list\n",5);
+	std::string count_str=getline_serial();
 	int count=atoi(count_str.c_str());
 	if (count_str.size()<1 || count<1) {
 		std::cerr<<"Expected device count, got '"<<count<<"'.\n";
 		std::cerr<<"Invalid Arduino device list--do you need to flash the latest tabula_rasa firmware?\n";
 	}
 	for (int dev=0;dev<count;dev++) {
-		std::string option=getline_serial(port);
+		std::string option=getline_serial();
 		std::cout<<"  Arduino device supported: '"<<option<<"'\n";
 		if (option!="serial_controller ")
 			all_dev_types.push_back(option);
 	}
 }
 
-void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
+void robot_backend::setup_arduino(std::string robot_config)
 {
 	// Dump configuration to Arduino
 	for (unsigned int i=0;i<robot_config_devices.size();i++) {
 		// Send device to Arduino
 		std::string dev=robot_config_devices[i];
 		std::cout<<"  To Arduino: "<<dev<<"\n";
-		port.write(&dev[0],dev.size());
+		Serial.write(&dev[0],dev.size());
 
 		// Wait for device creation confirmation from Arduino
 		std::string status="";
 		do {
-			status=getline_serial(port);
+			status=getline_serial();
 			std::cout<<"  From Arduino: "<<status<<"\n";
 			if (status=="-1") break;
 		} while (status[0]!='1');
@@ -807,7 +806,7 @@ void robot_backend::setup_arduino(SerialPort &port,std::string robot_config)
 
 	std::cout<<"Arduino switching to binary communication\n";
 	delete pkt; pkt=0;
-	pkt=new A_packet_formatter<SerialPort>(port);
+	pkt=new A_packet_formatter<SerialPort>(Serial);
 	send_serial();
 	read_serial();
 }
@@ -836,7 +835,25 @@ void robot_backend::read_serial(void) {
 		if (debug) printf("v");
 
 		A_packet p;
-		while (-1==pkt->read_packet(p)) { gotData = true;}
+		while (true)
+		{
+			int read=pkt->read_packet(p);
+
+			if(read==-1)
+			{
+				gotData=true;
+			}
+			else
+			{
+				if(read==-2)
+				{
+					std::cout<<"UNPLUGGED"<<std::endl;
+					reconnect();
+				}
+
+				break;
+			}
+		}
 		if (p.valid) {
 			//if (debug)
 			std::cout<<"P";
@@ -857,18 +874,6 @@ void robot_backend::read_serial(void) {
 			else printf("    Arduino sent unknown packet 0x%X command %d bytes, '%.*s'\n", p.command, p.length, p.length, p.data);
 		}
 	}
-	if(gotData)
-	{
-		_timeout=0;
-		_serialOpen = 1;
-		std::cout<<"Timeout: "<<_timeout<<std::endl;
-	}
-	else
-	{
-		_timeout++;
-		std::cout<<"Timeout: "<<_timeout<<std::endl;
-	}
-
 }
 
 /** Send data to the robot over serial connection */
@@ -1034,14 +1039,16 @@ void robot_backend::tabula_setup(std::string config)
 	config+="\nserial_controller();\n";
 	setup_devices(config);
 
+	last_config=config;
+
 	if(!sim)
 	{
 		std::cout<<"Uploading new config to arduino!"<<std::endl;
 		Serial.Close();
 		// sleep(1);
 		tabula_serial_begin(Serial.Get_baud());
-		get_arduino_options(Serial);
-		setup_arduino(Serial,config);
+		get_arduino_options();
+		setup_arduino(config);
 	} else { // sim mode: fake a bunch of options
 		all_dev_types.push_back("analog P");
 		all_dev_types.push_back("servo P");
@@ -1146,19 +1153,18 @@ void robot_backend::send_options(void)
 	printf("Send Time:	%.1f ms/request, %.1f req/sec\n", per*1.0e3, 1.0 / per);
 }
 
-void robot_backend::reconnect (std::string config, SerialPort &Serial)
+void robot_backend::reconnect ()
 {
-
 	while(tabula_serial_begin(Serial.Get_baud())!=0)
 	{
-		setup_devices(config);
+		setup_devices(last_config);
 		std::cout<<"Attempting to Reconnect"<<std::endl;
 		Serial.Close();
 		// sleep(1);
 		tabula_serial_begin(Serial.Get_baud());
 	}
-		get_arduino_options(Serial);
-		setup_arduino(Serial,config);
+		get_arduino_options();
+		setup_arduino(last_config);
 }
 
 robot_backend *backend=NULL; // the singleton robot
@@ -1208,12 +1214,6 @@ int main(int argc, char *argv[])
 			backend->send_serial();
 			moose_sleep_ms(to_int(config.get("delay_ms")));
 			backend->read_serial();
-
-			if((backend->_timeout)!=0)
-			{
-				std::cout<<"Disconnected"<<std::endl;
-				backend->reconnect(config.get("sensors")+"\n"+config.get("motors"),Serial);
-			}
 		}
 
 		if(config.get("marker")!="")

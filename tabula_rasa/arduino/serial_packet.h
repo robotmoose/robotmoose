@@ -135,7 +135,7 @@ public:
 	int read_packet(A_packet &p) {
 		if (!serial.available()) return 0; // no data to read
 		int c=serial.read(); // else read next byte
-		if (c==-1) return 0; // (hmmm, why did available return true then?)
+		if (c==-1) return -2; // (hmmm, why did available return true then?)
 		p.valid=0;
 
 		enum {
