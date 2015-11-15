@@ -125,6 +125,7 @@ public:
 	 Returns 0 if no data is available to read right now.
 	 Returns -1 if data was readable, but no packet is ready yet (call again).
 	 Fills out the packet and returns +1 if we received a correctly formatted packet.
+	 Returns -2 on disconnect...
 
 	 Idiomatic call code:
 	 	A_packet p;
