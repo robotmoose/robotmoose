@@ -1160,8 +1160,7 @@ void robot_backend::reconnect ()
 		setup_devices(last_config);
 		std::cout<<"Attempting to Reconnect"<<std::endl;
 		Serial.Close();
-		// sleep(1);
-		tabula_serial_begin(Serial.Get_baud());
+		moose_sleep_ms(1000);
 	}
 		get_arduino_options();
 		setup_arduino(last_config);
