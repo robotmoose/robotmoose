@@ -16,7 +16,7 @@ robot_config_t::robot_config_t()
 	keys_m["sensors"]="";                        // All our sensors
 	keys_m["trim"]="1.0";                        // proportional relation between left and right "motor" output
 	keys_m["debug"]="false";                     // more output, more mess, but more data
-	keys_m["delay_ms"]="10";                     // milliseconds to wait in control loop (be kind to CPU, network)
+	keys_m["delay_ms"]="50";                     // milliseconds to wait in control loop (be kind to CPU, network)
 	keys_m["sim"]="false";                       // use without an arduino (for testing)
 	keys_m["local"]="false";                     // use local server shortcut
 	keys_m["dev"]="false";                       // use dev server shortcut

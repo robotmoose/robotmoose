@@ -4,5 +4,5 @@ superstar=http://robotmoose.com
 #marker=
 #trim=1.0
 #debug=
-#delay_ms=10
+#delay_ms=50
 #sim=false

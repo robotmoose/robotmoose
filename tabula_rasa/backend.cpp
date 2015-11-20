@@ -1215,10 +1215,11 @@ int main(int argc, char *argv[])
 			backend->read_serial();
 		}
 
-		if(config.get("marker")!="")
+		//Never gets called...
+		/*if(config.get("marker")!="")
 		{
 			backend->location.update_vision(config.get("marker").c_str());
-		}
+		}*/
 	}
 
 	catch(std::exception& error)
