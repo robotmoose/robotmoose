@@ -2,6 +2,25 @@
   Neato XV-11 Laser Distance Sensor (LDS) serial data formatting code.
   This version does most of the protocol decoding on the Arduino side.
 
+  You need a few external components to drive the motor:
+     One 3904 NPN transistor, between the motor black line and ground.
+
+     One 1K ohm resistor, plugged between:
+	- the Arduino PWM motor control pin (settable on the website) 
+	- the transistor base pin.
+
+  The rest of the connections are:
+     Neato 4-pin logic port:
+        - Black to arduino ground
+	- Brown not connected (arduino TX2 to send Neato commands, not used here)
+	- Orange to arduino RX2
+	- Red to arduino 5v
+
+     Neato 2-pin motor port:
+	- Black to 3904 transistor above
+	- Red to arduino Vin
+
+
   Dr. Orion Lawlor, lawlor@alaska.edu, 2014-02-19 (Public Domain)
 */
 #ifndef __CYBERALASKA__NEATO_SERIAL__H
