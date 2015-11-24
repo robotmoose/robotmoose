@@ -251,9 +251,13 @@ function renderer_t(div,setup_func,loop_func)
 
 	myself.resize=function()
 	{
-		myself.camera.aspect=myself.width/myself.height;
-		myself.camera.updateProjectionMatrix();
-		myself.viewport.setSize(myself.width,myself.height);
+		if (myself.camera) {
+			myself.camera.aspect=myself.width/myself.height;
+			myself.camera.updateProjectionMatrix();
+		}
+		if (myself.viewport) {
+			myself.viewport.setSize(myself.width,myself.height);
+		}
 	};
 
 	myself.loop=function()
@@ -261,7 +265,7 @@ function renderer_t(div,setup_func,loop_func)
 		myself.dt=myself.clock.getDelta();
 		var do_redraw=myself.user_loop(myself.dt);
 		myself.controls.update(myself.dt);
-		if (do_redraw !== false) {
+		if (do_redraw !== false && myself.viewport) {
 			myself.viewport.render(myself.scene,myself.camera);
 		}
 		requestAnimationFrame(myself.loop); // call loop again
