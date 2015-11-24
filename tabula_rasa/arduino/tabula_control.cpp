@@ -46,7 +46,7 @@ public:
 				return true;
 			}
 		}
-		if (action_time_ms-last_send>1000) { // comms timeout
+		if (action_time_ms-last_send>2000) { // comms timeout
 			last_send=action_time_ms;
 			
 			// Zero our incoming command buffer (stops motors)
