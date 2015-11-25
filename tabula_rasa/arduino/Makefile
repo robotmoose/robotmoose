@@ -65,25 +65,26 @@ PROG2560=$(PROGRAMMER) -p$(ATMEGA2560_PROGRAM_CHIP) -b$(ATMEGA2560_BAUD) -c$(ATM
 ARDUINO_SRC=$(ARDUINO_DIR)/cores/arduino/*.cpp $(ARDUINO_DIR)/cores/arduino/*.c
 MAIN_SRC=*.cpp $(LIB_SRC)
 BIN_DIR=.
-BIN_FILE=$(BIN_DIR)/main
 
 #Builds
 all:
 	@echo "Run 'make mega' or 'make uno'."
 
 mega:
-	cp arduino.ino main.cpp
-	$(COMPILER2560) $(DIRS) $(CFLAGS) $(INCLUDE) $(MAIN_SRC) $(ARDUINO_SRC) -o $(BIN_DIR)/$@.elf
+	mkdir -p temp
+	cp arduino.ino temp/main.cpp
+	$(COMPILER2560) $(DIRS) $(CFLAGS) $(INCLUDE) temp/main.cpp $(MAIN_SRC) $(ARDUINO_SRC) -o $(BIN_DIR)/$@.elf
 	$(LINKER) -R .eeprom -O ihex $(BIN_DIR)/$@.elf $(BIN_DIR)/$@.hex
 	$(PROG2560) -P$(PROGRAM_PORT) -Uflash:w:$(BIN_DIR)/$@.hex $(PFLAGS)
-	@rm -rf main.cpp
+	@rm -rf main.cpp temp
 
 uno:
-	cp arduino.ino main.cpp
-	$(COMPILER328) $(DIRS) $(CFLAGS) $(INCLUDE) $(MAIN_SRC) $(ARDUINO_SRC) -o $(BIN_DIR)/$@.elf
+	mkdir -p temp
+	cp arduino.ino temp/main.cpp
+	$(COMPILER328) $(DIRS) $(CFLAGS) $(INCLUDE) temp/main.cpp $(MAIN_SRC) $(ARDUINO_SRC) -o $(BIN_DIR)/$@.elf
 	$(LINKER) -R .eeprom -O ihex $(BIN_DIR)/$@.elf $(BIN_DIR)/$@.hex
 	$(PROG328) -P$(PROGRAM_PORT) -Uflash:w:$(BIN_DIR)/$@.hex $(PFLAGS)
-	@rm -rf main.cpp
+	@rm -rf main.cpp temp
 
 clean:
-	@rm -rf $(BIN_DIR)/mega.elf $(BIN_DIR)/uno.elf $(BIN_DIR)/mega.hex $(BIN_DIR)/uno.hex main.cpp
+	@rm -rf $(BIN_DIR)/mega.elf $(BIN_DIR)/uno.elf $(BIN_DIR)/mega.hex $(BIN_DIR)/uno.hex main.cpp temp

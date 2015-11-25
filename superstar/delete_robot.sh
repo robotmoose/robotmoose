@@ -17,5 +17,5 @@ mt() {
 	done
 }
 
-mt config gui options pilot sensors
+mt config gui options pilot sensors experiments/testing/code active_experiment
 

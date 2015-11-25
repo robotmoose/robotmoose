@@ -366,7 +366,7 @@ config_editor_t.prototype.create_pin_drop_m=function(value)
 			this.div.className+=" has-error";
 	};
 
-	drop.click();
+	drop.onclick(); 
 
 	return drop;
 }
@@ -410,7 +410,7 @@ config_editor_t.prototype.create_serial_drop_m=function(value)
 			this.div.className+=" has-error";
 	};
 
-	drop.click();
+	drop.onclick();
 
 	return drop;
 }

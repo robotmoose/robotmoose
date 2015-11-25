@@ -32,9 +32,10 @@ superstar/superstar
 superstar/superstar.exe
 tabula_rasa/arduino/main.cpp
 tabula_rasa/arduino/main.elf
-tabula_rasa/arduino/mega.elf
-tabula_rasa/arduino/uno.elf
 tabula_rasa/arduino/main.hex
+tabula_rasa/arduino/mega.elf
+tabula_rasa/arduino/temp
+tabula_rasa/arduino/uno.elf
 tabula_rasa/backend
 tabula_rasa/backend.dSYM
 tabula_rasa/backend.exe
