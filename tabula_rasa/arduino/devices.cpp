@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include "NeoPixel.h"
 #include "digitalWriteFast.h"
+#include "NewPing.h" // Conflicts with tone.h
 
 
 // Servo output example:
@@ -330,4 +331,33 @@ REGISTER_TABULA_DEVICE(hallEffect_sensor,"P",
 	device->hallPin=hallPin;
 	src.sensor_index("value",F("Counts"),device->value.get_index());
 	actions_10ms.add(device);
+)
+
+// #include "NewPing.h"
+// HC-SR04 Ultrasonic Sensor (Dedicated Trigger & Echo Pins)
+class ultrasonic_sensor : public action {
+public:
+
+/*	int _trigPin;
+	int _echoPin;*/
+	//int MAX_DISTANCE = 200; // All reading greater than this will return 0
+	NewPing * _sonar;
+	tabula_sensor<unsigned char> _reading_cm;
+
+	virtual void loop()
+	{
+		_reading_cm = (_sonar -> ping_cm());
+	}
+
+	ultrasonic_sensor(int trigPin, int echoPin) : _sonar(new NewPing(trigPin, echoPin, 200)), _reading_cm(0)
+	{}
+
+};
+
+REGISTER_TABULA_DEVICE(ultrasonic_sensor, "PP",
+	int trigPin=src.read_pin();
+	int echoPin=src.read_pin();
+	ultrasonic_sensor * device = new ultrasonic_sensor(trigPin, echoPin);
+	src.sensor_index("Reading (cm)",F("Reading (cm)"),device->_reading_cm.get_index());
+	actions_100ms.add(device);
 )

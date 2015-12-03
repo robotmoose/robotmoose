@@ -656,6 +656,8 @@ void robot_backend::setup_devices(std::string robot_config)
 	int pwms=0;
 	int blinks=0;
 	int neopixels=0;
+	int ultrasonics=0;
+	int hallEffect=0;
 
 	// Parse lines of the configuration outselves, to
 	//   find the command and sensor fields and match them to JSON
@@ -747,6 +749,12 @@ void robot_backend::setup_devices(std::string robot_config)
 		else if (device=="bms") {
 			sensors.push_back(new json_sensor<int,uint8_t>(json_path("battery","charge")));
 			sensors.push_back(new json_sensor<int,uint8_t>(json_path("battery","state")));
+		}
+		else if (device=="ultrasonic_sensor") {
+			sensors.push_back(new json_sensor<int, uint8_t>(json_path("Ultrasonic Reading (cm)",ultrasonics++)));
+		}
+		else if (device=="hallEffect_sensor") {
+			sensors.push_back(new json_sensor<int, uint16_t>(json_path("Hall Effect Encoder Counts",hallEffect++)));
 		}
 		else std::cout<<"Arduino backend: ignoring unknown device '"<<device<<"'\n";
 	}
