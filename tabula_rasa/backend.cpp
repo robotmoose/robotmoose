@@ -751,7 +751,7 @@ void robot_backend::setup_devices(std::string robot_config)
 			sensors.push_back(new json_sensor<int,uint8_t>(json_path("battery","state")));
 		}
 		else if (device=="ultrasonic_sensor") {
-			sensors.push_back(new json_sensor<int, uint8_t>(json_path("Ultrasonic Reading (cm)",ultrasonics++)));
+			sensors.push_back(new json_sensor<int, uint8_t>(json_path("ultrasonic",ultrasonics++)));
 		}
 		else if (device=="hallEffect_sensor") {
 			sensors.push_back(new json_sensor<int, uint16_t>(json_path("Hall Effect Encoder Counts",hallEffect++)));
