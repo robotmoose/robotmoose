@@ -143,6 +143,7 @@ pilot_interface_t.prototype.make_slider=function(config_entry,name,number, minva
 	if (!pilotpower[name]) pilotpower[name]=[];
 	var value=pilotpower[name][number];
 	if (!value) value=0.0;
+	if(name=="servo") value=90.0;
 
 	var p=document.createElement("p");
 	var label_name=document.createTextNode(name+"["+number+"] = ");
