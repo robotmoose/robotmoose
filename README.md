@@ -3,7 +3,7 @@
 This is a simple, modern version of a networked robotics stack, built around the modern web.  The major pieces are:
 
 * A web **front end** for user friendly robot setup, teleoperation, and programming.  See www/js for the code, which is built in JavaScript on bootstrap.
-* A central JSON server called **superstar**, used by the robot to make its sensor values available to the front end (as /superstar/*robotname*/sensors), used the by the front end to post robot commands (at /superstar/*robotname*/pilot), and used for persistent storage as well.  See superstar/ for the code, which is built in C++ on Mongoose, but the HTTP get and set commands can be sent from any language, and is conceptually similar to MongoDB.
+* A central JSON server called **superstar**, used by the robot to make its sensor values available to the front end (as /superstar/*robotname*/sensors), used the by the front end to post robot commands (at /superstar/*robotname*/robots), and used for persistent storage as well.  See superstar/ for the code, which is built in C++ on Mongoose, but the HTTP get and set commands can be sent from any language, and is conceptually similar to MongoDB.
 * An on-robot **back end**, that relays superstar commands to the robot hardware, and keeps track of the robot location.  See tabula_rasa/ for a C++ version.
 * A runtime configurable Arduino **firmware**, which allows new robot hardware to be added at runtime without re-flashing or editing the code.
 
@@ -11,7 +11,7 @@ The typical usage model puts the front end on the robot pilot's web browser, sup
 
 ## Installation and Setup
 
-First, you need the version control system git to get this code.  For Mac, use [GitHub for Mac](https://desktop.github.com/).For Windows, use [Git for Windows](https://msysgit.github.io/).  For Ubuntu, use:
+First, you need the version control system git to get this code.  For Mac, use [GitHub for Mac](https://desktop.github.com/).  For Windows, use [Git for Windows](https://msysgit.github.io/).  For Ubuntu, use:
 ```
 sudo apt-get install git make g++ freeglut3-dev arduino
 ```
@@ -28,7 +28,7 @@ make
 ./backend --robot test/yourbot --sim
 ```
 
-You should immediately be able to pilot the simulated robot by choosing your robot at http://robotmoose.com/pilot/
+You should immediately be able to pilot the simulated robot by choosing your robot at http://robotmoose.com/robots/
 
 
 ### Firmware Installation and Physical Backend
@@ -61,7 +61,7 @@ You can now use the web interface to configure and pilot your robot!
 
 ### Configure and Pilot your Robot with the Web Front End
 
-You access the main robot web interface at [http://robotmoose.com/pilot/](http://robotmoose.com/pilot/).  
+You access the main robot web interface at [http://robotmoose.com/robots/](http://robotmoose.com/robots/).  
 * Connect to the school ("test") and robot name ("yourbot") you gave the backend above.
 * Configure the robot in the "Configure" tab by selecting a piece of hardware and hitting "Add".  I always start with a "heartbeat" so I can verify communication works.  Hit "Configure" to copy this configuration to the Arduino.
 * Check the "Sensors" tab to see the data sent back by your robot.  The "heartbeat" is a number that counts up from 0 to 255 again and again, so you can see the Arduino is connected.  The "location" is a guess of the position of the robot, and is updated as the robot moves.
@@ -99,7 +99,7 @@ make
 ./backend --robot test/yourbot --superstar http://localhost:8081/
 ```
 
-You should now be able to point your web browser to [http://localhost:8081/pilot/](http://localhost:8081/pilot/) and see your local copy of the web user interface.  Edit the files in ~/robotmoose/www/js and hit reload to modify the interface.  You can also manually examine the entries in [http://localhost:8081/superstar/](http://localhost:8081/superstar/) to see how the robot configuration, sensor, and pilot information is exchanged, using superstar get and set operations.
+You should now be able to point your web browser to [http://localhost:8081/robots/](http://localhost:8081/robots/) and see your local copy of the web user interface.  Edit the files in ~/robotmoose/www/js and hit reload to modify the interface.  You can also manually examine the entries in [http://localhost:8081/superstar/](http://localhost:8081/superstar/) to see how the robot configuration, sensor, and pilot information is exchanged, using superstar get and set operations.
 
 
 ### Fun Tricks

@@ -96,8 +96,8 @@ robot_ui_t.prototype.download_gui=function()
 		return;
 
 	var myself=this;
-	
-	var help_text_states = 
+
+	var help_text_states =
 	//"<h3> Code Examples </h3>"
 	"<h4>Basic</h4>"
 	+ "print(\"This will appear to the right of the state\") <br>"
@@ -115,13 +115,13 @@ robot_ui_t.prototype.download_gui=function()
 	+ "left(45)  // <i>turn left 45 degrees</i><br>"
 	+ "right(90)  // <i>turn right 90 degrees</i><br>"
 	+ "drive(-0.5, 0.5)  // <i>Sets the speed of the left and right wheels</i><br>"
-	+ "<br><a href=\"/api/\" title=\"API\"> <h4>Advanced</h4> </a>";
+	+ "<br><a href=\"/code/api/\" title=\"API\"> <h4>Advanced</h4> </a>";
 	//+ "<h4> Sensors </h4>"
 	//+ "sensors.location.x - <i> Robot location in x-coordinate</i><br>"
 	//+ "sensors.location.angle - <i> Direction robot is facing </i><br>"
 	//+ "sensors.floor[2] - <i> Floor sensor 2 </i><br>";
-	
-	var help_text_ui = 
+
+	var help_text_ui =
 	"Run your Code to add elements to the UI <br>"
 	+ "<h4>UI elements:</h4>"
 	+ "label(\"This will appear in the UI\")<br>"
@@ -181,10 +181,10 @@ robot_ui_t.prototype.run_interval=function() {
 			function(sensors) // sensor data has arrived:
 			{
 				myself.sensor_data_count--;
-				
+
 				if (!myself.doorways.sensors.minimized)
 					myself.widgets.sensors.refresh(sensors);
-				
+
 				if (!myself.doorways.map.minimized)
 					myself.widgets.map.refresh(sensors);
 
