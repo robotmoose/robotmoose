@@ -77,6 +77,9 @@ roomba_t::roomba_t(roomba_serial_t& serial):serial_m(&serial),leds_m(0),
 	serial_pointer_m(0),serial_state_m(HEADER)
 {
   memset(&sensor_packet_m,0,sizeof(sensor_packet_m));
+  last_encoder_m.L=0; last_encoder_m.R=0; 
+  last_raw_m.L=0; last_raw_m.R=0;
+  last_dir_m.L=1; last_dir_m.R=1; 
 }
 
 void roomba_t::setup(int BRC_pin) 
@@ -202,6 +205,12 @@ void roomba_t::drive(const int16_t left,const int16_t right)
 	serial_m->write((uint8_t*)&right,1);
 	serial_m->write((uint8_t*)&left+1,1);
 	serial_m->write((uint8_t*)&left,1);
+	
+	if (left>0) last_dir_m.L=1; 
+	if (left<0) last_dir_m.L=-1;
+	if (right>0) last_dir_m.R=1; 
+	if (right<0) last_dir_m.R=-1;
+	// power==0?  leave unchanged (allows inertia to roll to a stop)
 }
 
 #else
@@ -388,12 +397,31 @@ inline uint8_t adapt_floor(uint16_t v) {
 inline uint8_t adapt_light(uint16_t v) {
    if (v<128) return v;
    else {
-      v-=128; // what .. the ... ???
-      v=v>>2;
-      v+=128;
+      v-=128; // large value: shift start to zero
+      v=v>>2; // scale down by 4
+      v+=128; // shift zero back
       if (v>255) v=255;
       return v;
    }
+}
+
+/**
+  Update wheel encoder tick value, using motor direction (last_dir).
+  
+  On the create2, this is not needed--values count up and down properly.
+  
+  On early Roomba 500's, the encoder only counts upward, so we need
+  to combine the encoder value with the motor power to find the total "cooked" ticks.
+*/
+uint16_t update_encoder_ticks(uint16_t new_raw,uint16_t &last_raw,
+	uint16_t &last_cooked,uint16_t last_motor_dir)
+{
+	uint16_t delta=new_raw-last_raw; // count difference
+	if (delta>(1<<15)) delta=(1L<<16)-delta; // flip sign on negative values
+	uint16_t new_cooked=last_cooked+delta*last_motor_dir;
+	last_cooked=new_cooked;
+	last_raw=new_raw;
+	return new_cooked;
 }
 
 bool roomba_t::parse_sensor_packet_m()
@@ -426,12 +454,14 @@ bool roomba_t::parse_sensor_packet_m()
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_ENCODER_L)
 		{
-			temp_packet.encoder.L=read_big_16(serial_buffer_m+index);
+			uint16_t v=read_big_16(serial_buffer_m+index);
+			temp_packet.encoder.L=update_encoder_ticks(v, last_raw_m.L, last_encoder_m.L, last_dir_m.L);
 			index+=sizeof(uint16_t);
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_ENCODER_R)
 		{
-			temp_packet.encoder.R=read_big_16(serial_buffer_m+index);
+			uint16_t v=read_big_16(serial_buffer_m+index);
+			temp_packet.encoder.R=update_encoder_ticks(v, last_raw_m.R, last_encoder_m.R, last_dir_m.R);
 			index+=sizeof(uint16_t);
 		}
 		else if(sensor==ROOMBA_ID_SENSOR_CLIFF_L)

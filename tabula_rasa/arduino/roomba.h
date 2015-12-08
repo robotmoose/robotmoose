@@ -124,6 +124,10 @@ class roomba_t
 		uint8_t serial_pointer_m;
 		parser_state_t serial_state_m;
 		sensor_t sensor_packet_m;
+		
+		encoder_t last_encoder_m; // real encoder value
+		encoder_t last_raw_m; // raw encoder value
+		encoder_t last_dir_m; // motor direction (+1 or -1)
 
 		bool parse_sensor_packet_m();
 };
