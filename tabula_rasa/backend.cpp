@@ -83,7 +83,7 @@ int tabula_serial_begin(int baudrate) {
 	{
 		std::cout<<ii<<":  "<<ports[ii]<<std::endl;
 
-		if (ports[ii].find("Bluetooth")==std::string::npos)
+		if (ports[ii].find("Bluetooth")==std::string::npos&&ports[ii].find("AMA")==std::string::npos)
 		{
 			if(0==Serial.Open(ports[ii]))
 			{
