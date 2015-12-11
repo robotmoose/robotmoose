@@ -97,10 +97,25 @@ UI_builder_t.prototype.create_element=function(name,type,opts) {
 		e.dom.type="range";
 		e.dom.min = opts.min;
 		e.dom.max = opts.max;
+		if(e.dom.min>e.dom.max)
+			{
+				e.dom.min = opts.max;
+				e.dom.max = opts.min;
+			}
 		e.dom.defaultValue = opts.defaultValue;
 		e.dom.step = opts.step;
+		var value = e.dom.defaultValue;
+		var text_node = document.createTextNode(name);
+		text_node.appendData(" = "+value)
+		e.dom.onchange=e.dom.oninput=function(evt) {
+			value = e.dom.value;
+			console.log("min:"+e.dom.min+"max:"+e.dom.max+"value: "+value);
+			text_node.deleteData(0,text_node.length);
+			text_node.appendData(name+" = "+value);
+			
+		}
 		var div=document.createElement("div");
-		div.appendChild(document.createTextNode(name));
+		div.appendChild(text_node);
 		div.style.marginTop=-10;
 		this.div.appendChild(div);
 		break;
