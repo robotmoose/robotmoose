@@ -33,7 +33,7 @@ public:
 	
 	// Zero all data in this buffer
 	void zero(void) {
-		memset(array,sizeof(storage_t)*count,0);
+		memset(array,0,sizeof(storage_t)*count);
 	}
 
 	// Deallocate all space used in this storage object
