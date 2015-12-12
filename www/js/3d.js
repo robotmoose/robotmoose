@@ -238,6 +238,17 @@ function renderer_t(div,setup_func,loop_func)
 		myself.controls=null;
 	};
 
+	myself.show=function(show)
+	{
+		if(myself.div)
+		{
+			if(show)
+				myself.div.style.visibility="visible";
+			else
+				myself.div.style.visibility="hidden";
+		}
+	};
+
 	myself.set_size=function(width,height)
 	{
 		if(width)

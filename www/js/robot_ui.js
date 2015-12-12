@@ -223,6 +223,9 @@ robot_ui_t.prototype.create_widgets=function()
 	};
 	this.state_runner.set_UI(this.widgets.UI);
 
+	this.doorways.map.ondeactivate=function(){myself.widgets.map.renderer.show(false);};
+	this.doorways.map.onactivate=function(){myself.widgets.map.renderer.show(true);};
+
 	this.widgets.config.onchange=function() { // recreate pilot GUI when configuration changes
 		myself.widgets.pilot.reconfigure(myself.widgets.config);
 	}
