@@ -58,7 +58,8 @@ ini_t read_ini(const std::string& filename)
 		key=to_lower(strip_whitespace(key));
 		value=to_lower(strip_whitespace(value));
 
-		ini[key]=value;
+		if(value.size()>0)
+			ini[key]=value;
 	}
 
 	return ini;
