@@ -296,42 +296,38 @@ REGISTER_TABULA_DEVICE(neato,"SP",
 	actions_1ms.add(n);
 )
 
-// #include "hallEffect.h"
-class hallEffect_sensor : public action {
+class encoder : public action {
 public:
 	
-	int hallPin; // Hall effect sensor pin
+	int _hallPin; // Hall effect sensor pin
 	//hallEffect sensor(hallPin);
 	uint16_t _count;
 	bool _reading;
 	bool _oldReading;
 	
-	hallEffect_sensor():_count(0),_reading(false)
-	{}
+	encoder(int hallPin_)
+		:_hallPin(hallPin_),_count(0),_reading(false)
+	{
+		pinMode(_hallPin,INPUT_PULLUP);
+	}
  
 	tabula_sensor<uint16_t> value; // read-in value
-	virtual void setup()
-	{ 
-		pinMode(hallPin,INPUT_PULLUP);
-	}
 	virtual void loop() 
 	{
 	  _oldReading = _reading;
-	  _reading = digitalRead(hallPin);
+	  _reading = digitalRead(_hallPin);
 	  if(_reading!=_oldReading)
             _count++;
 	  value = _count;
 	}
 };
 
-REGISTER_TABULA_DEVICE(hallEffect_sensor,"P",
-	int hallPin=src.read_pin();
-	pinMode(hallPin,INPUT_PULLUP);
-	hallEffect_sensor *device=new hallEffect_sensor();
-	device->hallPin=hallPin;
+REGISTER_TABULA_DEVICE(encoder,"P",
+	encoder *device=new encoder(src.read_pin());
 	src.sensor_index("value",F("Counts"),device->value.get_index());
-	actions_10ms.add(device);
+	actions_1ms.add(device);
 )
+
 
 // #include "NewPing.h"
 // HC-SR04 Ultrasonic Sensor (Dedicated Trigger & Echo Pins)
