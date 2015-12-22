@@ -1,0 +1,262 @@
+<html>
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>Rasa Iterum</title>
+		<div id="content"></div>
+		<script>
+			function frontend_t(div)
+			{
+				if(!div)
+					return null;
+
+				this.div=div;
+				this.el=document.createElement("div");
+				this.div.appendChild(this.el);
+
+				this.modal=new modal_t(this.div);
+				this.modal.close_button.style.display="none";
+				this.modal.hide();
+
+				var _this=this;
+
+				this.connected=false;
+				this.ports_old=[];
+
+				this.status_label=document.createElement("p");
+				this.el.appendChild(this.status_label);
+
+				this.school_input=document.createElement("input");
+				this.el.appendChild(this.school_input);
+				this.school_input.className="form-control";
+				this.school_input.type="text";
+				this.school_input.style.width="200px";
+				this.school_input.placeholder="School";
+				this.school_input.onkeyup=function(){_this.validate();};
+
+				this.robot_input=document.createElement("input");
+				this.el.appendChild(this.robot_input);
+				this.robot_input.className="form-control";
+				this.robot_input.type="text";
+				this.robot_input.style.width="200px";
+				this.robot_input.placeholder="Robot";
+				this.robot_input.onkeyup=function(){_this.validate();};
+
+				this.ports=document.createElement("select");
+				this.el.appendChild(this.ports);
+				this.ports.className="form-control";
+				this.ports.style.width="200px";
+
+				this.connect_button=document.createElement("input");
+				this.el.appendChild(this.connect_button);
+				this.connect_button.className="btn btn-primary";
+				this.connect_button.type="button";
+				this.connect_button.value="Connect";
+				this.connect_button.disabled=true;
+				this.connect_button.onclick=function(){_this.set_info();};
+
+				this.get_info(true);
+
+				this.interval=setInterval(function(){_this.get_info();},100);
+			}
+
+			frontend_t.prototype.destroy=function()
+			{
+				this.div.removeChild(this.el);
+			}
+
+			frontend_t.prototype.get_info=function(overwrite)
+			{
+				var _this=this;
+				var xmlhttp=new XMLHttpRequest();
+
+				xmlhttp.onreadystatechange=function()
+				{
+					if(xmlhttp.readyState==4)
+					{
+						try
+						{
+							if(xmlhttp.status==200)
+							{
+								var json=JSON.parse(xmlhttp.responseText);
+
+								if(json.status.toLowerCase()=="disconnected")
+								{
+									_this.connected=false;
+									_this.connect_button.value="Connect";
+								}
+								else
+								{
+									_this.connected=true;
+									_this.connect_button.value="Disconnect";
+								}
+
+								if(overwrite||_this.connected)
+								{
+									if(_this.school_input!=document.activeElement)
+										_this.school_input.value=json.school;
+
+									if(_this.robot_input!=document.activeElement)
+										_this.robot_input.value=json.robot;
+								}
+
+								_this.build_port_list(json.ports,json.port);
+								_this.status_label.innerHTML=json.status;
+
+								_this.validate();
+								_this.hide_error();
+							}
+							else
+							{
+								throw xmlhttp.status;
+							}
+						}
+						catch(error)
+						{
+							_this.show_error(error);
+						}
+					}
+				}
+
+				xmlhttp.open("POST","?port=true&ports=true&robot=true&school=true&status=true",true);
+				xmlhttp.send();
+			}
+
+			frontend_t.prototype.set_info=function()
+			{
+				this.connect_button.disabled=true;
+
+				var _this=this;
+				var xmlhttp=new XMLHttpRequest();
+
+				xmlhttp.onreadystatechange=function()
+				{
+					if(xmlhttp.readyState==4)
+					{
+						try
+						{
+							if(xmlhttp.status==200)
+							{
+								var json=JSON.parse(xmlhttp.responseText);
+
+								if(json.set!="")
+									throw json.set;
+							}
+							else
+							{
+								throw xmlhttp.status;
+							}
+						}
+						catch(error)
+						{
+							this.show_error(error);
+						}
+					}
+				}
+
+				if(this.school_input!=document.activeElement)
+					this.school_input.value=this.validate_name(this.school_input.value);
+
+				if(this.robot_input!=document.activeElement)
+					this.robot_input.value=this.validate_name(this.robot_input.value);
+
+				var info=
+				{
+					robot:this.robot_input.value,
+					school:this.school_input.value,
+					port:this.ports.options[this.ports.selectedIndex].text
+				};
+
+				if(this.connected)
+					info.port="";
+
+				xmlhttp.open("POST","?set=true",true);
+				xmlhttp.send(JSON.stringify(info));
+			}
+
+			frontend_t.prototype.build_port_list=function(ports,active)
+			{
+				ports.sort();
+
+				if(!array_equals(this.ports_old,ports)||this.connected)
+				{
+					var old_value=active;
+
+					if(this.ports.options.length>0&&!this.connected)
+						old_value=this.ports.options[this.ports.selectedIndex];
+
+					this.ports.length=0;
+
+					for(var ii=0;ii<ports.length;++ii)
+					{
+						var port=document.createElement("option");
+						port.text=ports[ii];
+						this.ports.appendChild(port);
+
+						if(ports[ii]==old_value)
+							this.ports.selectedIndex=ii;
+					}
+				}
+
+				if(this.ports.length<=0)
+				{
+					if(!this.connected)
+					{
+						var port=document.createElement("option");
+						port.text="No Serial Ports Found";
+						this.ports.appendChild(port);
+					}
+
+					this.ports.disabled=true;
+				}
+				else
+				{
+					this.ports.disabled=false;
+				}
+
+				this.ports_old=ports;
+			}
+
+			frontend_t.prototype.validate_name=function(str)
+			{
+				str=str.toLowerCase();
+				str=str.split(' ').join('_');
+				return str;
+			}
+
+			frontend_t.prototype.validate=function()
+			{
+				if(this.ports_old.length>0)
+					this.ports.disabled=this.connected;
+				else
+					this.ports.disabled=true;
+
+				var disabled=false;
+
+				if(this.school_input.value.length<=0||this.robot_input.value.length<=0)
+					disabled=true;
+				if(this.ports.disabled&&!this.connected)
+					disabled=true;
+
+				this.connect_button.disabled=disabled;
+				this.school_input.disabled=this.connected;
+				this.robot_input.disabled=this.connected;
+			}
+
+			frontend_t.prototype.show_error=function(error)
+			{
+				this.modal.set_title("Connection Error");
+				this.modal.get_content().innerHTML="Lost connection to backend (Error: "+error+").";
+				this.modal.show();
+			}
+
+			frontend_t.prototype.hide_error=function()
+			{
+				this.modal.hide();
+			}
+
+			var frontend=new frontend_t(document.getElementById("content"));
+		</script>
+	</head>
+	<body>
+	</body>
+</html>
