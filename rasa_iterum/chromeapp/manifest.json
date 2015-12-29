@@ -1,0 +1,21 @@
+{
+	"name":"Robotmoose",
+	"description":"Robotics backend software.",
+	"version":"0.1",
+	"manifest_version":2,
+	"permissions":["http://127.0.0.1:8081/","serial"],
+	"app":
+	{
+		"background":
+		{
+			"scripts":["js/src/background.js","js/src/connection.js","js/src/gui.js",
+				"js/src/packetize.js","js/src/serial_selector.js","js/src/status_viewer.js",
+				"js/src/superstar.js","js/src/window.js"]
+		}
+	},
+	"icons":
+	{
+		"16":"images/moose-16.png",
+		"128":"images/moose-128.png"
+	}
+}
