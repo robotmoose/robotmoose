@@ -1,5 +1,12 @@
-//on_connect(port) - callback called when a connection is requested, port is the name of the port TO connect to.
-//on_disonnect(port) - callback called when a disconnect is requested, port is the name of the port that WAS connected to.
+/**
+  List serial ports on the machine, and show 
+  a drop-down menu for the user to select one.
+  
+
+  on_connect(port) - callback called when a connection is requested, port is the name of the port TO connect to.
+  on_disonnect(port) - callback called when a disconnect is requested, port is the name of the port that WAS connected to.
+*/
+
 function serial_selector_t(div,on_connect,on_disconnect)
 {
 	if(!div)
@@ -81,14 +88,19 @@ serial_selector_t.prototype.build_list_m=function(ports)
 
 	for(var ii=0;ii<ports.length;++ii)
 	{
+		var name=ports[ii].path;
+		
+		// Skip bluetooth devices (on Mac)
+		if ( /.*Bluetooth.*/.test( name ) ) continue;
+		
 		var option=document.createElement("option");
 		this.select.appendChild(option);
-		option.text=ports[ii].path;
+		option.text=name;
 
-		if(ports[ii].path==old_value)
+		if(name==old_value)
 			this.select.selectedIndex=ii;
 
-		if(ports[ii].path==this.selected_value)
+		if(name==this.selected_value)
 			found=true;
 	}
 

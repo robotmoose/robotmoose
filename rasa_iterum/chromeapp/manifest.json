@@ -1,9 +1,9 @@
 {
-	"name":"Robotmoose",
-	"description":"Robotics backend software.",
-	"version":"0.1",
+	"name":"RobotMoose test",
+	"description":"Robotics backend software (test version from git)",
+	"version":"2015.12.28.0",
 	"manifest_version":2,
-	"permissions":["http://127.0.0.1:8081/","serial"],
+	"permissions":["http://127.0.0.1:8081/","http://robotmoose.com/*","serial"],
 	"app":
 	{
 		"background":
