@@ -78,6 +78,7 @@ serial_selector_t.prototype.disconnect=function()
 
 serial_selector_t.prototype.build_list_m=function(ports)
 {
+	var _this=this;
 	var old_value=-1;
 
 	if(this.select.options.length>0)
@@ -115,6 +116,10 @@ serial_selector_t.prototype.build_list_m=function(ports)
 		var option=document.createElement("option");
 		this.select.appendChild(option);
 		option.text="No serial ports.";
+	}
+	else if (this.select.options.length==1 && !this.connected)
+	{ // Only one serial port--automatically connect to it
+		_this.connect();
 	}
 }
 

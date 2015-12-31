@@ -1,6 +1,6 @@
 function on_launch()
 {
-	var width=400;
+	var width=600;
 	var height=400;
 
 	chrome.app.window.create('/window.html',
@@ -8,7 +8,7 @@ function on_launch()
 		'innerBounds':
 		{
 			'width':width,'height':height,
-			'maxWidth':width,'maxHeight':height,
+		//	'maxWidth':width,'maxHeight':height,
 			'minWidth':width,'minHeight':height
 		}
 	});

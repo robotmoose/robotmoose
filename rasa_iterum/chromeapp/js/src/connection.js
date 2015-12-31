@@ -2,8 +2,6 @@
  This file handles serial communication with the 
  tabula_rasa Arduino firmware.
  
- 
-
  Mike Moss & Orion Lawlor, 2015-12, Public Domain
 */
 
@@ -13,13 +11,75 @@ function connection_t(div,on_message,on_disconnect)
 	_this.config="";
 	_this.status_message=on_message;
 	_this.on_disconnect=on_disconnect;
-	_this.port_name="not connected yet";
-	
 	_this.connection_invalid="yes, totally invalid";
-	_this.connection=_this.connection_invalid; // serial api writes an int
+	_this.show_debug_bytes=true; // serial comm debugging
+	_this.max_command=15; // A-packet formatting
+	_this.max_short_length=15; 
 	
 	// Are there other serial JS apis?
 	_this.serial_api=chrome.serial;
+	
+	_this.reset();
+			
+	// Set up event listeners:
+	_this.serial_api.onReceive.addListener(
+		function(info) { _this.serial_callback_onReceive(info); }
+	);
+	_this.serial_api.onReceiveError.addListener(
+		function(info) { _this.serial_callback_onReceiveError(info); }
+	);
+}
+
+
+// Reset all state
+connection_t.prototype.reset=function() {
+	var _this=this;
+	
+	_this.sends_in_progress=0;
+	_this.connection=_this.connection_invalid;
+	_this.port_name="not connected yet";
+	_this.arduino_dev_types=[];
+	
+	// ASCII line reader state
+	_this.read_line="";
+	_this.read_line_callback=null;
+	
+	// Binary A-packet reader state
+	_this.read_state=0; 
+	_this.read_index=0; 
+	_this.read_sumpay=0;
+	_this.read_packet=null; // callback
+	_this.read_packet_data={valid:0,command:-1,length:0,data:null};
+	_this.read_packet_data.toString=function() {
+		var p=_this.read_packet_data;
+		var str="command 0x";
+		str+=p.command.toString(16);
+		str+=" payload "+p.length+" bytes: '";
+		for (var i=0;i<p.length;i++) {
+			var c=p.data[i];
+			if (c>=32 && c<128) // ASCII
+				str+=String.fromCharCode(c);
+			else // non-ASCII
+				str+=" 0x"+c.toString(16)+" ";
+		}
+		str+="'";
+		return str;
+	}
+}
+
+// Internal error handling function
+connection_t.prototype.bad=function(why_string) {
+	var _this=this;
+	_this.status_message("ERROR: "+why_string);
+	console.log("Serial connection error: "+why_string);
+	// disconnect/reconnect here?
+}
+
+
+connection_t.prototype.connected=function()
+{
+	var _this=this;
+	return _this.connection!==_this.connection_invalid;
 }
 
 
@@ -27,58 +87,26 @@ function connection_t(div,on_message,on_disconnect)
 connection_t.prototype.gui_connect=function(port_name)
 {
 	var _this=this;
+	_this.reset();
+	
 	_this.port_name=port_name;
 	_this.status_message("Connecting to "+port_name);
-	_this.serial_api.connect(port_name, {bitrate: 57600}, 
+	var options={
+		bitrate:57600,
+		receiveTimeout:5*1000 // in ms (must be more than Arduino 1.7 second start delay)
+	};
+	_this.serial_api.connect(port_name, options, 
 		function(connectionInfo) {
 			_this.connection=connectionInfo.connectionId;
 			_this.status_message("Connected to "+port_name);
 			
-			_this.serial_api.onReceive.addListener(
-				function(info) { _this.serial_onReceive(info); }
-			);
-			_this.serial_api.onReceiveError.addListener(
-				function(info) { _this.serial_onReceiveError(info); }
-			);
-			
-			_this.version_check();
+			_this.serial_api.flush(_this.connection, function() {
+				_this.arduino_setup_start();
+			} );
 		}
 	);
 	
 }
-
-// Callback from serial API: incoming data
-connection_t.prototype.serial_onReceive=function(info) 
-{
-	var _this=this;
-	_this.status_message("Serial data arrived: "+info.data.byteLength+" bytes");
-	
-	// parse?
-	var buffer=info.data; // ArrayBuffer
-	var arr=new Uint8Array(buffer);
-	for (var i=0;i<arr.length;i++) {
-		var v=arr[i];
-		var c=String.fromCharCode(v);
-		_this.status_message("   \t"+v+"  \t"+c);
-	}
-	
-}
-
-// Callback from serial API: error on serial port
-connection_t.prototype.serial_onReceiveError=function(info) 
-{
-	var _this=this;
-	_this.status_message("Serial error: "+info.error);
-	_this.gui_disconnect(_this.port_name);
-}
-
-connection_t.prototype.version_check=function()
-{
-	var _this=this;
-	
-}
-
-
 
 // Callback from GUI
 connection_t.prototype.gui_disconnect=function(port_name)
@@ -93,13 +121,393 @@ connection_t.prototype.gui_disconnect=function(port_name)
 				_this.status_message("Disconnected from "+port_name);
 			}
 		);
-		_this.connection=_this.connection_invalid;
+	}
+	_this.reset();
+}
+
+/************* Serial Connection to Arduino ******************/
+connection_t.prototype.arduino_setup_start=function() {
+	var _this=this;
+	_this.serial_read_line( function(first_line) {
+		_this.status_message(" Arduino boot message: "+first_line);
+		_this.arduino_check_version();
+	} );
+}
+
+// Check the firmware version number (during ASCII setup phase)
+connection_t.prototype.arduino_check_version=function()
+{
+	var _this=this;
+	_this.serial_send_ascii("version?\n", function() {
+		_this.serial_read_line( function(line) {
+			_this.status_message(" Got version line: "+line);
+			_this.arduino_read_options();
+		} );
+	} );
+}
+
+// Read the list of configurable devices from Arduino (during ASCII setup phase)
+connection_t.prototype.arduino_read_options=function()
+{
+	var _this=this;
+	_this.serial_send_ascii("list\n", function() {
+		_this.serial_read_line( function(count_line) {
+			var count=parseInt(count_line);
+			if (count<1 || count>1000) _this.bad("Invalid device count "+count+" from line "+count_line);
+			var handle_option=function(option_name) {
+				_this.status_message(" Got option: "+option_name);
+				
+				if (option_name!="serial_controller ")
+					_this.arduino_dev_types.push(option_name);
+				
+				count--;
+				if (count>0) _this.serial_read_line(handle_option);
+				else _this.arduino_send_options(); 
+			};
+			_this.serial_read_line(handle_option);
+		});
+	});
+}
+
+
+// Upload device options to superstar
+connection_t.prototype.arduino_send_options=function()
+{
+	var _this=this;
+	
+	// FIXME: actually do this
+	_this.arduino_setup_devices();
+}
+
+// Configure all devices on the Arduino
+connection_t.prototype.arduino_setup_devices=function()
+{
+	var _this=this;
+	
+	var devices=["heartbeat();"];
+	// FIXME: add other devices from superstar config.configs here
+	
+	var d=0; // device counter
+	var next_device=function() {
+		d++;
+		if (d<devices.length) {
+			_this.arduino_setup_device(devices[d],next_device);
+		} else { // configured last device
+			_this.arduino_check_RAM();
+		}
+	}
+	_this.arduino_setup_device(devices[0],next_device);
+}
+
+// Configure this one device on the Arduino
+connection_t.prototype.arduino_setup_device=function(device_name_args,callback)
+{
+	var _this=this;
+	_this.serial_send_ascii(device_name_args+"\n",function() {
+		var read_to_end=function(line) {
+			status=parseInt(line); // first int on line is status
+			if (status==1) { // done with that device
+				callback();
+			} else {
+				_this.status_message(" Arduino device setup: "+line);
+				_this.serial_read_line(read_to_end);
+			}
+		}
+		_this.serial_read_line(read_to_end);
+	});
+}
+
+// Check Arduino free RAM after configuring devices
+connection_t.prototype.arduino_check_RAM=function()
+{
+	var _this=this;
+	_this.serial_send_ascii("ram?\n", function() {
+		_this.serial_read_line( function(ram_line) {
+			_this.status_message(" RAM free: "+ram_line);
+			
+			_this.arduino_setup_comms();
+		} )
+	} );
+}
+
+// Arduino is now configured--switch to binary comms
+connection_t.prototype.arduino_setup_comms=function()
+{
+	var _this=this;
+	
+	_this.arduino_setup_device("serial_controller();", function() {
+		_this.read_packet=_this.arduino_sensor_packet;
+		_this.arduino_setup_complete();
+	} );
+}
+
+// Arduino is fully configured and communicating
+connection_t.prototype.arduino_setup_complete=function()
+{
+	var _this=this;
+	
+	// FIXME: start sending piloting commands here...
+	//   currently garbage.
+	var write_data=new Uint8Array(13);
+	_this.serial_send_packet(0xC,write_data,function() {
+	} );
+}
+
+// Packet of sensor(?) data just arrived from the Arduino
+connection_t.prototype.arduino_sensor_packet=function(p)
+{
+	var _this=this;
+	switch (p.command) {
+	case 0xC: // sensor data
+		_this.status_message("Arduino incoming sensor data "+p);
+		break;
+	case 0xE: // Error code
+		_this.bad("Arduino firmware error packet "+p);
+		break;
+	case 0xD: // Debug data
+		_this.status_message("Arduino firmware debug packet "+p);
+		break;
+	case 0x0: // Ping
+		_this.status_message("Arduino ping packet "+p);
+		break;
+	default: // ??
+		_this.status_message("Arduino unexpected packet "+p);
+		break;
+	};
+}
+
+
+
+
+/***************** Low-level serial data I/O *********************/
+// Callback from serial API: error on serial port
+connection_t.prototype.serial_callback_onReceiveError=function(info) 
+{
+	var _this=this;
+	_this.status_message("Serial error: "+info.error);
+	// now what?!
+	_this.gui_disconnect(_this.port_name);
+}
+
+
+// Callback from serial API: incoming serial data
+connection_t.prototype.serial_callback_onReceive=function(info) 
+{
+	var _this=this;
+	_this.status_message("Serial data received: "+info.data.byteLength+" bytes");
+	
+	// parse?
+	var buffer=info.data; // ArrayBuffer
+	var arr=new Uint8Array(buffer);
+	for (var i=0;i<arr.length;i++) {
+		var v=arr[i];
+		var c=String.fromCharCode(v);
+		
+		if (_this.show_debug_bytes) { // show incoming bytes
+			_this.status_message("    received  \t"+v+"  \t"+c);
+		}
+		
+		if (_this.read_line_callback) 
+		{ // line based
+			if (v==13) {} // cursed windows newline--ignore it
+			else if (v==10) // real newline
+			{
+				// SUBTLE: callback will register new callbacks,
+				//  so save it before calling it.
+				var callback=_this.read_line_callback;
+				var line=_this.read_line;
+				
+				_this.read_line_callback=null;
+				_this.read_line=""; // reset line
+				
+				// Per-line debugging:
+				_this.status_message(" received serial: "+line);
+				
+				callback(line); // call user's callback
+			}
+			else { // normal data part of the line
+				_this.read_line+=c;
+			}
+		}
+		else if (_this.read_packet) 
+		{ // packet based
+			_this.serial_read_packet(v);
+		}
+		else { // who ordered this?
+			_this.bad("Unexpected serial data from Arduino: "+v+"  \t"+c);
+		}
 	}
 }
 
-connection_t.prototype.connected=function()
+// Read a line of ASCII text from the serial port, 
+//   and pass it to this callback (less newline)
+connection_t.prototype.serial_read_line=function(line_callback) 
 {
 	var _this=this;
-	return _this.connection!==_this.connection_invalid;
+	if (_this.read_line_callback) _this.bad("Cannot wait for two lines at once!");
+	_this.read_line_callback=line_callback;
+	// serial onReceive will call this once the line arrives
 }
+
+// Send a brick of binary data out the serial port.
+//  Serial port is blocked until we call the done_callback.
+connection_t.prototype.serial_send=function(array_like,done_callback) 
+{
+	var _this=this;
+	if (_this.sends_in_progress!=0) _this.bad("Cannot overlap send calls!");
+	_this.sends_in_progress++;
+	
+	var out=new Uint8Array(array_like);
+	
+	if (_this.show_debug_bytes) { // show sent bytes
+		_this.status_message("Serial data sending: "+out.byteLength+" bytes");
+		for (var i=0;i<out.byteLength;i++)
+			_this.status_message("    sending  \t"+out[i]+"  \t"+String.fromCharCode(out[i]));
+	}
+	
+	_this.serial_api.send(_this.connection,out.buffer,
+		function(info) {
+			if (info.error) {
+				_this.bad("Serial port send error: "+info.error);
+			}
+			else if (info.bytesSent!=out.byteLength) {
+				_this.bad("Serial port sent only "+info.bytesSent+" bytes, should be "+out.byteLength+" bytes!");
+			}
+			else {
+				_this.sends_in_progress--;
+				done_callback();
+			}
+		}
+	);
+}
+
+// Send a string of ASCII text, and
+//   call this callback after it's been sent.
+connection_t.prototype.serial_send_ascii=function(str,done_callback) 
+{
+	var _this=this;
+	// from http://stackoverflow.com/questions/6965107/converting-between-strings-and-arraybuffers
+	var buf = new ArrayBuffer(str.length);
+	var bufView = new Uint8Array(buf);
+	for (var i=0, strLen=str.length; i<strLen; i++) {
+		var c=str.charCodeAt(i);
+		if (c<=255) bufView[i] = c;
+		else _this.bad("serial_send_ascii with non-ASCII character code "+str[i]+" == "+c);
+	}
+	_this.serial_send(buf,done_callback);
+}
+
+/***** Binary A-packet (see serial_packet.h) serial data format ******/
+
+// Parse this incoming serial data byte (int) as an A-packet.
+//   Call the read_packet callback once packet is complete.
+//   Copied directly from C++ serial_packet.h read_packet function.
+connection_t.prototype.serial_read_packet=function(c) 
+{
+	var _this=this;
+	var p=_this.read_packet_data;
+	p.valid=false;
+
+	// pseudo-enum
+	var STATE_START=0;
+	var STATE_LENGTH=1;
+	var STATE_PAYLOAD=2;
+	var STATE_END=3;
+
+	switch (_this.read_state) {
+	case 0: /* start byte */
+		if ((c&0xf0) == 0xa0) { // valid start code
+			_this.read_index=0;
+			_this.read_sumpay=0;
+			p.length=c&0x0f;
+			if (p.length>=_this.max_short_length)
+			{
+				_this.read_state=STATE_LENGTH; // need real length byte
+			}
+			else if (p.length>0) {
+				_this.read_state=STATE_PAYLOAD; // short payload data
+				p.data=new Uint8Array(p.length);
+			} else { // length==0, no payload
+				_this.read_state=STATE_END;
+			}
+		}
+		else _this.status_message("Serial A-packet unexpected byte: \t"+c+"  \t"+String.fromCharCode(c));
+		
+		break;
+	case STATE_LENGTH: /* (optional) length byte */
+		p.length=c;
+		_this.read_state=STATE_PAYLOAD;
+		p.data=new Uint8Array(p.length);
+		if(p.length==0) {
+			_this.read_state=STATE_END;
+		}
+		break;
+	case STATE_PAYLOAD: /* payload data */
+		_this.read_sumpay+=c;
+		p.data[_this.read_index]=c;
+		_this.read_index++;
+		if (_this.read_index>=p.length) { // that was last byte of payload!
+			_this.read_state=STATE_END;
+		}
+		break;
+	case STATE_END: /* end byte */
+		{
+		_this.read_state=STATE_START;
+		p.command=c>>4;
+		var checksum=0xf&(p.length+p.command+_this.read_sumpay+(_this.read_sumpay>>4));
+		var checkread=0xf&(c);
+		if (checkread==checksum) { /* checksum match--valid packet! */
+			p.valid=true;
+			_this.read_packet(p); // report packet to callback
+		}
+		else _this.status_message("Serial A-packet checksum error: "+checkread+" vs "+checksum);
+		
+		}
+		break;
+	default: /* only way to get here is memory corruption!  Reset. */
+		_this.read_state=0; break;
+	};
+}
+
+// Send a binary A-packet with this Uint8Array payload, and
+//   call this callback after it's been sent.
+connection_t.prototype.serial_send_packet=function(command,array_data,done_callback) 
+{
+	var _this=this;
+	var length=array_data.byteLength;
+	var out_len=0;
+	if (length<_this.max_short_length) out_len=1+length+1;
+	else out_len=2+length+1; // extra length byte at start
+	var out=0; // index in output array
+	var write_data=new Uint8Array(out_len);
+	
+	// Send start of packet
+	var start=0xA0;  // sync code, length in low bits
+	if (length<_this.max_short_length)
+	{ // send short packets in one big buffer
+		write_data[out++]=start+length;
+	}
+	else { // long packet, with length byte
+		write_data[out++]=start;
+		write_data[out++]=length;
+		if (length>255) _this.bad("serial_send_packet data too big to send!");
+	}
+	
+	// Copy payload data & compute checksum
+	var sumpay=0;
+	for (var i=0;i<length;i++) {
+		sumpay+=array_data[i];
+		write_data[out++]=array_data[i];
+	}
+	var checksum=0xf&(length+command+sumpay+(sumpay>>4));
+	
+	// Send end of packet
+	var end=(command<<4)+(checksum);
+	write_data[out++]=end;
+	
+	if (out!=out_len) _this.bad("serial_send_packet packet length logic error!");
+	
+	_this.serial_send(write_data,done_callback);
+}
+
 
