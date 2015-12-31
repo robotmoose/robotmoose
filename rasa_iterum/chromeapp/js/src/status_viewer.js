@@ -1,3 +1,7 @@
+/**
+  This displays a console-style log of events onscreen.
+*/
+
 function status_viewer_t(div)
 {
 	if(!div)
@@ -7,7 +11,7 @@ function status_viewer_t(div)
 	this.el=document.createElement("div");
 	this.div.appendChild(this.el);
 
-	this.max_lines=40;
+	this.max_lines=500;
 	this.lines=[];
 
 	this.textarea=document.createElement("textarea");
@@ -15,7 +19,7 @@ function status_viewer_t(div)
 	this.textarea.wrap="off";
 	this.textarea.readOnly=true;
 	this.textarea.style.resize="none";
-	this.textarea.style.width="370px";
+	this.textarea.style.width="100%"; // 370px";
 	this.textarea.style.height="350px";
 }
 
@@ -42,8 +46,11 @@ status_viewer_t.prototype.show=function(message)
 
 status_viewer_t.prototype.rebuld_textarea_m=function()
 {
-	this.textarea.innerHTML="";
-
+	var lines=""; // buffer up lines to prevent repeated innerHTML updates
+	
 	for(var ii=0;ii<this.lines.length;++ii)
-		this.textarea.innerHTML+=this.lines[ii]+"\n";
+		lines+=this.lines[ii]+"\n";
+	
+	this.textarea.innerHTML=lines;
 }
+
