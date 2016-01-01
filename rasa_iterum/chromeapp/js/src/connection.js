@@ -12,7 +12,7 @@ function connection_t(div,on_message,on_disconnect)
 	_this.status_message=on_message;
 	_this.on_disconnect=on_disconnect;
 	_this.connection_invalid="yes, totally invalid";
-	_this.show_debug_bytes=true; // serial comm debugging
+	_this.show_debug_bytes=false; // low level serial comm debugging
 	_this.max_command=15; // A-packet formatting
 	_this.max_short_length=15; 
 	
@@ -38,7 +38,8 @@ connection_t.prototype.reset=function() {
 	_this.sends_in_progress=0;
 	_this.connection=_this.connection_invalid;
 	_this.port_name="not connected yet";
-	_this.arduino_dev_types=[];
+	_this.arduino_options=[]; // firmware-supported devices
+	_this.device_names=[]; // configured devices
 	
 	// ASCII line reader state
 	_this.read_line="";
@@ -50,7 +51,8 @@ connection_t.prototype.reset=function() {
 	_this.read_sumpay=0;
 	_this.read_packet=null; // callback
 	_this.read_packet_data={valid:0,command:-1,length:0,data:null};
-	_this.read_packet_data.toString=function() {
+	_this.read_packet_data.toString=function() 
+	{ // debug dump an A-packet to the screen
 		var p=_this.read_packet_data;
 		var str="command 0x";
 		str+=p.command.toString(16);
@@ -75,7 +77,7 @@ connection_t.prototype.bad=function(why_string) {
 	// disconnect/reconnect here?
 }
 
-
+// Status check
 connection_t.prototype.connected=function()
 {
 	var _this=this;
@@ -158,7 +160,7 @@ connection_t.prototype.arduino_read_options=function()
 				_this.status_message(" Got option: "+option_name);
 				
 				if (option_name!="serial_controller ")
-					_this.arduino_dev_types.push(option_name);
+					_this.arduino_options.push(option_name);
 				
 				count--;
 				if (count>0) _this.serial_read_line(handle_option);
@@ -184,7 +186,7 @@ connection_t.prototype.arduino_setup_devices=function()
 {
 	var _this=this;
 	
-	var devices=["heartbeat();"];
+	var devices=["heartbeat();","analog(A0);","servo(8);","servo(9);"];
 	// FIXME: add other devices from superstar config.configs here
 	
 	var d=0; // device counter
@@ -203,6 +205,10 @@ connection_t.prototype.arduino_setup_devices=function()
 connection_t.prototype.arduino_setup_device=function(device_name_args,callback)
 {
 	var _this=this;
+	var name_matcher=/^[^(]*/; // regex to match name of device (up to args)
+	var device_name=name_matcher.exec(device_name_args)[0];
+	_this.status_message(" Adding device name '"+device_name+"'"); // pure debug
+	_this.device_names.push(device_name);
 	_this.serial_send_ascii(device_name_args+"\n",function() {
 		var read_to_end=function(line) {
 			status=parseInt(line); // first int on line is status
@@ -241,17 +247,164 @@ connection_t.prototype.arduino_setup_comms=function()
 	} );
 }
 
+/**
+	Arduino binary blob <-> web JSON mapping via array of property strings.
+Really these should be downloaded from the firmware, not hardcoded here.
+
+Format for each property string:
+	json path
+	optional array size
+	optional # meaning indexed by this device number
+	<
+		u for unsigned
+		s for signed
+		bit count
+	>
+
+E.g., analog#<u16> puts an unsigned 16-bit value into analog[0], then [1], ...
+
+To traverse, see https://gist.github.com/wmbenedetto/5078940
+*/
+
+// Hash from device name to array of sensor property strings
+connection_t.sensor_property_list={
+
+"analog":["analog#<u16>"],
+"blink":["blink#<u8>"],
+"bms":["battery.charge<u8>","battery.state<u8>"],
+"encoder":["encoder_raw#<u8>"],
+"heartbeat":["heartbeats<u8>"],
+"latency":["latency<u8>"],
+"neopixel":[
+	"neopixel#.color.r<u8>",
+	"neopixel#.color.g<u8>",
+	"neopixel#.color.b<u8>",
+	"neopixel#.accent.r<u8>",
+	"neopixel#.accent.g<u8>",
+	"neopixel#.accent.b<u8>",
+	"neopixel#.start<s8>",
+	"neopixel#.repeat<u8>",
+	"neopixel#.state<u8>"
+],
+"pwm":["pwm#<u8>"],
+"serial_controller":[],
+"servo":["servo#<u8>"],
+"ultrasonic_sensor":["ultrasonic#<u8>"],
+
+// All these motor controllers have no sensor values
+"sabertooth1":[],
+"sabertooth2":[],
+"bts":[],
+
+// The create has a ton of sensors:
+"create2":[
+	"mode<u8>",
+	"bumper<u8>",
+	"battery.state<u8>",
+	"battery.temperature<s8>",
+	"battery.charge<s16>",
+	"encoder.L<u16>",
+	"encoder.R<u16>",
+	"floor[4]<u8>",
+	"light[6]<u8>",
+	"light_field<u8>",
+	"buttons<u8>",
+],
+};
+
+// Hash from device name to array of command property strings
+//   (same format as above)
+connection_t.command_property_list={
+"analog":[],
+"bms":[],
+"blink":["blink#<u8>"],
+"encoder":[],
+"heartbeat":[],
+"latency":[],
+"neopixel":[
+	"neopixel#.color.r<u8>",
+	"neopixel#.color.g<u8>",
+	"neopixel#.color.b<u8>",
+	"neopixel#.accent.r<u8>",
+	"neopixel#.accent.g<u8>",
+	"neopixel#.accent.b<u8>",
+	"neopixel#.start<s8>",
+	"neopixel#.repeat<u8>",
+	"neopixel#.state<u8>"
+],
+"pwm":["pwm#<u8>"],
+"serial_controller":[],
+"servo":["servo#<u8>"],
+"ultrasonic_sensor":["ultrasonic#<u8>"],
+
+// All the motor controllers have the same command interface:
+"sabertooth1":["L<s16>","R<s16>"],
+"sabertooth2":["L<s16>","R<s16>"],
+"bts":["L<s16>","R<s16>"],
+"create2":["L<s16>","R<s16>"],
+};
+
+
+
 // Arduino is fully configured and communicating
 connection_t.prototype.arduino_setup_complete=function()
 {
 	var _this=this;
 	
+	_this.arduino_send_packet();
+}
+
+// Look up all the properties for our currently configured set of devices,
+//   and call handle_property on each.
+connection_t.prototype.walk_property_list=function(property_list,handle_property)
+{
+	var _this=this;
+	for (var devi in _this.device_names) {
+		var dev=_this.device_names[devi];
+		var props=property_list[dev];
+		if (!props) 
+		{ // Can't find device in list--should be there though...
+			for (var pli in property_list)
+				_this.status_message("  Valid device '"+pli+"'");
+			_this.bad("Device type '"+dev+"' not in property list! (Do you need to update this app to match your firmware?)");
+		}
+		
+		for (var propi in props) 
+			handle_property(dev,props[propi]);
+	}
+}
+
+// Extract byte count from Arduino property list
+//   e.g., foo.bar#<u8> returns 1 (byte) for the 8-bit value
+connection_t.prototype.arduino_property_bytecount=function(property) {
+	var bitcount_regex=/<[us]([0-9]*)>$/;
+	var bitcount_str=bitcount_regex.exec(property)[1];
+	var bitcount=parseInt(bitcount_str);
+	if (bitcount==0 || bitcount%8!=0) _this.bad("Property '"+property+"' has invalid size "+bitcount+" (firmware bug?)");
+	return bitcount/8;
+}
+
+
+// Build a pilot packet and send it to the Arduino
+connection_t.prototype.arduino_send_packet=function()
+{
+	var _this=this;
+	
+	var cmd_bytes=0;
+	_this.walk_property_list(connection_t.command_property_list,function(device,property) {
+		_this.status_message(" device "+device+" has property "+property);
+		cmd_bytes+=_this.arduino_property_bytecount(property);
+	} );
+	
+	_this.status_message(" command packet has "+cmd_bytes+" bytes");
+	
 	// FIXME: start sending piloting commands here...
-	//   currently garbage.
-	var write_data=new Uint8Array(13);
+	//   currently garbage values of the right size.
+	var write_data=new Uint8Array(cmd_bytes);
 	_this.serial_send_packet(0xC,write_data,function() {
 	} );
 }
+
 
 // Packet of sensor(?) data just arrived from the Arduino
 connection_t.prototype.arduino_sensor_packet=function(p)
