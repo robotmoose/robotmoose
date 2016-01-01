@@ -392,16 +392,19 @@ connection_t.prototype.arduino_send_packet=function()
 	
 	var cmd_bytes=0;
 	_this.walk_property_list(connection_t.command_property_list,function(device,property) {
-		_this.status_message(" device "+device+" has property "+property);
+		// _this.status_message(" device "+device+" has property "+property);
 		cmd_bytes+=_this.arduino_property_bytecount(property);
 	} );
 	
-	_this.status_message(" command packet has "+cmd_bytes+" bytes");
+	// _this.status_message(" command packet has "+cmd_bytes+" bytes");
 	
-	// FIXME: start sending piloting commands here...
-	//   currently garbage values of the right size.
-	var write_data=new Uint8Array(cmd_bytes);
-	_this.serial_send_packet(0xC,write_data,function() {
+	var cmd_data=new Uint8Array(cmd_bytes);
+	
+	// FIXME: use walk_property_list to convert latest pilot JSON to 
+	//   binary piloting commands here...
+	//   currently just garbage values of the right size.
+	
+	_this.serial_send_packet(0xC,cmd_data,function() {
 	} );
 }
 
@@ -413,6 +416,7 @@ connection_t.prototype.arduino_sensor_packet=function(p)
 	switch (p.command) {
 	case 0xC: // sensor data
 		_this.status_message("Arduino incoming sensor data "+p);
+		_this.arduino_send_packet(); // send command data in response
 		break;
 	case 0xE: // Error code
 		_this.bad("Arduino firmware error packet "+p);
@@ -422,6 +426,7 @@ connection_t.prototype.arduino_sensor_packet=function(p)
 		break;
 	case 0x0: // Ping
 		_this.status_message("Arduino ping packet "+p);
+		_this.arduino_send_packet(); // send command data in response
 		break;
 	default: // ??
 		_this.status_message("Arduino unexpected packet "+p);
