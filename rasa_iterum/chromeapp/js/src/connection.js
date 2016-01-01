@@ -205,8 +205,8 @@ connection_t.prototype.arduino_setup_devices=function()
 connection_t.prototype.arduino_setup_device=function(device_name_args,callback)
 {
 	var _this=this;
-	var name_matcher=/^[^(]*/; // regex to match name of device (up to args)
-	var device_name=name_matcher.exec(device_name_args)[0];
+	var name_regex=/^[^(]*/; // regex to match name of device (up to args)
+	var device_name=device_name_args.match(name_regex)[0];
 	_this.status_message(" Adding device name '"+device_name+"'"); // pure debug
 	_this.device_names.push(device_name);
 	_this.serial_send_ascii(device_name_args+"\n",function() {
@@ -378,7 +378,7 @@ connection_t.prototype.walk_property_list=function(property_list,handle_property
 //   e.g., foo.bar#<u8> returns 1 (byte) for the 8-bit value
 connection_t.prototype.arduino_property_bytecount=function(property) {
 	var bitcount_regex=/<[us]([0-9]*)>$/;
-	var bitcount_str=bitcount_regex.exec(property)[1];
+	var bitcount_str=property.match(bitcount_regex)[1];
 	var bitcount=parseInt(bitcount_str);
 	if (bitcount==0 || bitcount%8!=0) _this.bad("Property '"+property+"' has invalid size "+bitcount+" (firmware bug?)");
 	return bitcount/8;
