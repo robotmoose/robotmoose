@@ -286,9 +286,9 @@ connection_t.sensor_property_list={
 	"neopixel#.repeat<u8>",
 	"neopixel#.state<u8>"
 ],
-"pwm":["pwm#<u8>"],
+"pwm":[],
 "serial_controller":[],
-"servo":["servo#<u8>"],
+"servo":[],
 "ultrasonic_sensor":["ultrasonic#<u8>"],
 
 // All these motor controllers have no sensor values
@@ -335,7 +335,7 @@ connection_t.command_property_list={
 "pwm":["pwm#<u8>"],
 "serial_controller":[],
 "servo":["servo#<u8>"],
-"ultrasonic_sensor":["ultrasonic#<u8>"],
+"ultrasonic_sensor":[],
 
 // All the motor controllers have the same command interface:
 "sabertooth1":["L<s16>","R<s16>"],
@@ -390,22 +390,39 @@ connection_t.prototype.arduino_send_packet=function()
 {
 	var _this=this;
 	
+	// How big is the command packet?
 	var cmd_bytes=0;
 	_this.walk_property_list(connection_t.command_property_list,function(device,property) {
 		// _this.status_message(" device "+device+" has property "+property);
 		cmd_bytes+=_this.arduino_property_bytecount(property);
 	} );
 	
-	// _this.status_message(" command packet has "+cmd_bytes+" bytes");
-	
+	// Fill a packet that size
 	var cmd_data=new Uint8Array(cmd_bytes);
+	var idx=0; // current output index
+	_this.walk_property_list(connection_t.command_property_list,function(device,property) {
+		// FIXME: copy JSON from property to cmd_data[idx] here...
+		idx+=_this.arduino_property_bytecount(property);
+	} );
 	
-	// FIXME: use walk_property_list to convert latest pilot JSON to 
-	//   binary piloting commands here...
-	//   currently just garbage values of the right size.
-	
+	// Send to Arduino
 	_this.serial_send_packet(0xC,cmd_data,function() {
 	} );
+}
+
+
+// Build a pilot packet and send it to the Arduino
+connection_t.prototype.arduino_recv_packet=function(p)
+{
+	var _this=this;
+	
+	_this.status_message("Arduino incoming sensor data "+p);
+	var idx=0;
+	_this.walk_property_list(connection_t.sensor_property_list,function(device,property) {
+		// FIXME: copy binary p.data[idx] to sensor JSON at property here...
+		idx+=_this.arduino_property_bytecount(property);
+	} );
+	if (idx!=p.length) _this.bad("Arduino sensor packet length mismatch: got "+p.length+", expected "+idx+" (bad property tags, firmware/app mismatch?)");
 }
 
 
@@ -415,7 +432,7 @@ connection_t.prototype.arduino_sensor_packet=function(p)
 	var _this=this;
 	switch (p.command) {
 	case 0xC: // sensor data
-		_this.status_message("Arduino incoming sensor data "+p);
+		_this.arduino_recv_packet(p);
 		_this.arduino_send_packet(); // send command data in response
 		break;
 	case 0xE: // Error code
