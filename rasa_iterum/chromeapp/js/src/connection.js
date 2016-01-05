@@ -35,6 +35,7 @@ function connection_t(div,on_message,on_disconnect)
 connection_t.prototype.reset=function() {
 	var _this=this;
 	
+	_this.serial_startup=true;
 	_this.sends_in_progress=0;
 	_this.connection=_this.connection_invalid;
 	_this.port_name="not connected yet";
@@ -152,6 +153,7 @@ connection_t.prototype.arduino_check_version=function()
 connection_t.prototype.arduino_read_options=function()
 {
 	var _this=this;
+	_this.serial_startup=false;
 	_this.serial_send_ascii("list\n", function() {
 		_this.serial_read_line( function(count_line) {
 			var count=parseInt(count_line);
@@ -186,7 +188,12 @@ connection_t.prototype.arduino_setup_devices=function()
 {
 	var _this=this;
 	
-	var devices=["heartbeat();","analog(A0);","servo(8);","servo(9);"];
+	var devices=["heartbeat();",
+		"analog(A0);","analog(A2);", "analog(A5);", 
+		"pwm(13);","servo(8);","servo(9);",
+		"encoder(3);","encoder(4);",
+		"latency();",
+		"sabertooth1(X2);"];
 	// FIXME: add other devices from superstar config.configs here
 	
 	var d=0; // device counter
@@ -272,7 +279,7 @@ connection_t.sensor_property_list={
 "analog":["analog#<u16>"],
 "blink":["blink#<u8>"],
 "bms":["battery.charge<u8>","battery.state<u8>"],
-"encoder":["encoder_raw#<u8>"],
+"encoder":["encoder_raw#<u16>"],
 "heartbeat":["heartbeats<u8>"],
 "latency":["latency<u8>"],
 "neopixel":[
@@ -350,7 +357,7 @@ connection_t.command_property_list={
 connection_t.prototype.arduino_setup_complete=function()
 {
 	var _this=this;
-	
+	_this.status_message("  arduino setup complete... sending command packet");
 	_this.arduino_send_packet();
 }
 
@@ -359,6 +366,7 @@ connection_t.prototype.arduino_setup_complete=function()
 connection_t.prototype.walk_property_list=function(property_list,handle_property)
 {
 	var _this=this;
+	var counts={};
 	for (var devi in _this.device_names) {
 		var dev=_this.device_names[devi];
 		var props=property_list[dev];
@@ -369,26 +377,111 @@ connection_t.prototype.walk_property_list=function(property_list,handle_property
 			_this.bad("Device type '"+dev+"' not in property list! (Do you need to update this app to match your firmware?)");
 		}
 		
-		for (var propi in props) 
-			handle_property(dev,props[propi]);
+		// Update device counter, for stuff like servo# -> servo[0]
+		var count=0;
+		if (counts[dev]!==undefined) count=counts[dev]+1;
+		counts[dev]=count;
+		
+		// Loop over device properties
+		for (var propi in props) {
+			// Loop over copies, for stuff like lights[4]
+			var copies=1;
+			var prop=props[propi];
+			var copy_arr=prop.match(/\[([0-9]+)\]/);
+			if (copy_arr && copy_arr[0]) copies=copy_arr[0];
+			
+			for (var copy=0;copy<copies;copy++) {
+				var prop_copy=prop.replace(/\[[0-9]+\]/,"["+copy+"]");
+				var prop_count=prop_copy.replace(/#/,"["+count+"]");
+				handle_property(dev,prop_count);
+			}
+		}
 	}
 }
 
-// Extract byte count from Arduino property list
+// Extract name string from Arduino property
+//   e.g., foo.bar<u8> returns "foo.bar"
+connection_t.prototype.arduino_property_name=function(property) {
+	var type_regex=/<([us][0-9]*)>$/;
+	var name_str=property.replace(type_regex,"");
+	if (!name_str) _this.bad("Property '"+property+"' has invalid type "+name_str+" (firmware bug?)");
+	return name_str;
+}
+
+// Extract property type string from Arduino property
+//   e.g., foo.bar#<u8> returns "u8"
+connection_t.prototype.arduino_property_type=function(property) {
+	var type_regex=/<([us][0-9]*)>$/;
+	var type_str=property.match(type_regex)[1];
+	if (!type_str) _this.bad("Property '"+property+"' has invalid type "+type_str+" (firmware bug?)");
+	return type_str;
+}
+
+// Extract byte count from Arduino property
 //   e.g., foo.bar#<u8> returns 1 (byte) for the 8-bit value
 connection_t.prototype.arduino_property_bytecount=function(property) {
-	var bitcount_regex=/<[us]([0-9]*)>$/;
-	var bitcount_str=property.match(bitcount_regex)[1];
-	var bitcount=parseInt(bitcount_str);
-	if (bitcount==0 || bitcount%8!=0) _this.bad("Property '"+property+"' has invalid size "+bitcount+" (firmware bug?)");
+	var _this=this;
+	var type_str=_this.arduino_property_type(property);
+	var bitcount=parseInt(type_str.substring(1));
+	if (isNaN(bitcount) || bitcount==0 || bitcount%8!=0) _this.bad("Property '"+property+"' has invalid size "+bitcount+" (firmware bug?)");
 	return bitcount/8;
 }
 
+
+// Read values from byte array in different sizes
+connection_t.read_bytes_as={
+"u8":	function(buf,idx) { 
+		return buf[idx]; 
+	},
+"s8":	function(buf,idx) { 
+		var u8=buf[idx];
+		return u8<<24>>24; // Shift up to 32-bit sign bit and back: see http://blog.vjeux.com/2013/javascript/conversion-from-uint8-to-int8-x-24.html
+	},
+"u16":	function(buf,idx) { 
+		return buf[idx]+(buf[idx+1]<<8); 
+	},
+"s16":	function(buf,idx) { 
+		var u16=buf[idx]+(buf[idx+1]<<8); 
+		return u16<<16>>16; // Shift up to 32-bit sign bit and back
+	},
+};
+
+// Write values to byte array from different sizes
+connection_t.write_bytes_as={
+"u8":	function(buf,idx,value) { 
+		if (value<0) value=0;
+		if (value>255) value=255;
+		buf[idx]=value&0xff; 
+	},
+"s8":	function(buf,idx,value) { 
+		if (value<-128) value=-128;
+		if (value>127) value=127;
+		buf[idx]=value&0xff; 
+	},
+"u16":	function(buf,idx,value) { 
+		if (value<0) value=0;
+		if (value>65535) value=65535;
+		buf[idx]=value&0xff;
+		buf[idx+1]=(value>>8)&0xff;
+	},
+"s16":	function(buf,idx,value) { 
+		if (value<-32768) value=-32768;
+		if (value>32767) value=32767;
+		buf[idx]=value&0xff;
+		buf[idx+1]=(value>>8)&0xff;
+	},
+};
 
 // Build a pilot packet and send it to the Arduino
 connection_t.prototype.arduino_send_packet=function()
 {
 	var _this=this;
+	
+	if (_this.sends_in_progress) 
+	{ // haven't finished sending last packet yet
+		_this.status_message("  skipping send_packet due to outstanding data");
+		return; 
+	}
 	
 	// How big is the command packet?
 	var cmd_bytes=0;
@@ -400,29 +493,42 @@ connection_t.prototype.arduino_send_packet=function()
 	// Fill a packet that size
 	var cmd_data=new Uint8Array(cmd_bytes);
 	var idx=0; // current output index
-	_this.walk_property_list(connection_t.command_property_list,function(device,property) {
-		// FIXME: copy JSON from property to cmd_data[idx] here...
+	_this.walk_property_list(connection_t.command_property_list,
+	  function(device,property) {
+		var name=_this.arduino_property_name(property);
+		var datatype=_this.arduino_property_type(property);
+		var value=0; // FIXME: value=pilot JSON.name here;
+		connection_t.write_bytes_as[datatype](cmd_bytes,idx,value);
 		idx+=_this.arduino_property_bytecount(property);
-	} );
+	  } 
+	);
 	
 	// Send to Arduino
 	_this.serial_send_packet(0xC,cmd_data,function() {
+		// maybe check if we delayed a send previously here?
 	} );
 }
 
 
-// Build a pilot packet and send it to the Arduino
+// Parse this binary sensor data packet from the Arduino
 connection_t.prototype.arduino_recv_packet=function(p)
 {
 	var _this=this;
 	
 	_this.status_message("Arduino incoming sensor data "+p);
 	var idx=0;
-	_this.walk_property_list(connection_t.sensor_property_list,function(device,property) {
-		// FIXME: copy binary p.data[idx] to sensor JSON at property here...
+	_this.walk_property_list(connection_t.sensor_property_list,
+	  function(device,property) {
+		var name=_this.arduino_property_name(property);
+		var datatype=_this.arduino_property_type(property);
+		var value=connection_t.read_bytes_as[datatype](p.data,idx);
+		_this.status_message("	sensor."+name+"="+value);
+		// FIXME: write to sensor JSON.name=value;
+		
 		idx+=_this.arduino_property_bytecount(property);
-	} );
-	if (idx!=p.length) _this.bad("Arduino sensor packet length mismatch: got "+p.length+", expected "+idx+" (bad property tags, firmware/app mismatch?)");
+	  } 
+	);
+	if (idx!=p.length) _this.bad("Arduino sensor packet length mismatch: got "+p.length+", expected "+idx+" (firmware/app mismatch?)");
 }
 
 
@@ -507,6 +613,9 @@ connection_t.prototype.serial_callback_onReceive=function(info)
 		else if (_this.read_packet) 
 		{ // packet based
 			_this.serial_read_packet(v);
+		}
+		else if (_this.serial_startup) {
+			// crap in serial buffer beforehand
 		}
 		else { // who ordered this?
 			_this.bad("Unexpected serial data from Arduino: "+v+"  \t"+c);
