@@ -35,6 +35,10 @@ function connection_t(div,on_message,on_disconnect)
 connection_t.prototype.reset=function() {
 	var _this=this;
 	
+	_this.power={}; // pilot's commanded values to Arduino
+	_this.sensors={}; // Arduino-reported sensor values
+	_this.sensors.power={}; // Commanded values reflected back up to pilot
+	
 	_this.serial_startup=true;
 	_this.sends_in_progress=0;
 	_this.connection=_this.connection_invalid;
@@ -391,8 +395,11 @@ connection_t.prototype.walk_property_list=function(property_list,handle_property
 			if (copy_arr && copy_arr[0]) copies=copy_arr[0];
 			
 			for (var copy=0;copy<copies;copy++) {
-				var prop_copy=prop.replace(/\[[0-9]+\]/,"["+copy+"]");
-				var prop_count=prop_copy.replace(/#/,"["+count+"]");
+				// For array indexing here,
+				//  we use .[4] instead of [4],
+				//  to match how we parse JSON, with [field].
+				var prop_copy=prop.replace(/\[[0-9]+\]/,".["+copy+"]");
+				var prop_count=prop_copy.replace(/#/,".["+count+"]");
 				handle_property(dev,prop_count);
 			}
 		}
@@ -472,6 +479,43 @@ connection_t.write_bytes_as={
 	},
 };
 
+// Convert string array index to int array index 
+//   (or if not an array index, return unmodified)
+connection_t.prototype.JSON_array_index=function(str_idx)
+{
+	var _this=this;
+	if (str_idx[0]=='[') {
+		var idx=str_idx.match(/\[([0-9]+)\]/)[1];
+		var idx_int=parseInt(idx);
+		return idx_int;
+	} else {
+		return str_idx;
+	}
+}
+
+// Write obj.property=value;
+connection_t.prototype.write_JSON_property=function(obj,property,value)
+{
+	var _this=this;
+	var name=_this.arduino_property_name(property);
+	var fieldlist=name.split(".");
+	for (var i=0;i<fieldlist.length-1;i++) {
+		var f=fieldlist[i];
+		var is_array=false;
+		if (fieldlist[i+1][0]=='[') { // next index is an array
+			is_array=true;
+		}
+		f=_this.JSON_array_index(f);
+		
+		if (obj[f]) obj=obj[f];
+		else {
+			if (is_array) obj=obj[f]=[];
+			else	obj=obj[f]={};
+		}
+	}
+	obj[_this.JSON_array_index(fieldlist[fieldlist.length-1])]=value;
+}
+
 // Build a pilot packet and send it to the Arduino
 connection_t.prototype.arduino_send_packet=function()
 {
@@ -497,7 +541,8 @@ connection_t.prototype.arduino_send_packet=function()
 	  function(device,property) {
 		var name=_this.arduino_property_name(property);
 		var datatype=_this.arduino_property_type(property);
-		var value=0; // FIXME: value=pilot JSON.name here;
+		var value=0; // FIXME: read value from pilot JSON here;
+		_this.write_JSON_property(_this.sensors.power,property,value);
 		connection_t.write_bytes_as[datatype](cmd_bytes,idx,value);
 		idx+=_this.arduino_property_bytecount(property);
 	  } 
@@ -510,6 +555,8 @@ connection_t.prototype.arduino_send_packet=function()
 }
 
 
+
+
 // Parse this binary sensor data packet from the Arduino
 connection_t.prototype.arduino_recv_packet=function(p)
 {
@@ -519,16 +566,17 @@ connection_t.prototype.arduino_recv_packet=function(p)
 	var idx=0;
 	_this.walk_property_list(connection_t.sensor_property_list,
 	  function(device,property) {
-		var name=_this.arduino_property_name(property);
 		var datatype=_this.arduino_property_type(property);
 		var value=connection_t.read_bytes_as[datatype](p.data,idx);
-		_this.status_message("	sensor."+name+"="+value);
-		// FIXME: write to sensor JSON.name=value;
+		_this.write_JSON_property(_this.sensors,property,value);
 		
 		idx+=_this.arduino_property_bytecount(property);
 	  } 
 	);
 	if (idx!=p.length) _this.bad("Arduino sensor packet length mismatch: got "+p.length+", expected "+idx+" (firmware/app mismatch?)");
+	
+	_this.status_message("	sensors = "+JSON.stringify(_this.sensors,null,'	'));
+	
 }
 
 
