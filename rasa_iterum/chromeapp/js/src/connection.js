@@ -193,12 +193,13 @@ connection_t.prototype.arduino_setup_devices=function()
 	var _this=this;
 	
 	var devices=["heartbeat();",
+		// "create2(X3);",
 		"analog(A0);","analog(A2);", "analog(A5);", 
 		"pwm(13);","servo(8);","servo(9);",
 		"encoder(3);","encoder(4);",
 		"latency();",
 		"sabertooth1(X2);"];
-	// FIXME: add other devices from superstar config.configs here
+	// FIXME: add real devices from superstar config.configs here
 	
 	var d=0; // device counter
 	var next_device=function() {
@@ -392,7 +393,7 @@ connection_t.prototype.walk_property_list=function(property_list,handle_property
 			var copies=1;
 			var prop=props[propi];
 			var copy_arr=prop.match(/\[([0-9]+)\]/);
-			if (copy_arr && copy_arr[0]) copies=copy_arr[0];
+			if (copy_arr && copy_arr[1]) copies=parseInt(copy_arr[1]);
 			
 			for (var copy=0;copy<copies;copy++) {
 				// For array indexing here,
