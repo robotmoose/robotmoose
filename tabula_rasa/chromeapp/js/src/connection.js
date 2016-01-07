@@ -1,7 +1,7 @@
 /**
- This file handles serial communication with the 
+ This file handles serial communication with the
  tabula_rasa Arduino firmware.
- 
+
  Mike Moss & Orion Lawlor, 2015-12, Public Domain
 */
 
@@ -14,19 +14,19 @@ function connection_t(div,on_message,on_disconnect)
 	_this.connection_invalid="yes, totally invalid";
 	_this.show_debug_bytes=false; // low level serial comm debugging
 	_this.max_command=15; // A-packet formatting
-	_this.max_short_length=15; 
+	_this.max_short_length=15;
 	_this.robot={ // FIXME: don't hardcode this, pass into constructor
 		"superstar":"robotmoose.com",
 		"name":"invalid",
 		"school":"invalid",
 		"auth":"",
 	};
-	
+
 	// Are there other serial JS apis?  maybe node.js?
 	_this.serial_api=chrome.serial;
-	
+
 	_this.reset();
-			
+
 	// Set up event listeners:
 	_this.serial_api.onReceive.addListener(
 		function(info) { _this.serial_callback_onReceive(info); }
@@ -40,11 +40,11 @@ function connection_t(div,on_message,on_disconnect)
 // Reset all state
 connection_t.prototype.reset=function() {
 	var _this=this;
-	
+
 	_this.power={}; // pilot's power commanded values to Arduino
 	_this.sensors={}; // Arduino-reported sensor values
 	_this.sensors.power={}; // Commanded values reflected back up to pilot
-	
+
 	_this.serial_startup=true;
 	_this.sends_in_progress=0;
 	_this.connection=_this.connection_invalid;
@@ -52,18 +52,18 @@ connection_t.prototype.reset=function() {
 	_this.arduino_options=[]; // firmware-supported devices
 	_this.device_names=[]; // configured devices
 	_this.last_config={counter:-1};
-	
+
 	// ASCII line reader state
 	_this.read_line="";
 	_this.read_line_callback=null;
-	
+
 	// Binary A-packet reader state
-	_this.read_state=0; 
-	_this.read_index=0; 
+	_this.read_state=0;
+	_this.read_index=0;
 	_this.read_sumpay=0;
 	_this.read_packet=null; // callback
 	_this.read_packet_data={valid:0,command:-1,length:0,data:null};
-	_this.read_packet_data.toString=function() 
+	_this.read_packet_data.toString=function()
 	{ // debug dump an A-packet to the screen
 		var p=_this.read_packet_data;
 		var str="command 0x";
@@ -90,7 +90,7 @@ connection_t.prototype.bad=function(why_string) {
 }
 
 // Reconnect to the Arduino
-connection_t.prototype.reconnect=function() 
+connection_t.prototype.reconnect=function()
 {
 	var _this=this;
 	var port_name=_this.port_name;
@@ -121,24 +121,24 @@ connection_t.prototype.gui_connect=function(port_name)
 {
 	var _this=this;
 	_this.reset();
-	
+
 	_this.port_name=port_name;
 	_this.status_message("Connecting to "+port_name);
 	var options={
 		bitrate:57600,
 		receiveTimeout:5*1000 // in ms (must be more than Arduino 1.7 second start delay)
 	};
-	_this.serial_api.connect(port_name, options, 
+	_this.serial_api.connect(port_name, options,
 		function(connectionInfo) {
 			_this.connection=connectionInfo.connectionId;
 			_this.status_message("Connected to "+port_name);
-			
+
 			_this.serial_api.flush(_this.connection, function() {
 				_this.arduino_setup_start();
 			} );
 		}
 	);
-	
+
 }
 
 // Callback from GUI
@@ -193,10 +193,10 @@ connection_t.prototype.arduino_read_options=function()
 				_this.status_message(" Got option: "+option_name);
 				if (option_name!="serial_controller ")
 					_this.arduino_options.push(option_name);
-				
+
 				count--;
 				if (count>0) _this.serial_read_line(handle_option);
-				else _this.arduino_send_options(); 
+				else _this.arduino_send_options();
 			};
 			_this.serial_read_line(handle_option);
 		});
@@ -221,24 +221,24 @@ connection_t.prototype.arduino_send_options=function()
 connection_t.prototype.arduino_setup_devices=function()
 {
 	var _this=this;
-	
+
 	var devices=["heartbeat();"];
 	/*
 		//"create2(X3);",
-		"analog(A0);","analog(A2);", "analog(A5);", 
+		"analog(A0);","analog(A2);", "analog(A5);",
 		"pwm(13);","servo(8);","servo(9);",
 		"encoder(3);","encoder(4);",
 		"latency();",
 		"sabertooth1(X2);"];
 	*/
-	
+
 	_this.status_message(" Getting device configs from superstar...");
 	superstar_get(_this.robot,"config",
 		function(config) {
 			_this.status_message(" Got device configs from superstar: "+JSON.stringify(config));
 			_this.last_config=config;
 			devices=devices.concat(config.configs);
-			
+
 			var d=0; // device counter
 			var next_device=function() {
 				d++;
@@ -282,7 +282,7 @@ connection_t.prototype.arduino_check_RAM=function()
 	_this.serial_send_ascii("ram?\n", function() {
 		_this.serial_read_line( function(ram_line) {
 			_this.status_message(" RAM free: "+ram_line);
-			
+
 			_this.arduino_setup_comms();
 		} )
 	} );
@@ -292,7 +292,7 @@ connection_t.prototype.arduino_check_RAM=function()
 connection_t.prototype.arduino_setup_comms=function()
 {
 	var _this=this;
-	
+
 	_this.arduino_setup_device("serial_controller();", function() {
 		_this.read_packet=_this.arduino_sensor_packet;
 		_this.arduino_setup_complete();
@@ -415,18 +415,18 @@ connection_t.prototype.walk_property_list=function(property_list,handle_property
 	for (var devi in _this.device_names) {
 		var dev=_this.device_names[devi];
 		var props=property_list[dev];
-		if (!props) 
+		if (!props)
 		{ // Can't find device in list--should be there though...
 			for (var pli in property_list)
 				_this.status_message("  Valid device '"+pli+"'");
 			_this.bad("Device type '"+dev+"' not in property list! (Do you need to update this app to match your firmware?)");
 		}
-		
+
 		// Update device counter, for stuff like servo# -> servo[0]
 		var count=0;
 		if (counts[dev]!==undefined) count=counts[dev]+1;
 		counts[dev]=count;
-		
+
 		// Loop over device properties
 		for (var propi in props) {
 			// Loop over copies, for stuff like lights[4]
@@ -434,7 +434,7 @@ connection_t.prototype.walk_property_list=function(property_list,handle_property
 			var prop=props[propi];
 			var copy_arr=prop.match(/\[([0-9]+)\]/);
 			if (copy_arr && copy_arr[1]) copies=parseInt(copy_arr[1]);
-			
+
 			for (var copy=0;copy<copies;copy++) {
 				// For array indexing here,
 				//  we use .[4] instead of [4],
@@ -478,41 +478,41 @@ connection_t.prototype.arduino_property_bytecount=function(property) {
 
 // Read values from byte array in different sizes
 connection_t.read_bytes_as={
-"u8":	function(buf,idx) { 
-		return buf[idx]; 
+"u8":	function(buf,idx) {
+		return buf[idx];
 	},
-"s8":	function(buf,idx) { 
+"s8":	function(buf,idx) {
 		var u8=buf[idx];
 		return u8<<24>>24; // Shift up to 32-bit sign bit and back: see http://blog.vjeux.com/2013/javascript/conversion-from-uint8-to-int8-x-24.html
 	},
-"u16":	function(buf,idx) { 
-		return buf[idx]+(buf[idx+1]<<8); 
+"u16":	function(buf,idx) {
+		return buf[idx]+(buf[idx+1]<<8);
 	},
-"s16":	function(buf,idx) { 
-		var u16=buf[idx]+(buf[idx+1]<<8); 
+"s16":	function(buf,idx) {
+		var u16=buf[idx]+(buf[idx+1]<<8);
 		return u16<<16>>16; // Shift up to 32-bit sign bit and back
 	},
 };
 
 // Write values to byte array from different sizes
 connection_t.write_bytes_as={
-"u8":	function(buf,idx,value) { 
+"u8":	function(buf,idx,value) {
 		if (value<0) value=0;
 		if (value>255) value=255;
-		buf[idx]=value&0xff; 
+		buf[idx]=value&0xff;
 	},
-"s8":	function(buf,idx,value) { 
+"s8":	function(buf,idx,value) {
 		if (value<-128) value=-128;
 		if (value>127) value=127;
-		buf[idx]=value&0xff; 
+		buf[idx]=value&0xff;
 	},
-"u16":	function(buf,idx,value) { 
+"u16":	function(buf,idx,value) {
 		if (value<0) value=0;
 		if (value>65535) value=65535;
 		buf[idx]=value&0xff;
 		buf[idx+1]=(value>>8)&0xff;
 	},
-"s16":	function(buf,idx,value) { 
+"s16":	function(buf,idx,value) {
 		if (value<-32768) value=-32768;
 		if (value>32767) value=32767;
 		buf[idx]=value&0xff;
@@ -520,7 +520,7 @@ connection_t.write_bytes_as={
 	},
 };
 
-// Convert string array index to int array index 
+// Convert string array index to int array index
 //   (or if not an array index, return unmodified)
 connection_t.prototype.JSON_array_index=function(str_idx)
 {
@@ -547,7 +547,7 @@ connection_t.prototype.write_JSON_property=function(obj,property,value)
 			is_array=true;
 		}
 		f=_this.JSON_array_index(f);
-		
+
 		if (obj[f]!==undefined) obj=obj[f];
 		else {
 			if (is_array) obj=obj[f]=[];
@@ -570,7 +570,7 @@ connection_t.prototype.read_JSON_property=function(obj,property)
 			is_array=true;
 		}
 		f=_this.JSON_array_index(f);
-		
+
 		if (obj[f]!==undefined) obj=obj[f];
 		else {
 			if (is_array) obj=obj[f]=[];
@@ -588,20 +588,20 @@ connection_t.prototype.read_JSON_property=function(obj,property)
 connection_t.prototype.arduino_send_packet=function()
 {
 	var _this=this;
-	
-	if (_this.sends_in_progress) 
+
+	if (_this.sends_in_progress)
 	{ // haven't finished sending last packet yet
 		_this.status_message("  skipping send_packet due to outstanding data");
-		return; 
+		return;
 	}
-	
+
 	// How big is the command packet?
 	var cmd_bytes=0;
 	_this.walk_property_list(connection_t.command_property_list,function(device,property) {
 		// _this.status_message(" device "+device+" has property "+property);
 		cmd_bytes+=_this.arduino_property_bytecount(property);
 	} );
-	
+
 	// Fill a packet that size
 	var cmd_data=new Uint8Array(cmd_bytes);
 	var idx=0; // current output index
@@ -609,14 +609,14 @@ connection_t.prototype.arduino_send_packet=function()
 	  function(device,property) {
 		var value=_this.read_JSON_property(_this.power,property);
 		_this.write_JSON_property(_this.sensors.power,property,value);
-		
+
 		var datatype=_this.arduino_property_type(property);
 		connection_t.write_bytes_as[datatype](cmd_data,idx,value);
 		_this.status_message("  Wrote "+property+" as "+cmd_data[idx]);
 		idx+=_this.arduino_property_bytecount(property);
-	  } 
+	  }
 	);
-	
+
 	// Send to Arduino
 	_this.serial_send_packet(0xC,cmd_data,function() {
 		// maybe check if we delayed a send previously here?
@@ -631,7 +631,7 @@ connection_t.prototype.arduino_send_packet=function()
 connection_t.prototype.arduino_recv_packet=function(p)
 {
 	var _this=this;
-	
+
 	_this.status_message("Arduino incoming sensor data "+p);
 	var idx=0;
 	_this.walk_property_list(connection_t.sensor_property_list,
@@ -639,14 +639,14 @@ connection_t.prototype.arduino_recv_packet=function(p)
 		var datatype=_this.arduino_property_type(property);
 		var value=connection_t.read_bytes_as[datatype](p.data,idx);
 		_this.write_JSON_property(_this.sensors,property,value);
-		
+
 		idx+=_this.arduino_property_bytecount(property);
-	  } 
+	  }
 	);
 	if (idx!=p.length) _this.bad("Arduino sensor packet length mismatch: got "+p.length+", expected "+idx+" (firmware/app mismatch?)");
-	
+
 	_this.status_message("	sensors = "+JSON.stringify(_this.sensors,null,'	'));
-	
+
 	// Send sensor data to superstar, and grab pilot commands:
 	var robotName=_this.robot.school+"/"+_this.robot.name;
 	superstar_generic(_this.robot,
@@ -659,11 +659,11 @@ connection_t.prototype.arduino_recv_packet=function(p)
 		var pilot=pilot_and_config[0];
 		_this.status_message("	pilot = "+JSON.stringify(pilot,null,'	'));
 		var config=pilot_and_config[1];
-		if (config.counter!=_this.last_config.counter) 
+		if (config.counter!=_this.last_config.counter)
 		{ // need to reconfigure Arduino
 			_this.reconnect();
 		}
-		
+
 		for (var field in pilot.power) {
 			_this.power[field]=pilot.power[field];
 		}
@@ -701,7 +701,7 @@ connection_t.prototype.arduino_sensor_packet=function(p)
 
 /***************** Low-level serial data I/O *********************/
 // Callback from serial API: error on serial port
-connection_t.prototype.serial_callback_onReceiveError=function(info) 
+connection_t.prototype.serial_callback_onReceiveError=function(info)
 {
 	var _this=this;
 	_this.status_message("Serial error: "+info.error);
@@ -711,23 +711,23 @@ connection_t.prototype.serial_callback_onReceiveError=function(info)
 
 
 // Callback from serial API: incoming serial data
-connection_t.prototype.serial_callback_onReceive=function(info) 
+connection_t.prototype.serial_callback_onReceive=function(info)
 {
 	var _this=this;
 	_this.status_message("Serial data received: "+info.data.byteLength+" bytes");
-	
+
 	// parse?
 	var buffer=info.data; // ArrayBuffer
 	var arr=new Uint8Array(buffer);
 	for (var i=0;i<arr.length;i++) {
 		var v=arr[i];
 		var c=String.fromCharCode(v);
-		
+
 		if (_this.show_debug_bytes) { // show incoming bytes
 			_this.status_message("    received  \t"+v+"  \t"+c);
 		}
-		
-		if (_this.read_line_callback) 
+
+		if (_this.read_line_callback)
 		{ // line based
 			if (v==13) {} // cursed windows newline--ignore it
 			else if (v==10) // real newline
@@ -736,20 +736,20 @@ connection_t.prototype.serial_callback_onReceive=function(info)
 				//  so save state before calling.
 				var callback=_this.read_line_callback;
 				var line=_this.read_line;
-				
+
 				_this.read_line_callback=null;
 				_this.read_line=""; // reset line
-				
+
 				// Per-line debugging:
 				_this.status_message(" received serial: "+line);
-				
+
 				callback(line); // call user's callback
 			}
 			else { // normal data part of the line
 				_this.read_line+=c;
 			}
 		}
-		else if (_this.read_packet) 
+		else if (_this.read_packet)
 		{ // packet based
 			_this.serial_read_packet(v);
 		}
@@ -762,9 +762,9 @@ connection_t.prototype.serial_callback_onReceive=function(info)
 	}
 }
 
-// Read a line of ASCII text from the serial port, 
+// Read a line of ASCII text from the serial port,
 //   and pass it to this callback (less newline)
-connection_t.prototype.serial_read_line=function(line_callback) 
+connection_t.prototype.serial_read_line=function(line_callback)
 {
 	var _this=this;
 	if (_this.read_line_callback) _this.bad("Cannot wait for two lines at once!");
@@ -774,20 +774,20 @@ connection_t.prototype.serial_read_line=function(line_callback)
 
 // Send a brick of binary data out the serial port.
 //  Serial port is blocked until we call the done_callback.
-connection_t.prototype.serial_send=function(array_like,done_callback) 
+connection_t.prototype.serial_send=function(array_like,done_callback)
 {
 	var _this=this;
 	if (_this.sends_in_progress!=0) _this.bad("Cannot overlap send calls!");
 	_this.sends_in_progress++;
-	
+
 	var out=new Uint8Array(array_like);
-	
+
 	if (_this.show_debug_bytes) { // show sent bytes
 		_this.status_message("Serial data sending: "+out.byteLength+" bytes");
 		for (var i=0;i<out.byteLength;i++)
 			_this.status_message("    sending  \t"+out[i]+"  \t"+String.fromCharCode(out[i]));
 	}
-	
+
 	_this.serial_api.send(_this.connection,out.buffer,
 		function(info) {
 			if (info.error) {
@@ -806,7 +806,7 @@ connection_t.prototype.serial_send=function(array_like,done_callback)
 
 // Send a string of ASCII text, and
 //   call this callback after it's been sent.
-connection_t.prototype.serial_send_ascii=function(str,done_callback) 
+connection_t.prototype.serial_send_ascii=function(str,done_callback)
 {
 	var _this=this;
 	// from http://stackoverflow.com/questions/6965107/converting-between-strings-and-arraybuffers
@@ -825,7 +825,7 @@ connection_t.prototype.serial_send_ascii=function(str,done_callback)
 // Parse this incoming serial data byte (int) as an A-packet.
 //   Call the read_packet callback once packet is complete.
 //   Copied directly from C++ serial_packet.h read_packet function.
-connection_t.prototype.serial_read_packet=function(c) 
+connection_t.prototype.serial_read_packet=function(c)
 {
 	var _this=this;
 	var p=_this.read_packet_data;
@@ -855,7 +855,7 @@ connection_t.prototype.serial_read_packet=function(c)
 			}
 		}
 		else _this.status_message("Serial A-packet unexpected byte: \t"+c+"  \t"+String.fromCharCode(c));
-		
+
 		break;
 	case STATE_LENGTH: /* (optional) length byte */
 		p.length=c;
@@ -884,7 +884,7 @@ connection_t.prototype.serial_read_packet=function(c)
 			_this.read_packet(p); // report packet to callback
 		}
 		else _this.status_message("Serial A-packet checksum error: "+checkread+" vs "+checksum);
-		
+
 		}
 		break;
 	default: /* only way to get here is memory corruption!  Reset. */
@@ -894,7 +894,7 @@ connection_t.prototype.serial_read_packet=function(c)
 
 // Send a binary A-packet with this Uint8Array payload, and
 //   call this callback after it's been sent.
-connection_t.prototype.serial_send_packet=function(command,array_data,done_callback) 
+connection_t.prototype.serial_send_packet=function(command,array_data,done_callback)
 {
 	var _this=this;
 	var length=array_data.byteLength;
@@ -903,7 +903,7 @@ connection_t.prototype.serial_send_packet=function(command,array_data,done_callb
 	else out_len=2+length+1; // extra length byte at start
 	var out=0; // index in output array
 	var write_data=new Uint8Array(out_len);
-	
+
 	// Send start of packet
 	var start=0xA0;  // sync code, length in low bits
 	if (length<_this.max_short_length)
@@ -915,7 +915,7 @@ connection_t.prototype.serial_send_packet=function(command,array_data,done_callb
 		write_data[out++]=length;
 		if (length>255) _this.bad("serial_send_packet data too big to send!");
 	}
-	
+
 	// Copy payload data & compute checksum
 	var sumpay=0;
 	for (var i=0;i<length;i++) {
@@ -923,13 +923,13 @@ connection_t.prototype.serial_send_packet=function(command,array_data,done_callb
 		write_data[out++]=array_data[i];
 	}
 	var checksum=0xf&(length+command+sumpay+(sumpay>>4));
-	
+
 	// Send end of packet
 	var end=(command<<4)+(checksum);
 	write_data[out++]=end;
-	
+
 	if (out!=out_len) _this.bad("serial_send_packet packet length logic error!");
-	
+
 	_this.serial_send(write_data,done_callback);
 }
 
