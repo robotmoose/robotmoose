@@ -20,16 +20,17 @@ function gui_t(div)
 	this.top_bar=document.createElement("div");
 	this.el.appendChild(this.top_bar);
 
+	this.name=new name_t(this.top_bar);
+	this.name.el.style.float="left";
+
 	this.serial_selector=new serial_selector_t
 	(
 		this.top_bar,
 		function(port_name){_this.connection.gui_connect(port_name);},
-		function(port_name){_this.connection.gui_disconnect(port_name);}
+		function(port_name){_this.connection.gui_disconnect(port_name);},
+		function(){return (_this.name.get_robot().school!=null&&_this.name.get_robot().robot!=null);}
 	);
 	this.serial_selector.el.style.float="left";
-
-	this.name=new name_t(this.top_bar);
-	this.name.el.style.float="left";
 
 	this.status_viewer=new status_viewer_t(this.el);
 

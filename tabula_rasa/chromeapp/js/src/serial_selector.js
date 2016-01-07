@@ -1,13 +1,14 @@
 /**
-  List serial ports on the machine, and show 
+  List serial ports on the machine, and show
   a drop-down menu for the user to select one.
-  
 
-  on_connect(port) - callback called when a connection is requested, port is the name of the port TO connect to.
-  on_disonnect(port) - callback called when a disconnect is requested, port is the name of the port that WAS connected to.
+
+  on_connect(port) - Callback called when a connection is requested, port is the name of the port TO connect to.
+  on_disonnect(port) - Callback called when a disconnect is requested, port is the name of the port that WAS connected to.
+  is_connectable() - Function called when checking if the connect button is clickable, should return true if it should be and false otherwise.
 */
 
-function serial_selector_t(div,on_connect,on_disconnect)
+function serial_selector_t(div,on_connect,on_disconnect,is_connectable)
 {
 	if(!div)
 		return null;
@@ -18,6 +19,10 @@ function serial_selector_t(div,on_connect,on_disconnect)
 
 	this.on_connect=on_connect;
 	this.on_disconnect=on_disconnect;
+	this.is_connectable=is_connectable;
+
+	if(!this.is_connectable)
+		this.is_connectable=function(){return true;};
 
 	var _this=this;
 
@@ -90,10 +95,10 @@ serial_selector_t.prototype.build_list_m=function(ports)
 	for(var ii=0;ii<ports.length;++ii)
 	{
 		var name=ports[ii].path;
-		
+
 		// Skip bluetooth devices (on Mac)
 		if ( /.*Bluetooth.*/.test( name ) ) continue;
-		
+
 		var option=document.createElement("option");
 		this.select.appendChild(option);
 		option.text=name;
@@ -109,7 +114,7 @@ serial_selector_t.prototype.build_list_m=function(ports)
 		this.disconnect();
 
 	this.select.disabled=(this.connected||this.select.options.length<=0);
-	this.button.disabled=(this.select.options.length<=0);
+	this.button.disabled=(this.select.options.length<=0||!this.is_connectable());
 
 	if(this.select.options.length<=0)
 	{
@@ -117,7 +122,7 @@ serial_selector_t.prototype.build_list_m=function(ports)
 		this.select.appendChild(option);
 		option.text="No serial ports.";
 	}
-	else if (this.select.options.length==1 && !this.connected)
+	else if (this.select.options.length==1 && !this.connected&&this.is_connectable())
 	{ // Only one serial port--automatically connect to it
 		_this.connect();
 	}

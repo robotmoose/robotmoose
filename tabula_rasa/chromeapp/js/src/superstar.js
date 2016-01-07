@@ -1,12 +1,12 @@
 /**
   Superstar network interface
-  
+
   robot fields:
   	superstar: string name of superstar server
   	name: string name of robot (URI encoded)
   	school: string name of robot's organization (URI encoded)
   	auth: authentication code (password for robot)
-  
+
 */
 
 // Error handling code
@@ -20,7 +20,7 @@ function superstar_error(user_errorhandler,why_string)
 function superstar_generic(robot,path_and_request,on_success,on_error)
 {
 	var url="http://"+robot.superstar+"/superstar/"+robot.school+"/"+robot.name+"/"+path_and_request;
-	
+
 try
 {
 	var xhr=new XMLHttpRequest();
@@ -74,7 +74,7 @@ function superstar_get(robot,path,on_success,on_error)
 function superstar_set(robot,path,json,on_success,on_error)
 {
 	var json_str=encodeURIComponent(JSON.stringify(json));
-	
+
 	superstar_generic(robot,path+"?set="+json_str,
 		function(response) {
 			if (on_success) on_success(json);
@@ -87,7 +87,7 @@ function superstar_set(robot,path,json,on_success,on_error)
 //   Return them to on_success as an array of strings
 function superstar_sub(robot,path,on_success,on_error)
 {
-	superstar_generic(robot,path+"?sub,
+	superstar_generic(robot,path+"?sub",
 		function(response) {
 			var json=JSON.parse(response);
 			on_success(json);
