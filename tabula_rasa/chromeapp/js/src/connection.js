@@ -17,8 +17,8 @@ function connection_t(div,on_message,on_disconnect)
 	_this.max_short_length=15; 
 	_this.robot={ // FIXME: don't hardcode this, pass into constructor
 		"superstar":"robotmoose.com",
-		"name":"demo",
-		"school":"test",
+		"name":"invalid",
+		"school":"invalid",
 		"auth":"",
 	};
 	
@@ -108,6 +108,13 @@ connection_t.prototype.connected=function()
 	return _this.connection!==_this.connection_invalid;
 }
 
+// Callback to add new robot name
+connection_t.prototype.gui_robot=function(robot)
+{
+	var _this=this;
+	_this.robot=robot;
+	if (_this.connected()) _this.reconnect();
+}
 
 // Callback from GUI
 connection_t.prototype.gui_connect=function(port_name)
