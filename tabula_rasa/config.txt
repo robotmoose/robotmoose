@@ -1,8 +1,8 @@
-robot=test/demo
+robot=uaf/laylagray
 superstar=http://robotmoose.com
 #baudrate=57600
 #marker=
-#trim=1.0
+trim=0.85
 #debug=
-#delay_ms=50
+delay_ms=100
 #sim=false

@@ -1,4 +1,12 @@
-function name_t(div,on_message)
+/**
+  List schools and robot names from superstar in
+  a drop-down menu for the user to select.
+
+  on_message(message) - Callback called when something should be added to a log.
+  on_selected(robot) - Callback called when a valid school and robot combination is chosen.
+*/
+
+function name_t(div,on_message,on_selected)
 {
 	if(!div)
 		return null;
@@ -8,6 +16,7 @@ function name_t(div,on_message)
 	this.div.appendChild(this.el);
 
 	this.on_message=on_message;
+	this.on_selected=on_selected;
 
 	var _this=this;
 
@@ -21,7 +30,7 @@ function name_t(div,on_message)
 	this.robot=document.createElement("select");
 	this.el.appendChild(this.robot);
 	this.robot.style.width="128px";
-	this.robot.onchange=function(){};
+	this.robot.onchange=function(){_this.on_selected_m();};
 
 	this.build_schools_m();
 	this.build_robots_m();
@@ -31,12 +40,12 @@ function name_t(div,on_message)
 
 name_t.prototype.get_robot=function()
 {
-	var robot={superstar:this.superstar,school:null,robot:null};
+	var robot={superstar:this.superstar,school:null,name:null};
 
 	if(this.school.selectedIndex>0&&this.robot.selectedIndex>0)
 	{
 		robot.school=this.school.options[this.school.selectedIndex].text;
-		robot.robot=this.robot.options[this.robot.selectedIndex].text;
+		robot.name=this.robot.options[this.robot.selectedIndex].text;
 	}
 
 	return robot;
@@ -119,4 +128,12 @@ name_t.prototype.update_disables_m=function()
 
 	this.school.disabled=school_disabled;
 	this.robot.disabled=robot_disabled;
+}
+
+name_t.prototype.on_selected_m=function()
+{
+	var robot=this.get_robot();
+
+	if(this.on_selected&&robot.school!=null&&robot.name!=null)
+		this.on_selected(robot);
 }
