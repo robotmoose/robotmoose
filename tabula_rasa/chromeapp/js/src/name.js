@@ -39,8 +39,6 @@ name_t.prototype.get_robot=function()
 		robot.robot=this.robot.options[this.robot.selectedIndex].text;
 	}
 
-	console.log(robot);
-
 	return robot;
 }
 
