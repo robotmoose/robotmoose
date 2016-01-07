@@ -15,12 +15,7 @@ function connection_t(div,on_message,on_disconnect)
 	_this.show_debug_bytes=false; // low level serial comm debugging
 	_this.max_command=15; // A-packet formatting
 	_this.max_short_length=15; 
-	_this.robot={ // FIXME: don't hardcode this, pass into constructor
-		"superstar":"robotmoose.com",
-		"name":"invalid",
-		"school":"invalid",
-		"auth":"",
-	};
+	_this.robot=null;
 	
 	// Are there other serial JS apis?  maybe node.js?
 	_this.serial_api=chrome.serial;
@@ -121,6 +116,7 @@ connection_t.prototype.gui_connect=function(port_name)
 {
 	var _this=this;
 	_this.reset();
+	if (!_this.robot) { _this.status_message("Need a school before connecting"); return; }
 	
 	_this.port_name=port_name;
 	_this.status_message("Connecting to "+port_name);
@@ -235,10 +231,14 @@ connection_t.prototype.arduino_setup_devices=function()
 	_this.status_message(" Getting device configs from superstar...");
 	superstar_get(_this.robot,"config",
 		function(config) {
-			_this.status_message(" Got device configs from superstar: "+JSON.stringify(config));
-			_this.last_config=config;
-			devices=devices.concat(config.configs);
-			
+			if (config.counter!==undefined) {
+				_this.status_message(" Got valid device configs from superstar: "+JSON.stringify(config));
+				_this.last_config=config;
+				devices=devices.concat(config.configs);
+			} else {
+				_this.status_message(" Pilot needs to configure robot on superstar: "+robot.name);
+			}
+		
 			var d=0; // device counter
 			var next_device=function() {
 				d++;
@@ -374,19 +374,19 @@ connection_t.command_property_list={
 "heartbeat":[],
 "latency":[],
 "neopixel":[
-	"neopixel#.color.r<u8>",
-	"neopixel#.color.g<u8>",
-	"neopixel#.color.b<u8>",
-	"neopixel#.accent.r<u8>",
-	"neopixel#.accent.g<u8>",
-	"neopixel#.accent.b<u8>",
-	"neopixel#.start<s8>",
-	"neopixel#.repeat<u8>",
-	"neopixel#.state<u8>"
+	"neopixel#.color.r<u8>=255",
+	"neopixel#.color.g<u8>=0",
+	"neopixel#.color.b<u8>=0",
+	"neopixel#.accent.r<u8>=0",
+	"neopixel#.accent.g<u8>=255",
+	"neopixel#.accent.b<u8>=255",
+	"neopixel#.start<s8>=4",
+	"neopixel#.repeat<u8>=8",
+	"neopixel#.state<u8>=0"
 ],
 "pwm":["pwm#<u8>"],
 "serial_controller":[],
-"servo":["servo#<u8>"],
+"servo":["servo#<u8>=90"],
 "ultrasonic_sensor":[],
 
 // All the motor controllers have the same command interface:
@@ -450,7 +450,7 @@ connection_t.prototype.walk_property_list=function(property_list,handle_property
 // Extract name string from Arduino property
 //   e.g., foo.bar<u8> returns "foo.bar"
 connection_t.prototype.arduino_property_name=function(property) {
-	var type_regex=/<([us][0-9]*)>$/;
+	var type_regex=/<.*$/;
 	var name_str=property.replace(type_regex,"");
 	if (!name_str) _this.bad("Property '"+property+"' has invalid type "+name_str+" (firmware bug?)");
 	return name_str;
@@ -459,7 +459,7 @@ connection_t.prototype.arduino_property_name=function(property) {
 // Extract property type string from Arduino property
 //   e.g., foo.bar#<u8> returns "u8"
 connection_t.prototype.arduino_property_type=function(property) {
-	var type_regex=/<([us][0-9]*)>$/;
+	var type_regex=/<([us][0-9]*)>/;
 	var type_str=property.match(type_regex)[1];
 	if (!type_str) _this.bad("Property '"+property+"' has invalid type "+type_str+" (firmware bug?)");
 	return type_str;
@@ -467,12 +467,29 @@ connection_t.prototype.arduino_property_type=function(property) {
 
 // Extract byte count from Arduino property
 //   e.g., foo.bar#<u8> returns 1 (byte) for the 8-bit value
-connection_t.prototype.arduino_property_bytecount=function(property) {
+connection_t.prototype.arduino_property_default=function(property) {
 	var _this=this;
 	var type_str=_this.arduino_property_type(property);
 	var bitcount=parseInt(type_str.substring(1));
 	if (isNaN(bitcount) || bitcount==0 || bitcount%8!=0) _this.bad("Property '"+property+"' has invalid size "+bitcount+" (firmware bug?)");
 	return bitcount/8;
+}
+
+// Extract default value count from Arduino property
+//   e.g., foo.bar#<u8>=3 returns the 3 as a number
+//   If no default is listed, returns 0.
+connection_t.prototype.arduino_property_default=function(property) {
+	var _this=this;
+	var def_regex=/=([0-9]*)/;
+	var def_match=property.match(def_regex);
+	if (def_match) {
+		var def_str=def_match[1];
+		var v=parseInt(def_str);
+		if (isNaN(v) ) _this.bad("Property '"+property+"' has invalid size "+bitcount+" (firmware bug?)");
+		return v;
+	} else { // no default value
+		return 0;
+	}
 }
 
 
@@ -581,7 +598,7 @@ connection_t.prototype.read_JSON_property=function(obj,property)
 	f=_this.JSON_array_index(f);
 	if (obj[f]!==undefined) return obj[f];
 	// else return default value
-	return 0;
+	return _this.arduino_property_default(property);
 }
 
 // Build a pilot packet and send it to the Arduino
