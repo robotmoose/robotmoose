@@ -9,8 +9,8 @@
 		"background":
 		{
 			"scripts":["js/src/background.js","js/src/connection.js","js/src/gui.js",
-				"js/src/packetize.js","js/src/serial_selector.js","js/src/status_viewer.js",
-				"js/src/superstar.js","js/src/window.js"]
+				"js/src/name.js","js/src/packetize.js","js/src/serial_selector.js",
+				"js/src/status_viewer.js","js/src/superstar.js","js/src/window.js"]
 		}
 	},
 	"icons":
