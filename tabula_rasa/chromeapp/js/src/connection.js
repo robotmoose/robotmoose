@@ -15,7 +15,7 @@ function connection_t(div,on_message,on_disconnect)
 	_this.show_debug_bytes=false; // low level serial comm debugging
 	_this.max_command=15; // A-packet formatting
 	_this.max_short_length=15; 
-	_this.robot={
+	_this.robot={ // FIXME: don't hardcode this, pass into constructor
 		"superstar":"robotmoose.com",
 		"name":"demo",
 		"school":"test",
@@ -41,7 +41,7 @@ function connection_t(div,on_message,on_disconnect)
 connection_t.prototype.reset=function() {
 	var _this=this;
 	
-	_this.power={}; // pilot's commanded values to Arduino
+	_this.power={}; // pilot's power commanded values to Arduino
 	_this.sensors={}; // Arduino-reported sensor values
 	_this.sensors.power={}; // Commanded values reflected back up to pilot
 	
@@ -51,6 +51,7 @@ connection_t.prototype.reset=function() {
 	_this.port_name="not connected yet";
 	_this.arduino_options=[]; // firmware-supported devices
 	_this.device_names=[]; // configured devices
+	_this.last_config={counter:-1};
 	
 	// ASCII line reader state
 	_this.read_line="";
@@ -85,7 +86,19 @@ connection_t.prototype.bad=function(why_string) {
 	var _this=this;
 	_this.status_message("ERROR: "+why_string);
 	console.log("Serial connection error: "+why_string);
-	// disconnect/reconnect here?
+	_this.reconnect();
+}
+
+// Reconnect to the Arduino
+connection_t.prototype.reconnect=function() 
+{
+	var _this=this;
+	var port_name=_this.port_name;
+	_this.gui_disconnect(port_name,
+		function() {
+			_this.gui_connect(port_name);
+		}
+	);
 }
 
 // Status check
@@ -122,7 +135,7 @@ connection_t.prototype.gui_connect=function(port_name)
 }
 
 // Callback from GUI
-connection_t.prototype.gui_disconnect=function(port_name)
+connection_t.prototype.gui_disconnect=function(port_name,done_callback)
 {
 	var _this=this;
 	if (_this.connection!==_this.connection_invalid) {
@@ -132,6 +145,7 @@ connection_t.prototype.gui_disconnect=function(port_name)
 				if (chrome.runtime.lastError)
 					_this.status_message("Error disconnecting from "+port_name);
 				_this.status_message("Disconnected from "+port_name);
+				if (done_callback) done_callback();
 			}
 		);
 	}
@@ -215,6 +229,7 @@ connection_t.prototype.arduino_setup_devices=function()
 	superstar_get(_this.robot,"config",
 		function(config) {
 			_this.status_message(" Got device configs from superstar: "+JSON.stringify(config));
+			_this.last_config=config;
 			devices=devices.concat(config.configs);
 			
 			var d=0; // device counter
@@ -526,13 +541,40 @@ connection_t.prototype.write_JSON_property=function(obj,property,value)
 		}
 		f=_this.JSON_array_index(f);
 		
-		if (obj[f]) obj=obj[f];
+		if (obj[f]!==undefined) obj=obj[f];
 		else {
 			if (is_array) obj=obj[f]=[];
 			else	obj=obj[f]={};
 		}
 	}
 	obj[_this.JSON_array_index(fieldlist[fieldlist.length-1])]=value;
+}
+
+// Return obj.property, or the default value if none exists
+connection_t.prototype.read_JSON_property=function(obj,property)
+{
+	var _this=this;
+	var name=_this.arduino_property_name(property); // e.g., foo.bar.[3]
+	var fieldlist=name.split(".");
+	for (var i=0;i<fieldlist.length-1;i++) {
+		var f=fieldlist[i];
+		var is_array=false;
+		if (fieldlist[i+1][0]=='[') { // next index is an array
+			is_array=true;
+		}
+		f=_this.JSON_array_index(f);
+		
+		if (obj[f]!==undefined) obj=obj[f];
+		else {
+			if (is_array) obj=obj[f]=[];
+			else	obj=obj[f]={};
+		}
+	}
+	var f=fieldlist[fieldlist.length-1];
+	f=_this.JSON_array_index(f);
+	if (obj[f]!==undefined) return obj[f];
+	// else return default value
+	return 0;
 }
 
 // Build a pilot packet and send it to the Arduino
@@ -558,11 +600,12 @@ connection_t.prototype.arduino_send_packet=function()
 	var idx=0; // current output index
 	_this.walk_property_list(connection_t.command_property_list,
 	  function(device,property) {
-		var name=_this.arduino_property_name(property);
-		var datatype=_this.arduino_property_type(property);
-		var value=0; // FIXME: read value from pilot JSON here;
+		var value=_this.read_JSON_property(_this.power,property);
 		_this.write_JSON_property(_this.sensors.power,property,value);
-		connection_t.write_bytes_as[datatype](cmd_bytes,idx,value);
+		
+		var datatype=_this.arduino_property_type(property);
+		connection_t.write_bytes_as[datatype](cmd_data,idx,value);
+		_this.status_message("  Wrote "+property+" as "+cmd_data[idx]);
 		idx+=_this.arduino_property_bytecount(property);
 	  } 
 	);
@@ -576,7 +619,8 @@ connection_t.prototype.arduino_send_packet=function()
 
 
 
-// Parse this binary sensor data packet from the Arduino
+// Parse this binary sensor data packet from the Arduino,
+//   convert to JSON, and send to superstar.
 connection_t.prototype.arduino_recv_packet=function(p)
 {
 	var _this=this;
@@ -595,9 +639,27 @@ connection_t.prototype.arduino_recv_packet=function(p)
 	if (idx!=p.length) _this.bad("Arduino sensor packet length mismatch: got "+p.length+", expected "+idx+" (firmware/app mismatch?)");
 	
 	_this.status_message("	sensors = "+JSON.stringify(_this.sensors,null,'	'));
-	superstar_set(_this.robot,"sensors",_this.sensors,
-	function() {
-		// sensor data back--network leash?
+	
+	// Send sensor data to superstar, and grab pilot commands:
+	var robotName=_this.robot.school+"/"+_this.robot.name;
+	superstar_generic(_this.robot,
+		"sensors?set="+encodeURIComponent(JSON.stringify(_this.sensors))
+		+"&get="+robotName+"/pilot,"+robotName+"/config"
+	,
+	function(pilot_and_config_str) {
+		var pilot_and_config=JSON.parse(pilot_and_config_str);
+		if (pilot_and_config.length!=2) _this.bad("Invalid pilot & config data back from superstar");
+		var pilot=pilot_and_config[0];
+		_this.status_message("	pilot = "+JSON.stringify(pilot,null,'	'));
+		var config=pilot_and_config[1];
+		if (config.counter!=_this.last_config.counter) 
+		{ // need to reconfigure Arduino
+			_this.reconnect();
+		}
+		
+		for (var field in pilot.power) {
+			_this.power[field]=pilot.power[field];
+		}
 	} );
 }
 
@@ -664,7 +726,7 @@ connection_t.prototype.serial_callback_onReceive=function(info)
 			else if (v==10) // real newline
 			{
 				// SUBTLE: callback will register new callbacks,
-				//  so save it before calling it.
+				//  so save state before calling.
 				var callback=_this.read_line_callback;
 				var line=_this.read_line;
 				

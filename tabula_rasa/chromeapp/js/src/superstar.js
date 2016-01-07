@@ -87,7 +87,7 @@ function superstar_set(robot,path,json,on_success,on_error)
 //   Return them to on_success as an array of strings
 function superstar_sub(robot,path,on_success,on_error)
 {
-	superstar_generic(robot,path+"?sub,
+	superstar_generic(robot,path+"?sub",
 		function(response) {
 			var json=JSON.parse(response);
 			on_success(json);
