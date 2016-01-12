@@ -467,7 +467,7 @@ connection_t.prototype.arduino_property_type=function(property) {
 
 // Extract byte count from Arduino property
 //   e.g., foo.bar#<u8> returns 1 (byte) for the 8-bit value
-connection_t.prototype.arduino_property_default=function(property) {
+connection_t.prototype.arduino_property_bytecount=function(property) {
 	var _this=this;
 	var type_str=_this.arduino_property_type(property);
 	var bitcount=parseInt(type_str.substring(1));
