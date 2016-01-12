@@ -15,6 +15,7 @@
 #include <string>
 #include <map>
 #include <stdarg.h>
+#include <stdlib.h>
 #include "mongoose/mongoose.h" /* central webserver library */
 #include <stdint.h>
 
@@ -433,7 +434,15 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 void *thread_code(void* data)
 {
 	struct mg_server *server= mg_create_server(NULL, http_handler);
-	mg_set_option(server, "listening_port", ADDRESS.c_str());
+
+	if(mg_set_option(server, "listening_port", ADDRESS.c_str())!=0)
+	{
+		std::cout<<"Could not open port "<<ADDRESS<<"."<<std::endl;
+		std::cout<<"\tDo you have permission?"<<std::endl;
+		std::cout<<"\tIs something already running on that port?"<<std::endl;
+		exit(1);
+	}
+
 	mg_set_option(server, "ssi_pattern", "**.html$");
 	mg_set_option(server, "document_root", "../www"); // files served from here
 
