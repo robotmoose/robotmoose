@@ -36,10 +36,10 @@ woodscrew_boss=1.0; // extra thickness under screw head
 // Clearance for woodscrew to pass through (minus)
 module woodscrew_head(head_clear_scale=1.0) 
 {
-	head_clear=0.5*floor+epsilon+head_clear_scale*10;
+    head_clear=0.5*floor+epsilon+head_clear_scale*10;
     translate([0,0,woodscrew_boss]) {
         // Head clearance
-        cylinder(d1=woodscrew_head_dia,d2=woodscrew_head_dia+head_clear,h=head_clear);
+        cylinder(d1=woodscrew_head_dia,d2=woodscrew_head_dia+0.7*head_clear,h=head_clear);
         
         // Through clearance for shaft of screw
         translate([0,0,+epsilon])

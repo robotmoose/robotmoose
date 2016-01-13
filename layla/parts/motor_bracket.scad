@@ -41,7 +41,7 @@ module poke_hole(holei, add_radius=0.0, add_depth=0.0, scale_depth=1.0)
     radius=diam/2;
     depth=add_depth+h[3]*scale_depth;
     translate([h[0]+radius,h[1]+radius,-depth])
-        cylinder(d=2*(radius+add_radius),h=depth);
+        cylinder(d=2*(radius+clearance+wiggle+add_radius),h=depth);
 }
 
 module poke_motor_holes() {
@@ -51,6 +51,9 @@ module poke_motor_holes() {
     poke_hole(1,2.0, 4.0,0.0);
     poke_hole(2);
     poke_hole(3);
+  #  translate([53,8,-3])
+        rotate([0,0,-20])
+            cube([10,8,10]);
 }
 
 module motor_bracket_holes() {
@@ -66,7 +69,7 @@ difference() {
     union() {
         hull() {
             translate([x_start,-width_neck/2,0])
-                cube([1,width_neck,thick]);
+                cube([25,width_neck,thick]);
             translate([81,0,0])
                 cylinder(d=50,h=thick);
         }
@@ -82,7 +85,7 @@ difference() {
             }
         }
     }
-    #union() { // minus
+    union() { // minus
         translate([0,0,thick+epsilon])
             poke_motor_holes();
         

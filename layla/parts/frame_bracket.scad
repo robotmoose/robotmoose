@@ -2,7 +2,7 @@
 include <layla_config.scad>;
 
 // Size of floorplate of bracket
-radius=75;
+radius=50;
 
 // Size of hole for retaining the tubing (quick detach)
 quickdetach_dia=0.25*25.4+3*clearance;
@@ -25,24 +25,23 @@ module tube_fin_2D() {
         polygon([
             [tube_OD/2,radius],
             [tube_OD/2+wall,radius],
-            [0.85*radius,0],
+            [0.9*radius,0],
             [radius,-radius],
             [tube_OD/2,-radius]
             ]);
         
-        // lightening hole
+        // lightening hole (and spot to tie down wires)
         translate([(radius-tube_OD/2)*0.32+tube_OD/2,radius*0.27])
-            circle(r=0.16*radius);
+            circle(r=0.12*radius);
     }
 }
 
-// This is the 3D fin
-module tube_fin_3D(fin_angle) {
-    finboss=3.5*wall;
-    rotate([90,0,fin_angle]) // stand up
+// This is the 3D fin.  finboss is the thickness of the outside rim.
+module tube_fin_3D(finboss) {
+    rotate([90,0,0]) // stand up
     union() {
         // main plate of fin
-        linear_extrude(height=wall,convexity=4,center=true)
+        linear_extrude(height=2*wall,convexity=4,center=true)
             offset(r=-epsilon) tube_fin_2D();
         
         // thicker rim of fin
@@ -52,6 +51,15 @@ module tube_fin_3D(fin_angle) {
                 offset(r=-finboss) tube_fin_2D();
             }
         }
+    }
+}
+
+// Place entire array of fins around main tube
+module tube_fins() {
+    fin_del=14; // angle change around screw hole
+    for (fin_angle=[45:90:360-epsilon]) {
+        rotate([0,0,fin_angle-fin_del]) children();
+        rotate([0,0,fin_angle+fin_del]) children();
     }
 }
 
@@ -68,6 +76,7 @@ module tube_bracket(tube_angles)
                         cylinder(h=floor,d=woodscrew_head_dia*2.2);
                 
                 // tube wall and fins
+                finboss=6*wall;
                 rotate(tube_angles) {
                     // main tube
                     cylinder(d=tube_OD+2*wall,h=3*radius,center=true,$fa=5);
@@ -84,11 +93,19 @@ module tube_bracket(tube_angles)
                             cylinder(d=tube_OD+6*wall,h=tubelet_h);
                     
                     // Fin array
-                    fin_del=9; // angle change around screw hole
-                    for (fin_angle=[45:90:360-epsilon]) {
-                        tube_fin_3D(fin_angle-fin_del); // left
-                        tube_fin_3D(fin_angle+fin_del); // right
-                    }
+                    tube_fins() tube_fin_3D(finboss);
+                    
+                }
+                
+                // Fin-to-base tapered chamfer
+                finchamfer=1.3*finboss;
+                highcut=floor+finchamfer;
+                minkowski() {
+                    linear_extrude(height=epsilon,convexity=8)
+                        projection(cut=true)
+                            translate([0,0,-highcut])
+                                rotate(tube_angles) tube_fins() tube_fin_3D(0.8*finboss);
+                    cylinder(r1=finchamfer,r2=0.0,h=finchamfer,$fn=3);
                 }
                 
                 // bosses around screw holes
@@ -106,7 +123,7 @@ module tube_bracket(tube_angles)
                 }
                 
                 // space for screws
-                tube_bracket_holes() woodscrew_head(0.1);
+                tube_bracket_holes() woodscrew_head(0.2);
             }
         }
        
