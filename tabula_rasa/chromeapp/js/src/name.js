@@ -17,6 +17,8 @@ function name_t(div,on_message,on_selected)
 
 	this.on_message=on_message;
 	this.on_selected=on_selected;
+	this.on_loaded_school=null;
+	this.on_loaded_robot=null;
 
 	var _this=this;
 
@@ -54,7 +56,7 @@ name_t.prototype.get_robot=function()
 
 
 
-name_t.prototype.build_select_m=function(select,json,heading)
+name_t.prototype.build_select_m=function(select,json,heading,on_loaded_value)
 {
 	select.length=0;
 
@@ -67,6 +69,12 @@ name_t.prototype.build_select_m=function(select,json,heading)
 		var option=document.createElement("option");
 		select.appendChild(option);
 		option.text=json[key];
+
+		if(json[key]==on_loaded_value)
+		{
+			select.value=on_loaded_value;
+			select.onchange();
+		}
 	}
 
 	this.update_disables_m();
@@ -74,19 +82,19 @@ name_t.prototype.build_select_m=function(select,json,heading)
 
 name_t.prototype.build_schools_m=function(json)
 {
-	this.build_select_m(this.school,json,"School");
+	this.build_select_m(this.school,json,"School",this.on_loaded_school);
 	this.download_robots_m();
 }
 
 name_t.prototype.build_robots_m=function(json)
 {
-	this.build_select_m(this.robot,json,"Robot");
+	this.build_select_m(this.robot,json,"Robot",this.on_loaded_robot);
 }
 
 name_t.prototype.on_error_m=function(error)
 {
 	if(this.on_message)
-		on_message(error);
+		this.on_message(error);
 }
 
 name_t.prototype.download_schools_m=function()

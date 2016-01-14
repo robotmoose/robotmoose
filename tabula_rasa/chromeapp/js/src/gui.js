@@ -27,6 +27,12 @@ function gui_t(div)
 		function(robot){_this.connection.gui_robot(robot);}
 	);
 	this.name.el.style.float="left";
+	this.connection.on_name_set=function(school,name)
+	{
+		_this.name.on_loaded_school=school;
+		_this.name.on_loaded_robot=name;
+	};
+	this.connection.load();
 
 	this.serial_selector=new serial_selector_t
 	(
@@ -38,16 +44,9 @@ function gui_t(div)
 	this.serial_selector.el.style.float="left";
 
 	this.status_viewer=new status_viewer_t(this.el);
-
-/*
-	this.download_config();
-	setInterval(function(){_this.download_config();},2000);
-	this.download_write();
-*/
 }
 
 gui_t.prototype.destroy=function()
 {
 	this.status_viewer.destroy();
 }
-

@@ -5,18 +5,19 @@
  Mike Moss & Orion Lawlor, 2015-12, Public Domain
 */
 
-function connection_t(div,on_message,on_disconnect)
+function connection_t(div,on_message,on_disconnect,on_name_set)
 {
 	var _this=this;
 	_this.config="";
 	_this.status_message=on_message;
 	_this.on_disconnect=on_disconnect;
+	_this.on_name_set=on_name_set;
 	_this.connection_invalid="yes, totally invalid";
 	_this.show_debug_bytes=false; // low level serial comm debugging
 	_this.max_command=15; // A-packet formatting
-	_this.max_short_length=15; 
+	_this.max_short_length=15;
 	_this.robot=null;
-	
+
 	// Are there other serial JS apis?  maybe node.js?
 	_this.serial_api=chrome.serial;
 
@@ -117,7 +118,7 @@ connection_t.prototype.gui_connect=function(port_name)
 	var _this=this;
 	_this.reset();
 	if (!_this.robot) { _this.status_message("Need a school before connecting"); return; }
-	
+
 	_this.port_name=port_name;
 	_this.status_message("Connecting to "+port_name);
 	var options={
@@ -131,6 +132,7 @@ connection_t.prototype.gui_connect=function(port_name)
 
 			_this.serial_api.flush(_this.connection, function() {
 				_this.arduino_setup_start();
+				_this.save();
 			} );
 		}
 	);
@@ -238,7 +240,7 @@ connection_t.prototype.arduino_setup_devices=function()
 			} else {
 				_this.status_message(" Pilot needs to configure robot on superstar: "+robot.name);
 			}
-		
+
 			var d=0; // device counter
 			var next_device=function() {
 				d++;
@@ -950,4 +952,24 @@ connection_t.prototype.serial_send_packet=function(command,array_data,done_callb
 	_this.serial_send(write_data,done_callback);
 }
 
+connection_t.prototype.save=function()
+{
+	var _this=this;
 
+	chrome.storage.local.set({"robot":this.robot},
+		function(){_this.status_message("Saved robot.");});
+}
+
+connection_t.prototype.load=function()
+{
+	var _this=this;
+
+	chrome.storage.local.get("robot",
+		function(data)
+		{
+			_this.status_message("Loaded robot:  "+JSON.stringify(data));
+
+			if(_this.on_name_set&&data&&data.robot&&data.robot.school&&data.robot.name)
+				_this.on_name_set(data.robot.school,data.robot.name);
+		});
+}
