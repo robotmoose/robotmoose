@@ -40,6 +40,11 @@ function name_t(div,on_message,on_selected)
 	this.download_schools_m();
 }
 
+name_t.prototype.destroy=function()
+{
+	this.div.removeChild(this.el);
+}
+
 name_t.prototype.get_robot=function()
 {
 	var robot={superstar:this.superstar,school:null,name:null};

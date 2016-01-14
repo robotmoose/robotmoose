@@ -48,5 +48,8 @@ function gui_t(div)
 
 gui_t.prototype.destroy=function()
 {
+	this.connection.destroy();
+	this.name.destroy();
 	this.status_viewer.destroy();
+	this.div.removedChild(this.el);
 }

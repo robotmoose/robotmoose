@@ -32,6 +32,12 @@ function connection_t(div,on_message,on_disconnect,on_name_set)
 	);
 }
 
+connection_t.prototype.destroy=function()
+{
+	this.gui_disconnect();
+	this.div.removeChild(this.el);
+}
+
 
 // Reset all state
 connection_t.prototype.reset=function() {
