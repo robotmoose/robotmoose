@@ -18,8 +18,8 @@ width_ears=90;
 // Y width of central region
 width_neck=65;
 
-// Z thickness
-thick=15;
+// Z thickness of whole plate
+thick=16;
 
 /* 
 Motor projection database:
@@ -45,13 +45,15 @@ module poke_hole(holei, add_radius=0.0, add_depth=0.0, scale_depth=1.0)
 }
 
 module poke_motor_holes() {
-    poke_hole(0);
-    poke_hole(0,3.0, 2.5,0.0);
+    poke_hole(0,-0.7);
+    poke_hole(0, 3.5, 3.0,0.0); // extra motor ring
     poke_hole(1);
-    poke_hole(1,2.0, 4.0,0.0);
+    poke_hole(1,2.0, 2.0,0.0); // extra minipin ring
     poke_hole(2);
-    poke_hole(3);
-  #  translate([53,8,-3])
+    poke_hole(3,0.5);
+    
+    // bridge between pin and motor area
+    translate([53,8,-3])
         rotate([0,0,-20])
             cube([10,8,10]);
 }
@@ -65,32 +67,67 @@ module motor_bracket_holes() {
 
 }
 
-difference() {
-    union() {
-        hull() {
-            translate([x_start,-width_neck/2,0])
-                cube([25,width_neck,thick]);
-            translate([81,0,0])
-                cylinder(d=50,h=thick);
+// The main motor bracket, overall
+module motor_bracket() {
+    difference() {
+        union() {
+            hull() {
+                translate([x_start,-width_neck/2,0])
+                    cube([15,width_neck,thick]);
+                translate([81,0,0])
+                    cylinder(d=50,h=thick);
+            }
+            
+            translate([x_start,-width_ears/2,0])
+                cube([x_ears,width_ears,thick]);
+            
+            intersection() {
+                translate([x_start,-width_ears/2,0])
+                    cube([80,width_ears,thick]);
+                union() {
+                    motor_bracket_holes() woodscrew_boss();
+                }
+            }
         }
-        
-        translate([x_start,-width_ears/2,0])
-            cube([x_ears,width_ears,thick]);
+        union() { // minus
+            translate([0,0,thick+epsilon])
+                poke_motor_holes();
+            
+           motor_bracket_holes() woodscrew_head(0.1);
+        }
+
+    }
+}
+
+// Lighten the bracket by insetting and subtracting
+module motor_bracket_lighter() {
+    difference() {
+        motor_bracket();
         
         intersection() {
-            translate([x_start,-width_ears/2,0])
-                cube([80,width_ears,thick]);
-            union() {
-                motor_bracket_holes() woodscrew_boss();
+            // Inset version of whole bracket top
+            slice_z=thick-1;
+            floor_z=1.5;
+            translate([0,0,floor_z])
+             linear_extrude(height=thick,convexity=4)
+              offset(r=2.5)  offset(r=-4)
+               projection(cut=true) 
+                translate([0,0,-slice_z]) 
+                 motor_bracket();
+            
+                
+            // Add some stuff back in:
+            difference() {
+               // bevel ends near mounting holes
+               translate([50,0,0])
+                 cylinder(r=32,h=floor_z+thick);
+               
+               // add a rib below 2nd axle
+               translate([0,13,0])
+               cube([100,1.5,100],center=true);
             }
         }
     }
-    union() { // minus
-        translate([0,0,thick+epsilon])
-            poke_motor_holes();
-        
-       motor_bracket_holes() woodscrew_head(0.1);
-    }
-
 }
-
+    
+motor_bracket_lighter();

@@ -7,10 +7,10 @@ epsilon=0.02;
 
 // This is how much your printer squishes extra around holes
 //   bigger value leaves more space for globs.
-clearance=0.4;
+clearance=0.3;
 
 // Removeable parts leave this much extra diameter
-wiggle=0.2;
+wiggle=0.1;
 
 // Wall thickness for most parts--two nozzle diameters typ.
 wall=0.8;
@@ -20,10 +20,10 @@ floor=1.2;
 
 
 // This is the main drive axle
-axle_dia=0.375*25.4+2*clearance;
+axle_dia=0.375*25.4+2*clearance+wiggle;
 
 // Main frame tubing
-tube_OD=23.5+2*clearance+wiggle;
+tube_OD=23.5+2*clearance;
 
 
 // Main woodscrews: Everbilt #8x9/16" lath screws
