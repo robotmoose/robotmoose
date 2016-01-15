@@ -1,9 +1,12 @@
-// Ridiculously complex bracket to hold a chunk of EMT tubing
+// Simpler cone-shaped bracket to hold a chunk of EMT tubing
 include <layla_config.scad>;
 
-// Size of floorplate of bracket
+$fa=5;
+
+// Size of floorplate of bracket (center to outside tip)
 radius=50;
 
+// Thickness of base of bracket
 floor=3;
 
 // Bracket mounting screw hole locations
@@ -11,7 +14,7 @@ module tube_bracket_holes() {
     translate([0,0,+floor]) 
     for (angle=[45:90:360-epsilon])
         rotate([0,0,angle])
-            translate([radius*0.8,0,0])
+            translate([radius*0.85,0,0])
                 children();
 }
 
@@ -25,7 +28,7 @@ module tube_bracket(tube_angles)
                 // Body
                 cylinder(d1=2*radius,d2=tube_OD,h=0.7*radius);
                 rotate(tube_angles) {
-                    cylinder(d1=1.5*radius,d2=3*wall+tube_OD,h=radius);
+                    cylinder(d1=1.5*radius,d2=2*wall+tube_OD,h=radius);
                 }
                 
                 // bosses around screw holes
@@ -40,6 +43,13 @@ module tube_bracket(tube_angles)
                 
                 // space for screws
                 tube_bracket_holes() woodscrew_head(1.5);
+                
+                // Lightening scoop-outs
+                translate([0,0,-epsilon])
+                for (angle=[0:90:360-epsilon])
+                    rotate([0,0,angle])
+                    translate([radius*1.2,0,0])
+                        cylinder(r=radius*0.60,h=radius);
             }
         }
        
@@ -52,4 +62,8 @@ module tube_bracket(tube_angles)
     }
 }
 
-tube_bracket([8,0,0]);
+tube_bracket([0,0,0]);
+for (shift=[2*radius,4*radius])
+    translate([shift,0,0])
+        tube_bracket([11,0,0]);
+
