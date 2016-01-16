@@ -5,12 +5,13 @@
  Mike Moss & Orion Lawlor, 2015-12, Public Domain
 */
 
-function connection_t(div,on_message,on_disconnect,on_name_set)
+function connection_t(on_message,on_disconnect,on_connect,on_name_set)
 {
 	var _this=this;
 	_this.config="";
 	_this.status_message=on_message;
 	_this.on_disconnect=on_disconnect;
+	_this.on_connect=on_connect;
 	_this.on_name_set=on_name_set;
 	_this.connection_invalid="yes, totally invalid";
 	_this.show_debug_bytes=false; // low level serial comm debugging
@@ -35,7 +36,6 @@ function connection_t(div,on_message,on_disconnect,on_name_set)
 connection_t.prototype.destroy=function()
 {
 	this.gui_disconnect();
-	this.div.removeChild(this.el);
 }
 
 
@@ -143,6 +143,9 @@ connection_t.prototype.gui_connect=function(port_name)
 		}
 	);
 
+	if(_this.on_connect)
+		_this.on_connect();
+
 }
 
 // Callback from GUI
@@ -161,6 +164,9 @@ connection_t.prototype.gui_disconnect=function(port_name,done_callback)
 		);
 	}
 	_this.reset();
+
+	if(_this.on_disconnect)
+		_this.on_disconnect();
 }
 
 /************* Serial Connection to Arduino ******************/

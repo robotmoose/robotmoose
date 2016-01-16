@@ -14,8 +14,7 @@ function serial_selector_t(div,on_connect,on_disconnect,is_connectable)
 		return null;
 
 	this.div=div;
-	this.el=document.createElement("div");
-	this.div.appendChild(this.el);
+	this.el=new_div(this.div);
 
 	this.on_connect=on_connect;
 	this.on_disconnect=on_disconnect;
@@ -122,10 +121,10 @@ serial_selector_t.prototype.build_list_m=function(ports)
 		this.select.appendChild(option);
 		option.text="No serial ports.";
 	}
-	else if (this.select.options.length==1 && !this.connected&&this.is_connectable())
+	/*else if (this.select.options.length==1 && !this.connected&&this.is_connectable())
 	{ // Only one serial port--automatically connect to it
 		_this.connect();
-	}
+	}*/
 }
 
 serial_selector_t.prototype.button_m=function()

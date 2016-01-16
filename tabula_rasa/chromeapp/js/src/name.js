@@ -12,13 +12,13 @@ function name_t(div,on_message,on_selected)
 		return null;
 
 	this.div=div;
-	this.el=document.createElement("div");
-	this.div.appendChild(this.el);
+	this.el=new_div(this.div);
 
 	this.on_message=on_message;
 	this.on_selected=on_selected;
 	this.on_loaded_school=null;
 	this.on_loaded_robot=null;
+	this.disabled=false;
 
 	var _this=this;
 
@@ -38,10 +38,13 @@ function name_t(div,on_message,on_selected)
 	this.build_robots_m();
 
 	this.download_schools_m();
+
+	this.disables_interval=setInterval(function(){_this.update_disables_m();},100);
 }
 
 name_t.prototype.destroy=function()
 {
+	clearInterval(this.disables_interval);
 	this.div.removeChild(this.el);
 }
 
@@ -133,14 +136,13 @@ name_t.prototype.download_robots_m=function()
 
 name_t.prototype.update_disables_m=function()
 {
-	var school_disabled=false;
-	var robot_disabled=false;
+	var disabled=false;
 
-	if(this.school.selectedIndex<=0)
-		robot_disabled=true;
+	if(this.school.selectedIndex<=0||this.disabled)
+		disabled=true;
 
-	this.school.disabled=school_disabled;
-	this.robot.disabled=robot_disabled;
+	this.school.disabled=disabled;
+	this.robot.disabled=disabled;
 }
 
 name_t.prototype.on_selected_m=function()

@@ -4,29 +4,32 @@ function gui_t(div)
 		return null;
 
 	this.div=div;
-	this.el=document.createElement("div");
-	this.div.appendChild(this.el);
+	this.el=new_div(this.div);
+	maximize(this.el);
+
+	this.layout=new_table(this.el,2,1);
+	maximize(this.layout);
+
+	this.top_bar=new_table(this.layout.rows[0].cells[0],1,2);
+	this.layout.rows[1].cells[0].style.height="100%";
+
 	this.superstar_errored=false;
 
 	var _this=this;
 
 	this.connection=new connection_t
 	(
-		this.el,
 		function(message){_this.status_viewer.show(message);},
-		function(){_this.serial_selector.disconnect();}
+		function(){_this.name.disabled=false;_this.serial_selector.disconnect();},
+		function(){_this.name.disabled=true;}
 	);
-
-	this.top_bar=document.createElement("div");
-	this.el.appendChild(this.top_bar);
 
 	this.name=new name_t
 	(
-		this.top_bar,
+		this.top_bar.rows[0].cells[0],
 		function(message){_this.status_viewer.show(message);},
 		function(robot){_this.connection.gui_robot(robot);}
 	);
-	this.name.el.style.float="left";
 	this.connection.on_name_set=function(school,name)
 	{
 		_this.name.on_loaded_school=school;
@@ -36,14 +39,13 @@ function gui_t(div)
 
 	this.serial_selector=new serial_selector_t
 	(
-		this.top_bar,
+		this.top_bar.rows[0].cells[1],
 		function(port_name){_this.connection.gui_connect(port_name);},
 		function(port_name){_this.connection.gui_disconnect(port_name);},
 		function(){return (_this.name.get_robot().school!=null&&_this.name.get_robot().name!=null);}
 	);
-	this.serial_selector.el.style.float="left";
 
-	this.status_viewer=new status_viewer_t(this.el);
+	this.status_viewer=new status_viewer_t(this.layout.rows[1].cells[0]);
 }
 
 gui_t.prototype.destroy=function()
