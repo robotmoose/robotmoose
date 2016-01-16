@@ -341,17 +341,7 @@ connection_t.sensor_property_list={
 "encoder":["encoder_raw#<u16>"],
 "heartbeat":["heartbeats<u8>"],
 "latency":["latency<u8>"],
-"neopixel":[
-	"neopixel#.color.r<u8>",
-	"neopixel#.color.g<u8>",
-	"neopixel#.color.b<u8>",
-	"neopixel#.accent.r<u8>",
-	"neopixel#.accent.g<u8>",
-	"neopixel#.accent.b<u8>",
-	"neopixel#.start<s8>",
-	"neopixel#.repeat<u8>",
-	"neopixel#.state<u8>"
-],
+"neopixel":[],
 "pwm":[],
 "serial_controller":[],
 "servo":[],
