@@ -96,11 +96,9 @@ connection_t.prototype.reconnect=function()
 {
 	var _this=this;
 	var port_name=_this.port_name;
-	_this.gui_disconnect(port_name,
-		function() {
-			_this.gui_connect(port_name);
-		}
-	);
+	_this.disconnect_m(function() {
+		_this.connect_m(port_name);
+	} );
 }
 
 // Status check
@@ -122,6 +120,32 @@ connection_t.prototype.gui_robot=function(robot)
 connection_t.prototype.gui_connect=function(port_name)
 {
 	var _this=this;
+	_this.connect_m(port_name, function() {
+		if(_this.on_connect)
+			_this.on_connect();
+		
+		_this.save();
+	} );
+}
+
+// Callback from GUI
+connection_t.prototype.gui_disconnect=function(port_name,done_callback)
+{
+	var _this=this;
+	_this.disconnect_m(function() {
+		if(_this.on_disconnect)
+			_this.on_disconnect();
+		
+		if (done_callback) done_callback();
+	} );
+}
+
+/************* Serial Connection to Arduino ******************/
+
+// Connect to this device
+connection_t.prototype.connect_m=function(port_name,done_callback)
+{
+	var _this=this;
 	_this.reset();
 	if (!_this.robot) { _this.status_message("Need a school before connecting"); return; }
 
@@ -138,38 +162,35 @@ connection_t.prototype.gui_connect=function(port_name)
 
 			_this.serial_api.flush(_this.connection, function() {
 				_this.arduino_setup_start();
-				_this.save();
+				if (done_callback) done_callback();
 			} );
 		}
 	);
-
-	if(_this.on_connect)
-		_this.on_connect();
-
 }
 
-// Callback from GUI
-connection_t.prototype.gui_disconnect=function(port_name,done_callback)
+// Disconnect from this device
+connection_t.prototype.disconnect_m=function(done_callback)
 {
 	var _this=this;
-	if (_this.connection!==_this.connection_invalid) {
+	if (_this.connected()) {
+		var connection=_this.connection;
+		var port_name=_this.port_name;
+		_this.reset();
 		_this.status_message("Disconnecting from "+port_name);
-		chrome.serial.disconnect(_this.connection,
+		chrome.serial.disconnect(connection,
 			function() {
 				if (chrome.runtime.lastError)
 					_this.status_message("Error disconnecting from "+port_name);
 				_this.status_message("Disconnected from "+port_name);
+
 				if (done_callback) done_callback();
 			}
 		);
 	}
-	_this.reset();
-
-	if(_this.on_disconnect)
-		_this.on_disconnect();
 }
 
-/************* Serial Connection to Arduino ******************/
+
+
 connection_t.prototype.arduino_setup_start=function() {
 	var _this=this;
 	_this.serial_read_line( function(first_line) {
@@ -736,6 +757,7 @@ connection_t.prototype.serial_callback_onReceive=function(info)
 {
 	var _this=this;
 	_this.status_message("Serial data received: "+info.data.byteLength+" bytes");
+	if (!_this.connected()) return;
 
 	// parse?
 	var buffer=info.data; // ArrayBuffer
@@ -798,6 +820,7 @@ connection_t.prototype.serial_read_line=function(line_callback)
 connection_t.prototype.serial_send=function(array_like,done_callback)
 {
 	var _this=this;
+	if (!_this.connected()) return;
 	if (_this.sends_in_progress!=0) _this.bad("Cannot overlap send calls!");
 	_this.sends_in_progress++;
 
