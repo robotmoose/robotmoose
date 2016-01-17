@@ -15,11 +15,13 @@ function new_table(el,rows,cells_per_row)
 	for(var rr=0;rr<rows;++rr)
 	{
 		var row=document.createElement("tr");
+		clear_margin_padding(row);
 		table.appendChild(row);
 
 		for(var cc=0;cc<cells_per_row;++cc)
 		{
 			var cell=document.createElement("td");
+			clear_margin_padding(cell);
 			row.appendChild(cell);
 		}
 	}
