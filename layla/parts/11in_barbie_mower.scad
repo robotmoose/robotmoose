@@ -54,7 +54,7 @@ module half_sphere(d=20,h=100)
 }
 
 module 11in_mower(spline_width=3.5,inner_diameter=36,
-	teeth_thickness=8,teeth_num=10,teeth_height=12,roundness=1,floor=4)
+	teeth_thickness=12,teeth_num=10,teeth_height=10,roundness=1,floor=2)
 {
 	//actual spline_width is 2.5
 	//actual inner_diameter is 35
@@ -80,8 +80,8 @@ module 11in_mower(spline_width=3.5,inner_diameter=36,
 		}
 }
 
-module barbie_adapter(channel_length=50,channel_width=13.3,channel_height=13.3,
-	center_cut_diameter=32,roundness=1,wall=1,floor=4,wiggle=1.5,channel_overcut=5)
+module barbie_adapter(channel_length=50,channel_width=13.3,channel_height=18,
+	center_cut_diameter=32,roundness=1,wall=5,floor=2,wiggle=0.75,channel_overcut=0)
 {
 	difference()
 	{
@@ -95,7 +95,7 @@ module barbie_adapter(channel_length=50,channel_width=13.3,channel_height=13.3,
 							-(channel_length+wiggle+channel_overcut)/2,0])
 								round_cube(size=[channel_width+wiggle,
 									channel_length+wiggle+channel_overcut,
-									channel_width+wiggle],
+									channel_width+wiggle*4],
 									radius=roundness);
 				round_cylinder(d=center_cut_diameter+wiggle,h=channel_height,
 					roundness=roundness);
@@ -107,7 +107,7 @@ module 11in_barbie_mower()
 {
 	difference()
 	{
-		translate([0,0,16])
+		translate([0,0,12])
 		{
 			barbie_adapter();
 			11in_mower();
@@ -118,3 +118,10 @@ module 11in_barbie_mower()
 }
 
 11in_barbie_mower();
+difference()
+{
+    cylinder(d=18,h=9.7);
+    
+    translate([0,0,-1])
+        cylinder(d=16,h=11.7);
+}
