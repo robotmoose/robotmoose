@@ -137,12 +137,11 @@ name_t.prototype.download_robots_m=function()
 name_t.prototype.update_disables_m=function()
 {
 	var disabled=false;
-
 	if(this.school.selectedIndex<=0||this.disabled)
 		disabled=true;
-
-	this.school.disabled=disabled;
 	this.robot.disabled=disabled;
+
+	this.school.disabled=this.disabled; 
 }
 
 name_t.prototype.on_selected_m=function()
