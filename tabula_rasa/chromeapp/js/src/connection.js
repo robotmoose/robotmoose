@@ -445,8 +445,6 @@ connection_t.prototype.walk_property_list=function(property_list,handle_property
 	for (var devi in _this.device_names) {
 		var dev=_this.device_names[devi];
 		var props=property_list[dev];
-		if(!dev)
-		console.log("Bad dev"+ devi);
 		if (!props)
 		{ // Can't find device in list--should be there though...
 			for (var pli in property_list)
