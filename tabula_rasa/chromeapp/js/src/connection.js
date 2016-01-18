@@ -367,6 +367,9 @@ connection_t.sensor_property_list={
 "serial_controller":[],
 "servo":[],
 "ultrasonic_sensor":["ultrasonic#<u8>"],
+"wheel_encoder":["wheel.left<u16>","wheel.right<u16>"],
+
+
 
 // All these motor controllers have no sensor values
 "sabertooth1":[],
@@ -413,6 +416,7 @@ connection_t.command_property_list={
 "serial_controller":[],
 "servo":["servo#<u8>=90"],
 "ultrasonic_sensor":[],
+"wheel_encoder":[],
 
 // All the motor controllers have the same command interface:
 "sabertooth1":["L<s16>","R<s16>"],
@@ -437,14 +441,18 @@ connection_t.prototype.walk_property_list=function(property_list,handle_property
 {
 	var _this=this;
 	var counts={};
+	console.log(JSON.stringify(_this.device_names));
 	for (var devi in _this.device_names) {
 		var dev=_this.device_names[devi];
 		var props=property_list[dev];
+		if(!dev)
+		console.log("Bad dev"+ devi);
 		if (!props)
 		{ // Can't find device in list--should be there though...
 			for (var pli in property_list)
 				_this.status_message("  Valid device '"+pli+"'");
 			_this.bad("Device type '"+dev+"' not in property list! (Do you need to update this app to match your firmware?)");
+			
 		}
 
 		// Update device counter, for stuff like servo# -> servo[0]
