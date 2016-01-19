@@ -20,7 +20,7 @@ function send_request(method,path,request,uri,on_reply,on_error,data,content_typ
 					if(xmlhttp.status==200)
 					{
 						if(on_reply)
-							on_reply(xmlhttp.responseText);
+							on_reply(decodeURIComponent(xmlhttp.responseText));
 					}
 					else if(on_error)
 					{
