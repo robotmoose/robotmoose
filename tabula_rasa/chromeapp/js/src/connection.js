@@ -18,6 +18,8 @@ function connection_t(on_message,on_disconnect,on_connect,on_name_set)
 	_this.max_command=15; // A-packet formatting
 	_this.max_short_length=15;
 	_this.robot=null;
+	_this.location = new vec3(0,0,0)
+	_this.angle = 0;
 
 	// Are there other serial JS apis?  maybe node.js?
 	_this.serial_api=chrome.serial;
@@ -1004,3 +1006,35 @@ connection_t.prototype.load=function()
 				_this.on_name_set(data.robot.school,data.robot.name);
 		});
 }
+
+
+connection_t.prototype.move_wheels=function(left, right, wheelbase)
+{
+	// Extract position and orientation from absolute location
+	var P = this.location; // position of robot (center of wheels)
+	var ang_rads = this.angle*Math.PI/180; // 2D rotation of robot
+
+	// Reconstruct coordinate system and wheel locations
+	var FW = new vec3(Math.cos(ang_rads), Math.sin(ang_rads), 0.0); // forward vector
+	var UP = new vec3(0,0,1); // up vector
+	var LR=FW.cross(UP); // left-to-right vector
+	var wheel = new Array(2);
+	wheel[0] = P.add(LR.mul(0.5*wheelbase/1000));
+	wheel[1] = P.add(LR.mul(0.5*wheelbase/1000));
+
+	// Move wheels forward by specified amounts
+	wheel[0] = wheel[0].add(FW.mul(left));
+	wheel[1] = wheel[1].add(FW.mul(left));
+
+	// Extract new robot position and orientation
+	P = (wheel[0].add(wheel[1])).mul(0.5);
+	LR = (wheel[1].sub(wheel[0])).normalize();
+	FW = UP.cross(LR);
+	ang_rads=Math.atan2(FW.y, FW.x);
+
+	// Put back into absolute location
+	this.location = P;
+	this.angle = 180/Math.PI*ang_rads;
+}
+
+//robot_localization.prototype.
