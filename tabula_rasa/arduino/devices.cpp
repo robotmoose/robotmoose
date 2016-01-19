@@ -333,8 +333,9 @@ class wheel_encoder : public action {
 public:
 	encoder * _L;
 	encoder * _R;
+	tabula_sensor<uint16_t> _wheelbase;
 
-	wheel_encoder(int LPin, int RPin) : _L(new encoder(LPin)), _R(new encoder(RPin))
+	wheel_encoder(int LPin, int RPin, uint16_t wheelbase) : _L(new encoder(LPin)), _R(new encoder(RPin)), _wheelbase(wheelbase)
 	{}
 
         virtual void loop()
@@ -344,13 +345,12 @@ public:
         }
 };
 
-REGISTER_TABULA_DEVICE(wheel_encoder, "PP",
+REGISTER_TABULA_DEVICE(wheel_encoder, "PPC",
 	int LPin=src.read_pin();
 	int RPin=src.read_pin();
-	wheel_encoder * device=new wheel_encoder(LPin, RPin);
-	//src.sensor_index("value",F("Left Counts"),device->_L->value.get_index());
-	//src.sensor_index("value",F("Right Counts"),device->_R->value.get_index());
-	actions_1ms.add(device);
+	int wheelbase=src.read_int();
+	wheel_encoder * device=new wheel_encoder(LPin, RPin, wheelbase);
+      	actions_1ms.add(device);
 )
 
 // #include "NewPing.h"
