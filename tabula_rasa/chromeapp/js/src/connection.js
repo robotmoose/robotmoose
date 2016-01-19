@@ -367,7 +367,7 @@ connection_t.sensor_property_list={
 "serial_controller":[],
 "servo":[],
 "ultrasonic_sensor":["ultrasonic#<u8>"],
-"wheel_encoder":["wheel.left<u16>","wheel.right<u16>"],
+"wheel_encoder":["wheel.left<u16>","wheel.right<u16>", "wheel.wheelbase<u16>"],
 
 
 

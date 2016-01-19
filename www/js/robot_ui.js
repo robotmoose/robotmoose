@@ -127,7 +127,15 @@ robot_ui_t.prototype.download_gui=function()
 	+ "label(\"This will appear in the UI\")<br>"
 	+ "button(\"Press me\", state1)<br>"
 	+ "slider(\"Slider!\", -1.0, 0.0, 1.0) <br>"
-	+ "checkbox(\"Would you like to check this box?\")<br>"
+	+ "checkbox(\"Would you like to check this box?\")<br>";
+	
+	var help_text_config = 
+	"<h3>When configuring devices:</h3>"
+	+"<h4><b>wheel_encoder</b></h4>"
+	+"<ul><li>Pin: Left wheel encoder pin</li><li>Pin: Right wheel encoder pin</li><li>"
+	+"Number: Robot wheelbase <ul><li>Distance between wheel centers (mm)</li></ul></li></ul>";
+
+	
 
 	var clear_out=function(div)
 	{
@@ -139,7 +147,7 @@ robot_ui_t.prototype.download_gui=function()
 	{
 		myself.doorways=
 		{
-			config:myself.create_doorway("Configure","Set up robot hardware",null),
+			config:myself.create_doorway("Configure","Set up robot hardware",help_text_config),
 			pilot:myself.create_doorway("Drive","Manually drive the robot",null),
 			sensors:myself.create_doorway("Sensors","Examine sensor data from robot",null),
 			states:myself.create_doorway("Code","Automatically drive the robot",help_text_states),
