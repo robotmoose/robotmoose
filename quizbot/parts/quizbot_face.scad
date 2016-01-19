@@ -3,7 +3,7 @@ sigma=0.1;
 base_thickness=2;
 base_diameter=42;
 
-neck_height=24;
+neck_height=32;
 neck_width=9;
 neck_thickness=8;
 neck_offset=20;
@@ -11,7 +11,7 @@ roundness=3;
 
 horn_width=7;
 horn_length=20;
-horn_depth=0.5;
+horn_depth=1;
 horn_yfudge=1.5;
 horn_zfudge=1;
 

@@ -4,8 +4,10 @@ base_thickness=5;
 base_diameter=42;
 
 servo_width=13;
+servo_offset=4;
 servo_bracket_height=5;
 servo_bracket_thickness=3;
+servo_edge=4;
 
 wall_height=4;
 wall_thickness=3;
@@ -15,10 +17,10 @@ horn_width=7;
 horn_length=32;
 horn_depth=1;
 
-cable_manager_walls=1;
-cable_manager_slit=1.5;
-cable_manager_channel=1;
-cable_manager_width=3;
+cable_manager_walls=2;
+cable_manager_slit=2.3;
+cable_manager_channel=1.5;
+cable_manager_width=6;
 cable_manager_height=2;
 
 union()
@@ -33,9 +35,9 @@ union()
         translate([0,0,base_thickness])
         {
             //Cut Center
-            translate([-servo_width/2,-base_diameter/2,0])
+            translate([-servo_width/2,-base_diameter/2+servo_edge,0])
                 cube(size=[servo_width,
-                    base_diameter,
+                    base_diameter-servo_edge,
                     wall_height+chop+sigma]);
 
             //Cut Walls
@@ -59,9 +61,9 @@ union()
                         cube_width,
                         wall_height+chop+sigma],
                         rot_z=true);
-                translate([0,-base_diameter/2-sigma,0])
+                translate([0,-base_diameter/2-sigma+servo_edge,0])
                     round_cube(size=[base_diameter,
-                        cube_width,
+                        cube_width-servo_edge,
                         wall_height+chop+sigma],
                         rot_z=true);
             }
@@ -69,7 +71,7 @@ union()
 
         //Cut Servo Hole
         translate([-servo_width/2,
-            -servo_bracket_thickness/2,
+            -servo_bracket_thickness/2-servo_offset,
             base_thickness-servo_bracket_height+sigma])
             cube(size=[servo_width,servo_bracket_thickness+sigma,servo_bracket_height]);
 
