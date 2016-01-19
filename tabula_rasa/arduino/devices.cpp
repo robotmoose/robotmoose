@@ -328,6 +328,30 @@ REGISTER_TABULA_DEVICE(encoder,"P",
 	actions_1ms.add(device);
 )
 
+// Robot with two encoders, one on the left & one on the right
+class wheel_encoder : public action {
+public:
+	encoder * _L;
+	encoder * _R;
+
+	wheel_encoder(int LPin, int RPin) : _L(new encoder(LPin)), _R(new encoder(RPin))
+	{}
+
+        virtual void loop()
+        {
+          _L->loop();
+          _R->loop();
+        }
+};
+
+REGISTER_TABULA_DEVICE(wheel_encoder, "PP",
+	int LPin=src.read_pin();
+	int RPin=src.read_pin();
+	wheel_encoder * device=new wheel_encoder(LPin, RPin);
+	//src.sensor_index("value",F("Left Counts"),device->_L->value.get_index());
+	//src.sensor_index("value",F("Right Counts"),device->_R->value.get_index());
+	actions_1ms.add(device);
+)
 
 // #include "NewPing.h"
 // HC-SR04 Ultrasonic Sensor (Dedicated Trigger & Echo Pins)
