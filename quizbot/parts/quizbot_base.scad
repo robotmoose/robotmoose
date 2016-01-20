@@ -3,25 +3,26 @@ sigma=0.1;
 base_thickness=5;
 base_diameter=42;
 
+center_fudge=2;
+
 servo_width=13;
-servo_offset=4;
+servo_offset=2;
 servo_bracket_height=5;
 servo_bracket_thickness=3;
 servo_edge=4;
 
 wall_height=4;
 wall_thickness=3;
-wall_width=18;
+wall_width=16;
 
 horn_width=7;
 horn_length=32;
 horn_depth=1;
 
-cable_manager_walls=2;
-cable_manager_slit=2.3;
-cable_manager_channel=1.5;
-cable_manager_width=6;
-cable_manager_height=2;
+cable_manager_width=12;
+cable_manager_height=4;
+cable_manager_depth=20;
+cable_manager_zoff=2;
 
 union()
 {
@@ -35,9 +36,9 @@ union()
         translate([0,0,base_thickness])
         {
             //Cut Center
-            translate([-servo_width/2,-base_diameter/2+servo_edge,0])
+            translate([-servo_width/2,-base_diameter/2+servo_edge+1,0])
                 cube(size=[servo_width,
-                    base_diameter-servo_edge,
+                    base_diameter-servo_edge*2-center_fudge,
                     wall_height+chop+sigma]);
 
             //Cut Walls
@@ -58,7 +59,7 @@ union()
                 cube_width=(base_diameter-wall_width)/2+sigma;
                 translate([0,wall_width/2+sigma,0])
                     round_cube(size=[base_diameter,
-                        cube_width,
+                        cube_width-servo_edge,
                         wall_height+chop+sigma],
                         rot_z=true);
                 translate([0,-base_diameter/2-sigma+servo_edge,0])
@@ -78,31 +79,12 @@ union()
         //Servo Horn
         translate([-horn_length/2,-horn_width/2,-sigma])
             cube(size=[horn_length,horn_width,horn_depth]);
-    }
-
-    //Cable Manager
-    translate([-(cable_manager_width+cable_manager_walls)/2,base_diameter/2,0])
-    {
-        difference()
-        {
-            translate([0,-1,0])
-                cube([cable_manager_walls+cable_manager_width,
-                    cable_manager_walls*2+
-                    cable_manager_slit+1,
-                    cable_manager_height]);
-            
-            translate([0,cable_manager_walls,-sigma])
-            {
-                translate([cable_manager_walls,0,0])
-                    cube([cable_manager_width-cable_manager_walls,
-                        cable_manager_slit,
-                        cable_manager_height+sigma*2]);
-                translate([-sigma,0,0])
-                    cube([cable_manager_width+sigma,
-                        cable_manager_channel,
-                        cable_manager_height+sigma*2]);
-            }
-        }
+        
+        //Cut Cable Management Hole
+        translate([-cable_manager_width/2,
+            base_diameter/2-cable_manager_depth/2,
+            base_thickness-cable_manager_zoff])
+            round_cube([cable_manager_width,cable_manager_depth,cable_manager_height],rot_z=true);
     }
 }
 
@@ -112,11 +94,11 @@ module round_cube(size,radius=1,rot_z=false)
     
     if(rot_z)
     {
-        x=size[1]-radius/2;
-        y=size[2];
-        z=size[0]-radius/2;
+        x=size[1]-radius*2;
+        y=size[2]-radius*2;
+        z=size[0]-radius;
 
-        translate([0,0,radius])
+        translate([0,radius,radius])
             rotate([90,0,90])
                 minkowski()
                 {
@@ -128,9 +110,9 @@ module round_cube(size,radius=1,rot_z=false)
     {
         x=size[2]-radius*2;
         y=size[0]-radius*2;
-        z=size[1];
+        z=size[1]-radius;
 
-        translate([radius,z+radius-radius/2,x+radius])
+        translate([radius,z+radius,x+radius])
             rotate([90,90,0])
                 minkowski()
                 {
@@ -139,68 +121,3 @@ module round_cube(size,radius=1,rot_z=false)
                 }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*difference()
-{
-    union()
-    {
-        //Base
-        cylinder(d=base_diameter,h=base_thickness,$fn=100);
-
-        //Walls
-        translate([servo_width/2,-wall_width/2,base_thickness])
-            cube(size=[wall_thickness,wall_width,wall_height]);
-        translate([-servo_width/2-wall_thickness,-wall_width/2,base_thickness])
-            cube(size=[wall_thickness,wall_width,wall_height]);
-
-        //Cable Manager
-        translate([-(cable_manager_width+cable_manager_walls)/2,base_diameter/2,0])
-        {
-            difference()
-            {
-                translate([0,-1,0])
-                    cube(size=[cable_manager_walls+cable_manager_width,
-                        cable_manager_walls*2+cable_manager_slit+1,base_thickness]);
-                
-                translate([0,cable_manager_walls,-sigma])
-                {
-                    translate([cable_manager_walls,0,0])
-                        cube(size=[cable_manager_width-cable_manager_walls,
-                            cable_manager_slit,base_thickness+sigma*2]);
-                    translate([-sigma,0,0])
-                        cube(size=[cable_manager_width+sigma,cable_manager_channel,
-                            base_thickness+sigma*2]);
-                }
-            }
-        }
-    }
-
-    //Servo Horn
-    translate([-horn_width/2,-horn_length/2,-sigma])
-        cube([horn_width,horn_length,horn_depth]);
-}*/

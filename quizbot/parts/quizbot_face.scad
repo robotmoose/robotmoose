@@ -4,8 +4,8 @@ base_thickness=2;
 base_diameter=42;
 
 neck_height=32;
-neck_width=9;
-neck_thickness=8;
+neck_width=12;
+neck_thickness=10;
 neck_offset=20;
 roundness=3;
 
