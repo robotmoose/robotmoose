@@ -125,7 +125,7 @@ connection_t.prototype.gui_connect=function(port_name)
 	_this.connect_m(port_name, function() {
 		if(_this.on_connect)
 			_this.on_connect();
-		
+
 		_this.save();
 	} );
 }
@@ -137,7 +137,7 @@ connection_t.prototype.gui_disconnect=function(port_name,done_callback)
 	_this.disconnect_m(function() {
 		if(_this.on_disconnect)
 			_this.on_disconnect();
-		
+
 		if (done_callback) done_callback();
 	} );
 }
@@ -443,16 +443,17 @@ connection_t.prototype.walk_property_list=function(property_list,handle_property
 {
 	var _this=this;
 	var counts={};
-	console.log(JSON.stringify(_this.device_names));
+	//console.log(JSON.stringify(_this.device_names));
 	for (var devi in _this.device_names) {
 		var dev=_this.device_names[devi];
 		var props=property_list[dev];
+		//console.log("|"+dev+"|"+props+"|");
 		if (!props)
 		{ // Can't find device in list--should be there though...
 			for (var pli in property_list)
 				_this.status_message("  Valid device '"+pli+"'");
 			_this.bad("Device type '"+dev+"' not in property list! (Do you need to update this app to match your firmware?)");
-			
+
 		}
 
 		// Update device counter, for stuff like servo# -> servo[0]
@@ -659,6 +660,16 @@ connection_t.prototype.arduino_send_packet=function()
 	  function(device,property) {
 		var value=_this.read_JSON_property(_this.power,property);
 		_this.write_JSON_property(_this.sensors.power,property,value);
+		//console.log("|"+device+"|"+value+"|");
+
+		//MOTOR SCALING
+		if(device=="sabertooth1"||device=="sabertooth2"||device=="bts"||device=="create2")
+			value*=255;
+
+		if(value>255)
+			value=255;
+		if(value<-255)
+			value=-255;
 
 		var datatype=_this.arduino_property_type(property);
 		connection_t.write_bytes_as[datatype](cmd_data,idx,value);
