@@ -663,13 +663,13 @@ connection_t.prototype.arduino_send_packet=function()
 		//console.log("|"+device+"|"+value+"|");
 
 		//MOTOR SCALING
+		var motor_scale_value=255;
 		if(device=="sabertooth1"||device=="sabertooth2"||device=="bts"||device=="create2")
-			value*=255;
-
-		if(value>255)
-			value=255;
-		if(value<-255)
-			value=-255;
+			value*=motor_scale_value;
+		if(value>motor_scale_value)
+			value=motor_scale_value;
+		if(value<-motor_scale_value)
+			value=-motor_scale_value;
 
 		var datatype=_this.arduino_property_type(property);
 		connection_t.write_bytes_as[datatype](cmd_data,idx,value);
