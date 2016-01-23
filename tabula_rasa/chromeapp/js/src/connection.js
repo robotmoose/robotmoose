@@ -18,8 +18,6 @@ function connection_t(on_message,on_disconnect,on_connect,on_name_set)
 	_this.max_command=15; // A-packet formatting
 	_this.max_short_length=15;
 	_this.robot=null;
-	_this.location = new vec3(0,0,0)
-	_this.angle = 0;
 
 	// Are there other serial JS apis?  maybe node.js?
 	_this.serial_api=chrome.serial;
@@ -48,6 +46,10 @@ connection_t.prototype.reset=function() {
 	_this.power={}; // pilot's power commanded values to Arduino
 	_this.sensors={}; // Arduino-reported sensor values
 	_this.sensors.power={}; // Commanded values reflected back up to pilot
+
+	// Localization
+	_this.location = new vec3(0,0,0);
+	_this.angle = 0;
 
 	_this.serial_startup=true;
 	_this.sends_in_progress=0;
@@ -701,9 +703,35 @@ connection_t.prototype.arduino_recv_packet=function(p)
 		var value=connection_t.read_bytes_as[datatype](p.data,idx);
 		_this.write_JSON_property(_this.sensors,property,value);
 
+
 		idx+=_this.arduino_property_bytecount(property);
 	  }
 	);
+
+	if(_this.sensors.encoder) // Assuming create 2
+	{
+
+		if(_this.old)
+		{
+			function wraparound_fix(old_value, new_value)
+			{
+				return (0xff&(new_value-old_value + 128))-128;
+			}
+
+			var m_per_tick = 0.000444;
+			var wheelbase = .235;
+			_this.move_wheels(wraparound_fix(_this.old.L, _this.sensors.encoder.L)*m_per_tick, 
+								wraparound_fix(_this.old.R, _this.sensors.encoder.R)*m_per_tick, 
+								wheelbase);
+		}
+		_this.old = {};
+		_this.old.L = _this.sensors.encoder.L;
+		_this.old.R = _this.sensors.encoder.R;
+
+		_this.sensors.location = _this.location;
+		_this.sensors.location.angle = _this.angle;
+	}
+
 	if (idx!=p.length) _this.bad("Arduino sensor packet length mismatch: got "+p.length+", expected "+idx+" (firmware/app mismatch?)");
 
 	_this.status_message("	sensors = "+JSON.stringify(_this.sensors,null,'	'));
@@ -760,7 +788,7 @@ connection_t.prototype.arduino_sensor_packet=function(p)
 
 
 
-/***************** Low-level serial data I/O *********************/
+/***************** Low-level serial data I/O ********************/
 // Callback from serial API: error on serial port
 connection_t.prototype.serial_callback_onReceiveError=function(info)
 {
@@ -1021,21 +1049,22 @@ connection_t.prototype.load=function()
 
 connection_t.prototype.move_wheels=function(left, right, wheelbase)
 {
+	var _this = this;
 	// Extract position and orientation from absolute location
-	var P = this.location; // position of robot (center of wheels)
-	var ang_rads = this.angle*Math.PI/180; // 2D rotation of robot
+	var P = _this.location; // position of robot (center of wheels)
+	var ang_rads = _this.angle*Math.PI/180; // 2D rotation of robot
 
 	// Reconstruct coordinate system and wheel locations
 	var FW = new vec3(Math.cos(ang_rads), Math.sin(ang_rads), 0.0); // forward vector
 	var UP = new vec3(0,0,1); // up vector
 	var LR=FW.cross(UP); // left-to-right vector
 	var wheel = new Array(2);
-	wheel[0] = P.add(LR.mul(0.5*wheelbase/1000));
-	wheel[1] = P.add(LR.mul(0.5*wheelbase/1000));
+	wheel[0] = P.sub(LR.mul(0.5*wheelbase));
+	wheel[1] = P.add(LR.mul(0.5*wheelbase));
 
 	// Move wheels forward by specified amounts
 	wheel[0] = wheel[0].add(FW.mul(left));
-	wheel[1] = wheel[1].add(FW.mul(left));
+	wheel[1] = wheel[1].add(FW.mul(right));
 
 	// Extract new robot position and orientation
 	P = (wheel[0].add(wheel[1])).mul(0.5);
@@ -1044,8 +1073,8 @@ connection_t.prototype.move_wheels=function(left, right, wheelbase)
 	ang_rads=Math.atan2(FW.y, FW.x);
 
 	// Put back into absolute location
-	this.location = P;
-	this.angle = 180/Math.PI*ang_rads;
+	_this.location = P;
+	_this.angle = 180/Math.PI*ang_rads;
 }
 
 //robot_localization.prototype.
