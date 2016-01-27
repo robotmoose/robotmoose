@@ -46,7 +46,7 @@ void loop() {
           ++count1;    
         }
         
-    /*Serial.print("Count1 = ");
-    Serial.println(count1);*/
+    Serial.print("Count1 = ");
+    Serial.println(count1);
 }
 
