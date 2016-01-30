@@ -125,7 +125,7 @@ pilot_interface_t.prototype.reconfigure=function(config_editor)
 			break;
 
 		case "pwm":
-			this.make_slider(entries[key],"pwm",pwms, 0,255);
+			this.make_slider(entries[key],"pwm",pwms, 0,100);
 			pwms++;
 			break;
 
@@ -295,8 +295,8 @@ pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_d
 		mouse.Power.R=0;
 	}
 
-	this.pilot.power.L=mousePower.L;
-	this.pilot.power.R=mousePower.R;
+	this.pilot.power.L=100.0*mousePower.L;
+	this.pilot.power.R=100.0*mousePower.R;
 	this.pilot_send();
 
 	// document.getElementById('p_outputPilot').innerHTML=str;
@@ -341,8 +341,8 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 	else
 		this.keyboardIsDriving=true;
 
-	this.pilot.power.L=clamp(maxPower*(forward+turn),-maxPower,+maxPower);
-	this.pilot.power.R=clamp(maxPower*(forward-turn),-maxPower,+maxPower);
+	this.pilot.power.L=100.0*clamp(maxPower*(forward+turn),-maxPower,+maxPower);
+	this.pilot.power.R=100.0*clamp(maxPower*(forward-turn),-maxPower,+maxPower);
 	this.pilot_send();
 }
 
