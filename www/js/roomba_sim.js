@@ -126,8 +126,8 @@ roomba_t.prototype.loop=function(dt)
 
 	// Limit motor power
 	var limit=function (power) {
-		if (power>500) return 500;
-		if (power<-500) return -500;
+		if (power>100) return 100;
+		if (power<-100) return -100;
 		return power;
 	}
 	var L=limit(this.left);

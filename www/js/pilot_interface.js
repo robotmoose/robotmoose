@@ -125,7 +125,7 @@ pilot_interface_t.prototype.reconfigure=function(config_editor)
 			break;
 
 		case "pwm":
-			this.make_slider(entries[key],"pwm",pwms, 0,255);
+			this.make_slider(entries[key],"pwm",pwms, 0,100);
 			pwms++;
 			break;
 
@@ -216,13 +216,13 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	var myself=this;
 	this.mouse_down=0;
 	this.mouse_in_div=0;
-	this.arrowDiv.onmousedown=function(evt) { myself.pilot_mouse(evt,1);}; if(myself.element.click)myself.element.click(); };
-	this.arrowDiv.ondragstart=function(evt) { myself.pilot_mouse(evt,1); };
-	this.arrowDiv.onmouseup=function(evt) { myself.pilot_mouse(evt,-1); };
-	this.arrowDiv.onmouseenter=function(evt) { myself.pilot_mouse(evt,0,+1); };
-	this.arrowDiv.onmouseleave=function(evt) { myself.pilot_mouse(evt,-1,-1); };
-	this.arrowDiv.onmousemove=function(evt) { myself.pilot_mouse(evt,0); };
-	this.arrowDiv.ondblclick=function(evt) { myself.pilot_mouse(evt,0); };
+	this.arrowDiv.onmousedown=function(evt) { myself.pilot_mouse(evt,1,0); };
+	this.arrowDiv.ondragstart=function(evt) { myself.pilot_mouse(evt,1,0); };
+	this.arrowDiv.onmouseup=function(evt) { myself.pilot_mouse(evt,-1,0); };
+	this.arrowDiv.onmouseover=function(evt) { myself.pilot_mouse(evt,0,+1); };
+	this.arrowDiv.onmouseout=function(evt) { myself.pilot_mouse(evt,-1,-1); };
+	this.arrowDiv.onmousemove=function(evt) { myself.pilot_mouse(evt,0,0); };
+	this.arrowDiv.ondblclick=function(evt) { myself.pilot_mouse(evt,0,0); };
 
 	// Add arrow image
 	var img=document.createElement("img");
@@ -258,9 +258,11 @@ pilot_interface_t.prototype.get_pilot_power=function() {
 pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_del) {
 	if (mouse_in_del) this.mouse_in_div=mouse_in_del;
 
-	if (mouse_down_del==1) this.mouse_down=1;
-	if (mouse_down_del==-1) this.mouse_down=-1;
+	if (mouse_down_del>0) this.mouse_down=1;
+	if (mouse_down_del<0) this.mouse_down=-1;
 
+	// console.log("Mouse event: down="+this.mouse_down+"  down del="+mouse_down_del+"   in="+this.mouse_in_div+"  in del="+mouse_in_del);
+	
 // Allow user to set maximum power
 	var maxPower=this.get_pilot_power();
 
@@ -280,7 +282,7 @@ pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_d
 	mousePower.L=pretty(clamp(dir.forward+dir.turn,-maxPower,maxPower));
 	mousePower.R=pretty(clamp(dir.forward-dir.turn,-maxPower,maxPower));
 
-	if (this.mouse_down==1) {
+	if (this.mouse_down>0 && this.mouse_in_div>0) {
 		arrowDiv.style.backgroundColor='#222222';
 		str+=" SENDING";
 	} else {
@@ -289,14 +291,8 @@ pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_d
 		str+=" (click to send)";
 	}
 
-	if(!this.mouse_in_div)
-	{
-		mousePower.L=0;
-		mousePower.R=0;
-	}
-
-	this.pilot.power.L=mousePower.L;
-	this.pilot.power.R=mousePower.R;
+	this.pilot.power.L=100.0*mousePower.L;
+	this.pilot.power.R=100.0*mousePower.R;
 	this.pilot_send();
 
 	// document.getElementById('p_outputPilot').innerHTML=str;
@@ -341,8 +337,8 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 	else
 		this.keyboardIsDriving=true;
 
-	this.pilot.power.L=clamp(maxPower*(forward+turn),-maxPower,+maxPower);
-	this.pilot.power.R=clamp(maxPower*(forward-turn),-maxPower,+maxPower);
+	this.pilot.power.L=100.0*clamp(maxPower*(forward+turn),-maxPower,+maxPower);
+	this.pilot.power.R=100.0*clamp(maxPower*(forward-turn),-maxPower,+maxPower);
 	this.pilot_send();
 }
 
