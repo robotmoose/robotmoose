@@ -470,32 +470,25 @@ deviceT json_command_conversion(const jsonT &v) {
 // Motor power conversion from float [-1..+1] to signed int [-255..+255]
 template <>
 int16_t json_command_conversion<float,int16_t>(const float &v) {
-	int iv=(int)(255.99*v);
+	int iv=(int)(255.99*v/100.0);
 	     if (iv<-255) return -255;
 	else if (iv>+255) return +255;
 	else return (int16_t)iv;  // motor power: clamp and scale
 }
-// Motor power conversion from float [-1..+1] to signed char [-127..+127]
+
+// Servo null conversion from short to unsigned char [0..255]
 template <>
-int8_t json_command_conversion<float,int8_t>(const float &v) {
-	int iv=(int)(127.99*(0.5+0.5*v));
-	     if (iv<-127) return -127;
-	else if (iv>+127) return 127;
-	else return (int8_t)iv;
-}
-// PWM conversion from float [0..1] to unsigned char [0..255]
-template <>
-uint8_t json_command_conversion<float,uint8_t>(const float &v) {
-	int iv=(int)(255.99*(0.5+0.5*v));
+uint8_t json_command_conversion<short,uint8_t>(const short &v) {
+	int iv=(int)(v);
 	     if (iv<0) return 0;
 	else if (iv>255) return 255;
 	else return (uint8_t)iv;
 }
 
-// Servo or PWM conversion from int to unsigned char [0..255]
+// PWM percent conversion [0..100] to unsigned char [0..255]
 template <>
 uint8_t json_command_conversion<int,uint8_t>(const int &v) {
-	int iv=(int)(v);
+	int iv=(int)(v*255/100);
 	     if (iv<0) return 0;
 	else if (iv>255) return 255;
 	else return (uint8_t)iv;
@@ -516,17 +509,18 @@ template <class jsonT,class deviceT>
 class json_command : public json_command_abstract {
 public:
 	jsonT scaleFactor; // from JSON to device value
+	deviceT defaultValue; // initial default value if no command is received
 	tabula_command<deviceT> command;
-	json_command(const json_path &path_,jsonT scaleFactor_=1.0)
-		:json_command_abstract(path_), scaleFactor(scaleFactor_) { }
+	json_command(const json_path &path_,deviceT defaultValue_=0, jsonT scaleFactor_=1.0)
+		:json_command_abstract(path_), scaleFactor(scaleFactor_), defaultValue(defaultValue_) { }
 
 	virtual void do_command(json::Value &pilot_root)
 	{
-		deviceT d=0;
+		deviceT d=defaultValue;
 		try {
 			json::Value &pilot_raw=path.in(pilot_root); // read commanded value from pilot
 			if (pilot_raw.IsNumeric()) {
-				jsonT j=pilot_raw; // convert to number
+				jsonT j=(jsonT)(double)pilot_raw; // convert to number
 				j*=scaleFactor;
 				d=json_command_conversion<jsonT,deviceT>(j);
 			}
@@ -542,7 +536,7 @@ public:
 	// Send our current value to this sensor structure
 	virtual void do_sensor(json::Value &sensor_root)
 	{
-		// Read value from command array
+		// Read actual device-side value from command array
 		deviceT d=*(deviceT *)&tabula_command_storage.array[command.get_index()];
 		jsonT j=(jsonT)d;
 		path.in(sensor_root)=j;
@@ -654,7 +648,6 @@ void robot_backend::setup_devices(std::string robot_config)
 	int analogs=0;
 	int servos=0;
 	int pwms=0;
-	int blinks=0;
 	int neopixels=0;
 	int ultrasonics=0;
 	int encoder=0;
@@ -686,7 +679,7 @@ void robot_backend::setup_devices(std::string robot_config)
 		{
 			// Virtually all motor controllers just need motor power, left and right:
 			commands.push_back(new json_command<float,int16_t>(json_path("power","L")));
-			commands.push_back(new json_command<float,int16_t>(json_path("power","R"),LRtrim));
+			commands.push_back(new json_command<float,int16_t>(json_path("power","R"),0,LRtrim));
 
 			if (device=="create2")
 			{ // Add all the Roomba's onboard sensors
@@ -722,10 +715,10 @@ void robot_backend::setup_devices(std::string robot_config)
 		else if (device=="analog") {
 			sensors.push_back(new json_sensor<int,uint16_t>(json_path("analog",analogs++)));
 		}
-		else if (device=="servo") {
-			commands.push_back(new json_command<int,uint8_t>(json_path("power","servo",servos++)));
+		else if (device=="servo") { // special degrees null conversion
+			commands.push_back(new json_command<short,uint8_t>(json_path("power","servo",servos++),90));
 		}
-		else if (device=="pwm") {
+		else if (device=="pwm") { // PWM percent conversion
 			commands.push_back(new json_command<int,uint8_t>(json_path("power","pwm",pwms++)));
 		}
 		else if (device=="neopixel") {
@@ -736,12 +729,9 @@ void robot_backend::setup_devices(std::string robot_config)
 			commands.push_back(new json_command<int,uint8_t>(json_path(np,"accent","r")));
 			commands.push_back(new json_command<int,uint8_t>(json_path(np,"accent","g")));
 			commands.push_back(new json_command<int,uint8_t>(json_path(np,"accent","b")));
-			commands.push_back(new json_command<int, int8_t>(json_path(np,"start")));
-			commands.push_back(new json_command<int,uint8_t>(json_path(np,"repeat")));
-			commands.push_back(new json_command<int,uint8_t>(json_path(np,"state")));
-		}
-		else if (device=="blink") {
-			commands.push_back(new json_command<int,uint8_t>(json_path("power","blink",blinks++)));
+			commands.push_back(new json_command<short, int8_t>(json_path(np,"start")));
+			commands.push_back(new json_command<short,uint8_t>(json_path(np,"repeat")));
+			commands.push_back(new json_command<short,uint8_t>(json_path(np,"state")));
 		}
 		else if (device=="heartbeat") {
 			sensors.push_back(new json_sensor<int,uint8_t>(json_path("heartbeats")));

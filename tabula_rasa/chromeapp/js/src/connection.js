@@ -406,27 +406,27 @@ connection_t.command_property_list={
 "heartbeat":[],
 "latency":[],
 "neopixel":[
-	"neopixel#.color.r<u8>=255",
-	"neopixel#.color.g<u8>=0",
-	"neopixel#.color.b<u8>=0",
-	"neopixel#.accent.r<u8>=0",
-	"neopixel#.accent.g<u8>=255",
-	"neopixel#.accent.b<u8>=255",
+	"neopixel#.color.r<u8>%=255",
+	"neopixel#.color.g<u8>%=0",
+	"neopixel#.color.b<u8>%=0",
+	"neopixel#.accent.r<u8>%=0",
+	"neopixel#.accent.g<u8>%=255",
+	"neopixel#.accent.b<u8>%=255",
 	"neopixel#.start<s8>=4",
 	"neopixel#.repeat<u8>=8",
 	"neopixel#.state<u8>=0"
 ],
-"pwm":["pwm#<u8>"],
+"pwm":["pwm#<u8>%"],
 "serial_controller":[],
 "servo":["servo#<u8>=90"],
 "ultrasonic_sensor":[],
 "wheel_encoder":[],
 
 // All the motor controllers have the same command interface:
-"sabertooth1":["L<s16>","R<s16>"],
-"sabertooth2":["L<s16>","R<s16>"],
-"bts":["L<s16>","R<s16>"],
-"create2":["L<s16>","R<s16>"],
+"sabertooth1":["L<s16>%","R<s16>%"],
+"sabertooth2":["L<s16>%","R<s16>%"],
+"bts":["L<s16>%","R<s16>%"],
+"create2":["L<s16>%","R<s16>%"],
 };
 
 
@@ -509,6 +509,15 @@ connection_t.prototype.arduino_property_bytecount=function(property) {
 	var bitcount=parseInt(type_str.substring(1));
 	if (isNaN(bitcount) || bitcount==0 || bitcount%8!=0) _this.bad("Property '"+property+"' has invalid size "+bitcount+" (firmware bug?)");
 	return bitcount/8;
+}
+
+// Does this Arduino property come in as a percentage?
+//   e.g., foo.bar<u8>% returns true
+connection_t.prototype.arduino_property_percent=function(property) {
+	var _this=this;
+	var percent_regex=/[%]/;
+	if (property.match(percent_regex)) return true;
+	else return false;
 }
 
 // Extract default value count from Arduino property
@@ -665,13 +674,14 @@ connection_t.prototype.arduino_send_packet=function()
 		//console.log("|"+device+"|"+value+"|");
 
 		//MOTOR SCALING
-		var motor_scale_value=255;
-		if(device=="sabertooth1"||device=="sabertooth2"||device=="bts"||device=="create2")
-			value*=motor_scale_value;
-		if(value>motor_scale_value)
-			value=motor_scale_value;
-		if(value<-motor_scale_value)
-			value=-motor_scale_value;
+		if(_this.arduino_property_percent(property))
+			value*=255/100; // comes in as a percent, leaves as a byte value
+		
+		var motor_limit_value=255;
+		if(value>motor_limit_value)
+			value=motor_limit_value;
+		if(value<-motor_limit_value)
+			value=-motor_limit_value;
 
 		var datatype=_this.arduino_property_type(property);
 		connection_t.write_bytes_as[datatype](cmd_data,idx,value);
