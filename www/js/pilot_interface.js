@@ -291,8 +291,8 @@ pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_d
 
 	if(!this.mouse_in_div)
 	{
-		mouse.Power.L=0;
-		mouse.Power.R=0;
+		mousePower.L=0;
+		mousePower.R=0;
 	}
 
 	this.pilot.power.L=mousePower.L;
