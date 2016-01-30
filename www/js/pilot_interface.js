@@ -219,8 +219,8 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	this.arrowDiv.onmousedown=function(evt) { myself.pilot_mouse(evt,1,0); };
 	this.arrowDiv.ondragstart=function(evt) { myself.pilot_mouse(evt,1,0); };
 	this.arrowDiv.onmouseup=function(evt) { myself.pilot_mouse(evt,-1,0); };
-	this.arrowDiv.onmouseenter=function(evt) { myself.pilot_mouse(evt,0,+1); };
-	this.arrowDiv.onmouseleave=function(evt) { myself.pilot_mouse(evt,-1,-1); };
+	this.arrowDiv.onmouseover=function(evt) { myself.pilot_mouse(evt,0,+1); };
+	this.arrowDiv.onmouseout=function(evt) { myself.pilot_mouse(evt,-1,-1); };
 	this.arrowDiv.onmousemove=function(evt) { myself.pilot_mouse(evt,0,0); };
 	this.arrowDiv.ondblclick=function(evt) { myself.pilot_mouse(evt,0,0); };
 
