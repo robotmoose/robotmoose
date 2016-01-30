@@ -21,7 +21,8 @@ public:
 	tabula_command<unsigned char> deg; // commanded degree orientation
 
 	virtual void loop() {
-		s.write(deg);
+		if (pc_connected)
+			s.write(deg);
 	}
 };
 
