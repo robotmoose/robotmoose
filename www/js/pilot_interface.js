@@ -258,10 +258,10 @@ pilot_interface_t.prototype.get_pilot_power=function() {
 pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_del) {
 	if (mouse_in_del) this.mouse_in_div=mouse_in_del;
 
-	if (mouse_down_del==1) this.mouse_down=1;
-	if (mouse_down_del==-1) this.mouse_down=-1;
+	if (mouse_down_del>0) this.mouse_down=1;
+	if (mouse_down_del<0) this.mouse_down=-1;
 
-	console.log("Mouse event: down="+this.mouse_down+"  down del="+mouse_down_del+"   in="+this.mouse_in_div+"  in del="+mouse_in_del);
+	// console.log("Mouse event: down="+this.mouse_down+"  down del="+mouse_down_del+"   in="+this.mouse_in_div+"  in del="+mouse_in_del);
 	
 // Allow user to set maximum power
 	var maxPower=this.get_pilot_power();
@@ -282,7 +282,7 @@ pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_d
 	mousePower.L=pretty(clamp(dir.forward+dir.turn,-maxPower,maxPower));
 	mousePower.R=pretty(clamp(dir.forward-dir.turn,-maxPower,maxPower));
 
-	if (this.mouse_down==1 && this.mouse_in_div!=0) {
+	if (this.mouse_down>0 && this.mouse_in_div>0) {
 		arrowDiv.style.backgroundColor='#222222';
 		str+=" SENDING";
 	} else {
