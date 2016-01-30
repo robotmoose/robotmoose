@@ -216,7 +216,7 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	var myself=this;
 	this.mouse_down=0;
 	this.mouse_in_div=0;
-	this.arrowDiv.onmousedown=function(evt) { myself.pilot_mouse(evt,1); myself.element.click(); };
+	this.arrowDiv.onmousedown=function(evt) { myself.pilot_mouse(evt,1);};// myself.element.click(); };
 	this.arrowDiv.ondragstart=function(evt) { myself.pilot_mouse(evt,1); };
 	this.arrowDiv.onmouseup=function(evt) { myself.pilot_mouse(evt,-1); };
 	this.arrowDiv.onmouseenter=function(evt) { myself.pilot_mouse(evt,0,+1); };
@@ -291,8 +291,8 @@ pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_d
 
 	if(!this.mouse_in_div)
 	{
-		mouse.Power.L=0;
-		mouse.Power.R=0;
+		mousePower.L=0;
+		mousePower.R=0;
 	}
 
 	this.pilot.power.L=100.0*mousePower.L;
