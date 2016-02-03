@@ -52,6 +52,7 @@ function config_editor_t(div)
 	{
 		var obj=myself.tabula.select.options[myself.tabula.select.element.selectedIndex].tabula;
 		myself.create_entry(obj.type,obj.args);
+		myself.refresh_m();
 	};
 	this.add_div.appendChild(this.add_button);
 
@@ -146,7 +147,7 @@ config_editor_t.prototype.create_entry=function(type,arg_types,arg_values)
 	var entry={};
 	entry.drag_list=this.drag_list.create_entry();
 	entry.drag_list.config_editor_t=entry;
-	entry.drag_list.onremove=function(entry){myself.remove_entry_m(entry.config_editor_t);};
+	entry.drag_list.onremove=function(entry){myself.remove_entry_m(entry.config_editor_t);myself.refresh_m();};
 	this.create_entry_m(entry,type,arg_types,arg_values);
 	this.entries.push(entry);
 
@@ -366,7 +367,7 @@ config_editor_t.prototype.create_pin_drop_m=function(value)
 			this.div.className+=" has-error";
 	};
 
-	drop.onclick(); 
+	drop.onclick();
 
 	return drop;
 }
@@ -614,13 +615,13 @@ config_editor_t.prototype.refresh_m=function()
 	this.tabula.select.element.disabled=(this.tabula.options.length==0);
 	this.add_button.disabled=(this.tabula.options.length==0);
 
-	var configureable=false;
-
 	var entries_count=0;
 
 	for(var key in this.entries)
 		if(this.entries[key])
 			++entries_count;
+
+	var configureable=(entries_count<=0);
 
 	if(entries_count>0)
 	{
