@@ -67,7 +67,7 @@ function config_editor_t(div)
 	{
 		if(myself.onconfigure)
 			myself.onconfigure(myself);
-		if (myself.onchange)
+		if(myself.onchange)
 			myself.onchange(myself);
 	};
 	this.element.appendChild(this.configure_button);
@@ -185,7 +185,7 @@ config_editor_t.prototype.download_m=function(robot)
 
 	superstar_get(robot.name,"config",function(obj)
 	{
-		if (obj==null) { // backend not connected, make fake config object
+		if(obj==null) { // backend not connected, make fake config object
 			obj={counter:0};
 		}
 		myself.counter=obj.counter+1;
@@ -208,7 +208,7 @@ config_editor_t.prototype.download_m=function(robot)
 		}
 
 		// Finally finished downloading--fire onchange
-		if (myself.onchange)
+		if(myself.onchange)
 			myself.onchange(myself);
 
 		myself.refresh_m();

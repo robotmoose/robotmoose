@@ -22,6 +22,7 @@ function name_t(div,on_message,on_selected)
 
 	var _this=this;
 
+	//this.superstar="127.0.0.1:8081";
 	this.superstar="robotmoose.com";
 
 	this.school=document.createElement("select");
@@ -141,7 +142,7 @@ name_t.prototype.update_disables_m=function()
 		disabled=true;
 	this.robot.disabled=disabled;
 
-	this.school.disabled=this.disabled; 
+	this.school.disabled=this.disabled;
 }
 
 name_t.prototype.on_selected_m=function()
