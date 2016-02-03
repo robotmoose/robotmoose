@@ -6,7 +6,7 @@ bracket_to_hole_centers=30-mount_board_thickness;
 walls=6;
 hole_depth=30;
 mount_hole_diameter=6;
-cube_hole_size=[20,hole_depth,hole_diameter];
+cube_hole_size=[20,hole_depth,hole_diameter+1];
 
 block_size=[hole_centers+walls*4,10,bracket_to_hole_centers];
 mount_block_size=[block_size.x+walls*2+mount_hole_diameter*2,block_size.y,6];
@@ -21,9 +21,9 @@ difference()
             cube(size=mount_block_size);
     }
     
-    translate([hole_centers/2-cube_hole_size.x/2-4,-hole_depth/2,-hole_diameter/2])
+    translate([hole_centers/2-cube_hole_size.x/2-4,-hole_depth/2,-cube_hole_size.z/2])
         cube(size=cube_hole_size);
-        translate([-hole_centers/2-cube_hole_size.x/2+4,-hole_depth/2,-hole_diameter/2])
+        translate([-hole_centers/2-cube_hole_size.x/2+4,-hole_depth/2,-cube_hole_size.z/2])
         cube(size=cube_hole_size);
     
    translate([-block_size.x/2-walls,0,-hole_depth/2])
