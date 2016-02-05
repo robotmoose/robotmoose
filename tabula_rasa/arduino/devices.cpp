@@ -73,8 +73,12 @@ public:
 		if (npix.numPixels()==0) return; // mem allocation failure
 		uint32_t color=npix.Color(color_r,color_g,color_b);
 		uint32_t accent=npix.Color(accent_r,accent_g,accent_b);
-		int p=start%count;
-		if (repeat>1) p=p%repeat; // wraparound
+		int p=-1;
+		if (repeat>=1) {
+			p=start%count;
+			p=p%repeat; // wraparound
+		}
+		
 		for(int i=0; i<count; i++)
 		{
 			uint32_t c=color;
