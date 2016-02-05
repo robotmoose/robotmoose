@@ -86,8 +86,18 @@ public:
 				c=accent; 
 				if (repeat>1) p=repeat-1; 
 			}
-			// FIXME: add bits to state for blur, persistence of vision, etc
-			npix.setPixelColor(i, c);
+			
+			if (state==1) { // gentle blur
+				uint32_t old=npix.getPixelColor(i);
+				c=((old>>1)&0x7F7F7F7F)+((c>>1)&0x7F7F7F7F); // 50-50 blend
+				npix.setPixelColor(i, c);
+			} else if (state==2) { // strong blur
+				uint32_t old=npix.getPixelColor(i);
+				c=((old>>1)&0x7F7F7F7F)+((old>>2)&0x3F3F3F3F)+((c>>2)&0x3F3F3F3F); // 75-25 blend
+				npix.setPixelColor(i, c);
+			} else {// simply set color
+				npix.setPixelColor(i, c);
+			} 
 		}
 		npix.show();
 	}
