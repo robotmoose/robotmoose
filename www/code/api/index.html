@@ -17,103 +17,127 @@
 		<h4>States</h4>
 		<p>Your code runs in one state at a time.&nbsp; It keeps running
 		  the state until the state times out, or you switch to a new
-		  state.<br>
+		  state.
 		  <br>
 		  <br>
-		  state = turnLeft </p>
-		<ul>
-		  <li>runs the state named turnLeft</li>
-		</ul>
+<pre>
+state = <i>turnLeft</i>
+</pre>
+		Switches to your state named <i>turnLeft</i>.
 		<br>
 		<br>
-		stop()
-		<ul>
-		  <li>stops the code, exiting your states<br>
-		  </li>
-		</ul>
-		<p><br>
+<pre>
+stop()
+</pre>
+		Stops running the code, exiting your states.
+		<br>
 		</p>
 		<h4>Basic User Interface (UI)</h4>
-		button("string", turnLeft)
-		<ul>
-		  <li>string is button's title, pressing the button will run the
-			state named turnLeft</li>
-		</ul>
+<pre>
+button("<i>Lefty!</i>", <i>turnLeft</i>)
+</pre>
+		Creates a button in the UI panel called "<i>Lefty!</i>".
+		  Pressing this button will run the state named <i>turnLeft</i>.
 		<br>
 		<br>
-		checkbox("string")
-		<ul>
-		  <li>string is the checkbox's title</li>
-		</ul>
+<pre>
+checkbox("string")
+</pre>
+		string is the checkbox's title
 		<br>
 		<br>
-		label("string")
-		<ul>
-		  <li>string will appear in the UI window</li>
-		</ul>
+<pre>
+label("string")
+</pre>
+		string will appear in the UI window.  This is useful for explaining things to the user.
 		<br>
 		<br>
-		print("string")
-		<ul>
-		  <li>string will appear to the right side of the state in the
-			code editor</li>
-		</ul>
+<pre>
+print("string")
+</pre>
+		string will appear to the right side of the state in the
+			code editor
 		<br>
 		<br>
-		slider("string", -1.0, 0.0, 1.0)
-		<ul>
-		  <li>creates a slider in the UI titled string, with range -1.0
-			to 1.0 and default slider placement at 0.0</li>
-		</ul>
+<pre>
+power.L=slider("Left", -100, 0, 100)
+</pre>
+		Creates a slider in the UI to control the left wheel, with range -100
+			to 100, and the slider first set to 0
 		<br>
 		<br>
-		store.x=j
-		<ul>
-		  <li>stores a variable named x, initialized to value j</li>
-		</ul>
+<pre>
+store.x=j
+</pre>
+		Store a variable named x, initialized to value j
 		<br>
 		<br>
-		<h4>Create2</h4>
-		forward(10)&nbsp; // <i>drive forward 10 centimeters</i><br>
-		backward(5)&nbsp; // <i>drive backward 5 centimeters</i><br>
-		left(45)&nbsp; // <i>turn left 45 degrees</i><br>
-		right(90)&nbsp; // <i>turn right 90 degrees</i><br>
-		<br>
-		drive(-0.5, 1.0)&nbsp; // <i>sets the speed of the left wheel
-		  to -0.5, sets the speed of the right wheel to +1.0 (range is
-		  -1.0 to 1.0)</i>
-		<ul>
-		</ul>
-		<br>
-		<br>
-		<h4>PWM (Pulse Width Modulation)</h4>
-		power.pwm[i] = j
-		<ul>
-		  <li>sets the value of pwm[i] to j (range is 0 to 255)</li>
-		</ul>
+		<h4>Create2 Driving</h4>
+<pre>
+forward(10) // <i>drive forward 10 centimeters</i><br>
+backward(5) // <i>drive backward 5 centimeters</i><br>
+left(45) // <i>turn left 45 degrees</i><br>
+right(90) // <i>turn right 90 degrees</i><br>
+<br>
+drive(-5, 10) // <i>sets the speed of the left wheel to -5, sets the speed of the right wheel to +10 (range is -100 to 100)</i>
+</pre>
 		<br>
 		<br>
 		<h4>Servos</h4>
-		power.servo[i] = j
-		<ul>
-		  <li>moves servo[i] to position j (in degrees, range is 0 to
-			180)</li>
-		</ul>
+<pre>
+power.servo[0] = 90
+</pre>
+		 Move the first servo to position 90 degrees (range is 0 to
+			180 degrees)
+		<br>
+		<br>
+		<h4>PWM (Pulse Width Modulation)</h4>
+<pre>
+power.pwm[0] = 100
+</pre>
+		Sets the value of the first PWM to 100, full power (range is 0 to 100)
+		<br>
+		<br>
+		<h4>Neopixel LEDs</h4>
+<pre>
+power.neopixel[0].color = {r:20,g:0,b:0}
+</pre>
+		Sets the neopixels to all be a dim red color.
+		
+		<br>
+		<br>
+<pre>
+power.neopixel[0].color = {
+	r:slider("Red",0,10,100),
+	g:slider("Green",0,10,100),
+	b:slider("Blue",0,10,100)
+}
+</pre>
+		Adds sliders in the UI panel to control the neopixel colors.
+		<br>
+		<br>
+<pre>
+power.neopixel[0].color = {r:10,g:10,b:10}
+power.neopixel[0].accent = {r:100,g:0,b:0}
+power.neopixel[0].repeat = 4
+power.neopixel[0].start = time/250
+</pre>
+		Animate a bright red accent down a dim white background.
 		<br>
 		<br>
 		<h4>Control Flow</h4>
-		if(expression) <br>
-		{<br>
-		&nbsp;&nbsp;&nbsp; statement1<br>
-		}<br>
-		else <br>
-		{<br>
-		&nbsp;&nbsp;&nbsp; statement2<br>
-		}<br>
-		<ul>
-		  <li>if expression evaluates to true, executes statement1,
-			otherwise executes statement2</li>
-		</ul>
+<pre>
+if (<i>expression</i>)
+{
+	<i>statement1</i>
+}
+else
+{
+	<i>statement2</i>
+}
+</pre>
+		 If <i>expression</i> evaluates to true, executes <i>statement1</i>,
+			otherwise executes <i>statement1</i>.
 		<br>
 		<br>
 		<h4>Examples:</h4>
