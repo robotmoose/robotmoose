@@ -264,6 +264,10 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	VM.power=this.VM_pilot.power;
 	VM.store=this.VM_store;
 	VM.robot={sensors:VM.sensors, power:VM.power};
+	
+	if (VM.sensors.power && VM.sensors.power.neopixel && !VM.power.neopixel) {
+		VM.power.neopixel=JSON.parse(JSON.stringify(VM.sensors.power.neopixel));
+	}
 
 	// Simple instantanious drive:
 	VM.drive=function(speedL,speedR) { 
