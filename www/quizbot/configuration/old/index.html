@@ -21,34 +21,31 @@
 
 				<h4>Step 1:</h4>
 				<ul>
+				<li>
+				First download the RobotMoose control software for your
+					<a href="/downloads/files/RobotMoose_MacOS_latest.zip">Mac</a> or
+					<a href="http://github.com/robotmoose/robotmoose">Linux</a>
+					computer
+				<li>Open the RobotMoose and tabula_rasa folders
+				<li>Open config.txt and give your robot a name:
+				<ul>
+					<li>robot=<i>YourSchool</i>/<i>YourTeam</i></a>
+				</ul>
+				<li>Save config.txt
 				<li>Plug your Quizbot into your computer
 				<ul>
-				<li>If you have not connected your Quizbot to the web before, you will first need to upload
-				our Arduino code to your Arduino. (In the classrooms, we've done this for you already!)
+					<li>If you haven't used your arduino on the web, open the arduino folder and use the Arduino IDE to upload our code.  (In the classrooms, we've done this for you already!)
 				</ul>
-				<li>
-				In a Google Chrome Web Browser, open this page and download the 
-					<a href="https://chrome.google.com/webstore/detail/robotmoose/ecadjbcmgjcekpogchpochjieaimpegf">RobotMoose "backend" app</a>
-				<li> Launch the app. Select your school, robot name, and serial port and click "Connect"
-				<ul>
-				<li>If you don't see your robot name, ask your teacher or facilitator to add it to the server.
-				</ul>
-				<li>The app should begin scrolling and show the heartbeats number changing, like this:
+				<li>Run the "backend" program.  It should show the heartbeats number changing, like this:
 				<pre>
-Serial data received: 3 bytes
-Arduino incoming sensor data command 0xc payload 1 bytes: ' 0x2 '
-	sensors = {
-	"power": {
-		"servo": [
-			90
-		]
-	},
-	"heartbeats": 2
-}
+Robot name: test/quizbot
+Outgoing sensors: {"heartbeats":19,"location":{"ID":0}}
+Incoming pilot commands: [{},{}]
+
+Superstar:	0.4 ms/request, 3e+03 req/sec
 </pre>
 				<li>Leave the backend running: it connects your Arduino to the internet.
 				<li>On a different computer, go to robotmoose.com's <a href="http://robotmoose.com/pilot/">Robots page</a>, find your school and robot name, and Connect to your robot!
-								
 				</ul>
 				<br/>
 
