@@ -122,7 +122,7 @@ state_table_t.prototype.download_with_check=function(robot,skip_get_active,ondow
 
 	if(myself.last_experiment)
 	{
-		superstar_get(robot.name+"/experiments/"+myself.last_experiment+"/","code",
+		superstar_get(robot.name+"/experiments/"+encodeURIComponent(myself.last_experiment)+"/","code",
 			function(obj)
 			{
 				if(JSON.stringify(obj)!=JSON.stringify(myself.get_states()))
@@ -187,7 +187,7 @@ state_table_t.prototype.upload_with_check=function(robot,onupload)
 
 	var myself=this;
 
-	superstar_get(robot.name+"/experiments/"+myself.experiment.name.value+"/","code",
+	superstar_get(robot.name+"/experiments/"+encodeURIComponent(myself.experiment.name.value)+"/","code",
 		function(obj)
 		{
 			if(myself.last_experiment&&obj&&obj.length>0&&myself.last_experiment!=myself.experiment.name.value)
@@ -211,10 +211,10 @@ state_table_t.prototype.upload=function(robot,onupload)
 
 	var myself=this;
 
-	superstar_set(robot.name+"/experiments/"+this.experiment.name.value+"/","code",this.get_states(),
+	superstar_set(robot.name+"/experiments/"+encodeURIComponent(this.experiment.name.value)+"/","code",this.get_states(),
 		function(obj)
 		{
-			superstar_set(robot.name,"active_experiment",myself.experiment.name.value,
+			superstar_set(robot.name,"active_experiment",encodeURIComponent(myself.experiment.name.value),
 				function(obj)
 				{
 					myself.last_experiment=myself.experiment.name.value;
@@ -475,7 +475,7 @@ state_table_t.prototype.download_m=function(robot,callback)
 {
 	var myself=this;
 
-	superstar_get(robot.name+"/experiments/"+this.experiment.name.value+"/","code",function(obj)
+	superstar_get(robot.name+"/experiments/"+encodeURIComponent(this.experiment.name.value)+"/","code",function(obj)
 	{
 		myself.last_active=myself.experiment.name.value;
 
