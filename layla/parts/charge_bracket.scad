@@ -24,10 +24,10 @@ difference()
    rotate([90,0,0]) 
     {
         translate([hole_centers/2,0,-hole_depth/2])
-            scale([5,1,1])
+            scale([4,7/6,1])
                 cylinder(d=hole_diameter,h=hole_depth);
         translate([-hole_centers/2,0,-hole_depth/2])
-            scale([5,1,1]) 
+            scale([4,7/6,1]) 
                 cylinder(d=hole_diameter,h=hole_depth);
  }
     
