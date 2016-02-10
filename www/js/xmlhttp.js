@@ -80,7 +80,7 @@ function superstar_set(path,element,newObject,onFinished,auth)
  Use superstar to get path/element,
  and pass the returned object to onFinished.
 */
-function superstar_get(path,element,onFinished)
+function superstar_get(path,element,onFinished,onError)
 {
 	send_request("GET", "/superstar/"+path, element,
 		"?get",
@@ -91,7 +91,7 @@ function superstar_get(path,element,onFinished)
 				replyObj=JSON.parse(replyData); // fixme: try/catch here
 			onFinished(replyObj);
 		},
-		undefined, // error function
+		function(){onError();}, // error function
 		undefined, // post data
 		"application/json"
 	);
