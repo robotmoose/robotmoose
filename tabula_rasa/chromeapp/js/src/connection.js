@@ -268,16 +268,14 @@ connection_t.prototype.arduino_setup_devices=function()
 	*/
 
 	_this.status_message(" Getting device configs from superstar...");
-
 	superstar_get(_this.robot,"config",
-		function(config){
-			_this.last_config=config;
-
+		function(config) {
 			if (config.counter!==undefined) {
 				_this.status_message(" Got valid device configs from superstar: "+JSON.stringify(config));
+				_this.last_config=config;
 				devices=devices.concat(config.configs);
 			} else {
-				_this.status_message(" Pilot needs to configure robot on superstar: "+_this.robot.name);
+				_this.status_message(" Pilot needs to configure robot on superstar: "+robot.name);
 			}
 
 			var d=0; // device counter
@@ -290,7 +288,8 @@ connection_t.prototype.arduino_setup_devices=function()
 				}
 			}
 			_this.arduino_setup_device(devices[0],next_device);
-		});
+		}
+	);
 }
 
 // Configure this one device on the Arduino
@@ -677,7 +676,7 @@ connection_t.prototype.arduino_send_packet=function()
 		//MOTOR SCALING
 		if(_this.arduino_property_percent(property))
 			value*=255/100; // comes in as a percent, leaves as a byte value
-
+		
 		var motor_limit_value=255;
 		if(value>motor_limit_value)
 			value=motor_limit_value;
@@ -731,8 +730,8 @@ connection_t.prototype.arduino_recv_packet=function(p)
 
 			var m_per_tick = 0.000444;
 			var wheelbase = .235;
-			_this.move_wheels(wraparound_fix(_this.old.L, _this.sensors.encoder.L)*m_per_tick,
-								wraparound_fix(_this.old.R, _this.sensors.encoder.R)*m_per_tick,
+			_this.move_wheels(wraparound_fix(_this.old.L, _this.sensors.encoder.L)*m_per_tick, 
+								wraparound_fix(_this.old.R, _this.sensors.encoder.R)*m_per_tick, 
 								wheelbase);
 		}
 		_this.old = {};
