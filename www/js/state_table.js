@@ -479,8 +479,11 @@ state_table_t.prototype.download_m=function(robot,callback)
 	{
 		myself.last_active=myself.experiment.name.value;
 
-		for(var key in obj)
-			myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
+		if(obj&&obj.length>0)
+			for(var key in obj)
+				myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
+		else
+			myself.create_entry("start","","// JavaScript code\n");
 
 		if(callback)
 			callback();
@@ -520,6 +523,7 @@ state_table_t.prototype.load_button_pressed_m=function()
 		{
 			myself.upload(old_robot);
 		});
+
 }
 
 state_table_t.prototype.onrun_m=function()
@@ -549,7 +553,7 @@ state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 		return;
 
 	if(!state)
-		state="";
+			state="";
 
 	if(!time)
 		time="";
