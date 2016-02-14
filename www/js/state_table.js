@@ -478,20 +478,16 @@ state_table_t.prototype.download_m=function(robot,callback)
 	superstar_get(robot.name+"/experiments/"+encodeURIComponent(this.experiment.name.value)+"/","code",function(obj)
 	{
 		myself.last_active=myself.experiment.name.value;
-			
+
+		if(obj&&obj.length>0)
 			for(var key in obj)
 				myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
+		else
+			myself.create_entry("start","","// JavaScript code\n");
+
 		if(callback)
 			callback();
-	},function() {
-
-	if(this.get_states().length==0)// If no states (new experiment ?) add a start state
-	{
-		console.log("New Experiment"+ "# of states = " + this.get_states().length);
-		state_name="start";
-		this.create_entry(state_name,"","// JavaScript code\n");
-	}
-});
+	});
 }
 
 state_table_t.prototype.run_button_pressed_m=function()

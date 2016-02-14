@@ -91,7 +91,7 @@ function superstar_get(path,element,onFinished,onError)
 				replyObj=JSON.parse(replyData); // fixme: try/catch here
 			onFinished(replyObj);
 		},
-		function(){onError();}, // error function
+		function(){if(onError)onError();}, // error function
 		undefined, // post data
 		"application/json"
 	);
