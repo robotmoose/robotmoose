@@ -35,11 +35,32 @@ function name_t(div,on_message,on_selected)
 	this.robot.style.width="128px";
 	this.robot.onchange=function(){_this.on_selected_m();};
 
+	/*this.superstar_select=document.createElement("select");
+	var superstar_options=new Object();
+	var superstar_options=[{"UAF main":"robotmoose.com"},
+						   {"UAF test":"test.robotmoose.com"},
+						   {"Local":"127.0.0.1:8081"}
+	];
+	this.build_select_m(this.superstar_select,superstar_options,"Superstar",function(){ console.log(_this.school.options[this.school.selectedIndex].text);});
+	/*for(index in superstar_options){
+		this.superstar_select[superstar_select.options.length]=new Object(superstar_options[index], index);
+	}*/
+
+	//this.el.appendChild(this.superstar_select);
+	/*this.superstar_main=document.createElement("option");
+	this.superstar_main.value="robotmoose.com";
+	this.superstar_select.style.width="128px";
+	this.superstar_select.appendChild(this.superstar_main);*/
+
+	setInterval(function(){
+						_this.on_loaded_school=_this.school.options[_this.school.selectedIndex].text; // Save old selected school
+						_this.on_loaded_robot=_this.robot.options[_this.robot.selectedIndex].text; // Save old selected robot
+						_this.download_schools_m();},
+						1000);
+	
 	this.build_schools_m();
 	this.build_robots_m();
-
-	setInterval(function(){ _this.download_schools_m();},1000);
-
+	
 	this.disables_interval=setInterval(function(){_this.update_disables_m();},100);
 }
 
@@ -121,6 +142,7 @@ name_t.prototype.download_robots_m=function()
 		this.build_robots_m();
 		return;
 	}
+	
 
 	var selected_school=this.school.options[this.school.selectedIndex].text;
 
