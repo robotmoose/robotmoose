@@ -109,7 +109,6 @@ name_t.prototype.on_error_m=function(error)
 name_t.prototype.download_schools_m=function()
 {
 	var _this=this;
-	console.log("Downloading schools from superstar");
 	superstar_sub({superstar:this.superstar,school:"",name:""},"/",
 		function(json){_this.build_schools_m(json); ;},
 		function(error){_this.on_error_m("School download error ("+error+").");});
