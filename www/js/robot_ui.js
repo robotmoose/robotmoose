@@ -96,13 +96,13 @@ robot_ui_t.prototype.download_gui=function()
 		return;
 
 	var myself=this;
-
+	
 	var help_text_states =
 	//"<h3> Code Examples </h3>"
 	"<h4>Basic</h4>"
 	+ "print(\"This will appear to the right of the state\") <br>"
 	+ "stop() <br>"
-	+ "state = turnLeft // <i>Runs your state named \"turnLeft\"</i><br>"
+	+ "state = \"turnLeft\" // <i>Runs your state named \"turnLeft\"</i><br>"
 	+ "<h4>UI</h4>"
 	+ "label(\"This will appear in the UI\")<br>"
 	+ "button(\"Press me\", turnLeft)<br>"
