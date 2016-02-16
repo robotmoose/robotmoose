@@ -38,13 +38,33 @@ function name_t(div,on_message,on_selected)
 	this.superstar_select=document.createElement("select");
 	this.el.appendChild(this.superstar_select);
 	this.superstar_select.style.width="128px";
+	this.superstar_select.onchange=function()
+	{
+		if(this.selectedIndex!=0)
+		{
+			_this.superstar=this.options[this.selectedIndex].text;
+			_this.build_schools_m();
+			_this.build_robots_m();
+		}
+		else
+		{
+			_this.build_select_m(_this.schools,[],"School","School");
+			_this.build_select_m(_this.robots,[],"Robot","Robot");
+		}
+	};
+
 	var superstar_options=
 	[
 		"robotmoose.com",
 		"test.robotmoose.com",
 		"127.0.0.1:8081"
 	];
-	this.build_select_m(this.superstar_select,superstar_options,"Superstar","Superstar");
+	var default_superstar="Superstar";
+
+	if(this.superstar)
+		default_superstar=this.superstar;
+
+	this.build_select_m(this.superstar_select,superstar_options,"Superstar",default_superstar);
 
 	var school_interval=setInterval(function(){
 						_this.on_loaded_school=_this.school.options[_this.school.selectedIndex].text; // Save old selected school
@@ -98,7 +118,9 @@ name_t.prototype.build_select_m=function(select,json,heading,on_loaded_value)
 		if(json[key]==on_loaded_value)
 		{
 			select.value=on_loaded_value;
-			select.onchange();
+
+			if(select.onchange)
+				select.onchange();
 		}
 	}
 
