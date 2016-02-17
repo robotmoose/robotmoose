@@ -320,18 +320,20 @@ void superstar_http_handler(struct mg_connection *conn, int ev,void *param) {
   // else it's an http request
   struct http_message *m=(struct http_message *)param;
 
-#if 0 /* Not clear where this is in mongoose v6! */
-  std::string remote_ip(conn->sa.remote_ip);
+  std::string remote_ip('?',100);
+  mg_sock_addr_to_str(&conn->sa,&remote_ip[0],remote_ip.size(),MG_SOCK_STRINGIFY_IP);
+  std::string remote_port('?',100);
+  mg_sock_addr_to_str(&conn->sa,&remote_port[0],remote_port.size(),MG_SOCK_STRINGIFY_PORT);
 
   if(remote_ip=="127.0.0.1")
   {
 		// std::cout<<"Local IP detected, attempting to get remote..."<<std::flush;
 
-		for(int ii=0;ii<conn->num_headers;++ii)
+		for(int ii=0;ii<MG_MAX_HTTP_HEADERS;++ii)
 		{
-			if(std::string(conn->http_headers[ii].name)=="X-Forwarded-For")
+			if(mg_str_to_std_string(&m->header_names[ii])=="X-Forwarded-For")
 			{
-				remote_ip=conn->http_headers[ii].value;
+				remote_ip=mg_str_to_std_string(&m->header_values[ii]);
 				// std::cout<<"success, X-Forwarded-For header found."<<std::endl;
 				break;
 			}
@@ -341,8 +343,7 @@ void superstar_http_handler(struct mg_connection *conn, int ev,void *param) {
 		//	std::cout<<"failed."<<std::endl;
   }
 
-  printf("Incoming request: client %s:%d, URI %s\n",remote_ip.c_str(),conn->remote_port,conn->uri);
-#endif
+  printf("Incoming request: client %s:%s, URI %s\n",remote_ip.c_str(),remote_port.c_str(),mg_str_to_std_string(&m->uri).c_str());
 
   const char *prefix="/superstar/";
   if (strncmp(m->uri.p,prefix,strlen(prefix))!=0) 
