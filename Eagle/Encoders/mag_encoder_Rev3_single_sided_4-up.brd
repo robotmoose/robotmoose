@@ -149,10 +149,10 @@
 <text x="5.536" y="18.705" size="0.762" layer="25">GND</text>
 <text x="11.8225" y="18.705" size="0.762" layer="25">SIG</text>
 <text x="8.838" y="18.705" size="0.762" layer="25">VCC</text>
-<wire x1="3.125" y1="1.5" x2="3.125" y2="25.5" width="0" layer="20"/>
-<wire x1="16" y1="25.5" x2="16" y2="1.5" width="0" layer="20"/>
-<wire x1="16" y1="1.5" x2="3.125" y2="1.5" width="0" layer="20"/>
-<wire x1="3.125" y1="25.5" x2="16" y2="25.5" width="0" layer="20"/>
+<wire x1="3.125" y1="1.5" x2="3.125" y2="25.5" width="0.01" layer="20"/>
+<wire x1="16" y1="25.5" x2="16" y2="1.5" width="0.01" layer="20"/>
+<wire x1="16" y1="1.5" x2="3.125" y2="1.5" width="0.01" layer="20"/>
+<wire x1="3.125" y1="25.5" x2="16" y2="25.5" width="0.01" layer="20"/>
 </plain>
 <libraries>
 <library name="SparkFun-Capacitors">
@@ -470,10 +470,10 @@ Please make sure your boards conform to these design rules.</description>
 <wire x1="7.375" y1="22" x2="7.2935" y2="22.0995" width="0.635" layer="1"/>
 <wire x1="7.375" y1="11.125" x2="7.667" y2="11.04" width="0.635" layer="1"/>
 <polygon width="0.4064" layer="1" thermals="no">
-<vertex x="-1" y="30.875"/>
-<vertex x="20.125" y="30.875"/>
-<vertex x="20.125" y="0.25"/>
-<vertex x="-0.625" y="0.25"/>
+<vertex x="2.125" y="26"/>
+<vertex x="16.625" y="26"/>
+<vertex x="16.625" y="0.25"/>
+<vertex x="2.25" y="0.25"/>
 </polygon>
 <wire x1="9.875" y1="6.125" x2="9.875" y2="10.25" width="1.016" layer="1"/>
 <wire x1="9.875" y1="10.25" x2="10.665" y2="11.04" width="1.016" layer="1"/>
