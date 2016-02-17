@@ -18,11 +18,11 @@ function name_t(div,on_message,on_selected)
 	this.on_selected=on_selected;
 	this.on_loaded_school=null;
 	this.on_loaded_robot=null;
+	this.on_loaded_superstar=null;
 	this.disabled=false;
 
 	var _this=this;
 
-	//this.superstar="127.0.0.1:8081";
 	this.superstar="robotmoose.com";
 
 	this.school=document.createElement("select");
@@ -66,17 +66,24 @@ function name_t(div,on_message,on_selected)
 
 	this.build_select_m(this.superstar_select,superstar_options,"Superstar",default_superstar);
 
-	var school_interval=setInterval(function(){
-						_this.on_loaded_school=_this.school.options[_this.school.selectedIndex].text; // Save old selected school
-						_this.on_loaded_robot=_this.robot.options[_this.robot.selectedIndex].text; // Save old selected robot
-						_this.download_schools_m();},
-						1000);
+	var school_interval=setInterval(function()
+		{
+			if(!_this.superstar_select.disabled)
+			{
+					_this.on_loaded_school=_this.school.options[_this.school.selectedIndex].text; // Save old selected school
+					_this.on_loaded_robot=_this.robot.options[_this.robot.selectedIndex].text; // Save old selected robot
+					_this.download_schools_m();		
+					
+			}
+		},1000);
 
 	this.build_schools_m();
 	this.build_robots_m();
 
 	this.disables_interval=setInterval(function(){_this.update_disables_m();},100);
+	this.download_schools_m();
 }
+
 
 name_t.prototype.destroy=function()
 {
@@ -93,6 +100,7 @@ name_t.prototype.get_robot=function()
 	{
 		robot.school=this.school.options[this.school.selectedIndex].text;
 		robot.name=this.robot.options[this.robot.selectedIndex].text;
+		robot.superstar=this.superstar;
 	}
 
 	return robot;
@@ -181,6 +189,7 @@ name_t.prototype.update_disables_m=function()
 	this.robot.disabled=disabled;
 
 	this.school.disabled=this.disabled;
+	this.superstar_select.disabled=this.disabled;
 }
 
 name_t.prototype.on_selected_m=function()
