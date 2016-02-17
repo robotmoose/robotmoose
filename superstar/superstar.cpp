@@ -22,7 +22,6 @@
 #include "osl/sha2_auth.h" /* for authentication */
 #include "osl/sha2.cpp" /* for easier linking */
 
-
 #ifdef USE_CPP_11
 #include <chrono>
 #include <thread>
@@ -48,6 +47,16 @@ const std::string backup_filename="db.bak";
 const int64_t backup_time=5000;
 int64_t old_time=millis();
 
+static struct mg_serve_http_opts s_http_server_opts;
+
+
+
+inline std::string mg_str_to_std_string(const mg_str *str)
+{
+	return std::string(str->p,str->len);
+}
+
+
 /// Utility: integer to string
 std::string my_itos(int i) {
 	char buf[100];
@@ -62,7 +71,7 @@ std::string my_itos(int i) {
   Simple mongoose utility function: send back raw JSON reply.
   This is designed to be minimal, and easy to parse in JavaScript or C++.
 */
-int send_json(struct mg_connection *conn,std::string json)
+void send_json(struct mg_connection *conn,std::string json)
 {
 	mg_printf(conn,
 		"HTTP/1.1 200 OK\r\n"
@@ -71,7 +80,8 @@ int send_json(struct mg_connection *conn,std::string json)
 		"\r\n"
 		"%s",
 		json.size(), json.c_str());
-	return MG_TRUE;
+	
+	conn->flags |= MG_F_SEND_AND_CLOSE;
 }
 
 /**
@@ -305,12 +315,13 @@ bool write_is_authorized(const std::string &starpath,
 }
 
 // This function will be called by mongoose on every new request.
-int http_handler(struct mg_connection *conn, enum mg_event ev) {
-  if (ev==MG_AUTH) return true; // everybody's authorized
-  if (ev!=MG_REQUEST) return false; // not a request? not our problem
-  // else it's a request
+void superstar_http_handler(struct mg_connection *conn, int ev,void *param) {
+  if (ev!=MG_EV_HTTP_REQUEST) return; // not a request? not our problem
+  // else it's an http request
+  struct http_message *m=(struct http_message *)param;
 
-  std::string remote_ip(conn->remote_ip);
+#if 0 /* Not clear where this is in mongoose v6! */
+  std::string remote_ip(conn->sa.remote_ip);
 
   if(remote_ip=="127.0.0.1")
   {
@@ -331,25 +342,62 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
   }
 
   printf("Incoming request: client %s:%d, URI %s\n",remote_ip.c_str(),conn->remote_port,conn->uri);
+#endif
 
   const char *prefix="/superstar/";
-  if (strncmp(conn->uri,prefix,strlen(prefix))!=0)
-  	return MG_FALSE; // file fallback
-  std::string starpath(&conn->uri[strlen(prefix)]);
+  if (strncmp(m->uri.p,prefix,strlen(prefix))!=0) 
+  { // not superstar--serve raw files instead
+  	mg_serve_http(conn, m, s_http_server_opts);
+  	return;
+  }
+  
+  std::string starpath=mg_str_to_std_string(&m->uri).substr(strlen(prefix));
 
-  std::string query="";
-  if (conn->query_string) query=conn->query_string;
+  std::string query=mg_str_to_std_string(&m->query_string);
 
-  std::string content="<HTML><BODY>Hello from mongoose!  "
-  "I see you're using source IP "+remote_ip+" and port "+my_itos(conn->remote_port)+"\n";
+  std::string content="<HTML><BODY>Hello from mongoose!  ";
+  
+//  "I see you're using source IP "+remote_ip+" and port "+my_itos(conn->remote_port)+"\n";
   content+="<P>Superstar path: "+starpath+"\n";
 
   enum {NBUF=32767}; // maximum length for JSON data being set
   char buf[NBUF];
-  if (0<=mg_get_var(conn,"set",buf,NBUF)) { /* writing new value */
+  
+// STOOOPID proof of concept comet (TESTING ONLY!!!!)
+  static struct mg_connection *comet_conn=NULL;
+  if (0<=mg_get_http_var(&m->query_string,"comet",buf,NBUF)) {
+	// Comet test: delay response 
+	printf("Comet request\n");
+	comet_conn=conn;
+	return; // don't close yet!
+  }
+  if (0<=mg_get_http_var(&m->query_string,"cometlanding",buf,NBUF)) {
+	// Comet test: send off delayed response
+	printf("Cometlanding\n");
+	
+	if (comet_conn) { // waiting connection:
+		std::string content="Long lost content: ";
+		content+=buf;
+
+		// Send human-readable HTTP reply to the client
+		mg_printf(comet_conn,
+		    "HTTP/1.1 200 OK\r\n"
+		    "Content-Type: text/html\r\n"
+		    "Content-Length: %ld\r\n"        // Always set Content-Length
+		    "\r\n"
+		    "%s",
+		    content.size(), content.c_str());
+		//mg_close_conn(comet_conn);
+		comet_conn->flags |= MG_F_SEND_AND_CLOSE;
+		comet_conn=NULL;
+	}
+  }
+  
+  
+  if (0<=mg_get_http_var(&m->query_string,"set",buf,NBUF)) { /* writing new value */
   	std::string newval(buf);
   	char sentauth[NBUF];
-  	if (0>mg_get_var(conn,"auth",sentauth,NBUF)) {
+  	if (0>mg_get_http_var(&m->query_string,"auth",sentauth,NBUF)) {
   		sentauth[0]=0; // empty authentication string
   	}
   	if (write_is_authorized(starpath,newval,sentauth)) {
@@ -363,7 +411,7 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 	}
 
 	// New optional syntax: /superstar/path1?set=newval1&get=path2,path3,path4
-	if (0<=mg_get_var(conn,"get",buf,NBUF))
+	if (0<=mg_get_http_var(&m->query_string,"get",buf,NBUF))
 	{
 		std::string retArray="[";
 		char *bufLoc=buf;
@@ -381,16 +429,19 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 			else bufLoc=nextComma+1; // move down string
 		}
 		retArray+="]";
-		return send_json(conn,retArray);
+		send_json(conn,retArray);
+		return;
 	}
   }
   else { /* Not writing a new value */
   	if (query=="get")
   	{ /* getting raw JSON */
-		return send_json(conn,superstar_db.get(starpath));
+		send_json(conn,superstar_db.get(starpath));
+		return;
   	}
   	if (query=="sub") { /* substring search */
-  		return send_json(conn,superstar_db.substrings(starpath));
+  		send_json(conn,superstar_db.substrings(starpath));
+  		return;
   	}
 
   	// fixme: "after" type query (requires thread suspend)
@@ -421,9 +472,8 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
             "%s",
             content.size(), content.c_str());
 
-  // Returning non-zero tells mongoose that our function has replied to
-  // the client, and mongoose should not send client any more data.
-  return MG_TRUE;
+  // We're done--close once data has been sent
+  conn->flags |= MG_F_SEND_AND_CLOSE;
 }
 
 /*
@@ -433,26 +483,30 @@ int http_handler(struct mg_connection *conn, enum mg_event ev) {
 */
 void *thread_code(void* data)
 {
-	struct mg_server *server= mg_create_server(NULL, http_handler);
+	struct mg_mgr mgr;
+	struct mg_connection *nc;
 
-	if(mg_set_option(server, "listening_port", ADDRESS.c_str())!=0)
+	mg_mgr_init(&mgr, NULL);
+	nc = mg_bind(&mgr, ADDRESS.c_str(), superstar_http_handler);
+	
+	if (nc==NULL)
 	{
 		std::cout<<"Could not open port "<<ADDRESS<<"."<<std::endl;
 		std::cout<<"\tDo you have permission?"<<std::endl;
 		std::cout<<"\tIs something already running on that port?"<<std::endl;
 		exit(1);
 	}
-
-	mg_set_option(server, "ssi_pattern", "**.html$");
-	mg_set_option(server, "document_root", "../www"); // files served from here
-
-	printf("OK, listening!  Visit http://localhost:%s to see the site!\n",
-	mg_get_option(server, "listening_port"));
-
+	
+	// Set up HTTP server parameters:
+	mg_set_protocol_http_websocket(nc);
+	s_http_server_opts.document_root = "../www";  // Serve current directory
+	s_http_server_opts.enable_directory_listing = "yes";
+	s_http_server_opts.ssi_pattern="**.html$";
+	
 	while(true)
 	{
-		mg_poll_server(server,1000);
-
+		mg_mgr_poll(&mgr, 1000);
+	
 		if(data!=NULL)
 		{
 			int64_t new_time=millis();
@@ -472,7 +526,9 @@ void *thread_code(void* data)
 				old_time=new_time;
 			}
 		}
+
 	}
+	mg_mgr_free(&mgr);
 
 	return 0;
 }
@@ -497,9 +553,10 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	/* Start threads to be redundant servers.  This seems to do nothing. */
+	/* Start threads to be redundant servers.  This seems to do nothing. 
 	for (int thread=0;thread<0;thread++)
 		mg_start_thread(thread_code,NULL);
+	*/
 
 	thread_code((void*)1); // devote main thread to listening as well as saving
 	return 0;
