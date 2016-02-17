@@ -1052,8 +1052,11 @@ connection_t.prototype.load=function()
 		{
 			_this.status_message("Loaded robot:  "+JSON.stringify(data));
 
-			if(_this.on_name_set&&data&&data.robot&&data.robot.school&&data.robot.name)
-				_this.on_name_set(data.robot.school,data.robot.name);
+			if(!data.superstar)
+				data.superstar="robotmoose.com";
+
+			if(_this.on_name_set&&data&&data.superstar&&data.robot&&data.robot.school&&data.robot.name)
+				_this.on_name_set(data.robot);
 		});
 }
 

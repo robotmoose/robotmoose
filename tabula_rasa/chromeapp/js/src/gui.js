@@ -30,10 +30,10 @@ function gui_t(div)
 		function(message){_this.status_viewer.show(message);},
 		function(robot){_this.connection.gui_robot(robot);}
 	);
-	this.connection.on_name_set=function(school,name)
+	this.connection.on_name_set=function(robot)
 	{
-		_this.name.on_loaded_school=school;
-		_this.name.on_loaded_robot=name;
+		_this.name.on_loaded_robot=robot;
+		_this.name.reload();
 	};
 	this.connection.load();
 
