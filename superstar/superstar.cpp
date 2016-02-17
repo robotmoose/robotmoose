@@ -13,6 +13,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 #include <map>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -68,6 +69,16 @@ std::string my_itos(int i) {
 }
 
 /**
+  We're done with this connection.
+*/
+void connection_done(struct mg_connection *conn)
+{
+	// This uses up way too many ports on the server--
+	//  leaving it out enables HTTP keepalive?
+	// conn->flags |= MG_F_SEND_AND_CLOSE;
+}
+
+/**
   Simple mongoose utility function: send back raw JSON reply.
   This is designed to be minimal, and easy to parse in JavaScript or C++.
 */
@@ -81,7 +92,7 @@ void send_json(struct mg_connection *conn,std::string json)
 		"%s",
 		json.size(), json.c_str());
 	
-	conn->flags |= MG_F_SEND_AND_CLOSE;
+	connection_done(conn);
 }
 
 /**
@@ -91,8 +102,39 @@ void send_json(struct mg_connection *conn,std::string json)
 */
 class superstar_db_t {
 private:
-	typedef std::map<std::string /* path */, std::string /* value */> db_t;
+
+	class database_entry {
+	public:
+		// JSON object at this path
+		std::string value;
+		
+		// Current client connections waiting for getnext data
+		std::vector<struct mg_connection *> waiting_connections;
+		
+		database_entry(void) :value("") {}
+		database_entry(const std::string &newval) :value(newval) {}
+	};
+
+	typedef std::map<std::string /* path */, database_entry> db_t;
 	db_t db;
+	
+	
+	// Normalize this path name--everything gets one trailing slash
+	std::string path_normalize(std::string path) const {
+		if(path.size()>0&&path[path.size()-1]!='/')
+			path+="/";
+
+		//if(path.size()==0)
+		//	path+="/";
+
+		while(path.size()>=2 && path[path.size()-1]=='/' && path[path.size()-2]=='/')
+			path.erase(path.end()-1); // trim extra ending slash
+
+		if(path[0]=='/') // trim weird leading slashes (front end bug?)
+			path.erase(path.begin());
+
+		return path;
+	}
 public:
 	superstar_db_t() {}
 
@@ -119,8 +161,8 @@ public:
 				throw std::runtime_error("superstar_db_t::save() - Error writeing key from file named \""+
 					filename+"\".");
 
-			uint64_t data_size=entry->second.size();
-			std::string data_str=entry->second;
+			uint64_t data_size=entry->second.value.size();
+			std::string data_str=entry->second.value;
 			if(!ostr.write((char*)&data_size,sizeof(uint64_t)))
 				throw std::runtime_error("superstar_db_t::save() - Error writeing data size from file named \""+
 					filename+"\" for loading.");
@@ -179,12 +221,7 @@ public:
 	*/
 	void set(std::string path,const std::string &new_value)
 	{
-		if(path.size()>0&&path[path.size()-1]!='/')
-			path+="/";
-
-		if(path.size()==0)
-			path+="/";
-
+		path=path_normalize(path);
 		if(new_value=="")
 		{
 			std::cout<<"Deleting entry \""<<path.substr(0,path.size()-1)<<"\"...";
@@ -203,7 +240,12 @@ public:
 		else
 		{
 			std::cout<<"Setting entry "<<path.substr(0,path.size()-1)<<" to "<<new_value<<std::endl;
-			db[path]=new_value;
+			database_entry &e=db[path];
+			if (e.value!=new_value) {
+				e.value=new_value;
+				
+				setnext(path,e); // any waiting getnext values
+			}
 		}
 	}
 
@@ -212,17 +254,67 @@ public:
 	*/
 	const std::string& get(std::string path)
 	{
-		if(path.size()>0&&path[path.size()-1]!='/')
-			path+="/";
-
-		db_t::iterator iter=db.find(path);
+		db_t::iterator iter=db.find(path_normalize(path));
 		if (iter!=db.end()) {
-			return (*iter).second; // i.e., db[path];
+			return (*iter).second.value; // i.e., db[path];
 		}
 		else {
 			static const std::string empty="";
 			return empty;
 		}
+	}
+	
+	/**
+	  Get this path's value back to this connection,
+	  after the next value is put in the database.
+	*/
+	void getnext(std::string path,struct mg_connection *conn)
+	{
+		database_entry &e=db[path_normalize(path)];
+		e.waiting_connections.push_back(conn);
+		conn->flags |= MG_F_USER_1; // mark as in use
+		conn->user_data=(void *)&e;
+	}
+	
+	// Called by set after the value changes:
+	void setnext(const std::string &path,database_entry &e)
+	{
+		// Send new value to all waiting clients:
+		for (unsigned int i=0;i<e.waiting_connections.size();i++) {
+			struct mg_connection *conn=e.waiting_connections[i];
+			conn->flags &= ~MG_F_USER_1; // mark as done
+			conn->user_data=0; // clear pointer
+  			printf("  sent off new value to getnext client\n");
+			send_json(conn,e.value);
+		}
+		// Remove them from the list
+		e.waiting_connections.clear();
+	}
+			
+	// This connection is shutting down--cancel its getnext
+	bool connection_closing(struct mg_connection *conn) {
+		if ((conn->flags & MG_F_USER_1) && conn->user_data) { // connection is getnext still in progress
+  			printf("Closing an in-progress getnext (WEIRD CASE): ");
+  			
+			database_entry &e=*(database_entry *)conn->user_data;
+			
+			// Check if this is the doomed connection
+			//  (This avoids future sends to the doomed one, 
+			//   which would yield a use-after-delete memory corruption)
+			for (unsigned int i=0;i<e.waiting_connections.size();i++) {
+				if (e.waiting_connections[i]==conn) {
+					e.waiting_connections.erase(e.waiting_connections.begin()+i);
+					printf("found and erased it.  OK.\n");
+					return true;
+				}
+			}
+			// No sign of that connection...
+			printf("no sign of closing getnext (SCARY!)\n");
+			return false;
+		}
+		
+		// Fine--not a getnext in progress
+		return true;
 	}
 
 	/**
@@ -231,8 +323,7 @@ public:
 	*/
 	std::string substrings(std::string path_prefix)
 	{
-		if(path_prefix.size()>0&&path_prefix[path_prefix.size()-1]!='/')
-			path_prefix+="/";
+		path_prefix=path_normalize(path_prefix);
 
 		std::string list="";
 		std::string last="";
@@ -259,8 +350,7 @@ public:
 
 	std::string sublinks(std::string path_prefix)
 	{
-		if(path_prefix.size()>0&&path_prefix[path_prefix.size()-1]!='/')
-			path_prefix+="/";
+		path_prefix=path_normalize(path_prefix);
 
 		std::string list="";
 		std::string last="";
@@ -316,6 +406,9 @@ bool write_is_authorized(const std::string &starpath,
 
 // This function will be called by mongoose on every new request.
 void superstar_http_handler(struct mg_connection *conn, int ev,void *param) {
+  if (ev==MG_EV_CLOSE) {
+  	superstar_db.connection_closing(conn);
+  }
   if (ev!=MG_EV_HTTP_REQUEST) return; // not a request? not our problem
   // else it's an http request
   struct http_message *m=(struct http_message *)param;
@@ -364,37 +457,6 @@ void superstar_http_handler(struct mg_connection *conn, int ev,void *param) {
   enum {NBUF=32767}; // maximum length for JSON data being set
   char buf[NBUF];
   
-// STOOOPID proof of concept comet (TESTING ONLY!!!!)
-  static struct mg_connection *comet_conn=NULL;
-  if (0<=mg_get_http_var(&m->query_string,"comet",buf,NBUF)) {
-	// Comet test: delay response 
-	printf("Comet request\n");
-	comet_conn=conn;
-	return; // don't close yet!
-  }
-  if (0<=mg_get_http_var(&m->query_string,"cometlanding",buf,NBUF)) {
-	// Comet test: send off delayed response
-	printf("Cometlanding\n");
-	
-	if (comet_conn) { // waiting connection:
-		std::string content="Long lost content: ";
-		content+=buf;
-
-		// Send human-readable HTTP reply to the client
-		mg_printf(comet_conn,
-		    "HTTP/1.1 200 OK\r\n"
-		    "Content-Type: text/html\r\n"
-		    "Content-Length: %ld\r\n"        // Always set Content-Length
-		    "\r\n"
-		    "%s",
-		    content.size(), content.c_str());
-		//mg_close_conn(comet_conn);
-		comet_conn->flags |= MG_F_SEND_AND_CLOSE;
-		comet_conn=NULL;
-	}
-  }
-  
-  
   if (0<=mg_get_http_var(&m->query_string,"set",buf,NBUF)) { /* writing new value */
   	std::string newval(buf);
   	char sentauth[NBUF];
@@ -435,6 +497,22 @@ void superstar_http_handler(struct mg_connection *conn, int ev,void *param) {
 	}
   }
   else { /* Not writing a new value */
+  	if (0<=mg_get_http_var(&m->query_string,"getnext",buf,NBUF))
+  	{ /* getting JSON when it next changes (COMET / Hanging Get / "Get on Set") 
+  	     from the given value.  Send current value to avoid update race. */
+  		if (buf!=superstar_db.get(starpath)) 
+  		{ // need new value immediately
+  			printf("Sending getnext client immediate data\n");
+  			send_json(conn,superstar_db.get(starpath));
+  		} 
+  		else 
+  		{ // wait for new value to arrive
+  			printf("Queuing up the getnext client\n");
+  			conn->flags |= MG_F_USER_1; // mark as getnext in progress
+			superstar_db.getnext(starpath,conn);
+		}
+		return;
+  	}
   	if (query=="get")
   	{ /* getting raw JSON */
 		send_json(conn,superstar_db.get(starpath));
@@ -474,7 +552,7 @@ void superstar_http_handler(struct mg_connection *conn, int ev,void *param) {
             content.size(), content.c_str());
 
   // We're done--close once data has been sent
-  conn->flags |= MG_F_SEND_AND_CLOSE;
+  connection_done(conn);
 }
 
 /*
