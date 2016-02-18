@@ -231,6 +231,7 @@ robot_ui_t.prototype.create_widgets=function()
 	};
 	this.state_runner.set_UI(this.widgets.UI);
 
+/* // This blanks out the map entirely when it's not on top--bad way to save CPU!
 	this.doorways.map.ondeactivate=function()
 	{
 		if(myself.widgets.map.renderer)
@@ -241,6 +242,7 @@ robot_ui_t.prototype.create_widgets=function()
 		if(myself.widgets.map.renderer)
 			myself.widgets.map.renderer.show(true);
 	};
+*/
 
 	this.widgets.config.onchange=function() { // recreate pilot GUI when configuration changes
 		myself.widgets.pilot.reconfigure(myself.widgets.config);
