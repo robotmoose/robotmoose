@@ -185,6 +185,7 @@ state_runner_t.prototype.run_m=function(state_table)
 // Request a stop (put actual functionality into stop, above)
 state_runner_t.prototype.stop_m=function(state_table)
 {
+	VM.drive(0,0);
 	state_table.onstop_m();
 }
 
