@@ -134,6 +134,7 @@ state_runner_t.prototype.stop=function(state_table)
 
 	if (this.VM_pilot) { // stop the robot when the code stops running
 		this.VM_pilot.power.L=this.VM_pilot.power.R=0.0; // stop drive
+		this.pilot_flush();
 		this.VM_pilot.cmd=undefined; // stop scripts
 		for (var idx in this.VM_pilot.power.pwm) {
 			this.VM_pilot.power.pwm[idx]=0; // stop PWM
@@ -185,7 +186,6 @@ state_runner_t.prototype.run_m=function(state_table)
 // Request a stop (put actual functionality into stop, above)
 state_runner_t.prototype.stop_m=function(state_table)
 {
-	VM.drive(0,0);
 	state_table.onstop_m();
 }
 
@@ -280,7 +280,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	// Drive forward specified distance (cm)
 	VM.forward=function(target,speed) {
 		if (!target) target=10; // centimeters
-		if (!speed) speed=0.4; // moderate speed
+		if (!speed) speed=0.4*100; // moderate speed -- scaled for percentage
 		
 		var t=VM.sequencer.block_start(VM);
 		if (VM.sequencer.current()) {
@@ -316,7 +316,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	// Turn right (clockwise) specified distance (deg)
 	VM.right=function(target,speed) {
 		if (!target) target=90; // degrees
-		if (!speed) speed=0.3; 
+		if (!speed) speed=0.3*100; // --- scaled for percentage
 		
 		var t=VM.sequencer.block_start(VM);
 		if (VM.sequencer.current()) {
