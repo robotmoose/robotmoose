@@ -4,6 +4,7 @@
 
 function status_viewer_t(div)
 {
+	var this_=this;
 	if(!div)
 		return null;
 
@@ -11,14 +12,19 @@ function status_viewer_t(div)
 	this.el=new_div(this.div);
 	maximize(this.el);
 
-	this.max_lines=500;
+	this.max_lines=50;
 	this.lines=[];
 	this.textarea=new_textarea(this.el);
+	// this.textarea.style.visibility="hidden";
+	this.interval=setInterval(function() {
+		this_.rebuild_textarea_m();
+	}, 500);
 }
 
 status_viewer_t.prototype.destroy=function()
 {
 	this.div.removeChild(this.el);
+	clearInterval(this.interval);
 }
 
 status_viewer_t.prototype.show=function(message)
@@ -30,14 +36,13 @@ status_viewer_t.prototype.show=function(message)
 		while(this.lines.length>this.max_lines)
 			this.lines=this.lines.slice(-this.max_lines,this.lines.length);
 
-		this.rebuld_textarea_m();
 		this.textarea.scrollTop=this.textarea.scrollHeight;
 	}
 }
 
 
 
-status_viewer_t.prototype.rebuld_textarea_m=function()
+status_viewer_t.prototype.rebuild_textarea_m=function()
 {
 	var lines=""; // buffer up lines to prevent repeated innerHTML updates
 
