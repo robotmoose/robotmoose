@@ -18,6 +18,7 @@ function connection_t(on_message,on_disconnect,on_connect,on_name_set)
 	_this.max_command=15; // A-packet formatting
 	_this.max_short_length=15;
 	_this.robot=null;
+	_this.serial_delay_ms=50; // milliseconds to wait between sensors and commands (saves CPU, costs some latency though)
 
 	// Are there other serial JS apis?  maybe node.js?
 	_this.serial_api=chrome.serial;
@@ -778,7 +779,9 @@ connection_t.prototype.arduino_sensor_packet=function(p)
 	switch (p.command) {
 	case 0xC: // sensor data
 		_this.arduino_recv_packet(p);
-		_this.arduino_send_packet(); // send command data in response
+		setTimeout(function() {
+			_this.arduino_send_packet(); // send command data in response
+		}, _this.serial_delay_ms); // limit CPU usage by waiting to send response
 		break;
 	case 0xE: // Error code
 		_this.bad("Arduino firmware error packet "+p);
