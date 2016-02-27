@@ -7,6 +7,7 @@
 
 function state_runner_t()
 {
+	var _this=this;
 	this.execution_interval=30; // milliseconds between runs
 
 	this.state=null;
@@ -56,7 +57,6 @@ function state_runner_t()
 	
 	// Restart the sequence for a new run
 	seq.reset=function() {
-		seq.advance_ready=false;
 		seq.code_count=0; // source code phase (counts up every time through code)
 		seq.exec_count=0; // active runtime phase (counts up only after delays)
 		seq.exec_start_count=-1; // trails exec_count by 1
@@ -82,7 +82,7 @@ function state_runner_t()
 	
 	// Advance to the next piece of code
 	seq.advance=function() {
-		seq.advance_ready=true;		
+		seq.exec_count++;
 	}
 	
 	// Mark end of blocking section
@@ -396,6 +396,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 // Outer code execution driver: setup and error reporting
 state_runner_t.prototype.execute_m=function(state_table)
 {
+	var _this=this;
 	if(!this.kill)
 	{
 		state_table.clear_error();
@@ -415,19 +416,14 @@ state_runner_t.prototype.execute_m=function(state_table)
 
 			var VM=this.make_user_VM(run_state.code,this.state_list);
 			
+			if (VM.sequencer.exec_count>=VM.sequencer.code_count) 
+			{ // Restart the state if we're at the end of the sequence:
+				console.log("Resetting sequencer back to start");
+				_this.do_writes(_this.VM);
+				VM.sequencer.reset();
+			}	
+
 			state_table.show_prints(VM.printed_text,this.state);
-			
-			if (VM.sequencer.advance_ready) 
-			{ // Switch to next phase
-				VM.sequencer.advance_ready=false;
-				VM.sequencer.exec_count++;
-				if (VM.sequencer.exec_count>=VM.sequencer.code_count) 
-				{ // Restart the state if we're at the end of the sequence:
-					console.log("Resetting sequencer back to start");
-					this.do_writes(VM);
-					VM.sequencer.reset();
-				}
-			}
 
 			if(VM.state_written===null)
 			{
