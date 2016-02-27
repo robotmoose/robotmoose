@@ -421,6 +421,12 @@ state_runner_t.prototype.execute_m=function(state_table)
 			{ // Switch to next phase
 				VM.sequencer.advance_ready=false;
 				VM.sequencer.exec_count++;
+				if (VM.sequencer.exec_count>=VM.sequencer.code_count) 
+				{ // Restart the state if we're at the end of the sequence:
+					console.log("Resetting sequencer back to start");
+					this.do_writes(VM);
+					VM.sequencer.reset();
+				}
 			}
 
 			if(VM.state_written===null)
