@@ -989,7 +989,7 @@ void robot_backend::read_network(const std::string &read_json)
 #endif
 
 		if (sim) {
-			double distance_per_power=0.02; // meters per timestep
+			double distance_per_power=0.0006; // meters per timestep
 			double wheelbase=0.3; // meters
 
 			if(pilot["power"].GetType()==json::ObjectVal&&pilot["power"]["L"].IsNumeric()&&pilot["power"]["R"].IsNumeric())
