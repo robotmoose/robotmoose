@@ -12,6 +12,33 @@ function config_editor_t(div)
 	this.div=div;
 	this.element=document.createElement("div");
 	this.counter=1;
+
+	this.tabula={};
+	this.tabula.select={};
+	this.tabula.select.element=document.createElement("select");
+	this.tabula.select.options=[];
+	this.tabula.select.element.title="Pick a hardware device, then click 'Add'";
+	this.tabula.options=[];
+	var default_tabula=document.createElement("option");
+	default_tabula.innerHTML="Select Device";
+	this.tabula.select.element.appendChild(default_tabula);
+	this.tabula.select.element.className="form-control";
+	this.tabula.select.element.disabled=true;
+	this.tabula.select.element.style.width=256;
+	this.tabula.select.element.style.marginRight=10;
+	this.tabula.select.element.onchange=function(event)
+	{
+		if(myself.tabula.select.element.selectedIndex>0)
+		{
+			var obj=myself.tabula.select.options[myself.tabula.select.element.selectedIndex].tabula;
+			myself.create_entry(obj.type,obj.args);
+			myself.refresh_m();
+			myself.tabula.select.element.selectedIndex=0;
+		}
+	};
+	this.element.appendChild(this.tabula.select.element);
+	this.element.appendChild(document.createElement("br"));
+
 	this.drag_list=new drag_list_t(this.element);
 
 	if(!this.drag_list)
@@ -22,12 +49,6 @@ function config_editor_t(div)
 
 	this.entries=[];
 	this.add_div=document.createElement("div");
-	this.tabula={};
-	this.tabula.select={};
-	this.tabula.select.element=document.createElement("select");
-	this.tabula.select.options=[];
-	this.tabula.select.element.title="Pick a hardware device, then click 'Add'";
-	this.tabula.options=[];
 	this.add_button=document.createElement("input");
 	this.configure_button=document.createElement("input");
 
@@ -37,17 +58,12 @@ function config_editor_t(div)
 	this.add_div.className="form-inline";
 	this.element.appendChild(this.add_div);
 
-	this.tabula.select.element.className="form-control";
-	this.tabula.select.element.disabled=true;
-	this.tabula.select.element.style.width=256;
-	this.tabula.select.element.style.marginRight=10;
-	this.add_div.appendChild(this.tabula.select.element);
-
 	this.add_button.className="btn btn-primary";
 	this.add_button.disabled=true;
 	this.add_button.type="button";
 	this.add_button.value="Add";
 	this.add_button.title="Click here to add this hardware device to this list";
+	this.add_button.style.visibility="hidden";
 	this.add_button.onclick=function(event)
 	{
 		var obj=myself.tabula.select.options[myself.tabula.select.element.selectedIndex].tabula;
@@ -56,10 +72,9 @@ function config_editor_t(div)
 	};
 	this.add_div.appendChild(this.add_button);
 
-	this.element.appendChild(document.createElement("br"));
-
 	this.configure_button.className="btn btn-primary";
 	this.configure_button.disabled=true;
+	this.configure_button.style.marginTop="-24px";
 	this.configure_button.type="button";
 	this.configure_button.value="Configure";
 	this.configure_button.title="Click here to send this list to the Arduino on the robot";
