@@ -88,7 +88,7 @@ function state_table_t(doorway)
 	this.run_button.style.marginLeft=10;
 	this.run_button.disabled=true;
 	this.run_button.value="Run";
-	this.run_button.title_run="Click here to make this code execute.";
+	this.run_button.title_run="Click here to save this code and make it execute.";
 	this.run_button.title=this.run_button.title_run;
 	this.run_button.title_stop="Click to stop this code.";
 	this.run_button.onclick=function(event){myself.run_button_pressed_m();};
