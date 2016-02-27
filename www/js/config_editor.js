@@ -30,7 +30,7 @@ function config_editor_t(div)
 	{
 		if(myself.tabula.select.element.selectedIndex>0)
 		{
-			var obj=myself.tabula.select.options[myself.tabula.select.element.selectedIndex].tabula;
+			var obj=myself.tabula.select.options[myself.tabula.select.element.selectedIndex-1].tabula;
 			myself.create_entry(obj.type,obj.args);
 			myself.refresh_m();
 			myself.tabula.select.element.selectedIndex=0;
