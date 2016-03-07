@@ -1199,7 +1199,11 @@ int main(int argc, char *argv[])
 		if(to_int(config.get("baudrate"))>0)
 			Serial.Set_baud(to_int(config.get("baudrate")));
 
-		backend=new robot_backend(config.get("superstar"),config.get("robot"));
+		std::string superstar_server(config.get("superstar"));
+		if(superstar_server.substr(0,7)!="http://")
+			throw std::runtime_error("Superstar server must start with \"http://\".");
+
+		backend=new robot_backend(superstar_server,config.get("robot"));
 		backend->LRtrim=to_double(config.get("trim"));
 		backend->debug=debug;
 
