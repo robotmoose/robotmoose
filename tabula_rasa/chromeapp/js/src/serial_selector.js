@@ -90,7 +90,12 @@ serial_selector_t.prototype.build_list_m=function(ports)
 
 	this.select.length=0;
 	var found=false;
-
+	//Uncomment to see Sim as a serial port option
+	/*{
+		var sim_option=document.createElement("option");
+		this.select.appendChild(sim_option);
+		sim_option.text="Sim";
+	}*/
 	for(var ii=0;ii<ports.length;++ii)
 	{
 		var name=ports[ii].path;
