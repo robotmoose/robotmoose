@@ -22,8 +22,8 @@
  					};
  }
 
-//TO DO: Actually reconnect to a fake arduino. Simulate tabula_rasa protocol
- sim_serial_t.prototype.connect = function(port, options, connectionInfo)
+//TO DO: Send faked data to stop connection from timing out
+ sim_serial_t.prototype.connect = function(port, options, callback)
  {
  	console.log("In function sim_serial.connect");
  	console.log("port name: " + port);
@@ -31,6 +31,7 @@
  	{
  		console.log(key +": " + options[key]);
  	}
+ 	callback(options);
  }
 
 sim_serial_t.prototype.disconnect = function(connection, action)
@@ -45,7 +46,11 @@ sim_serial_t.prototype.disconnect = function(connection, action)
 
  }
 
- sim_serial_t.prototype.send = function(connection, buf)
+ sim_serial_t.prototype.send = function(connection, buf,callback)
  {
  	console.log("Bytes Recieved: " + buf.length);
+ 	var sendInfo= {
+ 						bytesSent:buf.length
+ 				  }
+ 	callback(sendInfo);
  }
