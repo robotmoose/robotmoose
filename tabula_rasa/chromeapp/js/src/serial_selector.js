@@ -111,7 +111,10 @@ serial_selector_t.prototype.build_list_m=function(ports)
 			this.select.selectedIndex=ii;
 
 		if(name==this.selected_value)
+		{
 			found=true;
+			option.selected = true;
+		}
 	}
 
 	if(this.connected&&this.selected_value&&!found)
