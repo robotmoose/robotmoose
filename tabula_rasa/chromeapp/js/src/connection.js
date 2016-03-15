@@ -160,6 +160,14 @@ connection_t.prototype.connect_m=function(port_name,done_callback)
 		bitrate:57600,
 		receiveTimeout:5*1000 // in ms (must be more than Arduino 1.7 second start delay)
 	};
+	if(port_name == "Sim")
+	{
+		_this.serial_api = new sim_serial_t();
+	}
+	else
+	{
+		_this.serial_api = chrome.serial;
+	}
 	_this.serial_api.connect(port_name, options,
 		function(connectionInfo) {
 			_this.connection=connectionInfo.connectionId;
@@ -182,7 +190,7 @@ connection_t.prototype.disconnect_m=function(done_callback)
 		var port_name=_this.port_name;
 		_this.reset();
 		_this.status_message("Disconnecting from "+port_name);
-		chrome.serial.disconnect(connection,
+		_this.serial_api.disconnect(connection,
 			function() {
 				if (chrome.runtime.lastError)
 					_this.status_message("Error disconnecting from "+port_name);
