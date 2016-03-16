@@ -82,57 +82,45 @@ serial_selector_t.prototype.disconnect=function()
 
 serial_selector_t.prototype.build_list_m=function(ports)
 {
-	var _this=this;
-	var old_value=-1;
-
-	if(this.select.options.length>0)
-		old_value=this.select.options[this.select.selectedIndex].text;
-
-	this.select.length=0;
+	var old="";
 	var found=false;
+
+	if(this.select.selectedIndex>=0&&this.select.options.length>this.select.selectedIndex)
+		old=this.select.options[this.select.selectedIndex].value;
+
+	this.select.options.length=0;
+
 	//Uncomment to see Sim as a serial port option
-	{
+	/*{
 		var sim_option=document.createElement("option");
+		sim_option.text=sim_option.value="Sim";
 		this.select.appendChild(sim_option);
-		sim_option.text="Sim";
-	}
+	}*/
+
 	for(var ii=0;ii<ports.length;++ii)
 	{
 		var name=ports[ii].path;
 
 		// Skip bluetooth devices (on Mac)
-		if ( /.*Bluetooth.*/.test( name ) ) continue;
+		if ( /.*Bluetooth.*/.test( name ) )
+			continue;
 
 		var option=document.createElement("option");
+		option.text=option.value=name;
 		this.select.appendChild(option);
-		option.text=name;
 
-		if(name==old_value)
-			this.select.selectedIndex=ii;
-
-		if(name==this.selected_value)
-		{
-			found=true;
-			option.selected = true;
-		}
+		if(name==old)
+			option.selected=found=true;
 	}
+
+	if(!found)
+		this.select.selectedIndex=0;
 
 	if(this.connected&&this.selected_value&&!found)
 		this.disconnect();
 
 	this.select.disabled=(this.connected||this.select.options.length<=0);
 	this.button.disabled=(this.select.options.length<=0||!this.is_connectable());
-
-	if(this.select.options.length<=0)
-	{
-		var option=document.createElement("option");
-		this.select.appendChild(option);
-		option.text="No serial ports.";
-	}
-	/*else if (this.select.options.length==1 && !this.connected&&this.is_connectable())
-	{ // Only one serial port--automatically connect to it
-		_this.connect();
-	}*/
 }
 
 serial_selector_t.prototype.button_m=function()
