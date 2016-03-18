@@ -997,6 +997,9 @@ void robot_backend::read_network(const std::string &read_json)
 				double delL=pilot["power"]["L"];
 				double delR=pilot["power"]["R"];
 
+				
+				if (delL > 100.0) delL = 100.0;
+				if (delR > 100.0) delR = 100.0;
 				location.move_wheels(
 					delL*distance_per_power,
 					delR*distance_per_power,
