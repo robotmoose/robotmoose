@@ -758,7 +758,7 @@ state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 		matchBrackets:true,
 		mode:"text/x-javascript"
 	});
-	entry.code_editor.on("change",function(){_this.code_change_m();});
+	entry.code_editor.on("change",function(){_this.code_change_m();_this.autosave_m(true);});
 	entry.code_editor.setSize(500);
 	entry.code_editor_event=function(event){entry.code_editor.refresh();};
 	window.addEventListener("click",entry.code_editor_event);
