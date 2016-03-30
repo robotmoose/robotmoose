@@ -4,7 +4,6 @@
  Mike Moss, 2015-08 (Public Domain)
 */
 
-
 //Members
 //		onrefresh() - callback triggered when window needs updating (resizes)
 //		onrun() - callback triggered when run button is hit
@@ -15,13 +14,40 @@ function state_table_t(doorway)
 	if(!doorway||!doorway.content)
 		return null;
 
-	var myself=this;
+	var _this=this;
+	this.old_time=get_time();
+	this.old_last_experiment="HelloWorld";
 	this.old_robot_name=null;
 	this.old_robot_auth=null;
 	this.doorway=doorway;
 	this.overwrite_modal=new modal_yesno_t(this.doorway.parent_div,"Warning","");
 	this.div=doorway.content;
-	this.last_experiment="testing";
+	this.last_experiment="HelloWorld";
+
+	this.createnew={};
+	this.createnew.modal=new modal_createcancel_t(this.doorway.parent_div,"Create New Experiment","");
+	this.createnew.modal.modal.get_content().style.height="64px";
+
+	this.createnew.div=document.createElement("div");
+	this.createnew.div.className="form-group";
+	this.createnew.div.style.float="left";
+	this.createnew.modal.modal.get_content().appendChild(this.createnew.div);
+
+	this.createnew.name=document.createElement("input");
+	this.createnew.name.type="text";
+	this.createnew.name.placeholder="Experiment Name";
+	this.createnew.name.className="form-control";
+	this.createnew.name.style.width=240;
+	this.createnew.name.spellcheck=false;
+	this.createnew.name.onchange=function(event){_this.update_experiment_m();};
+	this.createnew.name.onkeydown=function(event){_this.update_experiment_m();};
+	this.createnew.name.onkeyup=function(event){_this.update_experiment_m();};
+	this.createnew.name.onkeypress=function(event){_this.update_experiment_m();};
+	this.createnew.div.appendChild(this.createnew.name);
+
+	this.createnew.glyph=document.createElement("span");
+	this.createnew.glyph.className="glyphicon form-control-feedback glyphicon glyphicon-remove";
+	this.createnew.div.appendChild(this.createnew.glyph);
 
 	this.make_error_span=function () {
 		var errors=document.createElement("span");
@@ -41,11 +67,10 @@ function state_table_t(doorway)
 	this.experiment=
 	{
 		div:document.createElement("div"),
-		name:document.createElement("input"),
-		glyph:document.createElement("span")
+		drop:document.createElement("select")
 	};
 	this.run_button=document.createElement("input");
-	this.load_button=document.createElement("input");
+	this.new_button=document.createElement("input");
 	this.add_button=document.createElement("input");
 	this.entries=[];
 
@@ -67,21 +92,18 @@ function state_table_t(doorway)
 	this.experiment.div.style.float="left";
 	this.controls_div.appendChild(this.experiment.div);
 
-	this.experiment.name.type="text";
-	this.experiment.name.value=this.last_experiment;
-	this.experiment.name.placeholder="Experiment Name";
-	this.experiment.name.className="form-control";
-	this.experiment.name.style.width=240;
-	this.experiment.name.spellcheck=false;
-	this.experiment.name.onchange=function(event){myself.update_experiment_m();};
-	this.experiment.name.onkeydown=function(event){myself.update_experiment_m();};
-	this.experiment.name.onkeyup=function(event){myself.update_experiment_m();};
-	this.experiment.name.onkeypress=function(event){myself.update_experiment_m();};
-	this.update_experiment_m();
-	this.experiment.div.appendChild(this.experiment.name);
-
-	this.experiment.glyph.className="glyphicon form-control-feedback glyphicon glyphicon-remove";
-	this.experiment.div.appendChild(this.experiment.glyph);
+	this.experiment.div.appendChild(this.experiment.drop);
+	this.experiment.drop.onchange=function()
+	{
+		_this.last_experiment=_this.experiment.drop.value;
+		_this.load_button_pressed_m();
+	};
+	this.experiment.drop.className="form-control";
+	{
+		var option=document.createElement("option");
+		option.value=option.text="HelloWorld";
+		this.experiment.drop.appendChild(option);
+	}
 
 	this.run_button.type="button";
 	this.run_button.className="btn btn-primary";
@@ -91,17 +113,42 @@ function state_table_t(doorway)
 	this.run_button.title_run="Click here to save this code and make it execute.";
 	this.run_button.title=this.run_button.title_run;
 	this.run_button.title_stop="Click to stop this code.";
-	this.run_button.onclick=function(event){myself.run_button_pressed_m();};
+	this.run_button.onclick=function(event){_this.run_button_pressed_m();};
 	this.controls_div.appendChild(this.run_button);
 
-	this.load_button.type="button";
-	this.load_button.className="btn btn-primary";
-	this.load_button.style.marginLeft=10;
-	this.load_button.disabled=false;
-	this.load_button.value="Load";
-	this.load_button.title="Click here to open the code with the name in the box to the left.";
-	this.load_button.onclick=function(event){myself.load_button_pressed_m();};
-	this.controls_div.appendChild(this.load_button);
+	this.new_button.type="button";
+	this.new_button.className="btn btn-primary";
+	this.new_button.style.marginLeft=10;
+	this.new_button.disabled=false;
+	this.new_button.value="New";
+	this.new_button.title="Click here to create a new experiment.";
+	this.new_button.onclick=function(event)
+	{
+		_this.createnew.modal.oncreate=function()
+		{
+			_this.set_autosave(false);
+			_this.autosave_m();
+			var experiment=_this.createnew.name.value;
+			var old_robot={name:_this.old_robot_name,auth:_this.old_robot_auth};
+			_this.clear();
+			_this.upload(old_robot,function()
+			{
+				_this.last_experiment=experiment;
+				_this.download_m(old_robot);
+			},experiment);
+
+
+			console.log("create "+_this.createnew.name.value);
+			_this.createnew.name.value="";
+		};
+		_this.createnew.modal.oncancel=function()
+		{
+			_this.createnew.name.value="";
+		};
+		_this.update_experiment_m();
+		_this.createnew.modal.show();
+	};
+	this.controls_div.appendChild(this.new_button);
 
 	this.add_button.type="button";
 	this.add_button.className="btn btn-primary";
@@ -109,8 +156,21 @@ function state_table_t(doorway)
 	this.add_button.disabled=false;
 	this.add_button.value="Add State";
 	this.add_button.title="Click here to add a new blank robot state to this list.";
-	this.add_button.onclick=function(event){myself.add_button_pressed_m();};
+	this.add_button.onclick=function(event){_this.add_button_pressed_m();};
 	this.controls_div.appendChild(this.add_button);
+
+	this.set_autosave(true);
+}
+
+state_table_t.prototype.set_autosave=function(on)
+{
+	var _this=this;
+	if(this.autosave_interval)
+		clearInterval(this.autosave_interval);
+	if(on)
+	{
+		this.autosave_interval=setInterval(function(){_this.autosave_m();},1000);
+	}
 }
 
 state_table_t.prototype.download_with_check=function(robot,skip_get_active,ondownload)
@@ -118,34 +178,40 @@ state_table_t.prototype.download_with_check=function(robot,skip_get_active,ondow
 	if(!robot||!robot.name)
 		return;
 
-	var myself=this;
+	var _this=this;
 
-	if(myself.last_experiment)
+	//Autosave...make this not necessary
+	/*if(_this.last_experiment.length>0)
 	{
-		superstar_get(robot.name+"/experiments/"+encodeURIComponent(myself.last_experiment)+"/","code",
+		superstar_get(robot.name+"/experiments/"+encodeURIComponent(_this.last_experiment),"code",
 			function(obj)
 			{
-				if(JSON.stringify(obj)!=JSON.stringify(myself.get_states()))
+				if(JSON.stringify(obj)!=JSON.stringify(_this.get_states()))
 				{
-					myself.overwrite_modal.set_message("All unsaved changes to the experiment named \""+
-						myself.last_experiment+"\" will be lost. Proceed?");
-					myself.overwrite_modal.onok=
-						function()
-						{
-							myself.download(robot,skip_get_active,ondownload);
-						}
-					myself.overwrite_modal.show();
+					_this.overwrite_modal.set_message("All unsaved changes to the experiment named \""+
+						_this.last_experiment+"\" will be lost. Proceed?");
+					_this.overwrite_modal.onok=function()
+					{
+						_this.last_experiment=_this.get_experiment_name();
+						_this.download(robot,skip_get_active,ondownload);
+					};
+					_this.overwrite_modal.oncancel=function()
+					{
+						_this.experiment.drop.value=_this.last_experiment;
+					};
+					_this.overwrite_modal.show();
 				}
 				else
 				{
-					myself.download(robot,skip_get_active,ondownload);
+					_this.download(robot,skip_get_active,ondownload);
 				}
 			});
 	}
 	else
 	{
-		myself.download(robot,skip_get_active,ondownload);
-	}
+		_this.download(robot,skip_get_active,ondownload);
+	}*/
+	_this.download(robot,skip_get_active,ondownload);
 }
 
 state_table_t.prototype.download=function(robot,skip_get_active,callback)
@@ -158,11 +224,11 @@ state_table_t.prototype.download=function(robot,skip_get_active,callback)
 	if(!robot||!robot.name)
 		return;
 
-	var myself=this;
+	var _this=this;
 
 	if(skip_get_active)
 	{
-		myself.download_m(robot,callback);
+		_this.download_m(robot,callback);
 	}
 	else
 	{
@@ -170,14 +236,62 @@ state_table_t.prototype.download=function(robot,skip_get_active,callback)
 		{
 			if(obj&&obj.length>0)
 			{
-				myself.last_experiment=myself.experiment.name.value=obj;
-				myself.download_m(robot,callback);
+				_this.last_experiment=obj;
+				_this.download_m(robot,callback);
+			}
+			else
+			{
+				_this.add_button_pressed_m();
+				_this.set_autosave(true);
+				_this.autosave_m(true);
 			}
 		});
 	}
 
 	this.update_states_m();
-	this.update_buttons_m();
+}
+
+state_table_t.prototype.download_experiments=function()
+{
+	var _this=this;
+	if(this.old_robot_name)
+	{
+		superstar_sub(this.old_robot_name+"/experiments",function(experiments)
+		{
+			experiments=remove_duplicates(experiments);
+			var old_value=_this.last_experiment;
+			_this.experiment.drop.length=0;
+
+			for(key in experiments)
+			{
+				var option=document.createElement("option");
+				_this.experiment.drop.appendChild(option);
+				option.text=option.value=experiments[key];
+				if(option.value==old_value)
+				{
+					_this.experiment.drop.value=option.value;
+					found=true;
+				}
+			}
+
+			if(!found)
+			{
+				_this.experiment.drop.selectedIndex=0;
+				_this.last_experiment=_this.get_experiment_name();
+			}
+
+			_this.experiment.drop.disabled=false;
+
+			_this.update_buttons_m();
+		});
+	}
+
+	if(this.experiment.drop.length<=0)
+	{
+		var option=document.createElement("option");
+		this.experiment.drop.appendChild(option);
+		option.value=option.text="No experiments found.";
+	}
 }
 
 state_table_t.prototype.upload_with_check=function(robot,onupload)
@@ -185,39 +299,49 @@ state_table_t.prototype.upload_with_check=function(robot,onupload)
 	if(!robot||!robot.name)
 		return;
 
-	var myself=this;
+	var _this=this;
 
-	superstar_get(robot.name+"/experiments/"+encodeURIComponent(myself.experiment.name.value)+"/","code",
+	superstar_get(robot.name+"/experiments/"+encodeURIComponent(this.get_experiment_name()),"code",
 		function(obj)
 		{
-			if(myself.last_experiment&&obj&&obj.length>0&&myself.last_experiment!=myself.experiment.name.value)
+			if(_this.last_experiment&&obj&&obj.length>0&&_this.last_experiment!=_this.get_experiment_name())
 			{
-				myself.overwrite_modal.set_message("This will overwrite the non-empty experiment named \""+
-					myself.experiment.name.value+"\". Proceed?");
-				myself.overwrite_modal.onok=function(){myself.upload(robot,onupload);}
-				myself.overwrite_modal.show();
+				_this.overwrite_modal.set_message("This will overwrite the non-empty experiment named \""+
+					_this.get_experiment_name()+"\". Proceed?");
+				_this.overwrite_modal.onok=function(){_this.upload(robot,onupload);}
+				_this.overwrite_modal.show();
 			}
 			else
 			{
-				myself.upload(robot,onupload);
+				_this.upload(robot,onupload);
 			}
 		});
 }
 
-state_table_t.prototype.upload=function(robot,onupload)
+state_table_t.prototype.get_experiment_name=function()
+{
+	if(this.experiment.drop.selectedIndex>=0&&this.experiment.drop.selectedIndex<this.experiment.drop.options.length)
+		return this.experiment.drop.options[this.experiment.drop.selectedIndex].value;
+	return "";
+}
+
+state_table_t.prototype.upload=function(robot,onupload,experiment)
 {
 	if(!robot||!robot.name)
 		return;
 
-	var myself=this;
+	var _this=this;
 
-	superstar_set(robot.name+"/experiments/"+encodeURIComponent(this.experiment.name.value)+"/","code",this.get_states(),
+	if(!experiment)
+		experiment=this.get_experiment_name();
+
+	superstar_set(robot.name+"/experiments/"+encodeURIComponent(experiment),"code",this.get_states(),
 		function(obj)
 		{
-			superstar_set(robot.name,"active_experiment",encodeURIComponent(myself.experiment.name.value),
+			superstar_set(robot.name,"active_experiment",encodeURIComponent(experiment),
 				function(obj)
 				{
-					myself.last_experiment=myself.experiment.name.value;
+					_this.last_experiment=experiment;
 
 					if(onupload)
 						onupload();
@@ -348,13 +472,13 @@ state_table_t.prototype.create_entry=function(state,time,code)
 		}
 	};
 
-	var myself=this;
+	var _this=this;
 	var entry={};
 	entry.drag_list=this.drag_list.create_entry();
 	entry.drag_list.li.style.minWidth=740;
-	entry.drag_list.ondrag=function(){myself.onstop_m();};
+	entry.drag_list.ondrag=function(){_this.onstop_m();};
 	entry.drag_list.state_table_t=entry;
-	entry.drag_list.onremove=function(entry){myself.remove_entry_m(entry.state_table_t);};
+	entry.drag_list.onremove=function(entry){_this.remove_entry_m(entry.state_table_t);};
 	this.create_entry_m(entry,state,time,code);
 	this.entries.push(entry);
 	this.update_states_m();
@@ -473,17 +597,18 @@ state_table_t.prototype.clear=function()
 
 state_table_t.prototype.download_m=function(robot,callback)
 {
-	var myself=this;
+	var _this=this;
 
-	superstar_get(robot.name+"/experiments/"+encodeURIComponent(this.experiment.name.value)+"/","code",function(obj)
+	superstar_get(robot.name+"/experiments/"+encodeURIComponent(this.last_experiment),"code",function(obj)
 	{
-		myself.last_active=myself.experiment.name.value;
-
 		if(obj&&obj.length>0)
 			for(var key in obj)
-				myself.create_entry(obj[key].name,obj[key].time,obj[key].code);
+				_this.create_entry(obj[key].name,obj[key].time,obj[key].code);
 		else
-			myself.create_entry("start","","// JavaScript code\n");
+			_this.create_entry("start","","// JavaScript code\n");
+
+		_this.old_last_experiment=_this.last_experiment;
+		_this.download_experiments();
 
 		if(callback)
 			callback();
@@ -512,16 +637,16 @@ state_table_t.prototype.add_button_pressed_m=function()
 
 state_table_t.prototype.load_button_pressed_m=function()
 {
-	var myself=this;
+	var _this=this;
 
 	this.onstop_m();
 
-	var old_robot={name:myself.old_robot_name,auth:myself.old_robot_auth}
+	var old_robot={name:_this.old_robot_name,auth:_this.old_robot_auth};
 
 	this.download_with_check(old_robot,true,
 		function()
 		{
-			myself.upload(old_robot);
+			_this.upload(old_robot);
 		});
 
 }
@@ -561,7 +686,7 @@ state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 	if(!code)
 		code="";
 
-	var myself=this;
+	var _this=this;
 	entry.table={};
 	entry.table.element=document.createElement("table");
 	entry.table.row=entry.table.element.insertRow(0);
@@ -589,10 +714,10 @@ state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 	entry.input.text.size=10;
 	entry.input.text.value=state;
 	entry.input.text.entry_input=entry.input;
-	entry.input.text.onchange=function(event){myself.update_states_m();};
-	entry.input.text.onkeydown=function(event){myself.update_states_m();};
-	entry.input.text.onkeyup=function(event){myself.update_states_m();};
-	entry.input.text.onkeypress=function(event){myself.update_states_m();};
+	entry.input.text.onchange=function(event){_this.update_states_m();_this.autosave_m();};
+	entry.input.text.onkeydown=function(event){_this.update_states_m();};
+	entry.input.text.onkeyup=function(event){_this.update_states_m();};
+	entry.input.text.onkeypress=function(event){_this.update_states_m();};
 	this.update_states_m();
 	entry.input.div.appendChild(entry.input.text);
 
@@ -608,10 +733,10 @@ state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 	entry.time.spellcheck=false;
 	entry.time.size=10;
 	entry.time.value=time;
-	entry.time.onchange=function(event){myself.validate_time_m(this);};
-	entry.time.onkeydown=function(event){myself.validate_time_m(this);};
-	entry.time.onkeyup=function(event){myself.validate_time_m(this);};
-	entry.time.onkeypress=function(event){myself.validate_time_m(this);};
+	entry.time.onchange=function(event){_this.validate_time_m(this);_this.autosave_m();};
+	entry.time.onkeydown=function(event){_this.validate_time_m(this);};
+	entry.time.onkeyup=function(event){_this.validate_time_m(this);};
+	entry.time.onkeypress=function(event){_this.validate_time_m(this);};
 	this.validate_time_m(entry.time);
 	entry.table.left.appendChild(entry.time);
 
@@ -633,7 +758,7 @@ state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 		matchBrackets:true,
 		mode:"text/x-javascript"
 	});
-	entry.code_editor.on("change",function(){myself.code_change_m()});
+	entry.code_editor.on("change",function(){_this.code_change_m();});
 	entry.code_editor.setSize(500);
 	entry.code_editor_event=function(event){entry.code_editor.refresh();};
 	window.addEventListener("click",entry.code_editor_event);
@@ -747,11 +872,11 @@ state_table_t.prototype.update_buttons_m=function(valid)
 		}
 	}
 
-	if(this.experiment.name.value.length==0)
+	if(this.get_experiment_name().length==0)
 		valid=false;
 
 	this.run_button.disabled=!valid;
-	this.load_button.disabled=(this.experiment.name.value.length==0);
+	//this.load_button.disabled=(this.get_experiment_name().length==0);
 
 	if(this.run_button.value!="Run")
 		this.onstop_m();
@@ -759,15 +884,17 @@ state_table_t.prototype.update_buttons_m=function(valid)
 
 state_table_t.prototype.update_experiment_m=function()
 {
-	if(this.experiment.name.value.length == 0)
+	if(this.createnew.name.value.length == 0)
 	{
-		this.experiment.div.className = "form-group has-feedback has-error";
-		this.experiment.glyph.style.visibility="visible";
+		this.createnew.div.className = "form-group has-feedback has-error";
+		this.createnew.glyph.style.visibility="visible";
+		this.createnew.modal.create_button.disabled=true;
 	}
 	else
 	{
-		this.experiment.div.className = "form-group";
-		this.experiment.glyph.style.visibility="hidden";
+		this.createnew.div.className = "form-group";
+		this.createnew.glyph.style.visibility="hidden";
+		this.createnew.modal.create_button.disabled=false;
 	}
 
 	this.update_buttons_m();
@@ -775,6 +902,20 @@ state_table_t.prototype.update_experiment_m=function()
 
 state_table_t.prototype.code_change_m=function()
 {
+	this.autosave_m();
 	if(this.run_button.value!="Run")
 		this.onstop_m();
+}
+
+state_table_t.prototype.autosave_m=function(force)
+{
+	var time=get_time();
+
+	if(force||this.old_last_experiment==this.last_experiment&&(time-this.old_time)>500)
+	{
+		console.log("autosave");
+		var old_robot={name:this.old_robot_name,auth:this.old_robot_auth};
+		this.upload(old_robot);
+		this.old_time=time;
+	}
 }

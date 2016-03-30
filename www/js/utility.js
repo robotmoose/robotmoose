@@ -11,3 +11,23 @@ function array_find(array, find_me)
 	}
 	return -1;
 }
+
+function remove_duplicates(arr)
+{
+	u_arr=[];
+
+	for(var key in arr)
+		u_arr[arr[key]]=true;
+
+	arr.length=0;
+
+	for(var key in u_arr)
+		arr.push(key);
+
+	return arr;
+}
+
+function get_time()
+{
+	return (new Date).getTime();
+}
