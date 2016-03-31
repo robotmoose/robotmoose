@@ -84,9 +84,10 @@ function state_table_t(doorway)
 	this.element.style.minWidth=640;
 	this.div.appendChild(this.element);
 
-	this.element.appendChild(this.drag_list_div);
-
 	this.element.appendChild(this.controls_div);
+	this.element.appendChild(document.createElement("br"));
+
+	this.element.appendChild(this.drag_list_div);
 
 	this.experiment.div.className="form-group";
 	this.experiment.div.style.float="left";
