@@ -141,6 +141,7 @@ function state_table_t(doorway)
 
 			console.log("create "+_this.createnew.name.value);
 			_this.createnew.name.value="";
+			_this.clear_error();
 		};
 		_this.createnew.modal.oncancel=function()
 		{
