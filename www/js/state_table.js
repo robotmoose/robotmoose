@@ -138,10 +138,7 @@ function state_table_t(doorway)
 				_this.download_m(old_robot);
 			},experiment);
 
-
-			console.log("create "+_this.createnew.name.value);
 			_this.createnew.name.value="";
-			_this.clear_error();
 		};
 		_this.createnew.modal.oncancel=function()
 		{
@@ -397,7 +394,7 @@ state_table_t.prototype.show_prints=function(print_text,current_state)
 // Error reporting onscreen
 state_table_t.prototype.clear_error=function()
 {
-	this.show_error(null,null); // hacky way to clear errors
+	this.show_error("",""); // hacky way to clear errors
 }
 
 state_table_t.prototype.show_error=function(error_text,current_state)
@@ -406,7 +403,8 @@ state_table_t.prototype.show_error=function(error_text,current_state)
 	if (current_state) error_entry=this.find_entry(current_state);
 
 	var global_report="", local_report="";
-	if (error_text) {
+	if (error_text)
+	{
 		local_report="Error here: "+error_text;
 		if (error_entry) { // detailed error next to state
 			global_report="Error in state '"+current_state+"'";
@@ -641,6 +639,7 @@ state_table_t.prototype.load_button_pressed_m=function()
 {
 	var _this=this;
 
+	this.clear_error();
 	this.onstop_m();
 
 	var old_robot={name:_this.old_robot_name,auth:_this.old_robot_auth};
@@ -915,7 +914,6 @@ state_table_t.prototype.autosave_m=function(force)
 
 	if(force||this.old_last_experiment==this.last_experiment&&(time-this.old_time)>500)
 	{
-		console.log("autosave");
 		var old_robot={name:this.old_robot_name,auth:this.old_robot_auth};
 		this.upload(old_robot);
 		this.old_time=time;
