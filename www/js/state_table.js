@@ -260,44 +260,49 @@ state_table_t.prototype.download=function(robot,skip_get_active,callback)
 
 state_table_t.prototype.download_experiments=function()
 {
-	var _this=this;
-	if(this.old_robot_name)
+	if(this)
 	{
-		superstar_sub(this.old_robot_name+"/experiments",function(experiments)
+		var _this=this;
+		if(this.old_robot_name)
 		{
-			experiments=remove_duplicates(experiments);
-			var old_value=_this.last_experiment;
-			_this.experiment.drop.length=0;
-
-			for(key in experiments)
+			superstar_sub(this.old_robot_name+"/experiments",function(experiments)
 			{
-				var option=document.createElement("option");
-				_this.experiment.drop.appendChild(option);
-				option.text=option.value=experiments[key];
-				if(option.value==old_value)
+				experiments=remove_duplicates(experiments);
+				var old_value=_this.last_experiment;
+				_this.experiment.drop.length=0;
+
+				for(key in experiments)
 				{
-					_this.experiment.drop.value=option.value;
-					found=true;
+					var option=document.createElement("option");
+					_this.experiment.drop.appendChild(option);
+					option.text=option.value=experiments[key];
+					if(option.value==old_value)
+					{
+						_this.experiment.drop.value=option.value;
+						found=true;
+					}
 				}
-			}
 
-			if(!found)
-			{
-				_this.experiment.drop.selectedIndex=0;
-				_this.last_experiment=_this.get_experiment_name();
-			}
+				if(!found)
+				{
+					_this.experiment.drop.selectedIndex=0;
+					_this.last_experiment=_this.get_experiment_name();
+				}
 
-			_this.experiment.drop.disabled=false;
+				_this.experiment.drop.disabled=false;
 
-			_this.update_buttons_m();
-		});
-	}
+				_this.update_buttons_m();
+			});
+		}
 
-	if(this.experiment.drop.length<=0)
-	{
-		var option=document.createElement("option");
-		this.experiment.drop.appendChild(option);
-		option.value=option.text="No experiments found.";
+		if(this.experiment.drop.length<=0)
+		{
+			var option=document.createElement("option");
+			this.experiment.drop.appendChild(option);
+			option.value=option.text="No experiments found.";
+		}
+
+		setTimeout(function(){_this.download_experiments();},1000);
 	}
 }
 
