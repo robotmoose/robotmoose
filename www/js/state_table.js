@@ -756,7 +756,7 @@ state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 	entry.table.code.appendChild(entry.errors);
 
 	entry.textarea=document.createElement("textarea");
-	entry.textarea.innerHTML=code;
+	entry.textarea.value=code;
 	entry.table.code.appendChild(entry.textarea);
 
 	entry.prints=document.createElement("span");
