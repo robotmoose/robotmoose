@@ -47,7 +47,10 @@ tree_viewer_t.prototype.create_handle=function(li)
 tree_viewer_t.prototype.refresh=function(json)
 {
 	this.json=json;
-	this.list.innerHTML="";
+	
+	//this.list.innerHTML="";
+	while (this.list.firstChild!==null) this.list.removeChild(this.list.firstChild);
+	
 	this.build(this.json,this.list);
 }
 
@@ -55,73 +58,71 @@ tree_viewer_t.prototype.build=function(json,parent)
 {
 	var myself=this;
 
-	return (function()
+	var ul=document.createElement("ul");
+	ul.className="list-group";
+	ul.style.marginBottom=-1;
+	myself.spacing+=myself.indent;
+
+	for(var key in json)
 	{
-		var ul=document.createElement("ul");
-		ul.className="list-group";
-		ul.style.marginBottom=-1;
-		parent.appendChild(ul);
-		myself.spacing+=myself.indent;
-
-		for(var key in json)
+		if(json[key]!=null && typeof json[key]==='object')
 		{
-			if(json[key]!=null&&Object.prototype.toString.call(json[key])==="[object Object]")
+			var li=document.createElement("li");
+			li.className="list-group-item";
+			li.style.marginLeft=myself.spacing;
+
+			var handle=myself.create_handle(li);
+
+			var text=document.createElement("span");
+			text.innerHTML=key;
+			text.style.paddingLeft=10;
+
+			li.tree_handle=handle;
+
+			li.appendChild(handle);
+			li.appendChild(text);
+			ul.appendChild(li);
+
+			myself.paths.push(key);
+			li.tree_path=JSON.stringify(myself.paths);
+
+			if(myself.views[li.tree_path]==null)
+				myself.views[li.tree_path]=false;
+
+			li.tree_parent=myself.build(json[key],ul);
+
+			if(!myself.views[li.tree_path])
 			{
-				var li=document.createElement("li");
-				li.className="list-group-item";
-				li.style.marginLeft=myself.spacing;
-
-				var handle=myself.create_handle(li);
-
-				var text=document.createElement("span");
-				text.innerHTML=key;
-				text.style.paddingLeft=10;
-
-				li.tree_handle=handle;
-
-				li.appendChild(handle);
-				li.appendChild(text);
-				ul.appendChild(li);
-
-				myself.paths.push(key);
-				li.tree_path=JSON.stringify(myself.paths);
-
-				if(myself.views[li.tree_path]==null)
-					myself.views[li.tree_path]=false;
-
-				li.tree_parent=myself.build(json[key],ul);
-
-				if(!myself.views[li.tree_path])
-				{
-					li.tree_parent.style.display="none";
-					handle.className="glyphicon glyphicon-plus";
-				}
-				else
-				{
-					li.tree_parent.style.display="";
-					handle.className="glyphicon glyphicon-minus";
-				}
-
-				myself.paths.pop();
+				li.tree_parent.style.display="none";
+				handle.className="glyphicon glyphicon-plus";
 			}
 			else
 			{
-				var li=document.createElement("li");
-				li.className="list-group-item";
-				li.style.marginLeft=myself.spacing;
-
-				var text=document.createElement("span");
-				text.innerHTML=key+" = "+json[key];
-				text.style.paddingLeft=10;
-
-				li.tree_parent=ul;
-
-				li.appendChild(text);
-				ul.appendChild(li);
+				li.tree_parent.style.display="";
+				handle.className="glyphicon glyphicon-minus";
 			}
-		}
 
-		myself.spacing-=myself.indent;
-		return ul;
-	})();
+			myself.paths.pop();
+		}
+		else
+		{
+			var li=document.createElement("li");
+			li.className="list-group-item";
+			li.style.marginLeft=myself.spacing;
+
+			var text=document.createElement("span");
+			text.innerHTML=key+" = "+json[key];
+			text.style.paddingLeft=10;
+
+			li.tree_parent=ul;
+
+			li.appendChild(text);
+			ul.appendChild(li);
+		}
+	}
+
+	parent.appendChild(ul);
+	
+	myself.spacing-=myself.indent;
+	return ul;
 }
