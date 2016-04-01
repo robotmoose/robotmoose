@@ -66,7 +66,7 @@ tree_viewer_t.prototype.build=function(json,parent)
 
 	for(var key in json)
 	{
-		if(json[key]!=null&&Object.prototype.toString.call(json[key])==="[object Object]")
+		if(json[key]!=null && typeof json[key]==='object')
 		{
 			var li=document.createElement("li");
 			li.className="list-group-item";
@@ -124,5 +124,6 @@ tree_viewer_t.prototype.build=function(json,parent)
 
 	myself.spacing-=myself.indent;
 	parent.appendChild(ul);
+
 	return ul;
 }
