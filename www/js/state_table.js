@@ -25,10 +25,11 @@ function state_table_t(doorway)
 	this.last_experiment="HelloWorld";
 	this.last_save_hash=null;
 	this.autosave_time_interval=1000;
+	this.old_experiments_list=[];
 
 	this.createnew={};
 	this.createnew.modal=new modal_createcancel_t(this.doorway.parent_div,"Create New Experiment","");
-	this.createnew.modal.modal.get_content().style.height="64px";
+	this.createnew.modal.modal.get_content().style.height="80px";
 
 	this.createnew.div=document.createElement("div");
 	this.createnew.div.className="form-group";
@@ -39,7 +40,7 @@ function state_table_t(doorway)
 	this.createnew.name.type="text";
 	this.createnew.name.placeholder="Experiment Name";
 	this.createnew.name.className="form-control";
-	this.createnew.name.style.width=240;
+	this.createnew.name.style.width="320px";
 	this.createnew.name.spellcheck=false;
 	this.createnew.name.onchange=function(event){_this.update_experiment_m();};
 	this.createnew.name.onkeydown=function(event){_this.update_experiment_m();};
@@ -56,8 +57,15 @@ function state_table_t(doorway)
 	this.createnew.glyph.className="glyphicon form-control-feedback glyphicon glyphicon-remove";
 	this.createnew.div.appendChild(this.createnew.glyph);
 
-	this.make_error_span=function () {
+	this.createnew.label=document.createElement("label");
+	this.createnew.div.appendChild(this.createnew.label);
+	this.createnew.label.style="col-sm-2 control-label";
+	this.createnew.label.style.color="#800000";
+
+	this.make_error_span=function (text) {
 		var errors=document.createElement("span");
+		if(text)
+			errors.innerHTML=text;
 		errors.style.color="#800000"; // dark red text
 		errors.style.background="#ffa0a0";  // light red background
 		return errors;
@@ -268,6 +276,7 @@ state_table_t.prototype.download_experiments=function()
 			superstar_sub(this.old_robot_name+"/experiments",function(experiments)
 			{
 				experiments=remove_duplicates(experiments);
+				_this.old_experiments_list=experiments;
 				var old_value=_this.last_experiment;
 				_this.experiment.drop.length=0;
 
@@ -903,7 +912,20 @@ state_table_t.prototype.update_buttons_m=function(valid)
 
 state_table_t.prototype.update_experiment_m=function()
 {
-	if(this.createnew.name.value.length == 0)
+	var error=(this.createnew.name.value.length == 0);
+	this.createnew.label.innerHTML="";
+
+	for(var key in this.old_experiments_list)
+	{
+		if(this.createnew.name.value==this.old_experiments_list[key])
+		{
+			this.createnew.label.innerHTML="Experiment with this name already exists.";
+			error=true;
+			break;
+		}
+	}
+
+	if(error)
 	{
 		this.createnew.div.className = "form-group has-feedback has-error";
 		this.createnew.glyph.style.visibility="visible";
@@ -911,6 +933,7 @@ state_table_t.prototype.update_experiment_m=function()
 	}
 	else
 	{
+		this.createnew.error="";
 		this.createnew.div.className = "form-group";
 		this.createnew.glyph.style.visibility="hidden";
 		this.createnew.modal.create_button.disabled=false;
