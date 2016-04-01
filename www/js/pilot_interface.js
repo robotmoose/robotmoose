@@ -84,6 +84,7 @@ function pilot_interface_t(div)
 	this.div.appendChild(this.element);
 
 	// Keyboard driving
+	this.mouse_in_div=0;
 	this.keyboardIsDriving=false;
 	this.keyInput=new input_t(function() {myself.pilot_keyboard()},window);
 }
