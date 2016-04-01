@@ -148,6 +148,7 @@ function state_table_t(doorway)
 		};
 		_this.update_experiment_m();
 		_this.createnew.modal.show();
+		_this.createnew.name.focus();
 	};
 	this.controls_div.appendChild(this.new_button);
 
