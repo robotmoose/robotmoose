@@ -351,7 +351,6 @@ state_table_t.prototype.upload=function(robot,onupload,experiment)
 
 						if(onupload)
 							onupload();
-						console.log("Uploaded");
 					},
 					robot.auth);
 			},
@@ -649,10 +648,8 @@ state_table_t.prototype.add_button_pressed_m=function()
 state_table_t.prototype.load_button_pressed_m=function()
 {
 	var _this=this;
-
-	this.clear_error();
 	this.onstop_m();
-
+	this.clear_error();
 	var old_robot={name:_this.old_robot_name,auth:_this.old_robot_auth};
 
 	this.download_with_check(old_robot,true,

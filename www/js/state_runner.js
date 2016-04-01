@@ -24,7 +24,7 @@ function state_runner_t()
 	this.VM_sensors={};
 	this.VM_store={};
 	this.VM_UI=null;
-	
+
 	// Send off the pilot data, if it has changed
 	myself.pilot_flush=function() {
 		console.log("Pilot flush: "+myself.VM_pilot.power.L);
@@ -35,14 +35,14 @@ function state_runner_t()
 			if (myself.onpilot) myself.onpilot(myself.VM_pilot);
 		}
 	}
-	
+
 	// Commit all changed data
 	myself.do_writes=function(VM) {
 		myself.pilot_flush();
-		
+
 		VM.state_written=VM.state;
 	}
-	
+
 	/**
 	 seq is used to sequence commands, including delays.
 	 The trick is executing code before and after the delay,
@@ -51,10 +51,10 @@ function state_runner_t()
 	*/
 	this.VM_seq={};
 	var seq=this.VM_seq;
-	
+
 	// Storage for blocking functions.  Index is by code_count.
 	seq.store=[];
-	
+
 	// Restart the sequence for a new run
 	seq.reset=function() {
 		seq.code_count=0; // source code phase (counts up every time through code)
@@ -62,29 +62,29 @@ function state_runner_t()
 		seq.exec_start_count=-1; // trails exec_count by 1
 	};
 	seq.reset();
-	
+
 	// Check if we are we currently active (running)
 	seq.current=function() { return seq.code_count==seq.exec_count; };
-	
-	// Mark start of a potentially blocking phase. 
+
+	// Mark start of a potentially blocking phase.
 	//  Returns state storage for this phase.
 	seq.block_start=function(VM) {
-		if (seq.current() && seq.exec_start_count<seq.exec_count) 
+		if (seq.current() && seq.exec_start_count<seq.exec_count)
 		{ // This is the first run of the new phase
 			seq.exec_start_count=seq.exec_count;
 			seq.store[seq.code_count]={}; // new empty object
-			
+
 			// Commit user's actions before blocking
 			myself.do_writes(VM);
 		}
 		return seq.store[seq.code_count];
 	}
-	
+
 	// Advance to the next piece of code
 	seq.advance=function() {
 		seq.exec_count++;
 	}
-	
+
 	// Mark end of blocking section
 	seq.block_end=function() {
 		seq.code_count++; // increment count for each phase
@@ -102,22 +102,20 @@ state_runner_t.prototype.run=function(robot,state_table)
 
 	var myself=this;
 
-	state_table.upload_with_check(robot,
-		function()
-		{
-			state_table.run();
+	state_table.upload(robot);
 
-			// Clear out old state
-			myself.state=null;
-			myself.continue_state=null;
-			myself.continue_timeout=null;
-			myself.state_list=[];
-			myself.kill=false;
-			state_table.clear_prints();
-			myself.VM_store={};
+	state_table.run();
 
-			myself.run_m(state_table);
-		});
+	// Clear out old state
+	myself.state=null;
+	myself.continue_state=null;
+	myself.continue_timeout=null;
+	myself.state_list=[];
+	myself.kill=false;
+	state_table.clear_prints();
+	myself.VM_store={};
+
+	myself.run_m(state_table);
 }
 
 state_runner_t.prototype.stop=function(state_table)
@@ -228,24 +226,24 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 			// console.log(value+"\n");
 		}
 	};
-	VM.stop=function() { 
+	VM.stop=function() {
 		if (VM.sequencer.current()) {
-			VM.state=null; 
+			VM.state=null;
 		}
 	}
 
 	var time_ms=this.get_time_ms();
 	VM.time=time_ms - this.state_start_time_ms; // time in state (ms)
 	VM.time_run=time_ms - this.run_start_time_ms; // time since "Run" (ms)
-	
+
 	VM.delay=function(ms) {
 		var t=VM.sequencer.block_start(VM);
 		if (VM.sequencer.current()) {
-			if (!t.time)  
+			if (!t.time)
 			{ // starting a delay
 				t.time=VM.time+ms;
 			}
-			if (VM.time >= t.time) 
+			if (VM.time >= t.time)
 			{ // done with delay
 				VM.sequencer.advance();
 			}
@@ -255,9 +253,9 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 
 	VM.pilot=JSON.parse(JSON.stringify(this.VM_pilot));
 	VM.pilot.cmd=undefined; // don't re-send scripts
-	VM.script=function(cmd,arg) { 
+	VM.script=function(cmd,arg) {
 		if (VM.sequencer.current()) {
-			VM.pilot.cmd={"run":cmd, "arg":arg}; 
+			VM.pilot.cmd={"run":cmd, "arg":arg};
 		}
 	};
 
@@ -265,27 +263,27 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	VM.power=this.VM_pilot.power;
 	VM.store=this.VM_store;
 	VM.robot={sensors:VM.sensors, power:VM.power};
-	
+
 	if (VM.sensors.power && VM.sensors.power.neopixel && !VM.power.neopixel) {
 		VM.power.neopixel=JSON.parse(JSON.stringify(VM.sensors.power.neopixel));
 	}
 
 	// Simple instantanious drive:
-	VM.drive=function(speedL,speedR) { 
+	VM.drive=function(speedL,speedR) {
 		if (VM.sequencer.current()) {
-			VM.power.L=speedL; VM.power.R=speedR; 
+			VM.power.L=speedL; VM.power.R=speedR;
 		}
 	}
-	
+
 	// Drive forward specified distance (cm)
 	VM.forward=function(target,speed) {
 		if (!target) target=10; // centimeters
 		if (!speed) speed=0.4*100; // moderate speed -- scaled for percentage
-		
+
 		var t=VM.sequencer.block_start(VM);
 		if (VM.sequencer.current()) {
 			var p=new vec3(VM.sensors.location.x,VM.sensors.location.y,0.0);
-			if (!t.start)  
+			if (!t.start)
 			{ // starting a move
 				t.start=p;
 			}
@@ -295,10 +293,10 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 			}
 			var dist=target - 100.0*p.distanceTo(t.start);
 			var slow_dist=10.0; // scale back on approach
-			if (dist<slow_dist) speed*=0.1+0.9*dist/slow_dist; 
+			if (dist<slow_dist) speed*=0.1+0.9*dist/slow_dist;
 			console.log("Forward: distance: "+dist+" -> speed "+speed);
 			VM.power.L=VM.power.R=speed;
-			if (dist <= 0.0) 
+			if (dist <= 0.0)
 			{ // done with move
 				VM.power.L=VM.power.R=0.0;
 				VM.sequencer.advance();
@@ -308,20 +306,20 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		}
 		VM.sequencer.block_end();
 	}
-	VM.backward=function(target,speed) { 
+	VM.backward=function(target,speed) {
 		if (!target) target=10; // centimeters
-		VM.forward(-target,speed); 
+		VM.forward(-target,speed);
 	}
-	
+
 	// Turn right (clockwise) specified distance (deg)
 	VM.right=function(target,speed) {
 		if (!target) target=90; // degrees
 		if (!speed) speed=0.3*100; // --- scaled for percentage
-		
+
 		var t=VM.sequencer.block_start(VM);
 		if (VM.sequencer.current()) {
 			var a=VM.sensors.location.angle;
-			if (!t.target)  
+			if (!t.target)
 			{ // starting turn: compute target angle
 				t.target=a-target;
 			}
@@ -332,12 +330,12 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 				speed=-speed;
 				dist=-dist;
 			}
-			
+
 			var slow_dist=40.0; // scale back on approach
-			if (dist<slow_dist) speed*=0.1+0.9*dist/slow_dist; 
+			if (dist<slow_dist) speed*=0.1+0.9*dist/slow_dist;
 			console.log("Turn: distance: "+dist+" -> speed "+speed);
 			VM.power.L=+speed; VM.power.R=-speed;
-			if (dist <= 0.0) 
+			if (dist <= 0.0)
 			{ // done with move
 				VM.power.L=VM.power.R=0.0;
 				VM.sequencer.advance();
@@ -347,9 +345,9 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		}
 		VM.sequencer.block_end();
 	}
-	VM.left=function(target,speed) { 
+	VM.left=function(target,speed) {
 		if (!target) target=90; // degrees
-		VM.right(-target,speed); 
+		VM.right(-target,speed);
 	}
 
 
@@ -387,9 +385,9 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 
 // Basically eval user's code here
 	(new Function("with(this)\n{\n"+code+"\n}")).call(VM);
-	
+
 	if (VM.sequencer.current()) this.do_writes(VM);
-	
+
 	return VM;
 }
 
@@ -415,13 +413,13 @@ state_runner_t.prototype.execute_m=function(state_table)
 			this.update_continue_m(state_table,run_state);
 
 			var VM=this.make_user_VM(run_state.code,this.state_list);
-			
-			if (VM.sequencer.exec_count>=VM.sequencer.code_count) 
+
+			if (VM.sequencer.exec_count>=VM.sequencer.code_count)
 			{ // Restart the state if we're at the end of the sequence:
 				console.log("Resetting sequencer back to start");
 				_this.do_writes(_this.VM);
 				VM.sequencer.reset();
-			}	
+			}
 
 			state_table.show_prints(VM.printed_text,this.state);
 

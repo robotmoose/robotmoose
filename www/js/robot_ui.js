@@ -96,7 +96,7 @@ robot_ui_t.prototype.download_gui=function()
 		return;
 
 	var myself=this;
-	
+
 	var help_text_states =
 	//"<h3> Code Examples </h3>"
 	"<h4>Basic</h4>"
@@ -128,14 +128,14 @@ robot_ui_t.prototype.download_gui=function()
 	+ "button(\"Press me\", state1)<br>"
 	+ "slider(\"Slider!\", -1.0, 0.0, 1.0) <br>"
 	+ "checkbox(\"Would you like to check this box?\")<br>";
-	
-	var help_text_config = 
+
+	var help_text_config =
 	"<h3>When configuring devices:</h3>"
 	+"<h4><b>wheel_encoder</b></h4>"
 	+"<ul><li>Pin: Left wheel encoder pin</li><li>Pin: Right wheel encoder pin</li><li>"
 	+"Number: Robot wheelbase <ul><li>Distance between wheel centers (mm)</li></ul></li></ul>";
 
-	
+
 
 	var clear_out=function(div)
 	{
