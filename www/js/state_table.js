@@ -455,7 +455,7 @@ state_table_t.prototype.get_entries=function()
 	return this.entries;
 }
 
-state_table_t.prototype.create_entry=function(state,time,code)
+state_table_t.prototype.create_entry=function(state,time,code,focus)
 {
 	if(!state)
 		state="";
@@ -533,6 +533,9 @@ state_table_t.prototype.create_entry=function(state,time,code)
 		this.doorway.resize(size);
 
 	this.doorway.body.scrollTop=this.doorway.body.scrollHeight;
+
+	if(focus)
+		entry.input.text.focus();
 
 	return entry;
 }
@@ -640,7 +643,7 @@ state_table_t.prototype.add_button_pressed_m=function()
 	if(this.get_states().length==0)
 		state_name="start";
 
-	this.create_entry(state_name,"","// JavaScript code\n");
+	this.create_entry(state_name,"","// JavaScript code\n",true);
 }
 
 state_table_t.prototype.load_button_pressed_m=function()
