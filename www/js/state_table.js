@@ -45,6 +45,11 @@ function state_table_t(doorway)
 	this.createnew.name.onkeydown=function(event){_this.update_experiment_m();};
 	this.createnew.name.onkeyup=function(event){_this.update_experiment_m();};
 	this.createnew.name.onkeypress=function(event){_this.update_experiment_m();};
+	this.createnew.name.addEventListener('keypress',function(e)
+	{
+		if((e.which||e.keyCode)===13)
+			_this.createnew.modal.create_button.click();
+	});
 	this.createnew.div.appendChild(this.createnew.name);
 
 	this.createnew.glyph=document.createElement("span");
