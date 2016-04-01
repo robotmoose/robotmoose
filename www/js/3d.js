@@ -279,7 +279,9 @@ function renderer_t(div,setup_func,loop_func)
 		if (do_redraw !== false && myself.viewport) {
 			myself.viewport.render(myself.scene,myself.camera);
 		}
-		requestAnimationFrame(myself.loop); // call loop again
+		
+		//requestAnimationFrame(myself.loop); // call loop again
+		setTimeout(myself.loop,100); // slower 10Hz updates, to be kind to slow CPUs
 	};
 
 	myself.load_texture=function(filename)
