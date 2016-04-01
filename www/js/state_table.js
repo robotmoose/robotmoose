@@ -23,6 +23,8 @@ function state_table_t(doorway)
 	this.overwrite_modal=new modal_yesno_t(this.doorway.parent_div,"Warning","");
 	this.div=doorway.content;
 	this.last_experiment="HelloWorld";
+	this.last_save_hash=null;
+	this.autosave_time_interval=1000;
 
 	this.createnew={};
 	this.createnew.modal=new modal_createcancel_t(this.doorway.parent_div,"Create New Experiment","");
@@ -334,20 +336,25 @@ state_table_t.prototype.upload=function(robot,onupload,experiment)
 	if(!experiment)
 		experiment=this.get_experiment_name();
 
-	superstar_set(robot.name+"/experiments/"+encodeURIComponent(experiment),"code",this.get_states(),
-		function(obj)
-		{
-			superstar_set(robot.name,"active_experiment",encodeURIComponent(experiment),
-				function(obj)
-				{
-					_this.last_experiment=experiment;
+	var new_hash=this.calc_save_hash_m(robot,experiment,this.get_states());
 
-					if(onupload)
-						onupload();
-				},
-				robot.auth);
-		},
-		robot.auth);
+	if(new_hash!=this.last_save_hash)
+		superstar_set(robot.name+"/experiments/"+encodeURIComponent(experiment),"code",this.get_states(),
+			function(obj)
+			{
+				superstar_set(robot.name,"active_experiment",encodeURIComponent(experiment),
+					function(obj)
+					{
+						_this.last_save_hash=new_hash;
+						_this.last_experiment=experiment;
+
+						if(onupload)
+							onupload();
+						console.log("Uploaded");
+					},
+					robot.auth);
+			},
+			robot.auth);
 }
 
 state_table_t.prototype.get_states=function()
@@ -759,7 +766,7 @@ state_table_t.prototype.create_entry_m=function(entry,state,time,code)
 		matchBrackets:true,
 		mode:"text/x-javascript"
 	});
-	entry.code_editor.on("change",function(){_this.code_change_m();_this.autosave_m(true);});
+	entry.code_editor.on("change",function(){_this.code_change_m();_this.autosave_m();});
 	entry.code_editor.setSize(500);
 	entry.code_editor_event=function(event){entry.code_editor.refresh();};
 	window.addEventListener("click",entry.code_editor_event);
@@ -912,10 +919,15 @@ state_table_t.prototype.autosave_m=function(force)
 {
 	var time=get_time();
 
-	if(force||this.old_last_experiment==this.last_experiment&&(time-this.old_time)>500)
+	if(force||this.old_last_experiment==this.last_experiment&&(time-this.old_time)>this.autosave_time_interval)
 	{
 		var old_robot={name:this.old_robot_name,auth:this.old_robot_auth};
 		this.upload(old_robot);
 		this.old_time=time;
 	}
+}
+
+state_table_t.prototype.calc_save_hash_m=function(robot,experiment,code)
+{
+	return JSON.stringify(robot)+JSON.stringify(experiment)+JSON.stringify(code);
 }
