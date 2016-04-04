@@ -502,7 +502,7 @@ state_table_t.prototype.create_entry=function(state,time,code,focus)
 	var entry={};
 	entry.drag_list=this.drag_list.create_entry();
 	entry.drag_list.li.style.minWidth=740;
-	entry.drag_list.ondrag=function(){console.log("stop drag");_this.onstop_m();};
+	entry.drag_list.ondrag=function(){_this.onstop_m();};
 	entry.drag_list.state_table_t=entry;
 	entry.drag_list.onremove=function(entry){_this.remove_entry_m(entry.state_table_t);};
 	this.create_entry_m(entry,state,time,code);
@@ -510,10 +510,7 @@ state_table_t.prototype.create_entry=function(state,time,code,focus)
 	this.update_states_m();
 
 	if(this.run_button.value!="Run")
-	{
-		console.log("stop create entry");
 		this.onstop_m();
-	}
 
 	var new_size=
 	{
@@ -652,15 +649,11 @@ state_table_t.prototype.run_button_pressed_m=function()
 	if(this.run_button.value=="Run")
 		this.onrun_m();
 	else
-	{
-		console.log("stop run pressed");
 		this.onstop_m();
-	}
 }
 
 state_table_t.prototype.add_button_pressed_m=function()
 {
-	console.log("stop add pressed");
 	this.onstop_m();
 
 	var state_name="";
@@ -674,7 +667,6 @@ state_table_t.prototype.add_button_pressed_m=function()
 state_table_t.prototype.load_button_pressed_m=function()
 {
 	var _this=this;
-	console.log("stop load pressed");
 	this.onstop_m();
 	this.clear_error();
 	var old_robot={name:_this.old_robot_name,auth:_this.old_robot_auth};
@@ -829,10 +821,7 @@ state_table_t.prototype.remove_entry_m=function(entry)
 	this.update_states_m();
 
 	if(this.run_button.value!="Run")
-	{
-		console.log("stop remove entry");
 		this.onstop_m();
-	}
 }
 
 state_table_t.prototype.update_states_m=function()
@@ -881,10 +870,7 @@ state_table_t.prototype.validate_time_m=function(input)
 		input.value=input.value.substr(0,input.value.length-1);
 
 	if(this.run_button.value!="Run")
-	{
-		console.log("stop validate time");
 		this.onstop_m();
-	}
 }
 
 state_table_t.prototype.set_state_name_valid_m=function(input,valid)
@@ -922,10 +908,7 @@ state_table_t.prototype.update_buttons_m=function(valid)
 	//this.load_button.disabled=(this.get_experiment_name().length==0);
 
 	if(this.run_button.value=="Run")
-	{
-		console.log("stop update buttons");
 		this.onstop_m();
-	}
 }
 
 state_table_t.prototype.update_experiment_m=function()
@@ -964,10 +947,7 @@ state_table_t.prototype.code_change_m=function()
 {
 	this.autosave_m();
 	if(this.run_button.value!="Run")
-	{
-		console.log("stop code changed");
 		this.onstop_m();
-	}
 }
 
 state_table_t.prototype.autosave_m=function(force)
