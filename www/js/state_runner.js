@@ -271,6 +271,13 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	// Simple instantanious drive:
 	VM.drive=function(speedL,speedR) {
 		if (VM.sequencer.current()) {
+			
+			// cap speed at 100 percent
+			if (speedL > 100.0) speedL = 100.0; 
+			else if (speedL < -100.0) speedL = -100.0;
+			if (speedR > 100.0) speedR = 100.0;
+			else if (speedR < -100.0) speedR = -100.0;
+			
 			VM.power.L=speedL; VM.power.R=speedR;
 		}
 	}
@@ -279,6 +286,8 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	VM.forward=function(target,speed) {
 		if (!target) target=10; // centimeters
 		if (!speed) speed=0.4*100; // moderate speed -- scaled for percentage
+		else if (speed > 100.0) speed = 100.0; // cap speed at 100 percent
+		else if (speed < -100.0) speed = -100.0;
 
 		var t=VM.sequencer.block_start(VM);
 		if (VM.sequencer.current()) {
@@ -315,6 +324,8 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	VM.right=function(target,speed) {
 		if (!target) target=90; // degrees
 		if (!speed) speed=0.3*100; // --- scaled for percentage
+		else if (speed > 100.0) speed = 100.0; // cap speed at 100 percent
+		else if (speed < -100.0) speed = -100.0;
 
 		var t=VM.sequencer.block_start(VM);
 		if (VM.sequencer.current()) {
