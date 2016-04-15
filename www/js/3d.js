@@ -176,7 +176,7 @@ function renderer_t(div,setup_func,loop_func)
 	var myself=this;
 
 	myself.div=div;
-	myself.div.innerHTML="";
+	//myself.div.innerHTML="";
 
 	myself.width=320;
 	myself.height=240;
@@ -289,6 +289,9 @@ function renderer_t(div,setup_func,loop_func)
 		return THREE.ImageUtils.loadTexture(filename);
 	};
 
+	
+	
+	
 	myself.load_obj=function(filename,texture)
 	{
 		var model=new model_t(myself.scene);
@@ -345,6 +348,8 @@ function renderer_t(div,setup_func,loop_func)
 		var plane=new THREE.Mesh(plane_geometry,plane_material);
 		plane.rotation.set(3*Math.PI/2,0,0);
 		myself.scene.add(plane);
+		
+	
 
 		var line_geometry=new THREE.Geometry();
 		var line_material=new THREE.LineBasicMaterial({color:0x0488c8,linewidth:1.5});
@@ -369,9 +374,12 @@ function renderer_t(div,setup_func,loop_func)
 		  }
 		}
 
-		var line=new THREE.Line(line_geometry,line_material,THREE.LinePieces);
+				var line=new THREE.Line(line_geometry,line_material,THREE.LinePieces);
 		plane.add(line);
-
+		
+		
+				
+		
 		return plane;
 	};
 }
