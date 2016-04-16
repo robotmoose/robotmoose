@@ -171,20 +171,7 @@ robot_map_t.prototype.add_map=function(filename) {
 				var line=new THREE.Line(line_geometry,line_material,THREE.LinePieces);
 		this.grid.add(line);
 		
-		
-		//Reset tracks
-		this.mapRobot.left_tracker.reset();
-		this.mapRobot.right_tracker.reset();
-	
-	
-		// TEST: Create new roomba each time you change map 
-		//makes purple and red tracks bold, but it leaves a roomba corpse
-		/*
-		var new_roomba = new roomba_t(this.renderer,null);
-		this.mapRobot = undefined;
-		this.mapRobot=new_roomba;
-		*/
-		
+
 }
 
 robot_map_t.prototype.clear_map=function(){
@@ -228,10 +215,7 @@ robot_map_t.prototype.clear_map=function(){
 
 			var line=new THREE.Line(line_geometry,line_material,THREE.LinePieces);
 	this.grid.add(line);
-	
-	//Reset tracks
-	this.mapRobot.left_tracker.reset();
-	this.mapRobot.right_tracker.reset();
+
 	
 }
 
@@ -268,6 +252,15 @@ robot_map_t.prototype.loop=function() {
 			this.last_lidar_change=sensors.lidar.change;
 		}
 	}
+	
+	if (this.reset_tracks)
+	{
+		this.mapRobot.left_tracker.reset();
+		this.mapRobot.right_tracker.reset();
+		this.reset_tracks = false;
+	}
+	
+	
 	var need_redraw=this.need_redraw;
 	this.need_redraw=false;
 	return need_redraw;
@@ -282,6 +275,14 @@ robot_map_t.prototype.load_button_pressed_m=function()
 	var filename = this.last_map_select;
 	if (filename === "none") this.clear_map();
 	else this.add_map(filename);
+	
+	//Reset robot	
+	this.mapRobot.model.destroy();
+	this.mapRobot=null;
+	var new_roomba = new roomba_t(this.renderer,null);
+	this.mapRobot=new_roomba;
+	this.reset_tracks = true;
+	
 }
 
 
