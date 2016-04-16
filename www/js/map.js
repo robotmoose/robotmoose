@@ -140,6 +140,9 @@ robot_map_t.prototype.add_map=function(filename) {
 		var plane_material=new THREE.MeshBasicMaterial({map: texture,depthWrite:false,
 			side:THREE.DoubleSide});
 		var plane_geometry=new THREE.PlaneBufferGeometry(size*width,size*height,size,size);
+		//this.grid.geometry=null;
+		//this.grid.material=null;
+		//this.grid.line=null;
 		this.grid.geometry = plane_geometry;
 		this.grid.material = plane_material;
 
