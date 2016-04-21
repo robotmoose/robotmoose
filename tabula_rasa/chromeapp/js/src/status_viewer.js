@@ -15,7 +15,7 @@ function status_viewer_t(div)
 	this.max_lines=50;
 	this.lines=[];
 	this.textarea=new_textarea(this.el);
-	
+
 	// Theoretically speeds up text rendering:
 	this.textarea.style.textRendering="optimizeSpeed";
 	this.textarea.style.webkitFontSmoothing="none";
@@ -34,17 +34,16 @@ status_viewer_t.prototype.destroy=function()
 status_viewer_t.prototype.show=function(message)
 {
 	if(this.lines.length<=0||message!=this.lines[this.lines.length-1])
-	{
 		this.lines.push(message);
-
-	}
 }
 
 
 
 status_viewer_t.prototype.rebuild_textarea_m=function()
 {
-	if (this.lines.length>this.max_lines)
+	var old_lines=this.textarea.value;
+
+	if(this.lines.length>this.max_lines)
 		this.lines=this.lines.slice(-this.max_lines,this.lines.length);
 
 	var lines=""; // buffer up lines to prevent repeated innerHTML updates
@@ -52,10 +51,12 @@ status_viewer_t.prototype.rebuild_textarea_m=function()
 	for(var ii=0;ii<this.lines.length;++ii)
 		lines+=this.lines[ii]+"\n";
 
-	var t=this.textarea;
-	while (t.firstChild) t.removeChild(t.firstChild);
-	this.textarea.appendChild(document.createTextNode(lines));
-	
-	this.textarea.scrollTop=this.textarea.scrollHeight;
+	if(lines!=old_lines)
+	{
+		var t=this.textarea;
+		while (t.firstChild) t.removeChild(t.firstChild);
+		this.textarea.appendChild(document.createTextNode(lines));
+		this.textarea.scrollTop=this.textarea.scrollHeight;
+	}
 }
 
