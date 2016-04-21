@@ -98,6 +98,8 @@ roomba_t=function (renderer,obstacles)
 		myself.right=right;
 	};
 };
+
+
 roomba_t.prototype=new robot_2wd(); // inheritance
 roomba_t.prototype.constructor=roomba_t; // patch up constructor
 
