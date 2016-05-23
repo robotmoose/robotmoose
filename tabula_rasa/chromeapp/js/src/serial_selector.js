@@ -38,7 +38,7 @@ function serial_selector_t(div,on_connect,on_disconnect,is_connectable)
 	this.button.value="Connect";
 	this.button.onclick=function(){_this.button_m();};
 
-	this.interval=setInterval(function(){_this.update_list_m();},250);
+	this.interval=setInterval(function(){_this.update_list_m();},5000);
 }
 
 serial_selector_t.prototype.connect=function()
@@ -76,8 +76,6 @@ serial_selector_t.prototype.disconnect=function()
 			this.on_disconnect(old_selected_value);
 	}
 }
-
-
 
 
 serial_selector_t.prototype.build_list_m=function(ports)

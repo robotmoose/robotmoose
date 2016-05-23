@@ -61,7 +61,7 @@ function name_t(div,on_message,on_selected)
 				};
 				_this.download_schools_m();
 		}
-	},1000);
+	},5000);
 
 	_this.build_superstar_m();
 	_this.build_schools_m();
