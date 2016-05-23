@@ -9,7 +9,7 @@
 #include <stdio.h> /* for error reporting */
 #include <string.h> /* for strlen & such reporting */
 
-#if defined(_WIN32)
+#if defined(_WIN32)||defined(__CYGWIN__)||defined(__WIN32__)
 #  define WINDOWS 1
 #  include <windows.h>
 #  define snprintf _snprintf /* what the heck, windows... */
