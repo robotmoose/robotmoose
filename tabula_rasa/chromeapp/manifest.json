@@ -12,7 +12,8 @@
 	{
 		"background":
 		{
-			"scripts":["js/src/background.js","js/src/connection.js","js/src/gui.js",
+			"scripts":["js/src/background.js","js/src/connection.js",
+				"js/src/dropdown.js","js/src/gui.js",
 				"js/src/name.js","js/src/packetize.js","js/src/prettify.js",
 				"js/src/serial_selector.js","js/src/sim_serial.js",
 				"js/src/status_viewer.js","js/src/superstar.js",

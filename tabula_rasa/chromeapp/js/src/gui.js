@@ -32,15 +32,14 @@ function gui_t(div)
 	);
 	this.connection.on_name_set=function(robot)
 	{
-		_this.name.on_loaded_robot=robot;
-		_this.name.reload();
+		_this.name.reload(robot);
 	};
 	this.connection.load();
 
 	this.serial_selector=new serial_selector_t
 	(
 		this.top_bar.rows[0].cells[1],
-		function(port_name){_this.connection.gui_connect(port_name);},
+		function(port_name){console.log(_this.name.get_robot());_this.connection.gui_connect(port_name);},
 		function(port_name){_this.connection.gui_disconnect(port_name);},
 		function(){return (_this.name.get_robot().school!=null&&_this.name.get_robot().name!=null);}
 	);

@@ -28,9 +28,8 @@ function serial_selector_t(div,on_connect,on_disconnect,is_connectable)
 	this.connected=false;
 	this.selected_value=null;
 
-	this.select=document.createElement("select");
-	this.el.appendChild(this.select);
-	this.select.style.width="240px";
+	this.dropdown=new dropdown_t(this.el,function(){return this.connected;});
+	this.dropdown.select.style.width="240px";
 
 	this.button=document.createElement("input");
 	this.el.appendChild(this.button);
@@ -38,16 +37,16 @@ function serial_selector_t(div,on_connect,on_disconnect,is_connectable)
 	this.button.value="Connect";
 	this.button.onclick=function(){_this.button_m();};
 
-	this.interval=setInterval(function(){_this.update_list_m();},5000);
+	this.interval=setInterval(function(){_this.update_list_m();},250);
 }
 
 serial_selector_t.prototype.connect=function()
 {
-	if(this.select.options.length>0&&!this.connected)
+	if(this.dropdown.size()>0&&!this.connected)
 	{
-		this.select.disabled=true;
+		this.dropdown.disable();
 		this.button.value="Disconnect";
-		this.selected_value=this.select.options[this.select.selectedIndex].value;
+		this.selected_value=this.dropdown.selected();
 		this.connected=true;
 
 		if(this.on_connect)
@@ -66,7 +65,7 @@ serial_selector_t.prototype.disconnect=function()
 {
 	if(this.connected)
 	{
-		this.select.disabled=false;
+		this.dropdown.enable();
 		this.button.value="Connect";
 		var old_selected_value=this.selected_value;
 		this.selected_value=null;
@@ -80,45 +79,26 @@ serial_selector_t.prototype.disconnect=function()
 
 serial_selector_t.prototype.build_list_m=function(ports)
 {
-	var old="";
+	var real_list=[];
+	var old=this.dropdown.selected();
 	var found=false;
-
-	if(this.select.selectedIndex>=0&&this.select.options.length>this.select.selectedIndex)
-		old=this.select.options[this.select.selectedIndex].value;
-
-	this.select.options.length=0;
-
-	//Uncomment to see Sim as a serial port option
-	/*{
-		var sim_option=document.createElement("option");
-		sim_option.text=sim_option.value="Sim";
-		this.select.appendChild(sim_option);
-	}*/
 
 	for(var ii=0;ii<ports.length;++ii)
 	{
 		var name=ports[ii].path;
-
-		// Skip bluetooth devices (on Mac)
-		if ( /.*Bluetooth.*/.test( name ) )
+		if(/.*Bluetooth.*/.test(name))
 			continue;
-
-		var option=document.createElement("option");
-		option.text=option.value=name;
-		this.select.appendChild(option);
-
+		real_list.push(name);
 		if(name==old)
-			option.selected=found=true;
+			found=true;
 	}
 
-	if(!found)
-		this.select.selectedIndex=0;
+	this.dropdown.build(real_list);
 
-	if(this.connected&&this.selected_value&&!found)
+	if(this.connected&&old&&!found)
 		this.disconnect();
 
-	this.select.disabled=(this.connected||this.select.options.length<=0);
-	this.button.disabled=(this.select.options.length<=0||!this.is_connectable());
+	this.button.disabled=(this.dropdown.size()<=0||!this.is_connectable());
 }
 
 serial_selector_t.prototype.button_m=function()

@@ -21,19 +21,16 @@ function name_t(div,on_message,on_selected)
 
 	var _this=this;
 
-	this.school=document.createElement("select");
-	this.el.appendChild(this.school);
-	this.school.style.width="128px";
+	this.school=new dropdown_t(this.el);
+	this.school.select.style.width="128px";
 	this.school.onchange=function(){_this.download_robots_m();};
 
-	this.robot=document.createElement("select");
-	this.el.appendChild(this.robot);
-	this.robot.style.width="128px";
+	this.robot=new dropdown_t(this.el);
+	this.robot.select.style.width="128px";
 	this.robot.onchange=function(){_this.on_selected_m();};
 
-	this.superstar=document.createElement("select");
-	this.el.appendChild(this.superstar);
-	this.superstar.style.width="128px";
+	this.superstar=new dropdown_t(this.el);
+	this.superstar.select.style.width="128px";
 	this.superstar.onchange=function()
 	{
 		if(this.selectedIndex!=0)
@@ -53,21 +50,21 @@ function name_t(div,on_message,on_selected)
 	{
 		if(!_this.superstar.disabled)
 		{
-				_this.on_loaded_robot=
-				{
-					superstar:_this.superstar.options[_this.superstar.selectedIndex].text,
-					school:_this.school.options[_this.school.selectedIndex].text,
-					name:_this.robot.options[_this.robot.selectedIndex].text
-				};
-				_this.download_schools_m();
+			_this.on_loaded_robot=
+			{
+				superstar:_this.superstar.selected(),
+				school:_this.school.selected(),
+				name:_this.robot.selected()
+			};
+			_this.download_schools_m();
 		}
-	},5000);
+	},250);
 
 	_this.build_superstar_m();
 	_this.build_schools_m();
 	_this.build_robots_m();
 
-	_this.disables_interval=setInterval(function(){_this.update_disables_m();},100);
+	_this.disables_interval=setInterval(function(){_this.update_disables_m();},250);
 	_this.download_schools_m();
 }
 
@@ -83,49 +80,35 @@ name_t.prototype.get_robot=function()
 {
 	var robot={superstar:"robotmoose.com",school:null,name:null};
 
-	if(this.school.selectedIndex>0&&this.robot.selectedIndex>0)
+	if(this.superstar.selected()&&this.school.selected()&&this.robot.selected()&&
+		this.superstar.selected_index()>0&&this.school.selected_index()>0&&
+		this.robot.selected_index()>0)
 	{
-		robot.school=this.school.options[this.school.selectedIndex].text;
-		robot.name=this.robot.options[this.robot.selectedIndex].text;
-		robot.superstar=this.superstar.options[this.superstar.selectedIndex].text;
+		robot.school=this.school.selected();
+		robot.name=this.robot.selected();
+		robot.superstar=this.superstar.selected();
 	}
 
 	return robot;
 }
 
-name_t.prototype.reload=function()
+name_t.prototype.reload=function(robot)
 {
-	this.build_superstar_m();
-	this.build_schools_m();
-	this.build_robots_m();
+	this.on_loaded_robot=robot;
+	this.build_superstar_m([]);
+	this.build_schools_m([]);
+	this.build_robots_m([]);
 }
-
-
-
 
 name_t.prototype.build_select_m=function(select,json,heading,on_loaded_value)
 {
 	select.length=0;
+	var list=[];
 
-	var heading_option=document.createElement("option");
-	select.appendChild(heading_option);
-	heading_option.text=heading;
-
+	list.push(heading);
 	for(var key in json)
-	{
-		var option=document.createElement("option");
-		select.appendChild(option);
-		option.text=json[key];
-
-		if(json[key]==on_loaded_value)
-		{
-			select.value=on_loaded_value;
-
-			if(select.onchange)
-				select.onchange();
-		}
-	}
-
+		list.push(json[key]);
+	select.build(list,on_loaded_value);
 	this.update_disables_m();
 }
 
@@ -163,31 +146,33 @@ name_t.prototype.on_error_m=function(error)
 
 name_t.prototype.download_schools_m=function()
 {
-	if(this.superstar.selectedIndex>0)
+	if(this.superstar.selected()&&this.superstar.selected_index()>0)
 	{
 		var _this=this;
 		superstar_sub({superstar:this.on_loaded_robot.superstar,school:"",name:""},"/",
-			function(json){_this.build_schools_m(json); ;},
-			function(error){_this.on_error_m("School download error ("+error+").");});
+			function(json){_this.build_schools_m(json);},
+			function(error){_this.build_schools_m([]);_this.build_robots_m([]);_this.build_robots_m([]);_this.on_error_m("School download error ("+error+").");});
+		return;
 	}
+	this.build_schools_m([]);
+	this.build_robots_m([]);
 }
 
 name_t.prototype.download_robots_m=function()
 {
-	if(this.school.selectedIndex<=0)
+	var selected_school=this.school.selected();
+
+	if(!selected_school||this.school.selected_index()<=0)
 	{
 		this.build_robots_m();
 		return;
 	}
 
-
-	var selected_school=this.school.options[this.school.selectedIndex].text;
-
-	if(selected_school)
+	if(this.superstar.selected()&&this.superstar.selected_index()>0&&selected_school)
 	{
 		var _this=this;
 
-		superstar_sub({superstar:this.superstar.options[this.superstar.selectedIndex].text,school:selected_school,name:""},"/",
+		superstar_sub({superstar:this.superstar.selected(),school:selected_school,name:""},"/",
 			function(json){_this.build_robots_m(json);},
 			function(error){_this.on_error_m("Robots download error ("+error+").");});
 	}
@@ -207,6 +192,7 @@ name_t.prototype.update_disables_m=function()
 name_t.prototype.on_selected_m=function()
 {
 	var robot=this.get_robot();
+	console.log(robot);
 
 	if(this.on_selected&&robot.school!=null&&robot.name!=null)
 		this.on_selected(robot);
