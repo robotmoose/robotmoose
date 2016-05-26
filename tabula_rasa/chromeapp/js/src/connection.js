@@ -440,6 +440,25 @@ connection_t.command_property_list={
 };
 
 
+// Persistently request this superstar path, sending
+//   the resulting JSON object to this function.
+connection_t.prototype.network_getnext=function(path,on_success) {
+	var _this=this;
+	superstar_getnext(_this.robot,path,
+		function(json) {
+			if (_this.connected()) {
+				_this.status_message("	Updated "+path+" = "+JSON.stringify(json,null,'	'));
+				
+				on_success(json);
+				
+				return true; // want more data
+			} else {
+				return false; // done
+			}
+		} 
+	);
+}
+
 
 // Arduino is fully configured and communicating
 connection_t.prototype.arduino_setup_complete=function()
@@ -447,6 +466,22 @@ connection_t.prototype.arduino_setup_complete=function()
 	var _this=this;
 	_this.status_message("  arduino setup complete... sending command packet");
 	_this.arduino_send_packet();
+	
+	// Set up network comms:
+	_this.network_getnext("pilot",function(pilot) {
+		for (var field in pilot.power) {
+			_this.power[field]=pilot.power[field];
+		}
+	}
+	);
+	
+	_this.network_getnext("config",function(config) {
+		if (config.counter!=_this.last_config.counter)
+		{ // need to reconfigure Arduino
+			_this.reconnect();
+		}
+	}
+	);
 }
 
 // Look up all the properties for our currently configured set of devices,
@@ -756,6 +791,11 @@ connection_t.prototype.arduino_recv_packet=function(p)
 
 	_this.status_message("	sensors = "+JSON.stringify(_this.sensors,null,'	'));
 
+	
+	// Upload new sensor data to network:
+	superstar_set(_this.robot,"sensors",_this.sensors);
+	
+/*
 	// Send sensor data to superstar, and grab pilot commands:
 	var robotName=_this.robot.school+"/"+_this.robot.name;
 	superstar_generic(_this.robot,
@@ -777,6 +817,7 @@ connection_t.prototype.arduino_recv_packet=function(p)
 			_this.power[field]=pilot.power[field];
 		}
 	} );
+*/
 }
 
 
