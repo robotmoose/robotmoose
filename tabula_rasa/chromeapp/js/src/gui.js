@@ -54,3 +54,9 @@ gui_t.prototype.destroy=function()
 	this.status_viewer.destroy();
 	this.div.removedChild(this.el);
 }
+
+chrome.app.runtime.onLaunched.addListener(function(){
+	chrome.app.window.create('gruveo.html');
+});
+
+
