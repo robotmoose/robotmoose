@@ -28,10 +28,15 @@ function gui_t(div)
 	(
 		this.top_bar.rows[0].cells[0],
 		function(message){_this.status_viewer.show(message);},
-		function(robot){_this.connection.gui_robot(robot);}
+		function(robot)
+		{
+			console.log("callback!");
+			_this.connection.gui_robot(robot);
+		}
 	);
 	this.connection.on_name_set=function(robot)
 	{
+		console.log("name set");
 		_this.name.reload(robot);
 	};
 	this.connection.load();
@@ -39,7 +44,7 @@ function gui_t(div)
 	this.serial_selector=new serial_selector_t
 	(
 		this.top_bar.rows[0].cells[1],
-		function(port_name){console.log(_this.name.get_robot());_this.connection.gui_connect(port_name);},
+		function(port_name){_this.connection.gui_connect(port_name);},
 		function(port_name){_this.connection.gui_disconnect(port_name);},
 		function(){return (_this.name.get_robot().school!=null&&_this.name.get_robot().name!=null);}
 	);

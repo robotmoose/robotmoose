@@ -94,10 +94,15 @@ name_t.prototype.get_robot=function()
 
 name_t.prototype.reload=function(robot)
 {
+	console.log(this.on_loaded_robot);
+	var need_reload=(!this.on_loaded_robot.name||!this.on_loaded_robot.school);
 	this.on_loaded_robot=robot;
 	this.build_superstar_m([]);
 	this.build_schools_m([]);
 	this.build_robots_m([]);
+
+	if(need_reload)
+		this.on_selected_m(this.on_loaded_robot);
 }
 
 name_t.prototype.build_select_m=function(select,json,heading,on_loaded_value)
@@ -189,11 +194,10 @@ name_t.prototype.update_disables_m=function()
 	this.superstar.disabled=this.disabled;
 }
 
-name_t.prototype.on_selected_m=function()
+name_t.prototype.on_selected_m=function(robot)
 {
-	var robot=this.get_robot();
-	console.log(robot);
-
+	if(!robot)
+		robot=this.get_robot();
 	if(this.on_selected&&robot.school!=null&&robot.name!=null)
 		this.on_selected(robot);
 }

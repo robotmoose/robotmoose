@@ -8,7 +8,7 @@ ifeq ($(OS),Windows_NT)
 	LIBS+=-lWs2_32
 endif
 
-all: superstar netbench
+all: superstar
 
 superstar: superstar.cpp
 	$(CXX) $(CFLAGS) $< ../include/mongoose/mongoose.c -o $@ $(LIBS)
