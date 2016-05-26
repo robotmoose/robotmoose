@@ -21,51 +21,66 @@ function name_t(div,on_message,on_selected)
 
 	var _this=this;
 
-	this.school=new dropdown_t(this.el);
-	this.school.select.style.width="128px";
-	this.school.onchange=function(){_this.download_robots_m();};
-
-	this.robot=new dropdown_t(this.el);
-	this.robot.select.style.width="128px";
-	this.robot.onchange=function(){_this.on_selected_m();};
-
-	this.superstar=new dropdown_t(this.el);
-	this.superstar.select.style.width="128px";
-	this.superstar.onchange=function()
+	this.superstar_div=document.createElement("div");
+    this.superstar_select = new dropdown_t(this.superstar_div);
+	this.el.appendChild(this.superstar_div);
+    this.superstar_select.el.style.width="100%";
+    this.superstar_select.select.style.width="100%";
+	this.superstar_select.onchange=function()
 	{
 		if(this.selectedIndex!=0)
 		{
+            _this.build_years_m();
 			_this.build_schools_m();
 			_this.build_robots_m();
 		}
 		else
 		{
-			_this.build_select_m(_this.schools,[],"School","School");
-			_this.build_select_m(_this.robots,[],"Robot","Robot");
+			_this.build_select_m(_this.school_select,[],"School","School");
+			_this.build_select_m(_this.robot_select,[],"Robot","Robot");
+			_this.build_select_m(_this.year_select,[],"Year","Year");
 		}
 	};
+
+    this.year_school_robot_div = document.createElement("div");
+    this.year_school_robot_div.style.width = "100%";
+    
+    this.year_select = new dropdown_t(this.year_school_robot_div);
+    this.year_select.set_width("33%");
+
+	this.school_select= new dropdown_t(this.year_school_robot_div);
+	this.school_select.set_width("33%");
+	this.school_select.onchange=function(){_this.download_robots_m();};
+
+	this.robot_select= new dropdown_t(this.year_school_robot_div);
+	this.robot_select.set_width("33%");
+	this.robot_select.onchange=function(){_this.on_selected_m();};
+
+    this.el.appendChild(this.year_school_robot_div);
 
 
 	_this.school_interval=setInterval(function()
 	{
-		if(!_this.superstar.disabled)
+		if(!_this.superstar_select.disabled)
 		{
-			_this.on_loaded_robot=
-			{
-				superstar:_this.superstar.selected(),
-				school:_this.school.selected(),
-				name:_this.robot.selected()
-			};
-			_this.download_schools_m();
+				_this.on_loaded_robot=
+				{
+					superstar:_this.superstar_select.selected(),
+                    year: _this.year_select.selected(),
+					school:_this.school_select.selected(),
+					name:_this.robot_select.selected()
+				};
+				_this.download_years_m();
 		}
 	},250);
 
 	_this.build_superstar_m();
+    _this.build_years_m();
 	_this.build_schools_m();
 	_this.build_robots_m();
 
 	_this.disables_interval=setInterval(function(){_this.update_disables_m();},250);
-	_this.download_schools_m();
+	_this.download_years_m();
 }
 
 
@@ -78,15 +93,16 @@ name_t.prototype.destroy=function()
 
 name_t.prototype.get_robot=function()
 {
-	var robot={superstar:"robotmoose.com",school:null,name:null};
+	var robot={superstar:"robotmoose.com",school:null,name:null,year:null};
 
-	if(this.superstar.selected()&&this.school.selected()&&this.robot.selected()&&
-		this.superstar.selected_index()>0&&this.school.selected_index()>0&&
-		this.robot.selected_index()>0)
+	if(this.year_select.selected_index()>0
+            &&this.school_select.selected_index()>0
+            &&this.robot_select.selected_index()>0)
 	{
-		robot.school=this.school.selected();
-		robot.name=this.robot.selected();
-		robot.superstar=this.superstar.selected();
+        robot.year=this.year_select.selected();
+		robot.school=this.school_select.selected();
+		robot.name=this.robot_select.selected();
+		robot.superstar=this.superstar_select.selected();
 	}
 
 	return robot;
@@ -97,6 +113,7 @@ name_t.prototype.reload=function(robot)
 	var need_reload=(!this.on_loaded_robot.name||!this.on_loaded_robot.school);
 	this.on_loaded_robot=robot;
 	this.build_superstar_m([]);
+    this.build_years_m([]);
 	this.build_schools_m([]);
 	this.build_robots_m([]);
 
@@ -116,15 +133,21 @@ name_t.prototype.build_select_m=function(select,json,heading,on_loaded_value)
 	this.update_disables_m();
 }
 
+name_t.prototype.build_years_m = function(json)
+{
+    this.build_select_m(this.year_select, json, "Year", this.on_loaded_robot.year);
+    this.download_schools_m();
+}
+
 name_t.prototype.build_schools_m=function(json)
 {
-	this.build_select_m(this.school,json,"School",this.on_loaded_robot.school);
+	this.build_select_m(this.school_select,json,"School",this.on_loaded_robot.school);
 	this.download_robots_m();
 }
 
 name_t.prototype.build_robots_m=function(json)
 {
-	this.build_select_m(this.robot,json,"Robot",this.on_loaded_robot.name);
+	this.build_select_m(this.robot_select,json,"Robot",this.on_loaded_robot.name);
 }
 
 name_t.prototype.build_superstar_m=function()
@@ -139,7 +162,7 @@ name_t.prototype.build_superstar_m=function()
 	if(!this.on_loaded_robot.superstar)
 		this.on_loaded_robot.superstar=superstar_options[0];
 
-	this.build_select_m(this.superstar,superstar_options,"Superstar",this.on_loaded_robot.superstar);
+	this.build_select_m(this.superstar_select,superstar_options,"Superstar",this.on_loaded_robot.superstar);
 }
 
 name_t.prototype.on_error_m=function(error)
@@ -148,15 +171,54 @@ name_t.prototype.on_error_m=function(error)
 		this.on_message(error);
 }
 
+name_t.prototype.download_years_m = function()
+{
+    if(this.superstar_select.selected() && this.superstar_select.selected_index()>0){
+        var _this = this;
+        superstar_sub(
+            {
+                superstar:this.on_loaded_robot.superstar,
+                year:"",
+                school:"",
+                name:""
+            },
+            "/",
+            function(json){_this.build_years_m(json);},
+            function(error){
+                _this.on_error_m("Year download error("+error+").");
+            }
+        );
+    }
+}
+
 name_t.prototype.download_schools_m=function()
 {
-	if(this.superstar.selected()&&this.superstar.selected_index()>0)
+    var selected_year = this.year_select.selected();
+    if(!selected_year || this.year_select.selected_index<=0)
+    {
+        this.build_schools_m();
+        return;
+    }
+    
+
+	if(this.superstar_select.selected() && this.superstar_select.selected_index()>0 
+            && selected_year)
 	{
 		var _this=this;
-		superstar_sub({superstar:this.on_loaded_robot.superstar,school:"",name:""},"/",
-			function(json){_this.build_schools_m(json);},
-			function(error){_this.build_schools_m([]);_this.build_robots_m([]);_this.build_robots_m([]);_this.on_error_m("School download error ("+error+").");});
-		return;
+		superstar_sub(
+            {
+                superstar:this.on_loaded_robot.superstar,
+                school:"",
+                name:"",
+                year: selected_year
+            },
+            "/",
+            function(json){ _this.build_schools_m(json); },
+            function(error){
+                _this.on_error_m("School download error ("+error+").");
+            }
+        );
+        return;
 	}
 	this.build_schools_m([]);
 	this.build_robots_m([]);
@@ -164,19 +226,29 @@ name_t.prototype.download_schools_m=function()
 
 name_t.prototype.download_robots_m=function()
 {
-	var selected_school=this.school.selected();
-
-	if(!selected_school||this.school.selected_index()<=0)
+	if(!this.school_select.selected() || this.school_select.selected_index<=0)
 	{
 		this.build_robots_m();
 		return;
 	}
 
-	if(this.superstar.selected()&&this.superstar.selected_index()>0&&selected_school)
+    var selected_year = this.year_select.selected();
+	var selected_school=this.school_select.selected();
+
+	if(this.superstar_select.selected() && this.superstar_select.selected_index()>0
+            && this.year_select.selected_index() >0 && this.school_select.selected_index() > 0
+            && selected_school && selected_year)
 	{
 		var _this=this;
 
-		superstar_sub({superstar:this.superstar.selected(),school:selected_school,name:""},"/",
+		superstar_sub(
+            {
+                superstar:this.superstar_select.selected(),
+                school:selected_school,
+                name:"",
+                year:selected_year
+            },
+            "/",
 			function(json){_this.build_robots_m(json);},
 			function(error){_this.on_error_m("Robots download error ("+error+").");});
 	}
@@ -184,19 +256,54 @@ name_t.prototype.download_robots_m=function()
 
 name_t.prototype.update_disables_m=function()
 {
-	var disabled=false;
-	if(this.school.selectedIndex<=0||this.disabled)
-		disabled=true;
-	this.robot.disabled=disabled;
+    if(this.superstar_select.selected_index()==0){
+        this.superstar_select.set_background_color("maroon");
+        this.year_select.disabled=true;
+    }
+    else{
+        this.superstar_select.set_background_color("cyan");
+        this.year_select.disabled=false;
+    }
+    if(this.year_select.selected_index()==0 || this.superstar_select.disabled){
+        this.year_select.set_background_color("maroon");
+        this.school_select.disabled=true;
+    }
+    else{
+        this.year_select.set_background_color("cyan");
+        this.school_select.disabled=false;
+    }
+    if(this.school_select.selected_index()==0 || this.year_select.disabled){
+        this.school_select.set_background_color("maroon");
+        this.robot_select.disabled=true;
+    }
+    else{
+        this.school_select.set_background_color("cyan");
+        this.robot_select.disabled=false;
+    }
+    if(this.robot_select.selected_index()==0 || this.school_select.disabled){
+        this.robot_select.set_background_color("maroon");
+    }
+    else{
+        this.robot_select.set_background_color("cyan");
+    }
 
-	this.school.disabled=this.disabled;
-	this.superstar.disabled=this.disabled;
+    /*
+    var disabled=false;
+    if(this.school_select.selected_index<=0||this.disabled)
+        disabled=true;
+    this.robot_select.disabled=disabled;
+
+    this.school_select.disabled=this.disabled;
+    this.superstar_select.disabled=this.disabled;
+    */
 }
 
 name_t.prototype.on_selected_m=function(robot)
 {
-	if(!robot)
-		robot=this.get_robot();
-	if(this.on_selected&&robot.school!=null&&robot.name!=null)
+    if(!robot)
+        var robot=this.get_robot();
+
+	if(this.on_selected&&robot.school!=null&&robot.name!=null){
 		this.on_selected(robot);
+    }
 }
