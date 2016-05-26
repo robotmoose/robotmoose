@@ -70,6 +70,30 @@ function superstar_get(robot,path,on_success,on_error)
 	,on_error);
 }
 
+// Subscribe to JSON changes at this robot path.
+//  This KEEPS calling on_success until it returns false.
+function superstar_getnext(robot,path,on_success,on_error)
+{
+	var state={};
+	state.current="{}"; // current string value of path
+	state.getnext=function() {
+		superstar_generic(robot,path+"?getnext="+encodeURIComponent(state.current),
+			function(str) {
+				if(str=="")
+					str="{}";
+
+				state.current=str;
+				state.json=JSON.parse(str);
+			
+				if (on_success(state.json)!=false) {
+					state.getnext(); // run ourselves again
+				}
+			}
+		,on_error);
+	}
+	state.getnext(); // start first one
+}
+
 // Write this object to this path
 function superstar_set(robot,path,json,on_success,on_error)
 {
