@@ -26,7 +26,7 @@ LINKER=avr-objcopy
 PROGRAMMER=avrdude
 
 #Search Directories
-ARDUINO_IDE=arduino
+ARDUINO_IDE=../../include/arduino
 ARDUINO_DIR=$(ARDUINO_IDE)/hardware/arduino
 ARD_LIB_DIR=$(ARDUINO_IDE)/libraries
 INCLUDE_DIR=-I$(ARDUINO_DIR)/cores -I$(ARDUINO_DIR)/cores/arduino
