@@ -1,3 +1,22 @@
+var appWin = null;
+
+function onWindowCreated()
+{
+	appWin = chrome.app.window.get('gruveo');//chrome.app.window.current();
+	appWin.onBoundsChanged.addListener(onBoundsChanged);
+	onBoundsChanged();
+
+}
+
+function onBoundsChanged()
+{
+	var webview = document.querySelector('webview');
+	var bounds = win.getBounds();
+	webview.style.height = bounds.height + 'px';
+	webview.style.width = bounds.width + 'px';
+	console.log("In resize");
+}
+
 function on_launch()
 {
 	var width=600;
@@ -12,6 +31,15 @@ function on_launch()
 			'minWidth':width,'minHeight':height
 		}
 	});
+	chrome.app.window.create('gruveo.html',
+		{
+			id:'gruveo'
+		}
+			//onWindowCreated
+		);
+
 }
 
 chrome.app.runtime.onLaunched.addListener(on_launch);
+
+
