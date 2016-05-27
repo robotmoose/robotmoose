@@ -13,7 +13,7 @@ function gui_t(div)
 	this.top_bar=new_table(this.layout.rows[0].cells[0],1,2);
 	this.layout.rows[1].cells[0].style.height="100%";
 
-	var gruveo=document.getElementById("gruveo");
+	this.gruveo=document.getElementById("gruveo");
 	this.layout.rows[1].cells[0].appendChild(gruveo);
 
 	gruveo.addEventListener('permissionrequest',
@@ -38,7 +38,12 @@ function gui_t(div)
 	(
 		this.top_bar.rows[0].cells[0],
 		function(message){_this.status_viewer.show(message);},
-		function(robot){_this.connection.gui_robot(robot);}
+		function(robot)
+		{
+			_this.connection.gui_robot(robot);
+			_this.gruveo.src = "https://www.gruveo.com/"+robot.school+robot.name;
+		}
+
 	);
 	this.connection.on_name_set=function(robot){_this.name.reload(robot);};
 	this.connection.load();
