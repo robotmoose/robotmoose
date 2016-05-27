@@ -7,7 +7,7 @@
 		"http://127.0.0.1:8081/",
 		"http://robotmoose.com/","https://robotmoose.com/",
 		"http://test.robotmoose.com/","https://test.robotmoose.com/","https://www.gruveo.com/embed/","https://www.youtube.com/v/zsqWawaOMCQ",
-		"serial","storage","webview"],
+		"serial","storage","audioCapture","videoCapture","webview"],
 	"app":
 	{
 		"background":
