@@ -32,12 +32,12 @@ function on_launch()
 		},
 		id: 'main'
 	});
-	chrome.app.window.create('gruveo.html',
+	/*chrome.app.window.create('gruveo.html',
 		{
 			id:'gruveo'
 		}
 			//onWindowCreated
-		);
+		);*/
 
 }
 

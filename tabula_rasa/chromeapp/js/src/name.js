@@ -94,7 +94,6 @@ name_t.prototype.get_robot=function()
 
 name_t.prototype.reload=function(robot)
 {
-	console.log(this.on_loaded_robot);
 	var need_reload=(!this.on_loaded_robot.name||!this.on_loaded_robot.school);
 	this.on_loaded_robot=robot;
 	this.build_superstar_m([]);
