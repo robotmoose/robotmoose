@@ -1,19 +1,23 @@
 {
 	"name":"RobotMoose test",
 	"description":"Robotics backend software (test version from git)",
-	"version":"2016.5.25.0",
+	"version":"2016.5.27.0",
 	"manifest_version":2,
 	"permissions":[
 		"http://127.0.0.1:8081/",
 		"http://robotmoose.com/","https://robotmoose.com/",
 		"http://test.robotmoose.com/","https://test.robotmoose.com/","https://www.gruveo.com/embed/","https://www.youtube.com/v/zsqWawaOMCQ",
-		"serial","storage","audioCapture","videoCapture","webview"],
+		"serial",
+		"storage",
+		"audioCapture",
+		"videoCapture",
+		"webview"],
 	"app":
 	{
 		"background":
 		{
 			"scripts":["js/src/background.js","js/src/connection.js",
-				"js/src/dropdown.js","js/src/gui.js","js/src/gruveo.js",
+				"js/src/dropdown.js","js/src/gui.js",
 				"js/src/name.js","js/src/packetize.js","js/src/prettify.js",
 				"js/src/serial_selector.js","js/src/sim_serial.js",
 				"js/src/status_viewer.js","js/src/superstar.js",

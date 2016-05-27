@@ -7,11 +7,21 @@ function gui_t(div)
 	this.el=new_div(this.div);
 	maximize(this.el);
 
-	this.layout=new_table(this.el,2,1);
+	this.layout=new_table(this.el,3,1);
 	maximize(this.layout);
 
 	this.top_bar=new_table(this.layout.rows[0].cells[0],1,2);
 	this.layout.rows[1].cells[0].style.height="100%";
+
+	var gruveo=document.getElementById("gruveo");
+	this.layout.rows[1].cells[0].appendChild(gruveo);
+
+	gruveo.addEventListener('permissionrequest',
+	function(e)
+	{
+		if(e.permission==='media')
+			e.request.allow();
+	});
 
 	this.superstar_errored=false;
 
@@ -28,17 +38,9 @@ function gui_t(div)
 	(
 		this.top_bar.rows[0].cells[0],
 		function(message){_this.status_viewer.show(message);},
-		function(robot)
-		{
-			console.log("callback!");
-			_this.connection.gui_robot(robot);
-		}
+		function(robot){_this.connection.gui_robot(robot);}
 	);
-	this.connection.on_name_set=function(robot)
-	{
-		console.log("name set");
-		_this.name.reload(robot);
-	};
+	this.connection.on_name_set=function(robot){_this.name.reload(robot);};
 	this.connection.load();
 
 	this.serial_selector=new serial_selector_t
@@ -49,7 +51,7 @@ function gui_t(div)
 		function(){return (_this.name.get_robot().school!=null&&_this.name.get_robot().name!=null);}
 	);
 
-	this.status_viewer=new status_viewer_t(this.layout.rows[1].cells[0]);
+	this.status_viewer=new status_viewer_t(this.layout.rows[2].cells[0]);
 }
 
 gui_t.prototype.destroy=function()

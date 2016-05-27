@@ -31,12 +31,12 @@ function on_launch()
 			'minWidth':width,'minHeight':height
 		}
 	});
-	chrome.app.window.create('gruveo.html',
+	/*chrome.app.window.create('gruveo.html',
 		{
 			id:'gruveo'
 		}
 			//onWindowCreated
-		);
+		);*/
 
 }
 
