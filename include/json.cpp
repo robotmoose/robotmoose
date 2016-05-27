@@ -11,9 +11,9 @@
 #include <stack>
 #include <cerrno>
 
-//#ifndef WIN32
+#ifndef WIN32
 #define _stricmp strcasecmp
-//#endif
+#endif
 
 #ifdef _MSC_VER
 #define snprintf sprintf_s
