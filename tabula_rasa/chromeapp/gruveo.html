@@ -4,33 +4,14 @@
 	05/25/2016
 -->
 
-<script type="text/javascript">
-
-function updateWebViews()
-{
-	var webview = document.getElementById("gruveo");
-	console.log(webview);
-	webview.style.height = document.documentElement.clientHeight + "px";
-	webview.style.width = document.documentElement.clientWidth + "px";
-	console.log("Height: "+ document.documentElement.clientHeight + "px")
-	console.log("Width: "+ document.documentElement.clientWidth + "px")
-}
-
-window.onload = updateWebViews();
-window.onresize = updateWebViews();
-
-webView.addEventListener('consolemessage', function(msg) {
-	console.log(msg);
-	});
-
-</script>
 
 <html>
 <head>
 	<meta charset="utf-8">
 </head>
 <body>
-	<webview  src="https://www.gruveo.com/embed/" onload = "updateWebViews()"> </webview> 
-	<!--<script src="js/gruveo.js">-->
+
+	<script src="js/src/gruveo.js"></script>
+	<webview  src="https://www.gruveo.com/embed/" onload="onload()"> </webview> 
 </body>
 </html> 
