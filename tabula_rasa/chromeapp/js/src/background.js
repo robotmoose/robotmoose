@@ -29,7 +29,8 @@ function on_launch()
 			'width':width,'height':height,
 		//	'maxWidth':width,'maxHeight':height,
 			'minWidth':width,'minHeight':height
-		}
+		},
+		id: 'main'
 	});
 	chrome.app.window.create('gruveo.html',
 		{
