@@ -48,6 +48,13 @@ connection_t.prototype.reset=function() {
 	_this.sensors={}; // Arduino-reported sensor values
 	_this.sensors.power={}; // Commanded values reflected back up to pilot
 
+	// Cancel all outstanding getnext calls
+	if (_this.getnexts) {
+		for (var i=0;i<_this.getnexts.length;i++)
+			_this.getnexts[i].abort();
+	}
+	_this.getnexts=[];
+
 	// Localization
 	_this.location = new vec3(0,0,0);
 	_this.angle = 0;
@@ -444,19 +451,17 @@ connection_t.command_property_list={
 //   the resulting JSON object to this function.
 connection_t.prototype.network_getnext=function(path,on_success) {
 	var _this=this;
-	superstar_getnext(_this.robot,path,
+	var state=superstar_getnext(_this.robot,path,
 		function(json) {
 			if (_this.connected()) {
 				_this.status_message("	Updated "+path+" = "+JSON.stringify(json,null,'	'));
 				
 				on_success(json);
-				
-				return true; // want more data
-			} else {
-				return false; // done
-			}
+			} // else we're done
 		} 
 	);
+	
+	_this.getnexts.push(state);
 }
 
 
@@ -796,7 +801,7 @@ connection_t.prototype.arduino_recv_packet=function(p)
 	superstar_set(_this.robot,"sensors",_this.sensors);
 	
 /*
-	// Send sensor data to superstar, and grab pilot commands:
+	// Send sensor data to superstar, and grab pilot commands with set & mget:
 	var robotName=_this.robot.school+"/"+_this.robot.name;
 	superstar_generic(_this.robot,
 		"sensors?set="+encodeURIComponent(JSON.stringify(_this.sensors))
