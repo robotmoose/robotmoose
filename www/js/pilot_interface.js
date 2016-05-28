@@ -352,7 +352,17 @@ pilot_interface_t.prototype.download=function(robot)
 
 pilot_interface_t.prototype.upload=function(robot)
 {
-	superstar_set(robot.name,"pilot",this.pilot,null,robot.auth);
+	if(robot.auth) //We have a password 
+	{
+		var pilot_str = JSON.stringify(this.pilot);
+		console.log(pilot_str);
+		var sent_auth = getAuthCode(robot.auth,robot.name+"/pilot",pilot_str,0);
+		console.log(sent_auth);
+		superstar_set(robot.name,"pilot",this.pilot,null,sent_auth);
+
+	}
+	else
+		superstar_set(robot.name,"pilot",this.pilot,null,robot.auth);
 }
 
 // This is a simple placeholder, to get things working for now:
