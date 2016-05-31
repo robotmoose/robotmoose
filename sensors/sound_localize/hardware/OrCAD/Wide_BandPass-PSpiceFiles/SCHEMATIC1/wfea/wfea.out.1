@@ -1,0 +1,53 @@
+
+**** 05/26/16 19:03:43 ****** PSpice Lite (October 2012) ****** ID# 10813 ****
+
+ ** Profile: "SCHEMATIC1-wfea"  [ C:\OrCAD_Projects\Wide_BandPass-PSpiceFiles\SCHEMATIC1\wfea.sim ] 
+
+
+ ****     CIRCUIT DESCRIPTION
+
+
+******************************************************************************
+
+
+
+
+** Creating circuit file "wfea.cir" 
+** WARNING: THIS AUTOMATICALLY GENERATED FILE MAY BE OVERWRITTEN BY SUBSEQUENT SIMULATIONS
+
+*Libraries: 
+* Profile Libraries :
+* Local Libraries :
+* From [PSPICE NETLIST] section of C:\Users\Ryker Dial\AppData\Roaming\SPB_16.6\cdssetup\OrCAD_PSpice/16.6.0/PSpice.ini file:
+.lib "nomd.lib" 
+.lib "fairchild.lib" 
+.lib "bipolar.lib" 
+.lib "diode.lib" 
+
+*Analysis directives: 
+.AC DEC 100 100m 100k
+.OPTIONS ADVCONV
+.PROBE64 V(alias(*)) I(alias(*)) W(alias(*)) D(alias(*)) NOISE(alias(*)) 
+.INC "..\SCHEMATIC1.net" 
+
+
+
+**** INCLUDING SCHEMATIC1.net ****
+* source WIDE_BANDPASS
+C_C1         N00500 N00223  10n  TC=0,0 
+R_R1         0 N00223  5.1k TC=0,0 
+X_U1         N00223 N00241 N00435 0 N00254 uA741
+R_R2         0 N00241  1k TC=0,0 
+R_R3         N00241 N00254  1k TC=0,0 
+R_R4         N00254 N00310  51k TC=0,0 
+C_C2         0 N00310  10n  TC=0,0 
+V_V1         N00435 0 5Vdc
+V_V2         N00500 M_UN0001 DC 0Vdc AC 100mVac 
+
+**** RESUMING wfea.cir ****
+.END
+
+ERROR(ORPSIM-15142): Node N00500 is floating
+
+ERROR(ORPSIM-15142): Node M_UN0001 is floating
+

@@ -1,0 +1,12 @@
+* source WIDE_BANDPASS
+X_U1         N00187 N00198 N00302 0 N00220 uA741
+R_R1         N00198 N00220  51k TC=0,0 
+R_R2         N001151 N00198  10k TC=0,0 
+C_C1         0 N001151  100n  TC=0,0 
+C_C2         N00187 VIN  100n  TC=0,0 
+R_R3         0 N00187  82k TC=0,0 
+R_R4         N00187 N00302  82k TC=0,0 
+V_V1         N00302 0 5Vdc
+R_R5         N00220 VOUT  5.1k TC=0,0 
+C_C3         0 VOUT  10n  TC=0,0 
+V_V2         VIN 0 DC 0Vdc AC 10mVac 

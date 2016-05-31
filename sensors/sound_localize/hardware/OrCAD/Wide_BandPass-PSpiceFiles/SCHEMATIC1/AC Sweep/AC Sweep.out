@@ -1,0 +1,175 @@
+
+**** 05/29/16 22:44:27 ****** PSpice Lite (October 2012) ****** ID# 10813 ****
+
+ ** Profile: "SCHEMATIC1-AC Sweep"  [ C:\Users\Ryker Dial\Documents\Documents\UAF\Robotics\ITEST\Sound Localization Research\OrCAD\wi
+
+
+ ****     CIRCUIT DESCRIPTION
+
+
+******************************************************************************
+
+
+
+
+** Creating circuit file "AC Sweep.cir" 
+** WARNING: THIS AUTOMATICALLY GENERATED FILE MAY BE OVERWRITTEN BY SUBSEQUENT SIMULATIONS
+
+*Libraries: 
+* Profile Libraries :
+* Local Libraries :
+* From [PSPICE NETLIST] section of C:\Users\Ryker Dial\AppData\Roaming\SPB_16.6\cdssetup\OrCAD_PSpice/16.6.0/PSpice.ini file:
+.lib "nomd.lib" 
+.lib "fairchild.lib" 
+.lib "bipolar.lib" 
+.lib "diode.lib" 
+
+*Analysis directives: 
+.AC DEC 100 10 100k
+.OPTIONS ADVCONV
+.PROBE64 V(alias(*)) I(alias(*)) W(alias(*)) D(alias(*)) NOISE(alias(*)) 
+.INC "..\SCHEMATIC1.net" 
+
+
+
+**** INCLUDING SCHEMATIC1.net ****
+* source WIDE_BANDPASS
+X_U1         N00187 N00198 N00302 0 N00220 uA741
+R_R1         N00198 N00220  51k TC=0,0 
+R_R2         N001151 N00198  10k TC=0,0 
+C_C1         0 N001151  100n  TC=0,0 
+C_C2         N00187 VIN  100n  TC=0,0 
+R_R3         0 N00187  82k TC=0,0 
+R_R4         N00187 N00302  82k TC=0,0 
+V_V1         N00302 0 5Vdc
+R_R5         N00220 VOUT  5.1k TC=0,0 
+C_C3         0 VOUT  10n  TC=0,0 
+V_V2         VIN 0 DC 0Vdc AC 10mVac 
+
+**** RESUMING "AC Sweep.cir" ****
+.END
+
+**** 05/29/16 22:44:27 ****** PSpice Lite (October 2012) ****** ID# 10813 ****
+
+ ** Profile: "SCHEMATIC1-AC Sweep"  [ C:\Users\Ryker Dial\Documents\Documents\UAF\Robotics\ITEST\Sound Localization Research\OrCAD\wi
+
+
+ ****     Diode MODEL PARAMETERS
+
+
+******************************************************************************
+
+
+
+
+               X_U1.dx         
+          IS  800.000000E-18 
+          RS    1            
+
+
+**** 05/29/16 22:44:27 ****** PSpice Lite (October 2012) ****** ID# 10813 ****
+
+ ** Profile: "SCHEMATIC1-AC Sweep"  [ C:\Users\Ryker Dial\Documents\Documents\UAF\Robotics\ITEST\Sound Localization Research\OrCAD\wi
+
+
+ ****     BJT MODEL PARAMETERS
+
+
+******************************************************************************
+
+
+
+
+               X_U1.qx         
+               NPN             
+       LEVEL    1            
+          IS  800.000000E-18 
+          BF   93.75         
+          NF    1            
+          BR    1            
+          NR    1            
+         ISS    0            
+          RE    0            
+          RC    0            
+         CJE    0            
+         VJE     .75         
+         CJC    0            
+         VJC     .75         
+         MJC     .33         
+        XCJC    1            
+         CJS    0            
+         VJS     .75         
+          KF    0            
+          AF    1            
+          CN    2.42         
+           D     .87         
+
+
+**** 05/29/16 22:44:27 ****** PSpice Lite (October 2012) ****** ID# 10813 ****
+
+ ** Profile: "SCHEMATIC1-AC Sweep"  [ C:\Users\Ryker Dial\Documents\Documents\UAF\Robotics\ITEST\Sound Localization Research\OrCAD\wi
+
+
+ ****     SMALL SIGNAL BIAS SOLUTION       TEMPERATURE =   27.000 DEG C
+
+
+******************************************************************************
+
+
+
+ NODE   VOLTAGE     NODE   VOLTAGE     NODE   VOLTAGE     NODE   VOLTAGE
+
+
+(  VIN)    0.0000  ( VOUT)    2.5008  (N00187)    2.4967 (N00198)    2.4968     
+
+(N00220)    2.5008 (N00302)    5.0000 (X_U1.6)-78.72E-09 (X_U1.7)    2.5008     
+
+(X_U1.8)    2.5008 (X_U1.9)    0.0000 (N001151)    2.4968                       
+
+(X_U1.10)    1.8891                   (X_U1.11)    4.9603                       
+
+(X_U1.12)    4.9603                   (X_U1.13)    1.9029                       
+
+(X_U1.14)    1.9029                   (X_U1.53)    4.0000                       
+
+(X_U1.54)    1.0000                   (X_U1.90) 79.77E-06                       
+
+(X_U1.91)   40.0000                   (X_U1.92)  -40.0000                       
+
+(X_U1.99)    2.5000                   
+
+
+
+
+    VOLTAGE SOURCE CURRENTS
+    NAME         CURRENT
+
+    V_V1        -3.208E-04
+    V_V2         0.000E+00
+    X_U1.vb     -7.872E-13
+    X_U1.vc      1.500E-12
+    X_U1.ve      1.502E-12
+    X_U1.vlim    7.977E-08
+    X_U1.vlp    -4.000E-11
+    X_U1.vln    -4.000E-11
+
+    TOTAL POWER DISSIPATION   1.60E-03  WATTS
+
+
+
+          JOB CONCLUDED
+
+**** 05/29/16 22:44:27 ****** PSpice Lite (October 2012) ****** ID# 10813 ****
+
+ ** Profile: "SCHEMATIC1-AC Sweep"  [ C:\Users\Ryker Dial\Documents\Documents\UAF\Robotics\ITEST\Sound Localization Research\OrCAD\wi
+
+
+ ****     JOB STATISTICS SUMMARY
+
+
+******************************************************************************
+
+
+
+  Total job time (using Solver 1)   =         .02
+

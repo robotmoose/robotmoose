@@ -1,0 +1,171 @@
+
+**** 05/26/16 19:47:30 ****** PSpice Lite (October 2012) ****** ID# 10813 ****
+
+ ** Profile: "SCHEMATIC1-wfea"  [ C:\OrCAD_Projects\Wide_BandPass-PSpiceFiles\SCHEMATIC1\wfea.sim ] 
+
+
+ ****     CIRCUIT DESCRIPTION
+
+
+******************************************************************************
+
+
+
+
+** Creating circuit file "wfea.cir" 
+** WARNING: THIS AUTOMATICALLY GENERATED FILE MAY BE OVERWRITTEN BY SUBSEQUENT SIMULATIONS
+
+*Libraries: 
+* Profile Libraries :
+* Local Libraries :
+* From [PSPICE NETLIST] section of C:\Users\Ryker Dial\AppData\Roaming\SPB_16.6\cdssetup\OrCAD_PSpice/16.6.0/PSpice.ini file:
+.lib "nomd.lib" 
+.lib "fairchild.lib" 
+.lib "bipolar.lib" 
+.lib "diode.lib" 
+
+*Analysis directives: 
+.AC DEC 100 100m 100k
+.OPTIONS ADVCONV
+.PROBE64 V(alias(*)) I(alias(*)) W(alias(*)) D(alias(*)) NOISE(alias(*)) 
+.INC "..\SCHEMATIC1.net" 
+
+
+
+**** INCLUDING SCHEMATIC1.net ****
+* source WIDE_BANDPASS
+C_C1         N00500 N00223  1n  TC=0,0 
+R_R1         0 N00223  510k TC=0,0 
+X_U1         N00223 N00241 N00435 0 N00254 uA741
+R_R2         0 N00241  10k TC=0,0 
+R_R3         N00241 N00254  100k TC=0,0 
+R_R4         N00254 N00310  51k TC=0,0 
+C_C2         0 N00310  1n  TC=0,0 
+V_V1         N00435 0 5Vdc
+V_V2         N00500 0 DC 0Vdc AC 100mVac 
+
+**** RESUMING wfea.cir ****
+.END
+
+**** 05/26/16 19:47:30 ****** PSpice Lite (October 2012) ****** ID# 10813 ****
+
+ ** Profile: "SCHEMATIC1-wfea"  [ C:\OrCAD_Projects\Wide_BandPass-PSpiceFiles\SCHEMATIC1\wfea.sim ] 
+
+
+ ****     Diode MODEL PARAMETERS
+
+
+******************************************************************************
+
+
+
+
+               X_U1.dx         
+          IS  800.000000E-18 
+          RS    1            
+
+
+**** 05/26/16 19:47:30 ****** PSpice Lite (October 2012) ****** ID# 10813 ****
+
+ ** Profile: "SCHEMATIC1-wfea"  [ C:\OrCAD_Projects\Wide_BandPass-PSpiceFiles\SCHEMATIC1\wfea.sim ] 
+
+
+ ****     BJT MODEL PARAMETERS
+
+
+******************************************************************************
+
+
+
+
+               X_U1.qx         
+               NPN             
+       LEVEL    1            
+          IS  800.000000E-18 
+          BF   93.75         
+          NF    1            
+          BR    1            
+          NR    1            
+         ISS    0            
+          RE    0            
+          RC    0            
+         CJE    0            
+         VJE     .75         
+         CJC    0            
+         VJC     .75         
+         MJC     .33         
+        XCJC    1            
+         CJS    0            
+         VJS     .75         
+          KF    0            
+          AF    1            
+          CN    2.42         
+           D     .87         
+
+
+**** 05/26/16 19:47:30 ****** PSpice Lite (October 2012) ****** ID# 10813 ****
+
+ ** Profile: "SCHEMATIC1-wfea"  [ C:\OrCAD_Projects\Wide_BandPass-PSpiceFiles\SCHEMATIC1\wfea.sim ] 
+
+
+ ****     SMALL SIGNAL BIAS SOLUTION       TEMPERATURE =   27.000 DEG C
+
+
+******************************************************************************
+
+
+
+ NODE   VOLTAGE     NODE   VOLTAGE     NODE   VOLTAGE     NODE   VOLTAGE
+
+
+(N00223)    -.0163 (N00241)     .0353 (N00254)     .4006 (N00310)     .4006     
+
+(N00435)    5.0000 (N00500)    0.0000 (X_U1.6)     .8747 (X_U1.7)     .4003     
+
+(X_U1.8)     .4003 (X_U1.9)    0.0000 (X_U1.10)    -.5921                       
+
+(X_U1.11)    4.9376                   (X_U1.12)    4.9841                       
+
+(X_U1.13)    -.5702                   (X_U1.14)    -.5865                       
+
+(X_U1.53)    4.0000                   (X_U1.54)    1.0000                       
+
+(X_U1.90)    -.0056                   (X_U1.91)   40.0000                       
+
+(X_U1.92)  -40.0000                   (X_U1.99)    2.5000                   
+
+
+
+
+    VOLTAGE SOURCE CURRENTS
+    NAME         CURRENT
+
+    V_V1        -2.901E-04
+    V_V2         0.000E+00
+    X_U1.vb      8.747E-06
+    X_U1.vc      3.600E-12
+    X_U1.ve     -9.279E-06
+    X_U1.vlim   -5.625E-06
+    X_U1.vlp    -4.001E-11
+    X_U1.vln    -4.000E-11
+
+    TOTAL POWER DISSIPATION   1.46E-03  WATTS
+
+
+
+          JOB CONCLUDED
+
+**** 05/26/16 19:47:30 ****** PSpice Lite (October 2012) ****** ID# 10813 ****
+
+ ** Profile: "SCHEMATIC1-wfea"  [ C:\OrCAD_Projects\Wide_BandPass-PSpiceFiles\SCHEMATIC1\wfea.sim ] 
+
+
+ ****     JOB STATISTICS SUMMARY
+
+
+******************************************************************************
+
+
+
+  Total job time (using Solver 1)   =         .02
+
