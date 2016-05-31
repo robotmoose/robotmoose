@@ -17,22 +17,22 @@
 // Stores an angle in radians between 0 and 2pi
 class angle {
 public:
-    angle();
-    angle(double angle);
-    
-    // Self modifying arithmetic
-    angle & operator+=(const angle & other);
-    angle & operator-=(const angle & other);
-    angle & operator*=(const angle & other);
-    angle & operator/=(const angle & other);
-    
-    operator double() const{
-        return radians;
-    }
-    
+	angle();
+	angle(double angle);
+	
+	// Self modifying arithmetic
+	angle & operator+=(const angle & other);
+	angle & operator-=(const angle & other);
+	angle & operator*=(const angle & other);
+	angle & operator/=(const angle & other);
+	
+	operator double() const{
+		return radians;
+	}
+	
 private:
 
-    double radians;
+	double radians;
 };
 
 #endif

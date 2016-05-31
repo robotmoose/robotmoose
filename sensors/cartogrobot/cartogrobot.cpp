@@ -202,14 +202,14 @@ void slam_backend::read_network(const std::string &read_json)
 			{
 				converted_depth_readings.push_back(depth.ToDouble() / scale);
 			}
-		    
-		    try {
-			    map.update(newLocation, converted_depth_readings);
-		    }
-		    catch(std::exception& error)
-	        {
-		        std::cout<<"Error! "<<error.what()<<std::endl;
-	        }
+			
+			try {
+				map.update(newLocation, converted_depth_readings);
+			}
+			catch(std::exception& error)
+			{
+				std::cout<<"Error! "<<error.what()<<std::endl;
+			}
 		}
 		
 		robotLocation = newLocation;
@@ -240,7 +240,7 @@ double savetime;               // Time of previous movement (sec)
 void drawGrid(const occupancy_grid & map)
 {
 	glPushMatrix();
-    glBegin(GL_QUADS);
+	glBegin(GL_QUADS);
    	for(std::size_t y = map.size(); y > 0; y--)
 	{
 		for(std::size_t x = 0; x < map.size(); x++)
@@ -248,13 +248,13 @@ void drawGrid(const occupancy_grid & map)
 			double weight = 1.0 - map(x,y-1);
 			glColor3f(weight, weight, weight);
 			glVertex2d(-1.0 + x, -1.0 + y);
-		    glVertex2d( 1.0 + x, -1.0 + y);
-		    glVertex2d( 1.0 + x,  1.0 + y);
-		    glVertex2d(-1.0 + x,  1.0 + y);
+			glVertex2d( 1.0 + x, -1.0 + y);
+			glVertex2d( 1.0 + x,  1.0 + y);
+			glVertex2d(-1.0 + x,  1.0 + y);
 		}
 	}
-    glEnd();
-    glPopMatrix();
+	glEnd();
+	glPopMatrix();
 }
 
 // Draws the robot as a simple triangle oriented as the robot is
@@ -265,70 +265,70 @@ void drawRobot(const map_location & robot)
 	double y = robot.get_y();
 	glTranslated(x, y, 0.0);
 	glRotated(robot.get_direction()*180/M_PI, 0.0,0.0,1.0);
-    glBegin(GL_TRIANGLES);
+	glBegin(GL_TRIANGLES);
 		glColor3f(0.4, 0.1, 0.0);
 		glVertex2d(3.0, 0.0);
 		glVertex2d(-3.0, 1.5);
 		glVertex2d(-3.0,  -1.5);
-    glEnd();
-    glPopMatrix();
+	glEnd();
+	glPopMatrix();
 }
 
 
 // Draw window, text, and display occupancy map
 void myDisplay()
 {
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 
-    // Initial transformation
-    glLoadIdentity();
+	// Initial transformation
+	glLoadIdentity();
 
-    // Draw map and robot in a 2x2 square centered at the origin
-    glPushMatrix();
-    glTranslated(-1.0, -1.0, 0.);   // Translate to center our grid
-    glScaled(2.0/(double)map.size(), 2.0/(double)map.size(), 1.0);  // Scale grid to 2x2 square
-    drawGrid(map);
-    drawRobot(robotLocation);
-    glPopMatrix();
+	// Draw map and robot in a 2x2 square centered at the origin
+	glPushMatrix();
+	glTranslated(-1.0, -1.0, 0.);   // Translate to center our grid
+	glScaled(2.0/(double)map.size(), 2.0/(double)map.size(), 1.0);  // Scale grid to 2x2 square
+	drawGrid(map);
+	drawRobot(robotLocation);
+	glPopMatrix();
 
-    // Draw documentation
-    glLoadIdentity();
-    glMatrixMode(GL_PROJECTION);  // Set up simple ortho projection
-    glPushMatrix();
-    glLoadIdentity();
-    gluOrtho2D(-1., 1., -1., 1.);
-    glColor3d(1., 1., 1.);        // Black text
-    BitmapPrinter p(-0.9, 0.9, 0.1);
-    p.print("Esc      Quit");
-    glPopMatrix();                // Restore prev projection
-    glMatrixMode(GL_MODELVIEW);
+	// Draw documentation
+	glLoadIdentity();
+	glMatrixMode(GL_PROJECTION);  // Set up simple ortho projection
+	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D(-1., 1., -1., 1.);
+	glColor3d(1., 1., 1.);        // Black text
+	BitmapPrinter p(-0.9, 0.9, 0.1);
+	p.print("Esc      Quit");
+	glPopMatrix();                // Restore prev projection
+	glMatrixMode(GL_MODELVIEW);
 
-    glutSwapBuffers();
+	glutSwapBuffers();
 }
 
 
 // Idle function pulls sensor data from superstar
 void myIdle()
 {
-    //timing
-    double currtime = glutGet(GLUT_ELAPSED_TIME) / 1000.;
-    double elapsedtime = currtime - savetime;
+	//timing
+	double currtime = glutGet(GLUT_ELAPSED_TIME) / 1000.;
+	double elapsedtime = currtime - savetime;
 
 	if(elapsedtime > 1.0/PULLS_PER_SECOND)
 	{
 		savetime = currtime;
 		// Pull network and redisplay
 		try
-	    {
-		    backend->do_network();
-	    }
-	    catch(std::exception& error)
-	    {
-		    std::cout<<"ERROR! "<<error.what()<<std::endl;
-		    exit(1);
-	    }
-	    
+		{
+			backend->do_network();
+		}
+		catch(std::exception& error)
+		{
+			std::cout<<"ERROR! "<<error.what()<<std::endl;
+			exit(1);
+		}
+		
 		glutPostRedisplay();
 	}
 }
@@ -337,12 +337,12 @@ void myIdle()
 // GLUT keyboard function
 void myKeyboard(unsigned char key, int x, int y)
 {
-    switch (key)
-    {
-    case ESCKEY:  //esc: quit
-        exit(0);
-        break;
-    }
+	switch (key)
+	{
+	case ESCKEY:  //esc: quit
+		exit(0);
+		break;
+	}
 }
 
 
@@ -352,31 +352,31 @@ void init()
 	//init opengl
 	int i = 0;
 	char * c;
-    glutInit(&i,&c);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+	glutInit(&i,&c);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 
-    //generate window
-    glutInitWindowSize(START_WIN_SIZE, START_WIN_SIZE);
-    glutInitWindowPosition(50, 50);
-    glutCreateWindow("Robot Mapping");	
+	//generate window
+	glutInitWindowSize(START_WIN_SIZE, START_WIN_SIZE);
+	glutInitWindowPosition(50, 50);
+	glutCreateWindow("Robot Mapping");	
 	
-    //timing
-    savetime = glutGet(GLUT_ELAPSED_TIME) / 1000.;
+	//timing
+	savetime = glutGet(GLUT_ELAPSED_TIME) / 1000.;
 
-    //transformation stuff
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D(-1., 1., -1., 1.);
+	//transformation stuff
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(-1., 1., -1., 1.);
 
-    //return to model/view mode
-    glMatrixMode(GL_MODELVIEW);
-    
-    glutDisplayFunc(myDisplay);
-    glutIdleFunc(myIdle);
-    glutKeyboardFunc(myKeyboard);
+	//return to model/view mode
+	glMatrixMode(GL_MODELVIEW);
+	
+	glutDisplayFunc(myDisplay);
+	glutIdleFunc(myIdle);
+	glutKeyboardFunc(myKeyboard);
 
-    //the loop
-    glutMainLoop();
+	//the loop
+	glutMainLoop();
 }
 
 /* MAIN */

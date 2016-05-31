@@ -37,46 +37,46 @@ class BitmapPrinter {
 // ***** BitmapPrinter: public functions *****
 public:
 
-    // Ctor (0, 1, 2, or 3 params)
-    // Set cursx, cursy, lineht to the given values.
-    BitmapPrinter(double theCursx = 0.,
-                  double theCursy = 0.,
-                  double theLineht = 0.1)
-    { setup(theCursx, theCursy, theLineht); }
+	// Ctor (0, 1, 2, or 3 params)
+	// Set cursx, cursy, lineht to the given values.
+	BitmapPrinter(double theCursx = 0.,
+				  double theCursy = 0.,
+				  double theLineht = 0.1)
+	{ setup(theCursx, theCursy, theLineht); }
 
-    // Compiler-generated copy ctor, copy =, dctor used
+	// Compiler-generated copy ctor, copy =, dctor used
 
-    // setup
-    // Set cursx, cursy, lineht to the given values.
-    void setup(double theCursx,
-               double theCursy,
-               double theLineht = 0.1)
-    { cursx = theCursx; cursy = theCursy; lineht = theLineht; }
+	// setup
+	// Set cursx, cursy, lineht to the given values.
+	void setup(double theCursx,
+			   double theCursy,
+			   double theLineht = 0.1)
+	{ cursx = theCursx; cursy = theCursy; lineht = theLineht; }
 
-    // print
-    // Draw the given string, using glutBitmapCharacter, with GLUT's
-    // 9x15 font, at cursx, cursy, and then reduce cursy by lineht
-    // (i.e., move to the next line).
-    //
-    // The model/view transformation should probably be the identity
-    // (or just translations) when calling this function.
-    void print(const std::string & msg)
-    {
-        glRasterPos2d(cursx, cursy);
-        for (std::string::const_iterator ii = msg.begin();
-             ii != msg.end();
-             ++ii)
-        {
-            glutBitmapCharacter(GLUT_BITMAP_9_BY_15, *ii);
-        }
-        cursy -= lineht;
-    }
+	// print
+	// Draw the given string, using glutBitmapCharacter, with GLUT's
+	// 9x15 font, at cursx, cursy, and then reduce cursy by lineht
+	// (i.e., move to the next line).
+	//
+	// The model/view transformation should probably be the identity
+	// (or just translations) when calling this function.
+	void print(const std::string & msg)
+	{
+		glRasterPos2d(cursx, cursy);
+		for (std::string::const_iterator ii = msg.begin();
+			 ii != msg.end();
+			 ++ii)
+		{
+			glutBitmapCharacter(GLUT_BITMAP_9_BY_15, *ii);
+		}
+		cursy -= lineht;
+	}
 
 // ***** BitmapPrinter: data members *****
 private:
 
-    double cursx, cursy;  // Raster pos for next text line: x, y
-    double lineht;        // How much to reduce cursy each line
+	double cursx, cursy;  // Raster pos for next text line: x, y
+	double lineht;        // How much to reduce cursy each line
 
 };  // End class BitmapPrinter
 

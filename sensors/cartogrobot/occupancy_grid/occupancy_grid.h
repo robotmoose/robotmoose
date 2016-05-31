@@ -21,7 +21,7 @@ class occupancy_grid
 		typedef double probability;
 		
 		occupancy_grid(std::size_t size = 100, probability p_0 = 0.5, probability p_free = 0.2,
-		    probability p_occ = 0.8, log_probability l_max = 10.0);
+			probability p_occ = 0.8, log_probability l_max = 10.0);
 		
 		void update(const map_location & xt, const std::vector<double> & zt);
 		
