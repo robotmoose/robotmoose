@@ -1,0 +1,44 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/serial/serial.h
+limits
+-
+vector
+-
+string
+-
+cstring
+-
+sstream
+-
+exception
+-
+stdexcept
+-
+serial/v8stdint.h
+-
+
+../include/serial/v8stdint.h
+stddef.h
+-
+stdio.h
+-
+stdint.h
+-
+
+/home/ryker/Documents/GitHub/robotmoose/sensors/sound_localize/software/Sound_Interface.cpp
+string
+-
+cstdint
+-
+iostream
+-
+serial/serial.h
+/home/ryker/Documents/GitHub/robotmoose/sensors/sound_localize/software/serial/serial.h
+
