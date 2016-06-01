@@ -17,8 +17,10 @@ include_directories(include)
 set(serial_SRCS src/serial.cc include/serial/serial.h include/serial/v8stdint.h)
 if(UNIX)
     list(APPEND serial_SRCS src/impl/unix.cc)
+    list(APPEND serial_SRCS src/impl/list_ports/list_ports_linux.cc)
 else()
     list(APPEND serial_SRCS src/impl/win.cc)
+    list(APPEND serial_SRCS src/impl/list_ports/list_ports_win.cc)
 endif()
 
 ## Add serial library
