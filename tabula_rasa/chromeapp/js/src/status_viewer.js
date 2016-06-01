@@ -37,8 +37,6 @@ status_viewer_t.prototype.show=function(message)
 		this.lines.push(message);
 }
 
-
-
 status_viewer_t.prototype.rebuild_textarea_m=function()
 {
 	var old_lines=this.textarea.value;

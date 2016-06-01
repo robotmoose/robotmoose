@@ -1,6 +1,7 @@
-function new_div(el)
+function new_div(el, id)
 {
 	var div=document.createElement("div");
+    if(el) div.id = id;
 	el.appendChild(div);
 	clear_margin_padding(div);
 	return div;
@@ -45,6 +46,16 @@ function new_textarea(el)
 	maximize(textarea);
 
 	return textarea;
+}
+
+function new_status_div(el, id, status_height){
+    var div = new_div(el, id);
+    div.style.width = "100%";
+    div.style.height = status_height;
+	div.style.boxSizing="border-box";
+	div.style["-webkit-box-sizing"]="border-box";
+	div.style["-moz-box-sizing"]="border-box";
+    div.style.border = "1px solid black";
 }
 
 function clear_margin_padding(el)
