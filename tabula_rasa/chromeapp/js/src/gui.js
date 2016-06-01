@@ -2,21 +2,29 @@ function gui_t(div)
 {
 	if(!div)
 		return null;
+    
+    var status_view_div = $("<div></div>")[0];
+    status_view_div.id="status_view";
+    maximize(status_view_div);
+    var gruveo_div = $("<div></div>")[0];
+    gruveo_div.id="gruveo_div";
+    maximize(gruveo_div);
 
-	this.div=div;
-	this.el=new_div(this.div);
-	maximize(this.el);
-
-	this.layout=new_table(this.el,3,1);
-	maximize(this.layout);
-
-	this.top_bar=new_table(this.layout.rows[0].cells[0],1,2);
-	this.layout.rows[1].cells[0].style.height="100%";
+    $(function(){
+        var pstyle = 'background-color: #F5F6F7; border: 1px solid #dfdfdf; padding: 5px;';
+        $('#content').w2layout({
+            name: 'app_layout',
+            panels:[
+                {type: 'main', resizable:true, content: gruveo_div},
+                {type: 'right', resizable:true, content: status_view_div, size: "25%"}
+            ]
+        });
+    });
 
 	this.gruveo=document.getElementById("gruveo");
-	this.layout.rows[1].cells[0].appendChild(gruveo);
+    gruveo_div.appendChild(gruveo);
 
-	gruveo.addEventListener('permissionrequest',
+	this.gruveo.addEventListener('permissionrequest',
 	function(e)
 	{
 		if(e.permission==='media')
@@ -36,7 +44,7 @@ function gui_t(div)
 
 	this.name=new name_t
 	(
-		this.top_bar.rows[0].cells[0],
+        status_view_div,
 		function(message){_this.status_viewer.show(message);},
 		function(robot)
 		{
@@ -50,13 +58,19 @@ function gui_t(div)
 
 	this.serial_selector=new serial_selector_t
 	(
-		this.top_bar.rows[0].cells[1],
+        status_view_div,
 		function(port_name){_this.connection.gui_connect(port_name);},
 		function(port_name){_this.connection.gui_disconnect(port_name);},
-		function(){return (_this.name.get_robot().school!=null&&_this.name.get_robot().name!=null);}
+		function(){
+            console.log(_this.name.get_robot());
+            return (_this.name.get_robot().school!=null
+                    &&_this.name.get_robot().name!=null
+                    &&_this.name.get_robot().year!=null);
+        }
 	);
 
-	this.status_viewer=new status_viewer_t(this.layout.rows[2].cells[0]);
+	this.status_viewer=new status_viewer_t(status_view_div);
+
 }
 
 gui_t.prototype.destroy=function()

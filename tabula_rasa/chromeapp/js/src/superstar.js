@@ -19,7 +19,7 @@ function superstar_error(user_errorhandler,why_string)
 // Generic string-in string-out network communication code.
 function superstar_generic(robot,path_and_request,on_success,on_error)
 {
-	var url="http://"+robot.superstar+"/superstar/"+robot.school+"/"+robot.name+"/"+path_and_request;
+	var url="http://"+robot.superstar+"/superstar/robots/"+robot.year+"/"+robot.school+"/"+robot.name+"/"+path_and_request;
 
 	try
 	{

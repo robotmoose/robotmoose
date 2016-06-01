@@ -35,7 +35,9 @@
 				"js/src/status_viewer.js",
 				"js/src/superstar.js",
 				"js/src/vector.js",
-				"js/src/window.js"
+				"js/src/window.js",
+                "js/include/jquery.min.js",
+                "js/include/w2ui-1.4.3.min.js"
 			]
 		}
 	},

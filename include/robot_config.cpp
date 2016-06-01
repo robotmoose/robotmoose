@@ -8,7 +8,7 @@
 
 robot_config_t::robot_config_t()
 {
-	keys_m["robot"]="test/demo";                 // superstar robot name
+	keys_m["robot"]="0/test/demo";                 // superstar robot name
 	keys_m["superstar"]="http://robotmoose.com"; // superstar server
 	keys_m["baudrate"]="57600";                  // serial comms to Arduino
 	keys_m["motors"]="";                         // Arduino firmware device name
@@ -123,7 +123,7 @@ void robot_config_t::validate()
 		if(keys_m["robot"][ii]=='/')
 			++slashes;
 
-	if(slashes!=1)
+	if(slashes!=2)
 		throw std::runtime_error("Invalid robot name \""+keys_m["robot"]+"\" - should be in the format \"school/name\".");
 }
 

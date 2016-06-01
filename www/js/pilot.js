@@ -103,7 +103,7 @@ function robot_name() {
 
 // Send this command off to superstar:
 function superstar_send(starpath,starcmd,callback) {
-	var url_start="/superstar/"; // absolute URL
+	var url_start="/superstar/robots/"; // absolute URL
 	var url=url_start+starpath+starcmd
 
 	var xmlhttp=new XMLHttpRequest();
