@@ -36,7 +36,7 @@ dropdown_t.prototype.size=function()
 dropdown_t.prototype.enable=function()
 {
 	this.disabled=this.select.disabled=false;
-    this.set_backgrond_color("cyan");
+    this.set_background_color("cyan");
 }
 
 dropdown_t.prototype.disable=function()
