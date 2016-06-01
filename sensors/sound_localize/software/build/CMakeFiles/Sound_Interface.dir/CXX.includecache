@@ -39,6 +39,10 @@ cstdint
 -
 iostream
 -
+vector
+-
 serial/serial.h
 /home/ryker/Documents/GitHub/robotmoose/sensors/sound_localize/software/serial/serial.h
+cstdio
+-
 

@@ -148,6 +148,30 @@ Sound_Interface.cpp.s:
 	$(MAKE) -f CMakeFiles/Sound_Interface.dir/build.make CMakeFiles/Sound_Interface.dir/Sound_Interface.cpp.s
 .PHONY : Sound_Interface.cpp.s
 
+src/impl/list_ports/list_ports_linux.o: src/impl/list_ports/list_ports_linux.cc.o
+.PHONY : src/impl/list_ports/list_ports_linux.o
+
+# target to build an object file
+src/impl/list_ports/list_ports_linux.cc.o:
+	$(MAKE) -f CMakeFiles/serial.dir/build.make CMakeFiles/serial.dir/src/impl/list_ports/list_ports_linux.cc.o
+.PHONY : src/impl/list_ports/list_ports_linux.cc.o
+
+src/impl/list_ports/list_ports_linux.i: src/impl/list_ports/list_ports_linux.cc.i
+.PHONY : src/impl/list_ports/list_ports_linux.i
+
+# target to preprocess a source file
+src/impl/list_ports/list_ports_linux.cc.i:
+	$(MAKE) -f CMakeFiles/serial.dir/build.make CMakeFiles/serial.dir/src/impl/list_ports/list_ports_linux.cc.i
+.PHONY : src/impl/list_ports/list_ports_linux.cc.i
+
+src/impl/list_ports/list_ports_linux.s: src/impl/list_ports/list_ports_linux.cc.s
+.PHONY : src/impl/list_ports/list_ports_linux.s
+
+# target to generate assembly for a file
+src/impl/list_ports/list_ports_linux.cc.s:
+	$(MAKE) -f CMakeFiles/serial.dir/build.make CMakeFiles/serial.dir/src/impl/list_ports/list_ports_linux.cc.s
+.PHONY : src/impl/list_ports/list_ports_linux.cc.s
+
 src/impl/unix.o: src/impl/unix.cc.o
 .PHONY : src/impl/unix.o
 
@@ -209,6 +233,9 @@ help:
 	@echo "... Sound_Interface.o"
 	@echo "... Sound_Interface.i"
 	@echo "... Sound_Interface.s"
+	@echo "... src/impl/list_ports/list_ports_linux.o"
+	@echo "... src/impl/list_ports/list_ports_linux.i"
+	@echo "... src/impl/list_ports/list_ports_linux.s"
 	@echo "... src/impl/unix.o"
 	@echo "... src/impl/unix.i"
 	@echo "... src/impl/unix.s"
