@@ -82,7 +82,7 @@ function superstar_set(path,element,newObject,onFinished,auth)
 */
 function superstar_get(path,element,onFinished,onError)
 {
-	send_request("GET", "/superstar/"+path, element,
+	send_request("GET", "/superstar/robots/"+path, element,
 		"?get",
 		function(replyData) { // reply OK
 

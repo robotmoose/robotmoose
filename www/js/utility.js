@@ -31,3 +31,8 @@ function get_time()
 {
 	return (new Date).getTime();
 }
+
+function get_select_value(select)
+{
+	return select.options[select.selectedIndex].text
+}
