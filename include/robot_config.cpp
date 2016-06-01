@@ -123,7 +123,7 @@ void robot_config_t::validate()
 		if(keys_m["robot"][ii]=='/')
 			++slashes;
 
-	if(slashes!=1)
+	if(slashes!=2)
 		throw std::runtime_error("Invalid robot name \""+keys_m["robot"]+"\" - should be in the format \"school/name\".");
 }
 
