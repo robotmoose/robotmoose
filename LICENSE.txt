@@ -1,0 +1,6 @@
+The RobotMoose software and hardware here is public domain:
+you may copy, modify, and distribute it in any way you like.
+
+Some components in the include/ directory have their own licenses,
+including Mongoose, SOIL, and uriparser.
+
