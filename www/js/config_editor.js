@@ -90,12 +90,12 @@ function config_editor_t(div)
 
 config_editor_t.prototype.download=function(robot)
 {
-	if(!robot||!robot.name)
+	if(!robot)
 		return;
 
 	var myself=this;
 
-	superstar_get(robot.name,"options",function(options)
+	superstar_get(robot,"options",function(options)
 	{
 		myself.get_options_m(options);
 		myself.download_m(robot);
@@ -104,7 +104,7 @@ config_editor_t.prototype.download=function(robot)
 
 config_editor_t.prototype.upload=function(robot)
 {
-	if(!robot||!robot.name)
+	if(!robot)
 		return;
 
 	this.get_entries();
@@ -139,7 +139,7 @@ config_editor_t.prototype.upload=function(robot)
 		}
 	}
 
-	superstar_set(robot.name,"config",data,null,robot.auth);
+	superstar_set(robot,"config",data);
 }
 
 config_editor_t.prototype.get_entries=function()
@@ -188,7 +188,7 @@ config_editor_t.prototype.remove_entry=function(entry)
 
 config_editor_t.prototype.download_m=function(robot)
 {
-	if(!robot||!robot.name)
+	if(!robot)
 		return;
 
 	var myself=this;
@@ -198,7 +198,7 @@ config_editor_t.prototype.download_m=function(robot)
 
 	this.entries=[];
 
-	superstar_get(robot.name,"config",function(obj)
+	superstar_get(robot,"config",function(obj)
 	{
 		if(obj==null) { // backend not connected, make fake config object
 			obj={counter:0};

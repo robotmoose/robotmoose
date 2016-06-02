@@ -15,6 +15,8 @@ function robot_ui_t(div)
 	this.div=div;
 	this.robot=
 	{
+		year:null,
+		school:null,
 		name:null,
 		auth:null
 	};
@@ -35,15 +37,16 @@ function robot_ui_t(div)
 
 	this.create_gui();
 
-	var options=parse_uri(location.search);
 	var myself=this;
-
+	var options=parse_uri(location.search);
 	validate_robot_name(options.robot,
-		function()
+		// good robot:
+		function(robot)
 		{
-			myself.robot.name=options.robot;
-			myself.connect_menu.onconnect(myself.robot.name,myself.robot.auth);
+			console.log("Connecting to URL robot "+JSON.stringify(robot));
+			myself.connect_menu.onconnect(robot);
 		},
+		// bad robot:
 		function()
 		{
 			myself.connect_menu.show();
@@ -67,15 +70,13 @@ robot_ui_t.prototype.create_menus=function()
 		"Connect to a new robot over the network"
 	);
 
-	this.connect_menu.onconnect=function(robot_name,robot_auth)
+	this.connect_menu.onconnect=function(robot)
 	{
-		if(robot_name)
+		if(robot)
 		{
-			myself.robot.name=null;
+			myself.robot=JSON.parse(JSON.stringify(robot));
 			clearInterval(myself.gui.interval);
 			myself.gui.interval=null;
-			myself.robot.name=robot_name;
-			myself.robot.auth=robot_auth;
 			myself.menu.get_status_area().innerHTML="Connected to \""+myself.robot.name+"\"";
 
 			myself.download_gui();
@@ -143,7 +144,7 @@ robot_ui_t.prototype.download_gui=function()
 			div.removeChild(div.firstChild);
 	}
 
-	superstar_get(this.robot.name,"gui",function(json)
+	superstar_get(this.robot,"gui",function(json)
 	{
 		myself.doorways=
 		{
@@ -185,7 +186,7 @@ robot_ui_t.prototype.run_interval=function() {
 	if (myself.sensor_data_count<2)
 	{ // request more sensor data
 		this.sensor_data_count++;
-		superstar_get(this.robot.name,"sensors",
+		superstar_get(this.robot,"sensors",
 			function(sensors) // sensor data has arrived:
 			{
 				myself.sensor_data_count--;
@@ -210,7 +211,7 @@ robot_ui_t.prototype.upload_gui=function()
 
 	if(this.robot&&this.robot.name&&this.gui.old!=stringified)
 	{
-		superstar_set(this.robot.name,"gui",save,null,this.robot.auth);
+		superstar_set(this.robot,"gui",save);
 		this.gui.old=stringified;
 	}
 }

@@ -347,22 +347,12 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 // It's not clear a pilot needs to download data, but it's easy:
 pilot_interface_t.prototype.download=function(robot)
 {
-	superstar_get(robot.name,"pilot",function(newPilot) { this.pilot=newPilot; });
+	superstar_get(robot,"pilot",function(newPilot) { this.pilot=newPilot; });
 }
 
 pilot_interface_t.prototype.upload=function(robot)
-{
-	if(robot.auth) //We have a password 
-	{
-		var pilot_str = JSON.stringify(this.pilot);
-		console.log(pilot_str);
-		var sent_auth = getAuthCode(robot.auth,robot.name+"/pilot",pilot_str,0);
-		console.log(sent_auth);
-		superstar_set(robot.name,"pilot",this.pilot,null,sent_auth);
-
-	}
-	else
-		superstar_set(robot.name,"pilot",this.pilot,null,robot.auth);
+{	
+	superstar_set(robot,"pilot",this.pilot);
 }
 
 // This is a simple placeholder, to get things working for now:

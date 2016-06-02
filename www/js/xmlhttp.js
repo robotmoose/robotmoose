@@ -1,7 +1,7 @@
 /**
-  Network communication with superstar server.
+  Network communication with generic web server.
 
-  FIXME: Raise level of abstraction here, by adding something like superstar_get and/or superstar_set
+  (Superstar-specific communication is now in superstar.js, so this file is unused)
 */
 
 /// Bare XMLHttpRequest wrapper
@@ -57,64 +57,4 @@ function send_request(method,path,request,uri,on_reply,on_error,data,content_typ
 		}
 	}
 }
-
-/**
- Use superstar to set path/element=newObject
- and then call onFinished.
-*/
-function superstar_set(path,element,newObject,onFinished,auth)
-{
-	send_request("GET", "/superstar/"+path, element,
-		"?set=" + encodeURIComponent(JSON.stringify(newObject)),
-		function(replyData) { // reply OK
-			if (onFinished) onFinished(replyData);
-		},
-		undefined, // error function
-		undefined, // post data
-		"application/json"
-	);
-}
-
-
-/**
- Use superstar to get path/element,
- and pass the returned object to onFinished.
-*/
-function superstar_get(path,element,onFinished,onError)
-{
-	send_request("GET", "/superstar/robots/"+path, element,
-		"?get",
-		function(replyData) { // reply OK
-
-			var replyObj=null;
-			if(replyData)
-				replyObj=JSON.parse(replyData); // fixme: try/catch here
-			onFinished(replyObj);
-		},
-		function(){if(onError)onError();}, // error function
-		undefined, // post data
-		"application/json"
-	);
-}
-
-/**
- Use superstar to get sub elements of path,
- and pass the returned object to onFinished.
-*/
-function superstar_sub(path,onFinished)
-{
-	send_request("GET", "/superstar/"+path, ".",
-		"?sub",
-		function(replyData) { // reply OK
-			var replyObj=null;
-			if(replyData)
-				replyObj=JSON.parse(replyData); // fixme: try/catch here
-			onFinished(replyObj);
-		},
-		undefined, // error function
-		undefined, // post data
-		"application/json"
-	);
-}
-
 

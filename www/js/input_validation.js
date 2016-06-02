@@ -158,33 +158,46 @@ function skip_whitespace(str,col,line)
 }
 
 function validate_robot_name(robot_name,on_ok,on_notok)
-{
+{	
 	if(robot_name)
 	{
 		var split=robot_name.split("/");
 
-		if(split.length==2)
+		if(split.length==3)
 		{
-			var school=split[0];
-			var robot=split[1];
+			var year=split[0];
+			var school=split[1];
+			var name=split[2];
 
-			superstar_sub("/superstar/.",
-				function(obj)
-				{
-					if(array_find(obj,school))
-						superstar_sub("/superstar/"+school,
-							function(obj)
-							{
-								if(array_find(obj,robot))
-									if(on_ok)
-										on_ok();
-							});
-				});
-
-			return;
+			var name_in_path=function(path, name, foundit) {
+				superstar_sub(null,path, 
+					function(list) {
+						if (array_find(list,name)>=0) foundit();
+						else {
+							if(on_notok)
+								on_notok();
+						}
+					}
+				);
+			}
+			
+			name_in_path("",year, function() {
+				name_in_path(year,school, function() {
+					name_in_path(year+"/"+school,name, function() {
+						if(on_ok) {
+							var robot={};
+							robot.year=year;
+							robot.school=school;
+							robot.name=name;
+							on_ok(robot);
+						}
+					})
+				})
+			});
 		}
 	}
-
-	if(on_notok)
-		on_notok();
+	else {
+		if(on_notok)
+			on_notok();
+	}
 }

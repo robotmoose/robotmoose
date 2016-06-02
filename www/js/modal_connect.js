@@ -56,12 +56,15 @@ function modal_connect_t(div)
 	this.connect_button.value="Connect";
 	this.connect_button.onclick=function()
 	{
+		var robot={};
+		robot.superstar=null; // <- means "same server as this page"
+		robot.year=get_select_value(myself.year_select);
+		robot.school=get_select_value(myself.school_select);
+		robot.name=get_select_value(myself.robot_select);
+		robot.auth=myself.robot_auth.value;
 		if(myself.onconnect)
-			myself.onconnect(
-				get_select_value(myself.year_select)+
-				"/"+get_select_value(myself.school_select)+
-				"/"+get_select_value(myself.robot_select),myself.robot_auth.value);
-
+			myself.onconnect(robot);
+		
 		myself.hide();
 	};
 	this.modal.get_footer().appendChild(this.connect_button);
@@ -79,11 +82,10 @@ modal_connect_t.prototype.show=function()
 
 	try
 	{
-		send_request("GET",this.superstar_root,".","?sub",
-			function(response)
+		superstar_sub(null,"",
+			function(year_list)
 			{
-				myself.years=[];
-				myself.years=JSON.parse(response);
+				myself.years=year_list;
 				myself.schools=[];
 				myself.robots=[];
 				myself.build_year_list_m();
@@ -94,8 +96,7 @@ modal_connect_t.prototype.show=function()
 			function(error)
 			{
 				throw error;
-			},
-			"application/json");
+			});
 	}
 	catch(error)
 	{
@@ -145,11 +146,11 @@ modal_connect_t.prototype.build_school_list_m=function()
 		this.update_disables_m();
 
 		if(this.year_select.selectedIndex!=0)
-			send_request("GET",this.superstar_root,get_select_value(this.year_select),"?sub",
-				function(response)
+		
+			superstar_sub(null,get_select_value(this.year_select),
+				function(school_list)
 				{
-					console.log(response);
-					myself.schools=JSON.parse(response);
+					myself.schools=school_list;
 
 					for(var key in myself.schools)
 					{
@@ -163,8 +164,7 @@ modal_connect_t.prototype.build_school_list_m=function()
 				function(error)
 				{
 					throw error;
-				},
-				"application/json");
+				});
 	}
 	catch(error)
 	{
@@ -189,10 +189,10 @@ modal_connect_t.prototype.build_robot_list_m=function()
 		this.update_disables_m();
 
 		if(this.school_select.selectedIndex!=0)
-			send_request("GET",this.superstar_root+"/"+get_select_value(this.year_select),get_select_value(this.school_select),"?sub",
-				function(response)
+			superstar_sub(null,get_select_value(this.year_select)+"/"+get_select_value(this.school_select),
+				function(robot_list)
 				{
-					myself.robots=JSON.parse(response);
+					myself.robots=robot_list;
 
 					for(var key in myself.robots)
 					{

@@ -17,8 +17,7 @@ function state_table_t(doorway)
 	var _this=this;
 	this.old_time=get_time();
 	this.old_last_experiment="HelloWorld";
-	this.old_robot_name=null;
-	this.old_robot_auth=null;
+	this.old_robot=null;
 	this.doorway=doorway;
 	this.overwrite_modal=new modal_yesno_t(this.doorway.parent_div,"Warning","");
 	this.div=doorway.content;
@@ -145,7 +144,7 @@ function state_table_t(doorway)
 			_this.set_autosave(false);
 			_this.autosave_m();
 			var experiment=_this.createnew.name.value;
-			var old_robot={name:_this.old_robot_name,auth:_this.old_robot_auth};
+			var old_robot=JSON.parse(JSON.stringify(_this.old_robot));
 			_this.clear();
 			_this.upload(old_robot,function()
 			{
@@ -198,7 +197,7 @@ state_table_t.prototype.download_with_check=function(robot,skip_get_active,ondow
 	//Autosave...make this not necessary
 	/*if(_this.last_experiment.length>0)
 	{
-		superstar_get(robot.name+"/experiments/"+encodeURIComponent(_this.last_experiment),"code",
+		superstar_get(robot,"/experiments/"+encodeURIComponent(_this.last_experiment)+"/code",
 			function(obj)
 			{
 				if(JSON.stringify(obj)!=JSON.stringify(_this.get_states()))
@@ -231,8 +230,7 @@ state_table_t.prototype.download_with_check=function(robot,skip_get_active,ondow
 
 state_table_t.prototype.download=function(robot,skip_get_active,callback)
 {
-	this.old_robot_name=robot.name;
-	this.old_robot_auth=robot.auth;
+	this.old_robot=JSON.parse(JSON.stringify(robot));
 
 	this.clear();
 
@@ -247,7 +245,7 @@ state_table_t.prototype.download=function(robot,skip_get_active,callback)
 	}
 	else
 	{
-		superstar_get(robot.name,"active_experiment",function(obj)
+		superstar_get(robot,"active_experiment",function(obj)
 		{
 			if(obj&&obj.length>0)
 			{
@@ -271,10 +269,12 @@ state_table_t.prototype.download_experiments=function()
 	if(this)
 	{
 		var _this=this;
-		if(this.old_robot_name)
+		if(this.old_robot)
 		{
-			superstar_sub(this.old_robot_name+"/experiments",function(experiments)
+			superstar_sub(this.old_robot,"/experiments",function(experiments)
 			{
+				for (k in experiments) experiments[k]=decodeURIComponent(experiments[k]);
+				
 				experiments=remove_duplicates(experiments);
 				_this.old_experiments_list=experiments;
 				var old_value=_this.last_experiment;
@@ -317,12 +317,12 @@ state_table_t.prototype.download_experiments=function()
 
 state_table_t.prototype.upload_with_check=function(robot,onupload)
 {
-	if(!robot||!robot.name)
+	if(!robot)
 		return;
 
 	var _this=this;
 
-	superstar_get(robot.name+"/experiments/"+encodeURIComponent(this.get_experiment_name()),"code",
+	superstar_get(robot,"/experiments/"+encodeURIComponent(this.get_experiment_name())+"/code",
 		function(obj)
 		{
 			if(_this.last_experiment&&obj&&obj.length>0&&_this.last_experiment!=_this.get_experiment_name())
@@ -348,7 +348,7 @@ state_table_t.prototype.get_experiment_name=function()
 
 state_table_t.prototype.upload=function(robot,onupload,experiment)
 {
-	if(!robot||!robot.name)
+	if(!robot)
 		return;
 
 	var _this=this;
@@ -359,21 +359,19 @@ state_table_t.prototype.upload=function(robot,onupload,experiment)
 	var new_hash=this.calc_save_hash_m(robot,experiment,this.get_states());
 
 	if(new_hash!=this.last_save_hash)
-		superstar_set(robot.name+"/experiments/"+encodeURIComponent(experiment),"code",this.get_states(),
-			function(obj)
+		superstar_set(robot,"/experiments/"+encodeURIComponent(experiment)+"/code",this.get_states(),
+			function()
 			{
-				superstar_set(robot.name,"active_experiment",encodeURIComponent(experiment),
-					function(obj)
+				superstar_set(robot,"active_experiment",experiment,
+					function()
 					{
 						_this.last_save_hash=new_hash;
 						_this.last_experiment=experiment;
 
 						if(onupload)
 							onupload();
-					},
-					robot.auth);
-			},
-			robot.auth);
+					});
+			});
 }
 
 state_table_t.prototype.get_states=function()
@@ -628,7 +626,7 @@ state_table_t.prototype.download_m=function(robot,callback)
 {
 	var _this=this;
 
-	superstar_get(robot.name+"/experiments/"+encodeURIComponent(this.last_experiment),"code",function(obj)
+	superstar_get(robot,"/experiments/"+encodeURIComponent(this.last_experiment)+"/code",function(obj)
 	{
 		if(obj&&obj.length>0)
 			for(var key in obj)
@@ -669,12 +667,11 @@ state_table_t.prototype.load_button_pressed_m=function()
 	var _this=this;
 	this.onstop_m();
 	this.clear_error();
-	var old_robot={name:_this.old_robot_name,auth:_this.old_robot_auth};
 
-	this.download_with_check(old_robot,true,
+	this.download_with_check(_this.old_robot,true,
 		function()
 		{
-			_this.upload(old_robot);
+			_this.upload(_this.old_robot);
 		});
 
 }
@@ -956,8 +953,7 @@ state_table_t.prototype.autosave_m=function(force)
 
 	if(force||this.old_last_experiment==this.last_experiment&&(time-this.old_time)>this.autosave_time_interval)
 	{
-		var old_robot={name:this.old_robot_name,auth:this.old_robot_auth};
-		this.upload(old_robot);
+		this.upload(this.old_robot);
 		this.old_time=time;
 	}
 }
