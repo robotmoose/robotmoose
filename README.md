@@ -4,7 +4,7 @@ This is a simple, modern version of a networked robotics stack, built around the
 
 * A web **front end** for user friendly robot setup, teleoperation, and programming.  See www/js for the code, which is built in JavaScript on bootstrap.
 * A central JSON server called **superstar**, used by the robot to make its sensor values available to the front end (as /superstar/*robotname*/sensors), used the by the front end to post robot commands (at /superstar/*robotname*/robots), and used for persistent storage as well.  See superstar/ for the code, which is built in C++ on Mongoose, but the HTTP get and set commands can be sent from any language, and is conceptually similar to MongoDB.
-* An on-robot **back end**, that relays superstar commands to the robot hardware, and keeps track of the robot location.  See tabula_rasa/ for a C++ version.
+* An on-robot **back end**, that relays superstar commands to the robot hardware, and keeps track of the robot location.  See tabula_rasa/chromeapp for an easy to use RobotMoose chrome app GUI; or tabula_rasa/ for a command line C++ backend.
 * A runtime configurable Arduino **firmware**, which allows new robot hardware to be added at runtime without re-flashing or editing the code.
 
 The typical usage model puts the front end on the robot pilot's web browser, superstar on a cloud server accessible from anywhere, the backend on a laptop onboard the robot, and the Arduino directly wired into the robot hardware.  But you can run all the software on a single low-end laptop for a network-free version, or use a dedicated superstar on a closed network, or many other permutations.
@@ -25,7 +25,7 @@ The easy way to get started is to connect a **simulated** robot backend to our r
 ```
 cd ~/robotmoose/tabula_rasa
 make
-./backend --robot test/yourbot --sim
+./backend --robot 2016/test/yourbot --sim
 ```
 
 You should immediately be able to pilot the simulated robot by choosing your robot at http://robotmoose.com/robots/
@@ -50,11 +50,12 @@ make uno
 ```
 You can doublecheck the installation by opening the Arduino as a serial port at 57600 baud, and you should get a welcome message.
 
+
 Now run the backend again, but leave off the "--sim" argument, and the backend will connect to the Arduino and configure it:
 ```
 cd ~/robotmoose/tabula_rasa
 make
-./backend --robot test/yourbot
+./backend --robot 2016/test/yourbot
 ```
 
 You can now use the web interface to configure and pilot your robot!
@@ -67,7 +68,7 @@ You access the main robot web interface at [http://robotmoose.com/robots/](http:
 * Check the "Sensors" tab to see the data sent back by your robot.  The "heartbeat" is a number that counts up from 0 to 255 again and again, so you can see the Arduino is connected.  The "location" is a guess of the position of the robot, and is updated as the robot moves.
 
 There are many options for robot driving hardware (tabula_rasa/arduino/motor_controller.cpp) supported by this system.  Once you configure any of these robot motors, the "Drive" tab will gain a set of arrows allowing you to drive the robot!
-* "create2" is a serial connection to an iRobot Create 2 or 500/600 series Roomba.  When you press "Configure", you may need to press the Roomba's power button to wake up the Roomba, or the Arduino will sit waiting for the Roomba to connect.
+* "create2" is a serial connection to an iRobot Create 2 or 500/600 series Roomba.  Arduino Pin 2 should be wired into the serial port wakeup line (otherwise when you press "Configure", you may need to press the Roomba's power button to wake up the Roomba, or the Arduino will sit waiting for the Roomba to connect).
 * "bts" represents two BTS 7960B motor controllers, used to drive the left and right wheels of your robot.  There are four pins listed, two PWM pins for each motor.  (Tie the BTS's VCC and EN lines to Arduino 5V, and the GND line to Arduino ground.  You can leave the IS pins unconnected.)
 * "sabertooth2" is a Dimension Engineering SaberTooth dual motor controller, version 2.  You set the serial port that sends serial commands to this device.  (Set address 128, packetized serial format, 9600 baud)
 * "sabertooth1" is a Dimension Engineering SaberTooth, version 1.  (Set simple serial format, 9600 baud)
@@ -96,7 +97,7 @@ Connect a robot backend to this local interface using:
 ```
 cd ~/robotmoose/tabula_rasa
 make
-./backend --robot test/yourbot --superstar http://localhost:8081/
+./backend --robot 2016/test/yourbot --superstar http://localhost:8081/
 ```
 
 You should now be able to point your web browser to [http://localhost:8081/robots/](http://localhost:8081/robots/) and see your local copy of the web user interface.  Edit the files in ~/robotmoose/www/js and hit reload to modify the interface.  You can also manually examine the entries in [http://localhost:8081/superstar/](http://localhost:8081/superstar/) to see how the robot configuration, sensor, and pilot information is exchanged, using superstar get and set operations.
