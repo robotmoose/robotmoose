@@ -554,7 +554,7 @@ private:
 	osl::http_connection superstar; // HTTP keepalive connection
 	std::string superstar_send_get(const std::string &path); // HTTP request
 
-	std::string robotName;
+	std::string robot_name;
 	A_packet_formatter<SerialPort> *pkt;
 
 	// All supported tabula devices, with their argument list.
@@ -575,9 +575,9 @@ public:
 	bool gotData;
 	std::string last_config;
 
-	robot_backend(std::string superstarURL, std::string robotName_)
+	robot_backend(std::string superstarURL, std::string robot_name_)
 		:parseURL(superstarURL), superstar(parseURL.host,0,parseURL.port),
-		robotName(robotName_), pkt(0), LRtrim(1.0),config_counter(-1234),
+		robot_name(robot_name_), pkt(0), LRtrim(1.0),config_counter(-1234),
 		gotData(false),last_config("")
 	{
 		//stop();
@@ -917,15 +917,16 @@ void robot_backend::do_network()
 	double start=time_in_seconds();
 
 	std::cout << "\033[2J\033[1;1H"; // clear screen
-	std::cout<<"Robot name: "<<robotName<<"\n";
+	std::cout<<"Robot name: "<<robot_name<<"\n";
 
 	std::string send_json=send_network();
 	std::cout<<"Outgoing sensors: "<<send_json<<"\n";
 
-	std::string send_path=robotName+"/sensors";
-	std::string read_path=robotName+"/pilot,"+robotName+"/config";
+	std::string path="robots/"+robot_name;
+	std::string send_path=path+"/sensors";
+	std::string read_path=path+"/pilot,"+path+"/config";
 	std::string request=send_path+"?set="+send_json+"&get="+read_path;
-	std::string read_json=superstar_send_get(superstart_path + request);
+	std::string read_json=superstar_send_get("/superstar/" + request);
 
 	std::cout<<"Incoming pilot commands: "<<read_json<<"\n";
 	read_network(read_json);
@@ -1069,7 +1070,7 @@ void robot_backend::tabula_setup(std::string config)
 
 void robot_backend::read_config(std::string config,const json::Value& configs,const int counter)
 {
-	std::string path = superstart_path + robotName + "/config?get";
+	std::string path = superstart_path + robot_name + "/config?get";
 	try
 	{
 		for(size_t ii=0;ii<configs.ToArray().size();++ii)
@@ -1092,7 +1093,7 @@ void robot_backend::read_config(std::string config,const json::Value& configs,co
 void robot_backend::send_config(std::string config)
 {
 	double start = time_in_seconds();
-	std::string path = superstart_path + robotName + "/config?set=";
+	std::string path = superstart_path + robot_name + "/config?set=";
 	try
 	{ // send all registered tabula devices
 		json::Object json;
@@ -1141,7 +1142,7 @@ void robot_backend::send_config(std::string config)
 void robot_backend::send_options(void)
 {
 	double start = time_in_seconds();
-	std::string path = superstart_path + robotName + "/options?set=";
+	std::string path = superstart_path + robot_name + "/options?set=";
 	try
 	{ // send all registered tabula devices
 		std::string str = json::Serialize(all_dev_types);
