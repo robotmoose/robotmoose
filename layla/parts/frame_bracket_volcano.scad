@@ -19,6 +19,8 @@ module tube_bracket_holes() {
 }
 
 
+metalscrew_center=[tube_OD/2+wall,0,0.75*radius];
+
 // Build bracket to hold axle to wood frame
 module tube_bracket(tube_angles)
 {
@@ -29,6 +31,7 @@ module tube_bracket(tube_angles)
                 cylinder(d1=2*radius,d2=tube_OD,h=0.7*radius);
                 rotate(tube_angles) {
                     cylinder(d1=1.5*radius,d2=2*wall+tube_OD,h=radius);
+					//translate(metalscrew_center) rotate([0,90,0]) woodscrew_boss();
                 }
                 
                 // bosses around screw holes
@@ -39,6 +42,7 @@ module tube_bracket(tube_angles)
                 rotate(tube_angles) {
                     cylinder(d=tube_OD,h=3*radius,center=true,$fa=5);
                     
+					#translate(metalscrew_center) rotate([0,90,0]) woodscrew_head(1.5);
                 }
                 
                 // space for screws
@@ -63,7 +67,8 @@ module tube_bracket(tube_angles)
 }
 
 tube_bracket([0,0,0]);
-for (shift=[2*radius,4*radius])
-    translate([shift,0,0])
-        tube_bracket([11,0,0]);
+for (more=[0:1])
+    translate([radius*(2+2*more),0,0])
+		scale([more*2-1,1,1])  // flip left and right
+			tube_bracket([11,0,0]);
 
