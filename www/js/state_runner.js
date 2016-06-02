@@ -395,7 +395,13 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	};
 
 // Basically eval user's code here
-	(new Function("with(this)\n{\n"+code+"\n}")).call(VM);
+	(new Function(
+		"with(this)\n{\n"+  // "with" lets us access VM. stuff directly
+			"(function() { \"use strict\";\n"+	// strict mode prevents undefined variables
+				code+	// user's code
+			"}())\n"+
+		"\n}"
+	)).call(VM);
 
 	if (VM.sequencer.current()) this.do_writes(VM);
 
