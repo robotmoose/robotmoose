@@ -66,6 +66,8 @@ using std::exit;
 # define M_PI 3.1415926535897
 #endif
 
+const std::string superstar_path = "/superstar/robots/";
+
 void moose_sleep_ms(int delay_ms)
 {
 #if defined(__unix__)||defined(__MACH__)
@@ -139,7 +141,7 @@ std::string slam_backend::superstar_send_get(const std::string &path)
 
 void slam_backend::read_config(std::string config,const json::Value& configs,const int counter)
 {
-	std::string path = "/superstar/" + robotName + "/config?get";
+	std::string path = superstar_path + robotName + "/config?get";
 	try
 	{
 		for(size_t ii=0;ii<configs.ToArray().size();++ii)
@@ -167,7 +169,7 @@ void slam_backend::do_network()
 	//std::cout << "\033[2J\033[1;1H"; // clear screen	
 	//std::cout<<"Robot name: "<<robotName<<"\n";
 
-	std::string read_path=robotName+"/sensors";
+	std::string read_path="robots/"+robotName+"/sensors";
 	std::string read_json=superstar_send_get("/superstar/"+read_path+"?get");	//+request);
 
 	//std::cout<<"Incoming sensor values: "<<read_json<<"\n";

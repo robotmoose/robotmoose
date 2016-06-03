@@ -1,5 +1,5 @@
-robot=uaf/aven_test_bot
-superstar=http://robotmoose.com
+robot=2016/uaf/aven_test_bot
+superstar=http://localhost:8081
 #baudrate=57600
 #marker=
 trim=0.85
