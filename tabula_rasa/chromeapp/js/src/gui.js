@@ -49,7 +49,8 @@ function gui_t(div)
 		function(robot)
 		{
 			_this.connection.gui_robot(robot);
-			_this.gruveo.src = "https://www.gruveo.com/"+robot.school+robot.name;
+			_this.gruveo.src = "https://www.gruveo.com/"+ encodeURIComponent(robot.school + robot.name);
+
 		}
 
 	);
