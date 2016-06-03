@@ -1,2 +1,0 @@
-/home/ryker/Documents/GitHub/robotmoose/sensors/sound_localize/software/build/CMakeFiles/Sound_Interface.dir
-/home/ryker/Documents/GitHub/robotmoose/sensors/sound_localize/software/build/CMakeFiles/serial.dir

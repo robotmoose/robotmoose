@@ -32,4 +32,4 @@ endif()
 ## Build your executable
 add_executable(Sound_Interface Sound_Interface.cpp)
 ## Link your executable against the library
-target_link_libraries(Sound_Interface serial)
+target_link_libraries(Sound_Interface serial fftw3 m)

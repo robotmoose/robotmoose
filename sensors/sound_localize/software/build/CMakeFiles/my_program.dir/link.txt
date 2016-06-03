@@ -1,1 +1,0 @@
-/usr/bin/c++    -std=c++11    CMakeFiles/my_program.dir/Sound_Interface.cpp.o  -o my_program -rdynamic libserial.a -lrt 
