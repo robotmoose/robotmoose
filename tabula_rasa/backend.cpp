@@ -57,7 +57,7 @@
 # define M_PI 3.1415926535897
 #endif
 
-const std::string superstart_path = "/superstar/robots/";
+const std::string superstar_path = "/superstar/robots/";
 
 void moose_sleep_ms(int delay_ms)
 {
@@ -1070,7 +1070,7 @@ void robot_backend::tabula_setup(std::string config)
 
 void robot_backend::read_config(std::string config,const json::Value& configs,const int counter)
 {
-	std::string path = superstart_path + robot_name + "/config?get";
+	std::string path = superstar_path + robot_name + "/config?get";
 	try
 	{
 		for(size_t ii=0;ii<configs.ToArray().size();++ii)
@@ -1093,7 +1093,7 @@ void robot_backend::read_config(std::string config,const json::Value& configs,co
 void robot_backend::send_config(std::string config)
 {
 	double start = time_in_seconds();
-	std::string path = superstart_path + robot_name + "/config?set=";
+	std::string path = superstar_path + robot_name + "/config?set=";
 	try
 	{ // send all registered tabula devices
 		json::Object json;
@@ -1142,7 +1142,7 @@ void robot_backend::send_config(std::string config)
 void robot_backend::send_options(void)
 {
 	double start = time_in_seconds();
-	std::string path = superstart_path + robot_name + "/options?set=";
+	std::string path = superstar_path + robot_name + "/options?set=";
 	try
 	{ // send all registered tabula devices
 		std::string str = json::Serialize(all_dev_types);
