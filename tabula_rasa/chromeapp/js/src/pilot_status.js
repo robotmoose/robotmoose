@@ -26,12 +26,12 @@ pilot_status_t.prototype.check_connected=function(heartbeat)
 			this.pilot_connected = true;
 			this.last_update_ms = new Date().getTime(); 
 		}
-	/*else
+	else
 		{
 			var cur_time = new Date().getTime();
 			if( cur_time - this.last_update_ms > 5000 ) //Wait 5 seconds before changing pilot status
 				this.pilot_connected = false;
-		}*/
+		}
 	console.log("Pilot Connected " + this.pilot_connected);
 }
 
