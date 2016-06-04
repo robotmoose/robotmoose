@@ -51,6 +51,7 @@ function robot_ui_t(div)
 		{
 			myself.connect_menu.show();
 		});
+	this.pilot_heartbeat = new pilot_status_t(this);
 }
 
 robot_ui_t.prototype.create_menus=function()
