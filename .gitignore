@@ -48,3 +48,5 @@ tabula_rasa/arduino/mega.hex
 www/blog
 www/downloads/files
 www/latest.tar.gz
+*.o
+a.out
