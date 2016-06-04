@@ -70,6 +70,12 @@ function gui_t(div)
         }
 	);
 
+	this.pilot_status = new pilot_status_t(this);
+	/*(
+		status_view_div
+		console.log("Pilot Connected: " pilot_status_t.pilot.connected);
+	);
+*/
 	this.status_viewer=new status_viewer_t(status_view_div);
 
 }
