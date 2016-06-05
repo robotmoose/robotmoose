@@ -882,7 +882,7 @@ connection_t.prototype.serial_callback_onReceive=function(info)
 		var c=String.fromCharCode(v);
 
 		if (_this.show_debug_bytes) { // show incoming bytes
-			_this.status_message("    received  \t"+v+"  \t"+c);
+			_this.status_message("	received  \t"+v+"  \t"+c);
 		}
 
 		if (_this.read_line_callback)
@@ -944,7 +944,7 @@ connection_t.prototype.serial_send=function(array_like,done_callback)
 	if (_this.show_debug_bytes) { // show sent bytes
 		_this.status_message("Serial data sending: "+out.byteLength+" bytes");
 		for (var i=0;i<out.byteLength;i++)
-			_this.status_message("    sending  \t"+out[i]+"  \t"+String.fromCharCode(out[i]));
+			_this.status_message("	sending  \t"+out[i]+"  \t"+String.fromCharCode(out[i]));
 	}
 
 	_this.serial_api.send(_this.connection,out.buffer,

@@ -36,13 +36,13 @@ dropdown_t.prototype.size=function()
 dropdown_t.prototype.enable=function()
 {
 	this.disabled=this.select.disabled=false;
-    this.set_background_color("cyan");
+	this.set_background_color("cyan");
 }
 
 dropdown_t.prototype.disable=function()
 {
 	this.disabled=this.select.disabled=true;
-    this.set_background_color("maroon");
+	this.set_background_color("maroon");
 }
 
 dropdown_t.prototype.selected=function()
@@ -84,11 +84,11 @@ dropdown_t.prototype.build=function(list,on_loaded_value)
 
 dropdown_t.prototype.set_width=function(w)
 {
-    this.el.style.width=w;
-    this.select.style.width="100%";
+	this.el.style.width=w;
+	this.select.style.width="100%";
 }
 
 dropdown_t.prototype.set_background_color=function(color)
 {
-    this.select.style.backgroundColor=color;
+	this.select.style.backgroundColor=color;
 }

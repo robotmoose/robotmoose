@@ -22,15 +22,15 @@ function name_t(div,on_message,on_selected)
 	var _this=this;
 
 	this.superstar_div=document.createElement("div");
-    this.superstar_select=new dropdown_t(this.superstar_div);
+	this.superstar_select=new dropdown_t(this.superstar_div);
 	this.el.appendChild(this.superstar_div);
-    this.superstar_select.el.style.width="100%";
-    this.superstar_select.select.style.width="100%";
+	this.superstar_select.el.style.width="100%";
+	this.superstar_select.select.style.width="100%";
 	this.superstar_select.onchange=function()
 	{
 		if(this.selectedIndex!=0)
 		{
-            _this.build_years_m();
+			_this.build_years_m();
 			_this.build_schools_m();
 			_this.build_robots_m();
 		}
@@ -42,11 +42,11 @@ function name_t(div,on_message,on_selected)
 		}
 	};
 
-    this.year_school_robot_div=document.createElement("div");
-    this.year_school_robot_div.style.width="100%";
+	this.year_school_robot_div=document.createElement("div");
+	this.year_school_robot_div.style.width="100%";
 
-    this.year_select=new dropdown_t(this.year_school_robot_div);
-    this.year_select.set_width("33%");
+	this.year_select=new dropdown_t(this.year_school_robot_div);
+	this.year_select.set_width("33%");
 
 	this.school_select=new dropdown_t(this.year_school_robot_div);
 	this.school_select.set_width("33%");
@@ -56,7 +56,7 @@ function name_t(div,on_message,on_selected)
 	this.robot_select.set_width("33%");
 	this.robot_select.onchange=function(){_this.on_selected_m();};
 
-    this.el.appendChild(this.year_school_robot_div);
+	this.el.appendChild(this.year_school_robot_div);
 
 
 	_this.school_interval=setInterval(function()
@@ -66,7 +66,7 @@ function name_t(div,on_message,on_selected)
 				_this.on_loaded_robot=
 				{
 					superstar:_this.superstar_select.selected(),
-                    year: _this.year_select.selected(),
+					year: _this.year_select.selected(),
 					school:_this.school_select.selected(),
 					name:_this.robot_select.selected()
 				};
@@ -75,7 +75,7 @@ function name_t(div,on_message,on_selected)
 	},250);
 
 	_this.build_superstar_m();
-    _this.build_years_m();
+	_this.build_years_m();
 	_this.build_schools_m();
 	_this.build_robots_m();
 
@@ -96,10 +96,10 @@ name_t.prototype.get_robot=function()
 	var robot={superstar:"robotmoose.com",school:null,name:null,year:null};
 
 	if(this.year_select.selected_index()>0
-            &&this.school_select.selected_index()>0
-            &&this.robot_select.selected_index()>0)
+			&&this.school_select.selected_index()>0
+			&&this.robot_select.selected_index()>0)
 	{
-        robot.year=this.year_select.selected();
+		robot.year=this.year_select.selected();
 		robot.school=this.school_select.selected();
 		robot.name=this.robot_select.selected();
 		robot.superstar=this.superstar_select.selected();
@@ -113,7 +113,7 @@ name_t.prototype.reload=function(robot)
 	var need_reload=(!this.on_loaded_robot.name||!this.on_loaded_robot.school);
 	this.on_loaded_robot=robot;
 	this.build_superstar_m([]);
-    this.build_years_m([]);
+	this.build_years_m([]);
 	this.build_schools_m([]);
 	this.build_robots_m([]);
 
@@ -135,8 +135,8 @@ name_t.prototype.build_select_m=function(select,json,heading,on_loaded_value)
 
 name_t.prototype.build_years_m=function(json)
 {
-    this.build_select_m(this.year_select, json, "Year", this.on_loaded_robot.year);
-    this.download_schools_m();
+	this.build_select_m(this.year_select, json, "Year", this.on_loaded_robot.year);
+	this.download_schools_m();
 }
 
 name_t.prototype.build_schools_m=function(json)
@@ -173,52 +173,52 @@ name_t.prototype.on_error_m=function(error)
 
 name_t.prototype.download_years_m=function()
 {
-    if(this.superstar_select.selected() && this.superstar_select.selected_index()>0){
-        var _this=this;
-        superstar_sub(
-            {
-                superstar:this.on_loaded_robot.superstar,
-                year:"",
-                school:"",
-                name:""
-            },
-            "/",
-            function(json){_this.build_years_m(json);},
-            function(error){
-                _this.on_error_m("Year download error("+error+").");
-            }
-        );
-    }
+	if(this.superstar_select.selected() && this.superstar_select.selected_index()>0){
+		var _this=this;
+		superstar_sub(
+			{
+				superstar:this.on_loaded_robot.superstar,
+				year:"",
+				school:"",
+				name:""
+			},
+			"/",
+			function(json){_this.build_years_m(json);},
+			function(error){
+				_this.on_error_m("Year download error("+error+").");
+			}
+		);
+	}
 }
 
 name_t.prototype.download_schools_m=function()
 {
-    var selected_year=this.year_select.selected();
-    if(!selected_year || this.year_select.selected_index<=0)
-    {
-        this.build_schools_m();
-        return;
-    }
+	var selected_year=this.year_select.selected();
+	if(!selected_year || this.year_select.selected_index<=0)
+	{
+		this.build_schools_m();
+		return;
+	}
 
 
 	if(this.superstar_select.selected() && this.superstar_select.selected_index()>0
-            && selected_year)
+			&& selected_year)
 	{
 		var _this=this;
 		superstar_sub(
-            {
-                superstar:this.on_loaded_robot.superstar,
-                school:"",
-                name:"",
-                year: selected_year
-            },
-            "/",
-            function(json){ _this.build_schools_m(json); },
-            function(error){
-                _this.on_error_m("School download error ("+error+").");
-            }
-        );
-        return;
+			{
+				superstar:this.on_loaded_robot.superstar,
+				school:"",
+				name:"",
+				year: selected_year
+			},
+			"/",
+			function(json){ _this.build_schools_m(json); },
+			function(error){
+				_this.on_error_m("School download error ("+error+").");
+			}
+		);
+		return;
 	}
 	this.build_schools_m([]);
 	this.build_robots_m([]);
@@ -232,23 +232,23 @@ name_t.prototype.download_robots_m=function()
 		return;
 	}
 
-    var selected_year=this.year_select.selected();
+	var selected_year=this.year_select.selected();
 	var selected_school=this.school_select.selected();
 
 	if(this.superstar_select.selected() && this.superstar_select.selected_index()>0
-            && this.year_select.selected_index() >0 && this.school_select.selected_index() > 0
-            && selected_school && selected_year)
+			&& this.year_select.selected_index() >0 && this.school_select.selected_index() > 0
+			&& selected_school && selected_year)
 	{
 		var _this=this;
 
 		superstar_sub(
-            {
-                superstar:this.superstar_select.selected(),
-                school:selected_school,
-                name:"",
-                year:selected_year
-            },
-            "/",
+			{
+				superstar:this.superstar_select.selected(),
+				school:selected_school,
+				name:"",
+				year:selected_year
+			},
+			"/",
 			function(json){_this.build_robots_m(json);},
 			function(error){_this.on_error_m("Robots download error ("+error+").");});
 	}
@@ -256,54 +256,54 @@ name_t.prototype.download_robots_m=function()
 
 name_t.prototype.update_disables_m=function()
 {
-    if(this.superstar_select.selected_index()==0){
-        this.superstar_select.set_background_color("maroon");
-        this.year_select.disabled=true;
-    }
-    else{
-        this.superstar_select.set_background_color("cyan");
-        this.year_select.disabled=false;
-    }
-    if(this.year_select.selected_index()==0 || this.superstar_select.disabled){
-        this.year_select.set_background_color("maroon");
-        this.school_select.disabled=true;
-    }
-    else{
-        this.year_select.set_background_color("cyan");
-        this.school_select.disabled=false;
-    }
-    if(this.school_select.selected_index()==0 || this.year_select.disabled){
-        this.school_select.set_background_color("maroon");
-        this.robot_select.disabled=true;
-    }
-    else{
-        this.school_select.set_background_color("cyan");
-        this.robot_select.disabled=false;
-    }
-    if(this.robot_select.selected_index()==0 || this.school_select.disabled){
-        this.robot_select.set_background_color("maroon");
-    }
-    else{
-        this.robot_select.set_background_color("cyan");
-    }
+	if(this.superstar_select.selected_index()==0){
+		this.superstar_select.set_background_color("maroon");
+		this.year_select.disabled=true;
+	}
+	else{
+		this.superstar_select.set_background_color("cyan");
+		this.year_select.disabled=false;
+	}
+	if(this.year_select.selected_index()==0 || this.superstar_select.disabled){
+		this.year_select.set_background_color("maroon");
+		this.school_select.disabled=true;
+	}
+	else{
+		this.year_select.set_background_color("cyan");
+		this.school_select.disabled=false;
+	}
+	if(this.school_select.selected_index()==0 || this.year_select.disabled){
+		this.school_select.set_background_color("maroon");
+		this.robot_select.disabled=true;
+	}
+	else{
+		this.school_select.set_background_color("cyan");
+		this.robot_select.disabled=false;
+	}
+	if(this.robot_select.selected_index()==0 || this.school_select.disabled){
+		this.robot_select.set_background_color("maroon");
+	}
+	else{
+		this.robot_select.set_background_color("cyan");
+	}
 
-    /*
-    var disabled=false;
-    if(this.school_select.selected_index<=0||this.disabled)
-        disabled=true;
-    this.robot_select.disabled=disabled;
+	/*
+	var disabled=false;
+	if(this.school_select.selected_index<=0||this.disabled)
+		disabled=true;
+	this.robot_select.disabled=disabled;
 
-    this.school_select.disabled=this.disabled;
-    this.superstar_select.disabled=this.disabled;
-    */
+	this.school_select.disabled=this.disabled;
+	this.superstar_select.disabled=this.disabled;
+	*/
 }
 
 name_t.prototype.on_selected_m=function(robot)
 {
-    if(!robot)
-        var robot=this.get_robot();
+	if(!robot)
+		var robot=this.get_robot();
 
 	if(this.on_selected&&robot.school!=null&&robot.name!=null){
 		this.on_selected(robot);
-    }
+	}
 }
