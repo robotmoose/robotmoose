@@ -82,13 +82,13 @@ dropdown_t.prototype.build=function(list,on_loaded_value)
 	}
 }
 
-dropdown_t.prototype.set_width = function(w)
+dropdown_t.prototype.set_width=function(w)
 {
-    this.el.style.width = w;
-    this.select.style.width = "100%";
+    this.el.style.width=w;
+    this.select.style.width="100%";
 }
 
-dropdown_t.prototype.set_background_color = function(color) 
+dropdown_t.prototype.set_background_color=function(color)
 {
     this.select.style.backgroundColor=color;
 }

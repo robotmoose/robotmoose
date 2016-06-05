@@ -56,8 +56,8 @@ connection_t.prototype.reset=function() {
 	_this.getnexts=[];
 
 	// Localization
-	_this.location = new vec3(0,0,0);
-	_this.angle = 0;
+	_this.location=new vec3(0,0,0);
+	_this.angle=0;
 
 	_this.serial_startup=true;
 	_this.sends_in_progress=0;
@@ -167,13 +167,13 @@ connection_t.prototype.connect_m=function(port_name,done_callback)
 		bitrate:57600,
 		receiveTimeout:5*1000 // in ms (must be more than Arduino 1.7 second start delay)
 	};
-	if(port_name == "Sim")
+	if(port_name=="Sim")
 	{
-		_this.serial_api = new sim_serial_t();
+		_this.serial_api=new sim_serial_t();
 	}
 	else
 	{
-		_this.serial_api = chrome.serial;
+		_this.serial_api=chrome.serial;
 	}
 	_this.serial_api.connect(port_name, options,
 		function(connectionInfo) {
@@ -454,13 +454,13 @@ connection_t.prototype.network_getnext=function(path,on_success) {
 	var state=superstar_getnext(_this.robot,path,
 		function(json) {
 			if (_this.connected()) {
-				_this.status_message("	Updated "+path+" = "+JSON.stringify(json,null,'	'));
-				
+				_this.status_message("	Updated "+path+"="+JSON.stringify(json,null,'	'));
+
 				on_success(json);
 			} // else we're done
-		} 
+		}
 	);
-	
+
 	_this.getnexts.push(state);
 }
 
@@ -471,7 +471,7 @@ connection_t.prototype.arduino_setup_complete=function()
 	var _this=this;
 	_this.status_message("  arduino setup complete... sending command packet");
 	_this.arduino_send_packet();
-	
+
 	// Set up network comms:
 	_this.network_getnext("pilot",function(pilot) {
 		for (var field in pilot.power) {
@@ -479,7 +479,7 @@ connection_t.prototype.arduino_setup_complete=function()
 		}
 	}
 	);
-	
+
 	_this.network_getnext("config",function(config) {
 		if (config.counter!=_this.last_config.counter)
 		{ // need to reconfigure Arduino
@@ -775,31 +775,31 @@ connection_t.prototype.arduino_recv_packet=function(p)
 		{
 			function wraparound_fix(old_value, new_value)
 			{
-				return (0xff&(new_value-old_value + 128))-128;
+				return (0xff&(new_value-old_value+128))-128;
 			}
 
-			var m_per_tick = 0.000444;
-			var wheelbase = .235;
+			var m_per_tick=0.000444;
+			var wheelbase=.235;
 			_this.move_wheels(wraparound_fix(_this.old.L, _this.sensors.encoder.L)*m_per_tick,
 								wraparound_fix(_this.old.R, _this.sensors.encoder.R)*m_per_tick,
 								wheelbase);
 		}
-		_this.old = {};
-		_this.old.L = _this.sensors.encoder.L;
-		_this.old.R = _this.sensors.encoder.R;
+		_this.old={};
+		_this.old.L=_this.sensors.encoder.L;
+		_this.old.R=_this.sensors.encoder.R;
 
-		_this.sensors.location = _this.location;
-		_this.sensors.location.angle = _this.angle;
+		_this.sensors.location=_this.location;
+		_this.sensors.location.angle=_this.angle;
 	}
 
 	if (idx!=p.length) _this.bad("Arduino sensor packet length mismatch: got "+p.length+", expected "+idx+" (firmware/app mismatch?)");
 
-	_this.status_message("	sensors = "+JSON.stringify(_this.sensors,null,'	'));
+	_this.status_message("	sensors="+JSON.stringify(_this.sensors,null,'	'));
 
-	
+
 	// Upload new sensor data to network:
 	superstar_set(_this.robot,"sensors",_this.sensors);
-	
+
 /*
 	// Send sensor data to superstar, and grab pilot commands with set & mget:
 	var robotName=_this.robot.school+"/"+_this.robot.name;
@@ -811,7 +811,7 @@ connection_t.prototype.arduino_recv_packet=function(p)
 		var pilot_and_config=JSON.parse(pilot_and_config_str);
 		if (pilot_and_config.length!=2) _this.bad("Invalid pilot & config data back from superstar");
 		var pilot=pilot_and_config[0];
-		_this.status_message("	pilot = "+JSON.stringify(pilot,null,'	'));
+		_this.status_message("	pilot="+JSON.stringify(pilot,null,'	'));
 		var config=pilot_and_config[1];
 		if (config.counter!=_this.last_config.counter)
 		{ // need to reconfigure Arduino
@@ -969,12 +969,12 @@ connection_t.prototype.serial_send_ascii=function(str,done_callback)
 {
 	var _this=this;
 	// from http://stackoverflow.com/questions/6965107/converting-between-strings-and-arraybuffers
-	var buf = new ArrayBuffer(str.length);
-	var bufView = new Uint8Array(buf);
+	var buf=new ArrayBuffer(str.length);
+	var bufView=new Uint8Array(buf);
 	for (var i=0, strLen=str.length; i<strLen; i++) {
 		var c=str.charCodeAt(i);
-		if (c<=255) bufView[i] = c;
-		else _this.bad("serial_send_ascii with non-ASCII character code "+str[i]+" == "+c);
+		if (c<=255) bufView[i]=c;
+		else _this.bad("serial_send_ascii with non-ASCII character code "+str[i]+"=="+c);
 	}
 	_this.serial_send(buf,done_callback);
 }
@@ -983,7 +983,7 @@ connection_t.prototype.serial_send_ascii=function(str,done_callback)
 
 // Parse this incoming serial data byte (int) as an A-packet.
 //   Call the read_packet callback once packet is complete.
-//   Copied directly from C++ serial_packet.h read_packet function.
+//   Copied directly from C++serial_packet.h read_packet function.
 connection_t.prototype.serial_read_packet=function(c)
 {
 	var _this=this;
@@ -998,7 +998,7 @@ connection_t.prototype.serial_read_packet=function(c)
 
 	switch (_this.read_state) {
 	case 0: /* start byte */
-		if ((c&0xf0) == 0xa0) { // valid start code
+		if ((c&0xf0)==0xa0) { // valid start code
 			_this.read_index=0;
 			_this.read_sumpay=0;
 			p.length=c&0x0f;
@@ -1120,32 +1120,32 @@ connection_t.prototype.load=function()
 
 connection_t.prototype.move_wheels=function(left, right, wheelbase)
 {
-	var _this = this;
+	var _this=this;
 	// Extract position and orientation from absolute location
-	var P = _this.location; // position of robot (center of wheels)
-	var ang_rads = _this.angle*Math.PI/180; // 2D rotation of robot
+	var P=_this.location; // position of robot (center of wheels)
+	var ang_rads=_this.angle*Math.PI/180; // 2D rotation of robot
 
 	// Reconstruct coordinate system and wheel locations
-	var FW = new vec3(Math.cos(ang_rads), Math.sin(ang_rads), 0.0); // forward vector
-	var UP = new vec3(0,0,1); // up vector
+	var FW=new vec3(Math.cos(ang_rads), Math.sin(ang_rads), 0.0); // forward vector
+	var UP=new vec3(0,0,1); // up vector
 	var LR=FW.cross(UP); // left-to-right vector
-	var wheel = new Array(2);
-	wheel[0] = P.sub(LR.mul(0.5*wheelbase));
-	wheel[1] = P.add(LR.mul(0.5*wheelbase));
+	var wheel=new Array(2);
+	wheel[0]=P.sub(LR.mul(0.5*wheelbase));
+	wheel[1]=P.add(LR.mul(0.5*wheelbase));
 
 	// Move wheels forward by specified amounts
-	wheel[0] = wheel[0].add(FW.mul(left));
-	wheel[1] = wheel[1].add(FW.mul(right));
+	wheel[0]=wheel[0].add(FW.mul(left));
+	wheel[1]=wheel[1].add(FW.mul(right));
 
 	// Extract new robot position and orientation
-	P = (wheel[0].add(wheel[1])).mul(0.5);
-	LR = (wheel[1].sub(wheel[0])).normalize();
-	FW = UP.cross(LR);
+	P=(wheel[0].add(wheel[1])).mul(0.5);
+	LR=(wheel[1].sub(wheel[0])).normalize();
+	FW=UP.cross(LR);
 	ang_rads=Math.atan2(FW.y, FW.x);
 
 	// Put back into absolute location
-	_this.location = P;
-	_this.angle = 180/Math.PI*ang_rads;
+	_this.location=P;
+	_this.angle=180/Math.PI*ang_rads;
 }
 
 //robot_localization.prototype.

@@ -22,7 +22,7 @@ function name_t(div,on_message,on_selected)
 	var _this=this;
 
 	this.superstar_div=document.createElement("div");
-    this.superstar_select = new dropdown_t(this.superstar_div);
+    this.superstar_select=new dropdown_t(this.superstar_div);
 	this.el.appendChild(this.superstar_div);
     this.superstar_select.el.style.width="100%";
     this.superstar_select.select.style.width="100%";
@@ -42,17 +42,17 @@ function name_t(div,on_message,on_selected)
 		}
 	};
 
-    this.year_school_robot_div = document.createElement("div");
-    this.year_school_robot_div.style.width = "100%";
-    
-    this.year_select = new dropdown_t(this.year_school_robot_div);
+    this.year_school_robot_div=document.createElement("div");
+    this.year_school_robot_div.style.width="100%";
+
+    this.year_select=new dropdown_t(this.year_school_robot_div);
     this.year_select.set_width("33%");
 
-	this.school_select= new dropdown_t(this.year_school_robot_div);
+	this.school_select=new dropdown_t(this.year_school_robot_div);
 	this.school_select.set_width("33%");
 	this.school_select.onchange=function(){_this.download_robots_m();};
 
-	this.robot_select= new dropdown_t(this.year_school_robot_div);
+	this.robot_select=new dropdown_t(this.year_school_robot_div);
 	this.robot_select.set_width("33%");
 	this.robot_select.onchange=function(){_this.on_selected_m();};
 
@@ -133,7 +133,7 @@ name_t.prototype.build_select_m=function(select,json,heading,on_loaded_value)
 	this.update_disables_m();
 }
 
-name_t.prototype.build_years_m = function(json)
+name_t.prototype.build_years_m=function(json)
 {
     this.build_select_m(this.year_select, json, "Year", this.on_loaded_robot.year);
     this.download_schools_m();
@@ -171,10 +171,10 @@ name_t.prototype.on_error_m=function(error)
 		this.on_message(error);
 }
 
-name_t.prototype.download_years_m = function()
+name_t.prototype.download_years_m=function()
 {
     if(this.superstar_select.selected() && this.superstar_select.selected_index()>0){
-        var _this = this;
+        var _this=this;
         superstar_sub(
             {
                 superstar:this.on_loaded_robot.superstar,
@@ -193,15 +193,15 @@ name_t.prototype.download_years_m = function()
 
 name_t.prototype.download_schools_m=function()
 {
-    var selected_year = this.year_select.selected();
+    var selected_year=this.year_select.selected();
     if(!selected_year || this.year_select.selected_index<=0)
     {
         this.build_schools_m();
         return;
     }
-    
 
-	if(this.superstar_select.selected() && this.superstar_select.selected_index()>0 
+
+	if(this.superstar_select.selected() && this.superstar_select.selected_index()>0
             && selected_year)
 	{
 		var _this=this;
@@ -232,7 +232,7 @@ name_t.prototype.download_robots_m=function()
 		return;
 	}
 
-    var selected_year = this.year_select.selected();
+    var selected_year=this.year_select.selected();
 	var selected_school=this.school_select.selected();
 
 	if(this.superstar_select.selected() && this.superstar_select.selected_index()>0
