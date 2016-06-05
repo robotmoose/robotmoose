@@ -15,9 +15,6 @@
 
 function pilot_status_t(ui)
 {
-	if(!ui || !ui.robot)
-		return null;
-
 	this.current_heartbeat = 0;
 	this.ui = ui;
 	this.path = "pilotHeartbeat";
@@ -29,6 +26,9 @@ function pilot_status_t(ui)
 
 pilot_status_t.prototype.upload=function()
 {
+	if(!this.ui || !this.ui.robot || !this.ui.robot.name)
+		return null;
+
 	this.current_heartbeat++
 	if(this.current_heartbeat > 255)
 		this.current_heartbeat = 0;
