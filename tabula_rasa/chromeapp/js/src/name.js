@@ -46,7 +46,7 @@ function name_t(div,on_message,on_selected)
 	this.year_school_robot_div.style.width="100%";
 
 	this.year_select=new dropdown_t(this.year_school_robot_div);
-	this.year_select.set_width("33%");
+	this.year_select.set_width("34%");
 
 	this.school_select=new dropdown_t(this.year_school_robot_div);
 	this.school_select.set_width("33%");
