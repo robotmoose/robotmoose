@@ -50,7 +50,7 @@ function gui_t(div)
 
 	this.serial_selector=new serial_selector_t
 	(
-		this.main_div,
+		this.name.el,
 		function(port_name){_this.connection.gui_connect(port_name);},
 		function(port_name){_this.connection.gui_disconnect(port_name);},
 		function()
