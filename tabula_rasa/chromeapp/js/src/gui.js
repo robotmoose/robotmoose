@@ -71,7 +71,7 @@ function gui_t(div)
 		name:'app_layout',
 		panels:
 		[
-			{type:'left',resizable:true,content:this.gruveo_div,size:"75%"},
+			{type:'left',resizable:true,content:this.gruveo_div,size:"65%"},
 			{type:'main',resizable:true,content:this.name.el,},
 			{type:'preview',resizable:true,content:this.status_viewer.el,size:"85%"}
 		]
