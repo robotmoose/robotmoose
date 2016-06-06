@@ -111,7 +111,11 @@ name_t.prototype.update_schools_m=function(json)
 name_t.prototype.update_robots_m=function(json)
 {
 	this.build_robots_m(json);
-	this.onloaded_robot={};
+	if(this.onloaded_robot)
+	{
+		this.onloaded_robot={};
+		this.on_selected_m();
+	}
 }
 
 name_t.prototype.build_superstars_m=function(json)

@@ -11,12 +11,7 @@ function gui_t(div)
 	this.gruveo_div.style.overflow="hidden";
 	this.gruveo=document.getElementById("gruveo");
 	this.gruveo_div.appendChild(gruveo);
-	this.gruveo.addEventListener('permissionrequest',
-	function(e)
-	{
-		if(e.permission==='media')
-			e.request.allow();
-	});
+	this.gruveo.addEventListener('permissionrequest',function(evt){if(evt.permission==='media')evt.request.allow();});
 
 	this.superstar_errored=false;
 
@@ -36,12 +31,7 @@ function gui_t(div)
 		function(robot)
 		{
 			_this.connection.gui_robot(robot);
-			url="https://gruveo.com/";
-			robot_url="";
-			if(robot&&robot.year&&robot.school&&robot.name)
-				robot_url=robot.year+robot.school+robot.name;
-			url+=encodeURIComponent(robot_url.replace(/_/g,''));
-			_this.gruveo.src=url;
+			_this.load_gruveo(robot);
 		}
 
 	);
@@ -53,15 +43,10 @@ function gui_t(div)
 		this.name.el,
 		function(port_name){_this.connection.gui_connect(port_name);},
 		function(port_name){_this.connection.gui_disconnect(port_name);},
-		function()
-		{
-			return (_this.name.get_robot().school!=null
-					&&_this.name.get_robot().name!=null
-					&&_this.name.get_robot().year!=null);
-		}
+		function(){return (_this.name.get_robot().school!=null&&_this.name.get_robot().name!=null&&_this.name.get_robot().year!=null);}
 	);
 
-	this.pilot_status=new pilot_status_t(this);
+	this.pilot_status=new pilot_status_t(this,function(){_this.load_gruveo(_this.name.get_robot());});
 	this.status_viewer=new status_viewer_t(this.main_div);
 
 	this.state_side_bar=document.createElement("div");
@@ -86,5 +71,12 @@ gui_t.prototype.destroy=function()
 	this.div.removedChild(this.el);
 }
 
-
-
+gui_t.prototype.load_gruveo=function(robot)
+{
+	var url="https://gruveo.com/";
+	var robot_url="";
+	if(robot&&robot.year&&robot.school&&robot.name)
+		robot_url=robot.year+robot.school+robot.name;
+	url+=encodeURIComponent(robot_url.replace(/_/g,''));
+	this.gruveo.src=url;
+}
