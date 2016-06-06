@@ -119,10 +119,10 @@ modal_connect_t.prototype.build_year_list_m=function()
 	this.year_select.appendChild(default_option);
 	this.year_select.selectedIndex=0;
 
-	for(var key in this.years)
+	for(var ii=this.years.length-1;ii>=0;--ii)
 	{
 		var option=document.createElement("option");
-		option.text=this.years[key];
+		option.text=this.years[ii];
 		this.year_select.appendChild(option);
 	}
 
