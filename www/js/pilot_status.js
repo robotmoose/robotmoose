@@ -6,12 +6,12 @@
 
 /*
 	pilot_status.js
-	Class to handle pilot status. 
+	Class to handle pilot status.
 	Increments a counter as long as a pilot is connected
-	Used for backend pilot detetcion   
+	Used for backend pilot detetcion
 */
 
-//TO DO: Detect multiple pilots.  
+//TO DO: Detect multiple pilots.
 
 function pilot_status_t(ui)
 {
@@ -32,6 +32,6 @@ pilot_status_t.prototype.upload=function()
 	this.current_heartbeat++
 	if(this.current_heartbeat > 255)
 		this.current_heartbeat = 0;
-	console.log("Pilot Heartbeat: " + this.current_heartbeat);
+	//console.log("Pilot Heartbeat: " + this.current_heartbeat);
 	superstar_set(this.ui.robot,this.path,{"pilotHeartbeat":this.current_heartbeat});
 }

@@ -14,7 +14,7 @@
 // Error handling code
 function superstar_error(user_errorhandler,why_string)
 {
-	console.log("Superstar network error: "+why_string);
+	//console.log("Superstar network error: "+why_string);
 	if (user_errorhandler) user_errorhandler(why_string);
 }
 
@@ -35,7 +35,7 @@ function superstar_generic(robot,path,request,on_success,on_error)
 	var url="";
 	if (robot.superstar) url="http://"+robot.superstar;
 	url+="/superstar/"+starpath+request;
-	
+
 	try
 	{
 		var xhr=new XMLHttpRequest();
@@ -48,7 +48,7 @@ function superstar_generic(robot,path,request,on_success,on_error)
 				{
 					try
 					{
-						console.log("Network "+url+" -> "+xhr.responseText);
+						//console.log("Network "+url+" -> "+xhr.responseText);
 						on_success(xhr.responseText);
 					}
 					catch(error)
@@ -92,50 +92,50 @@ function superstar_getnext(robot,path,on_success,on_error)
 {
 	var state={};
 	state.current=""; // assume current string value of path is empty
-	
+
 	// Fetch the next value from the server
 	state.getnext=function() {
 		state.abort(); // stop any previous work
 		state.timeout=setTimeout(state.repeat,2*60*1000); // getnext will time out every 5 minutes, so repeat request every few minutes.
-		
+
 		// Send off network request:
 		state.xhr=superstar_generic(robot,path,"?getnext="+encodeURIComponent(state.current),
 			function(str) {
 				// Done with this request:
 				state.xhr=undefined;
-				state.abort_timeout(); 
-			
+				state.abort_timeout();
+
 				state.current=str;
 				if (str!="")
 					state.json=JSON.parse(str);
 				else state.json=null;
-				
+
 				on_success(state.json);
-				
+
 				state.getnext(); // call ourselves to do it again
 			}
 		,on_error);
 	}
-	
+
 	// Reload the request from the server
 	state.repeat=function() {
 		state.getnext();
 	}
-	
+
 	// Stop all in-progress requests.
 	state.abort=function() {
 		state.abort_xhr();
 		state.abort_timeout();
 	}
-	
+
 	// Stop any in-progress XmlHttpRequest network request
 	state.abort_xhr=function() {
 		if (state.xhr) {
-			state.xhr.abort(); 
+			state.xhr.abort();
 			state.xhr=undefined;
 		}
 	}
-	
+
 	// Stop any in-progress timeout
 	state.abort_timeout=function() {
 		if (state.timeout) {
@@ -143,7 +143,7 @@ function superstar_getnext(robot,path,on_success,on_error)
 			state.timeout=undefined;
 		}
 	}
-	
+
 	state.getnext(); // start first one
 	return state; // hand back access object
 }
@@ -158,7 +158,7 @@ function superstar_set(robot,path,json,on_success,on_error)
 		var starpath=superstar_path(robot,path);
 		var seq="0"; // <- fixme: fight replay by getting sequence number from server first
 		auth = "&auth="+getAuthCode(robot.auth,starpath,json_str,seq);
-		console.log(path,"Authentication code "+auth);
+		//console.log(path,"Authentication code "+auth);
 	}
 
 	superstar_generic(robot,path,"?set="+json_str+auth,

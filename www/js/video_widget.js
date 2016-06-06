@@ -45,7 +45,7 @@ function video_widget_t(obj)
 	this.default_link="http://robotmoose.com/webrtc/";
 	this.create_option("Off",null);
 	this.create_option("WebRTC",this.default_link);
-	this.create_option("Gruveo","https://www.gruveo.com/embed/");
+	this.create_option("Gruveo","https://www.gruveo.com/");
 }
 
 video_widget_t.prototype.download=function(robot,link)
@@ -62,7 +62,18 @@ video_widget_t.prototype.download=function(robot,link)
 	if(link)
 	{
 		this.frame=document.createElement("iframe");
-		this.frame.src=link+"?robot="+this.robot.name;
+
+		if(link=="https://www.gruveo.com/"&&this.robot&&this.robot.year&&this.robot.school&&this.robot.name)
+		{
+			var robot_url=this.robot.year+this.robot.school+this.robot.name;
+			link+=robot_url.replace(/_/g,'');
+		}
+		else
+		{
+			link+="?robot="+this.robot.name;
+		}
+
+		this.frame.src=link;
 		this.frame.style.width="100%";
 		this.frame.style.height="100%";
 		this.frame.style.border="none";

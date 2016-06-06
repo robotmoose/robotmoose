@@ -43,7 +43,7 @@ function robot_ui_t(div)
 		// good robot:
 		function(robot)
 		{
-			console.log("Connecting to URL robot "+JSON.stringify(robot));
+			//console.log("Connecting to URL robot "+JSON.stringify(robot));
 			myself.connect_menu.onconnect(robot);
 		},
 		// bad robot:
@@ -79,7 +79,6 @@ robot_ui_t.prototype.create_menus=function()
 			clearInterval(myself.gui.interval);
 			myself.gui.interval=null;
 			myself.menu.get_status_area().innerHTML="Connected to \""+myself.robot.name+"\"";
-
 			myself.download_gui();
 		}
 	};
