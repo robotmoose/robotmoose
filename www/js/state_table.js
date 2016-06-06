@@ -273,12 +273,15 @@ state_table_t.prototype.download_experiments=function()
 		{
 			superstar_sub(this.old_robot,"/experiments",function(experiments)
 			{
-				for (k in experiments) experiments[k]=decodeURIComponent(experiments[k]);
-				
+				for (k in experiments)
+					experiments[k]=decodeURIComponent(experiments[k]);
+
 				experiments=remove_duplicates(experiments);
 				_this.old_experiments_list=experiments;
 				var old_value=_this.last_experiment;
 				_this.experiment.drop.length=0;
+
+				var found=false;
 
 				for(key in experiments)
 				{
