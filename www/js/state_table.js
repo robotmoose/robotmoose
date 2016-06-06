@@ -271,7 +271,7 @@ state_table_t.prototype.download_experiments=function()
 		var _this=this;
 		if(this.old_robot)
 		{
-			superstar_sub(this.old_robot,"/experiments",function(experiments)
+			superstar_sub(this.old_robot,"experiments",function(experiments)
 			{
 				for (k in experiments)
 					experiments[k]=decodeURIComponent(experiments[k]);
@@ -325,7 +325,7 @@ state_table_t.prototype.upload_with_check=function(robot,onupload)
 
 	var _this=this;
 
-	superstar_get(robot,"/experiments/"+encodeURIComponent(this.get_experiment_name())+"/code",
+	superstar_get(robot,"experiments/"+encodeURIComponent(this.get_experiment_name())+"/code",
 		function(obj)
 		{
 			if(_this.last_experiment&&obj&&obj.length>0&&_this.last_experiment!=_this.get_experiment_name())
@@ -362,7 +362,7 @@ state_table_t.prototype.upload=function(robot,onupload,experiment)
 	var new_hash=this.calc_save_hash_m(robot,experiment,this.get_states());
 
 	if(new_hash!=this.last_save_hash)
-		superstar_set(robot,"/experiments/"+encodeURIComponent(experiment)+"/code",this.get_states(),
+		superstar_set(robot,"experiments/"+encodeURIComponent(experiment)+"/code",this.get_states(),
 			function()
 			{
 				superstar_set(robot,"active_experiment",experiment,
@@ -629,7 +629,7 @@ state_table_t.prototype.download_m=function(robot,callback)
 {
 	var _this=this;
 
-	superstar_get(robot,"/experiments/"+encodeURIComponent(this.last_experiment)+"/code",function(obj)
+	superstar_get(robot,"experiments/"+encodeURIComponent(this.last_experiment)+"/code",function(obj)
 	{
 		if(obj&&obj.length>0)
 			for(var key in obj)
