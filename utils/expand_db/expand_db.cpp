@@ -88,15 +88,17 @@ void read(const std::string& filename){
         value_struct.data_value.resize(value_struct.data_size);
         FILEIO_CHECK(db_file.read(&value_struct.data_value[0],value_struct.data_size),
                 "failed to read value");
-        
-        int status = _mkdir(key_struct.data_value.c_str());   
-        if(status){
-            throw runtime_error("error creating directory \'" + key_struct.data_value
-                    + "\'");
+        if(key_struct.data_value.size()>0)//Account for Empty Things...
+        {
+            int status = _mkdir((key_struct.data_value).c_str());   
+            if(status){
+                throw runtime_error("error creating directory \'" + key_struct.data_value
+                        + "\'");
+            }
+            ofstream value_file((key_struct.data_value + "value").c_str());
+            value_file<<value_struct.data_value;
+            value_file.close();
         }
-        ofstream value_file((key_struct.data_value + "value").c_str());
-        value_file<<value_struct.data_value;
-        value_file.close();
     }
 }
 
