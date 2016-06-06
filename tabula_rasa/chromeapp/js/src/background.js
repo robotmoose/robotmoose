@@ -1,8 +1,8 @@
-var appWin = null;
+var appWin=null;
 
 function onWindowCreated()
 {
-	appWin = chrome.app.window.get('gruveo');//chrome.app.window.current();
+	appWin=chrome.app.window.get('gruveo');//chrome.app.window.current();
 	appWin.onBoundsChanged.addListener(onBoundsChanged);
 	onBoundsChanged();
 
@@ -10,10 +10,10 @@ function onWindowCreated()
 
 function onBoundsChanged()
 {
-	var webview = document.querySelector('webview');
-	var bounds = win.getBounds();
-	webview.style.height = bounds.height + 'px';
-	webview.style.width = bounds.width + 'px';
+	var webview=document.querySelector('webview');
+	var bounds=win.getBounds();
+	webview.style.height=bounds.height+'px';
+	webview.style.width=bounds.width+'px';
 	console.log("In resize");
 }
 

@@ -1,44 +1,49 @@
-function pilot_status_t(gui)
-{
-	if (!gui)
-		return null;
-	this.gui = gui;
-	this.current_pilot_heartbeat = 0;
-	this.prev_pilot_hearbeat = 0;
-	this.last_update_ms = new Date().getTime();
-	this.pilot_connected = false;
-	this.path = "pilotHeartbeat";
-	var _this = this;
-	this.current_pilot_heartbeat = setInterval(function(){_this.update();},1000);
+//callback on_connected() - Called when no pilot is connected and then at least one pilot is connected.
+//callback on_disconnected() - Called when at least one pilot is connected and then no pilot is connected.
 
+function pilot_status_t(gui,on_connected,on_disconnected)
+{
+	if(!gui)
+		return null;
+	this.gui=gui;
+	this.current_pilot_heartbeat=0;
+	this.on_connected=on_connected;
+	this.on_disconnected=on_disconnected;
+	this.prev_pilot_hearbeat=0;
+	this.last_update_ms=new Date().getTime();
+	this.pilot_connected=false;
+	this.path="pilotHeartbeat";
+	this.pilot_disconnect_ms=5000;
+	var _this=this;
+	this.current_pilot_heartbeat=setInterval(function(){_this.update();},1000);
 }
 
 pilot_status_t.prototype.check_connected=function(heartbeat)
 {
-	console.log("Pilot heartbeat: "+heartbeat);
-	this.prev_pilot_heartbeat = this.current_pilot_heartbeat;
-	this.current_pilot_heartbeat = heartbeat;
-	console.log("Current heartbeat: "+this.current_pilot_heartbeat);
-	console.log("Prev heartbeat: "+this.prev_pilot_heartbeat);
+	this.prev_pilot_heartbeat=this.current_pilot_heartbeat;
+	this.current_pilot_heartbeat=heartbeat;
 
-	if(this.current_pilot_heartbeat == this.prev_pilot_heartbeat+1)
-		{
-			this.pilot_connected = true;
-			this.last_update_ms = new Date().getTime(); 
-		}
-	else
-		{
-			var cur_time = new Date().getTime();
-			if( cur_time - this.last_update_ms > 5000 ) //Wait 5 seconds before changing pilot status
-				this.pilot_connected = false;
-		}
-	console.log("Pilot Connected " + this.pilot_connected);
+	var last=this.pilot_connected;
+
+	if(this.current_pilot_heartbeat==this.prev_pilot_heartbeat+1)
+	{
+		this.pilot_connected=true;
+		this.last_update_ms=new Date().getTime();
+	}
+
+	if((new Date()).getTime()-this.last_update_ms>this.pilot_disconnect_ms)
+		this.pilot_connected=false;
+
+	if(!last&&this.pilot_connected&&this.on_connected)
+		this.on_connected();
+	if(last&&!this.pilot_connected&&this.on_disconnected)
+		this.on_disconnected();
 }
 
 pilot_status_t.prototype.update=function()
 {
-	var _this = this;
-	superstar_get(this.gui.name.get_robot(),this.path, function(heartbeat){console.log(heartbeat);_this.check_connected(heartbeat.pilotHeartbeat);});
+	var _this=this;
+	superstar_get(this.gui.name.get_robot(),this.path,function(heartbeat){_this.check_connected(heartbeat.pilotHeartbeat);});
 }
 
 

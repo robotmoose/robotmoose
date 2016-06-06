@@ -2,34 +2,16 @@ function gui_t(div)
 {
 	if(!div)
 		return null;
-    
-    var status_view_div = $("<div></div>")[0];
-    status_view_div.id="status_view";
-    maximize(status_view_div);
-    var gruveo_div = $("<div></div>")[0];
-    gruveo_div.id="gruveo_div";
-    maximize(gruveo_div);
 
-    $(function(){
-        var pstyle = 'background-color: #F5F6F7; border: 1px solid #dfdfdf; padding: 5px;';
-        $('#content').w2layout({
-            name: 'app_layout',
-            panels:[
-                {type: 'main', resizable:true, content: gruveo_div},
-                {type: 'right', resizable:true, content: status_view_div, size: "25%"}
-            ]
-        });
-    });
+	this.main_div=document.createElement("div");
+	maximize(this.main_div);
 
+	this.gruveo_div=document.createElement("div");
+	maximize(this.gruveo_div);
+	this.gruveo_div.style.overflow="hidden";
 	this.gruveo=document.getElementById("gruveo");
-    gruveo_div.appendChild(gruveo);
-
-	this.gruveo.addEventListener('permissionrequest',
-	function(e)
-	{
-		if(e.permission==='media')
-			e.request.allow();
-	});
+	this.gruveo_div.appendChild(gruveo);
+	this.gruveo.addEventListener('permissionrequest',function(evt){if(evt.permission==='media')evt.request.allow();});
 
 	this.superstar_errored=false;
 
@@ -44,40 +26,41 @@ function gui_t(div)
 
 	this.name=new name_t
 	(
-        status_view_div,
+		this.main_div,
 		function(message){_this.status_viewer.show(message);},
 		function(robot)
 		{
 			_this.connection.gui_robot(robot);
-			_this.gruveo.src = "https://www.gruveo.com/"+ encodeURIComponent(robot.school + robot.name);
-
+			_this.load_gruveo(robot);
 		}
 
 	);
-	this.connection.on_name_set=function(robot){_this.name.reload(robot);};
+	this.connection.on_name_set=function(robot){_this.name.load(robot);};
 	this.connection.load();
 
 	this.serial_selector=new serial_selector_t
 	(
-        status_view_div,
+		this.name.el,
 		function(port_name){_this.connection.gui_connect(port_name);},
 		function(port_name){_this.connection.gui_disconnect(port_name);},
-		function(){
-            console.log(_this.name.get_robot());
-            return (_this.name.get_robot().school!=null
-                    &&_this.name.get_robot().name!=null
-                    &&_this.name.get_robot().year!=null);
-        }
+		function(){return (_this.name.get_robot().school!=null&&_this.name.get_robot().name!=null&&_this.name.get_robot().year!=null);}
 	);
 
-	this.pilot_status = new pilot_status_t(this);
-	/*(
-		status_view_div
-		console.log("Pilot Connected: " pilot_status_t.pilot.connected);
-	);
-*/
-	this.status_viewer=new status_viewer_t(status_view_div);
+	this.pilot_status=new pilot_status_t(this,function(){_this.load_gruveo(_this.name.get_robot());});
+	this.status_viewer=new status_viewer_t(this.main_div);
 
+	this.state_side_bar=document.createElement("div");
+
+	$('#content').w2layout
+	({
+		name:'app_layout',
+		panels:
+		[
+			{type:'left',resizable:true,content:this.gruveo_div,size:"60%"},
+			{type:'main',resizable:true,content:this.name.el,},
+			{type:'preview',resizable:true,content:this.status_viewer.el,size:"80%"}
+		]
+	});
 }
 
 gui_t.prototype.destroy=function()
@@ -88,5 +71,12 @@ gui_t.prototype.destroy=function()
 	this.div.removedChild(this.el);
 }
 
-
-
+gui_t.prototype.load_gruveo=function(robot)
+{
+	var url="https://gruveo.com/";
+	var robot_url="";
+	if(robot&&robot.year&&robot.school&&robot.name)
+		robot_url=robot.year+robot.school+robot.name;
+	url+=encodeURIComponent(robot_url.replace(/_/g,''));
+	this.gruveo.src=url;
+}

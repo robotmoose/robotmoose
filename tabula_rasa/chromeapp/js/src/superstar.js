@@ -79,51 +79,51 @@ function superstar_getnext(robot,path,on_success,on_error)
 {
 	var state={};
 	state.current="{}"; // current string value of path
-	
+
 	// Fetch the next value from the server
 	state.getnext=function() {
 		state.abort(); // stop any previous work
 		state.timeout=setTimeout(state.repeat,2*60*1000); // getnext will time out every 5 minutes, so repeat request every few minutes.
-		
+
 		// Send off network request:
 		state.xhr=superstar_generic(robot,path+"?getnext="+encodeURIComponent(state.current),
 			function(str) {
 				// Done with this request:
 				state.xhr=undefined;
-				state.abort_timeout(); 
-				
+				state.abort_timeout();
+
 				if(str=="")
 					str="{}";
-			
+
 				state.current=str;
 				state.json=JSON.parse(str);
-			
+
 				on_success(state.json);
-				
+
 				state.getnext(); // call ourselves to do it again
 			}
 		,on_error);
 	}
-	
+
 	// Reload the request from the server
 	state.repeat=function() {
 		state.getnext();
 	}
-	
+
 	// Stop all in-progress requests.
 	state.abort=function() {
 		state.abort_xhr();
 		state.abort_timeout();
 	}
-	
+
 	// Stop any in-progress XmlHttpRequest network request
 	state.abort_xhr=function() {
 		if (state.xhr) {
-			state.xhr.abort(); 
+			state.xhr.abort();
 			state.xhr=undefined;
 		}
 	}
-	
+
 	// Stop any in-progress timeout
 	state.abort_timeout=function() {
 		if (state.timeout) {
@@ -131,7 +131,7 @@ function superstar_getnext(robot,path,on_success,on_error)
 			state.timeout=undefined;
 		}
 	}
-	
+
 	state.getnext(); // start first one
 	return state; // hand back access object
 }
