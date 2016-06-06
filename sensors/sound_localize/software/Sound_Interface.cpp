@@ -4,13 +4,14 @@
 // UAF ITEST
 
 // Date Created: 5/31/2016
-// Last Modified: 6/5/2016
+// Last Modified: 6/6/2016
 
 #include <string>
 #include <cstdint>
 #include <iostream> // for std::cout, std::endl
 #include <vector>
 #include <deque>
+#include <array>
 #include <cstdio> // for std::printf & std::sprintf
 #include <utility> // for std::pair
 #include <cmath>
@@ -18,6 +19,8 @@
 #include <fftw3.h>
 
 #include <fstream>
+
+#define NUMSAMPLES_FFT 8192 // Number of samples to use for FFT. FFT resolution is fs/N.
 
 int main() {
 
@@ -75,12 +78,19 @@ int main() {
 
 	std::uint16_t fs = 7800; // ADC Sampling Frequency
 	// Number of samples to use for FFT. FFT resolution is fs/N.
-	std::size_t num_samples_fft = 8192;
-	// Counts up to num_samples_fft, then triggers FFT. Is reset to N/2 so FFTs overlap.
+	//std::size_t NUMSAMPLES_FFT = 8192;
+	// Counts up to NUMSAMPLES_FFT, then triggers FFT. Is reset to N/2 so FFTs overlap.
 	std::size_t fft_counter = 0;
 
-	std::vector<std::vector<double>> crossCorr_pairs(num_streams+1); // Stores cross correlation results
-	
+	std::vector<std::array<double, NUMSAMPLES_FFT>> crossCorr_pairs(num_streams+1); // Stores cross correlation results
+	// 
+	// for(int i=0; i=num_streams+1; ++i) {
+	// 	for(int j=0; j<NUMSAMPLES_FFT; ++j) {
+	// 		crossCorr_pairs[i].push_back(double);
+	// 	}
+	// }
+
+
 	// Create a vector of data streams. Each data stream is a deque containing the received
 	//     microphone readings.
 	std::vector<std::deque<std::uint16_t>> data_streams;
@@ -102,14 +112,14 @@ int main() {
 
 	for(int i=0; i<num_streams; ++i) {
 		fft_data.push_back(std::make_pair(
-			(double*) fftw_malloc(sizeof(double) * num_samples_fft),
-			(double*) fftw_malloc(sizeof(double) * num_samples_fft)
+			(double*) fftw_malloc(sizeof(double) * NUMSAMPLES_FFT),
+			(double*) fftw_malloc(sizeof(double) * NUMSAMPLES_FFT)
 		));
 	}
 
 	// Create optimized plan for executing FFT
 	fftw_plan p = fftw_plan_r2r_1d(
-		num_samples_fft, 
+		NUMSAMPLES_FFT, 
 		fft_data[0].first, 
 		fft_data[0].second, 
 		FFTW_R2HC, 
@@ -143,24 +153,24 @@ int main() {
 					}
 					// Store data for use with FFT
 					data_streams[i].push_back(microphone_data[i]);
-					if(data_streams[i].size() > num_samples_fft) data_streams[i].pop_front();
+					if(data_streams[i].size() > NUMSAMPLES_FFT) data_streams[i].pop_front();
 					
 					std::sprintf(buff, "%u,", microphone_data[i]);
 					output_time << buff;
 					//std::printf("Microphone data %d: %u\n", i, microphone_data[i]);
 				}
 				//std::printf("Counter: %lu\n", fft_counter);
-				if(fft_counter >= num_samples_fft) {
+				if(fft_counter >= NUMSAMPLES_FFT) {
 					// Execute the Fourier transforms
 					for(int i=0; i<num_streams; ++i) {
-						for(int j=0; j<num_samples_fft; ++j) {
+						for(int j=0; j<NUMSAMPLES_FFT; ++j) {
 							// Copy microphone data over. This will convert int to double.
 							fft_data[i].first[j] = (double) data_streams[i][j];
 						}
 						fftw_execute_r2r(p, fft_data[i].first, fft_data[i].second);
 					}
 					// Log the FFT outputs.
-					for(int i=0; i<(num_samples_fft+1)/2; ++i) {
+					for(int i=0; i<(NUMSAMPLES_FFT+1)/2; ++i) {
 						for(int j=0; j<num_streams; ++j) {
 							std::sprintf(buff, "%f,", fft_data[j].second[i]);
 							output_freq << buff;			
@@ -170,13 +180,13 @@ int main() {
 
 					// For each adjacent FFT pair, calculate the cross correlation.
 					for(int i=0; i<num_streams+1; ++i) {
-						if(i!=num_streams-1) {
-							for(int j=0; j<num_samples_fft; ++j) {
+						if(i!=num_streams) {
+							for(int j=0; j<NUMSAMPLES_FFT; ++j) {
 								crossCorr_pairs[i][j] = std::abs(fft_data[i].second[j]*fft_data[i+1].second[j]);
 							}
 						}
 						else { // Wraparound
-							for(int j=0; j<num_samples_fft; ++j) {
+							for(int j=0; j<NUMSAMPLES_FFT; ++j) {
 								crossCorr_pairs[i][j] = std::abs(fft_data[i].second[j]*fft_data[0].second[j]);
 							}
 						}
@@ -184,7 +194,7 @@ int main() {
 
 					++counter;
 					std::printf("FFT Counter %lu\n", counter);
-					fft_counter = num_samples_fft/2;
+					fft_counter = NUMSAMPLES_FFT/2;
 				}
 				output_time << "\n";		
 			}
