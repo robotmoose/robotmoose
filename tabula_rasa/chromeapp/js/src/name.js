@@ -71,14 +71,15 @@ name_t.prototype.load=function(robot)
 	this.update_superstars_m();
 }
 
-name_t.prototype.build_select_m=function(select,json,heading,on_loaded_value)
+name_t.prototype.build_select_m=function(select,json,heading,on_loaded_value,sort_func)
 {
 	select.length=0;
 	var list=[];
-
 	list.push(heading);
 	for(var key in json)
 		list.push(json[key]);
+	if(sort_func)
+		list.sort(sort_func);
 	select.build(list,on_loaded_value);
 	this.update_disables_m();
 }
@@ -131,7 +132,7 @@ name_t.prototype.build_years_m=function(json)
 	var value=this.year_select.selected();
 	if(this.onloaded_robot.year)
 		value=this.onloaded_robot.year;
-	this.build_select_m(this.year_select,json,"Year",value);
+	this.build_select_m(this.year_select,json,"Year",value,function(lhs,rhs){return parseInt(rhs)-parseInt(lhs);});
 }
 
 name_t.prototype.build_schools_m=function(json)
