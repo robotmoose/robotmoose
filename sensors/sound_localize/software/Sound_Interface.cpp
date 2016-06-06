@@ -4,7 +4,7 @@
 // UAF ITEST
 
 // Date Created: 5/31/2016
-// Last Modified: 6/3/2016
+// Last Modified: 6/5/2016
 
 #include <string>
 #include <cstdint>
@@ -13,6 +13,7 @@
 #include <deque>
 #include <cstdio> // for std::printf & std::sprintf
 #include <utility> // for std::pair
+#include <cmath>
 #include "serial/serial.h"
 #include <fftw3.h>
 
@@ -74,9 +75,11 @@ int main() {
 
 	std::uint16_t fs = 7800; // ADC Sampling Frequency
 	// Number of samples to use for FFT. FFT resolution is fs/N.
-	std::size_t num_samples_fft = 2048;
+	std::size_t num_samples_fft = 8192;
 	// Counts up to num_samples_fft, then triggers FFT. Is reset to N/2 so FFTs overlap.
-	std::size_t fft_counter = 0; 
+	std::size_t fft_counter = 0;
+
+	std::vector<std::vector<double>> crossCorr_pairs(num_streams+1); // Stores cross correlation results
 	
 	// Create a vector of data streams. Each data stream is a deque containing the received
 	//     microphone readings.
@@ -103,8 +106,7 @@ int main() {
 			(double*) fftw_malloc(sizeof(double) * num_samples_fft)
 		));
 	}
-	//in = (double*) fftw_malloc(sizeof(double) * num_samples_fft);
-	//out = (double*) fftw_malloc(sizeof(double) * num_samples_fft);
+
 	// Create optimized plan for executing FFT
 	fftw_plan p = fftw_plan_r2r_1d(
 		num_samples_fft, 
@@ -116,7 +118,7 @@ int main() {
 
 	// ********** Data Parsing and Processing Setup End ********** // 
 
-
+	std::size_t counter = 0;
 	// ********** Main Program Loop ********** //
 	while(true) {
 		// Syncronize by reading CR (10) followed by LF (13)
@@ -152,12 +154,10 @@ int main() {
 					// Execute the Fourier transforms
 					for(int i=0; i<num_streams; ++i) {
 						for(int j=0; j<num_samples_fft; ++j) {
-							// Copy microphone data to in. This will convert int to double.
+							// Copy microphone data over. This will convert int to double.
 							fft_data[i].first[j] = (double) data_streams[i][j];
 						}
-						//clearfftw_execute(p); // perform the fft
 						fftw_execute_r2r(p, fft_data[i].first, fft_data[i].second);
-						std::printf("FFT #%d performed.\n", i);
 					}
 					// Log the FFT outputs.
 					for(int i=0; i<(num_samples_fft+1)/2; ++i) {
@@ -167,9 +167,26 @@ int main() {
 						}
 						output_freq << "\n";
 					}
+
+					// For each adjacent FFT pair, calculate the cross correlation.
+					for(int i=0; i<num_streams+1; ++i) {
+						if(i!=num_streams-1) {
+							for(int j=0; j<num_samples_fft; ++j) {
+								crossCorr_pairs[i][j] = std::abs(fft_data[i].second[j]*fft_data[i+1].second[j]);
+							}
+						}
+						else { // Wraparound
+							for(int j=0; j<num_samples_fft; ++j) {
+								crossCorr_pairs[i][j] = std::abs(fft_data[i].second[j]*fft_data[0].second[j]);
+							}
+						}
+					}
+
+					++counter;
+					std::printf("FFT Counter %lu\n", counter);
 					fft_counter = num_samples_fft/2;
 				}
-				output_time << "\n";
+				output_time << "\n";		
 			}
 		}
 	}
