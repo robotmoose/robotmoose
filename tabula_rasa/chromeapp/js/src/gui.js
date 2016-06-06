@@ -45,7 +45,7 @@ function gui_t(div)
 		}
 
 	);
-	this.connection.on_name_set=function(robot){_this.name.reload(robot);};
+	this.connection.on_name_set=function(robot){_this.name.load(robot);};
 	this.connection.load();
 
 	this.serial_selector=new serial_selector_t

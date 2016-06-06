@@ -28,14 +28,15 @@ function serial_selector_t(div,on_connect,on_disconnect,is_connectable)
 	this.connected=false;
 	this.selected_value=null;
 
-	this.dropdown=new dropdown_t(this.el,function(){return this.connected;});
-	this.dropdown.set_width("70%");
+	this.checkmark=new checkmark_t(this.el);
+
+	this.dropdown=new dropdown_t(this.checkmark.getElement(),function(){return this.connected;});
+	this.dropdown.set_width("100%");
 
 	this.button=document.createElement("input");
 	this.el.appendChild(this.button);
 	this.button.type="button";
 	this.button.value="Connect";
-	this.button.style.float="right";
 	this.button.onclick=function(){_this.button_m();};
 
 	this.interval=setInterval(function(){_this.update_list_m();},250);
@@ -99,12 +100,8 @@ serial_selector_t.prototype.build_list_m=function(ports)
 	if(this.connected&&old&&!found)
 		this.disconnect();
 
-	this.button.disabled=(this.dropdown.size()<=0 || !this.is_connectable());
-	if(this.button.disabled)
-		this.dropdown.select.style.backgroundColor="maroon";
-	else
-	this.dropdown.select.style.backgroundColor="cyan";
-
+	this.button.disabled=(this.dropdown.size()<=0||!this.is_connectable());
+	this.checkmark.check(this.dropdown.selected());
 }
 
 serial_selector_t.prototype.button_m=function()

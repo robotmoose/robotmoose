@@ -1,4 +1,4 @@
-function new_div(el, id)
+function new_div(el,id)
 {
 	var div=document.createElement("div");
 	if(el) div.id=id;

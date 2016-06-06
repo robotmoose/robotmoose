@@ -33,16 +33,28 @@ dropdown_t.prototype.size=function()
 	return this.select.options.length;
 }
 
+dropdown_t.prototype.clear=function()
+{
+	this.select.selectedIndex=0;
+	this.select.options.length=0;
+}
+
+dropdown_t.prototype.set_enable=function(value)
+{
+	if(value)
+		this.enable();
+	else
+		this.disable();
+}
+
 dropdown_t.prototype.enable=function()
 {
 	this.disabled=this.select.disabled=false;
-	this.set_background_color("cyan");
 }
 
 dropdown_t.prototype.disable=function()
 {
 	this.disabled=this.select.disabled=true;
-	this.set_background_color("maroon");
 }
 
 dropdown_t.prototype.selected=function()
