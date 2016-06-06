@@ -31,6 +31,7 @@ pilot_status_t.prototype.check_connected=function(heartbeat)
 	{
 		this.pilot_connected=true;
 		this.last_update_ms=new Date().getTime();
+
 	}
 
 	if((new Date()).getTime()-this.last_update_ms>this.pilot_disconnect_ms)
@@ -40,6 +41,7 @@ pilot_status_t.prototype.check_connected=function(heartbeat)
 		this.on_connected();
 	if(last&&!this.pilot_connected&&this.on_disconnected)
 		this.on_disconnected();
+	this.gui.name.pilot_checkmark.check(this.pilot_connected);
 }
 
 pilot_status_t.prototype.update=function()
