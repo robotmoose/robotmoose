@@ -62,17 +62,18 @@ video_widget_t.prototype.download=function(robot,link)
 	if(link)
 	{
 		this.frame=document.createElement("iframe");
+		//Commented code attempts to add robot to gruveo...doing so causes a full redirect to gruveo's site...
 		//this.frame.sandbox="allow-same-origin allow-forms allow-scripts";
 
-		if(link=="https://www.gruveo.com/"&&this.robot&&this.robot.year&&this.robot.school&&this.robot.name)
+		/*if(link=="https://www.gruveo.com/"&&this.robot&&this.robot.year&&this.robot.school&&this.robot.name)
 		{
 			var robot_url=this.robot.year+this.robot.school+this.robot.name;
 			link+=robot_url.replace(/_/g,'');
 		}
 		else
-		{
+		{*/
 			link+="?robot="+this.robot.name;
-		}
+		//}
 
 		this.frame.src=link;
 		this.frame.style.width="100%";
