@@ -9,7 +9,7 @@ function pilot_status_t(gui,on_connected,on_disconnected)
 	this.current_pilot_heartbeat=0;
 	this.on_connected=on_connected;
 	this.on_disconnected=on_disconnected;
-	this.prev_pilot_hearbeat=0;
+	this.prev_pilot_heartbeat=-1;
 	this.last_update_ms=new Date().getTime();
 	this.pilot_connected=false;
 	this.path="pilotHeartbeat";
@@ -27,11 +27,11 @@ pilot_status_t.prototype.check_connected=function(heartbeat)
 
 	// Check if the pilot heartbeat has changed 
 	// No update == no pilot connected 
-	if(this.current_pilot_heartbeat != this.prev_pilot_heartbeat)
+	if(this.current_pilot_heartbeat != this.prev_pilot_heartbeat
+		&& this.prev_pilot_heartbeat != -1 )
 	{
 		this.pilot_connected=true;
 		this.last_update_ms=new Date().getTime();
-
 	}
 
 	if((new Date()).getTime()-this.last_update_ms>this.pilot_disconnect_ms)
