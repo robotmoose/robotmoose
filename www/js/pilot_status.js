@@ -29,7 +29,7 @@ function pilot_status_t(ui)
 		videobeats:0
 	}; 
 
-	setInterval(function(){_this.upload();},10000);
+	setInterval(function(){_this.upload();},1000);
 
 }
 
@@ -59,7 +59,7 @@ pilot_status_t.prototype.upload=function()
 	if(!this.ui || !this.ui.robot || !this.ui.robot.name)
 		return null;
 	this.update_heartbeats();
-	superstar_set(this.ui.robot,this.path,this.pilot_status);
+	superstar_set(this.ui.robot,this.path,[{"heartbeats":this.pilot_status.heartbeats,"videobeats":this.pilot_status.videobeats}]);
 }
 
 
