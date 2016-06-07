@@ -21,7 +21,7 @@ function dropdown_t(div,enable_callback,onchange)
 		function(){_this.select.blur();});
 	this.key_listener=document.addEventListener("keydown",
 		function(evt){if(evt.keyCode==9)
-		setTimeout(function(){_this.select.blur();},100);});
+		setTimeout(function(){_this.select.blur();},1000);});
 	this.disabled=false;
 }
 
@@ -97,6 +97,7 @@ dropdown_t.prototype.build=function(list,on_loaded_value)
 		return;
 	}
 
+	var _this=this;
 	setTimeout(function(){_this.build(list,on_loaded_value);},10);
 }
 

@@ -271,7 +271,7 @@ robot_ui_t.prototype.create_widgets=function()
 	}
 	this.widgets.pilot.onpilot=myself.state_runner.onpilot=function(power)
 	{
-		console.log("Pilot data upload: "+myself.robot.name);
+		//console.log("Pilot data upload: "+myself.robot.name);
 		if(myself.robot.name)
 			myself.widgets.pilot.upload(myself.robot);
 	}

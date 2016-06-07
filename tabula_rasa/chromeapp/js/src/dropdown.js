@@ -94,6 +94,7 @@ dropdown_t.prototype.build=function(list,on_loaded_value)
 		return;
 	}
 
+	var _this=this;
 	setTimeout(function(){_this.build(list,on_loaded_value);},10);
 }
 
