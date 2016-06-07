@@ -271,13 +271,13 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	// Simple instantanious drive:
 	VM.drive=function(speedL,speedR) {
 		if (VM.sequencer.current()) {
-			
+
 			// cap speed at 100 percent
-			if (speedL > 100.0) speedL = 100.0; 
+			if (speedL > 100.0) speedL = 100.0;
 			else if (speedL < -100.0) speedL = -100.0;
 			if (speedR > 100.0) speedR = 100.0;
 			else if (speedR < -100.0) speedR = -100.0;
-			
+
 			VM.power.L=speedL; VM.power.R=speedR;
 		}
 	}
@@ -429,7 +429,7 @@ state_runner_t.prototype.execute_m=function(state_table)
 
 			this.update_continue_m(state_table,run_state);
 
-			var VM=this.make_user_VM(run_state.code,this.state_list);
+			var VM=this.make_user_VM(run_state.code+"\n",this.state_list);
 
 			if (VM.sequencer.exec_count>=VM.sequencer.code_count)
 			{ // Restart the state if we're at the end of the sequence:

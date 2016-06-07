@@ -16,12 +16,12 @@ function state_table_t(doorway)
 
 	var _this=this;
 	this.old_time=get_time();
-	this.old_last_experiment="HelloWorld";
+	this.old_last_experiment=null;
 	this.old_robot=null;
 	this.doorway=doorway;
 	this.overwrite_modal=new modal_yesno_t(this.doorway.parent_div,"Warning","");
 	this.div=doorway.content;
-	this.last_experiment="HelloWorld";
+	this.last_experiment=this.old_last_experiment;
 	this.last_save_hash=null;
 	this.autosave_time_interval=1000;
 	this.old_experiments_list=[];
@@ -70,7 +70,6 @@ function state_table_t(doorway)
 		return errors;
 	}
 	this.global_errors=this.make_error_span();
-	// this.global_errors.textContent="Sample error here";
 	this.div.appendChild(this.global_errors);
 	this.last_error_entry=null;
 
@@ -78,11 +77,14 @@ function state_table_t(doorway)
 	this.drag_list_div=document.createElement("div");
 	this.drag_list=new drag_list_t(this.drag_list_div);
 	this.controls_div=document.createElement("div");
-	this.experiment=
+
+	this.experiment_drop=new dropdown_t(this.controls_div);
+	this.experiment_drop.onchange=function()
 	{
-		div:document.createElement("div"),
-		drop:document.createElement("select")
+		_this.last_experiment=_this.experiment_drop.selected();
+		_this.load_button_pressed_m();
 	};
+
 	this.run_button=document.createElement("input");
 	this.new_button=document.createElement("input");
 	this.add_button=document.createElement("input");
@@ -102,23 +104,6 @@ function state_table_t(doorway)
 	this.element.appendChild(document.createElement("br"));
 
 	this.element.appendChild(this.drag_list_div);
-
-	this.experiment.div.className="form-group";
-	this.experiment.div.style.float="left";
-	this.controls_div.appendChild(this.experiment.div);
-
-	this.experiment.div.appendChild(this.experiment.drop);
-	this.experiment.drop.onchange=function()
-	{
-		_this.last_experiment=_this.experiment.drop.value;
-		_this.load_button_pressed_m();
-	};
-	this.experiment.drop.className="form-control";
-	{
-		var option=document.createElement("option");
-		option.value=option.text="HelloWorld";
-		this.experiment.drop.appendChild(option);
-	}
 
 	this.run_button.type="button";
 	this.run_button.className="btn btn-primary";
@@ -174,6 +159,8 @@ function state_table_t(doorway)
 	this.controls_div.appendChild(this.add_button);
 
 	this.set_autosave(true);
+
+	this.download_experiments();
 }
 
 state_table_t.prototype.set_autosave=function(on)
@@ -182,49 +169,14 @@ state_table_t.prototype.set_autosave=function(on)
 	if(this.autosave_interval)
 		clearInterval(this.autosave_interval);
 	if(on)
-	{
 		this.autosave_interval=setInterval(function(){_this.autosave_m();},1000);
-	}
 }
 
 state_table_t.prototype.download_with_check=function(robot,skip_get_active,ondownload)
 {
 	if(!robot||!robot.name)
 		return;
-
 	var _this=this;
-
-	//Autosave...make this not necessary
-	/*if(_this.last_experiment.length>0)
-	{
-		superstar_get(robot,"/experiments/"+encodeURIComponent(_this.last_experiment)+"/code",
-			function(obj)
-			{
-				if(JSON.stringify(obj)!=JSON.stringify(_this.get_states()))
-				{
-					_this.overwrite_modal.set_message("All unsaved changes to the experiment named \""+
-						_this.last_experiment+"\" will be lost. Proceed?");
-					_this.overwrite_modal.onok=function()
-					{
-						_this.last_experiment=_this.get_experiment_name();
-						_this.download(robot,skip_get_active,ondownload);
-					};
-					_this.overwrite_modal.oncancel=function()
-					{
-						_this.experiment.drop.value=_this.last_experiment;
-					};
-					_this.overwrite_modal.show();
-				}
-				else
-				{
-					_this.download(robot,skip_get_active,ondownload);
-				}
-			});
-	}
-	else
-	{
-		_this.download(robot,skip_get_active,ondownload);
-	}*/
 	_this.download(robot,skip_get_active,ondownload);
 }
 
@@ -254,6 +206,7 @@ state_table_t.prototype.download=function(robot,skip_get_active,callback)
 			}
 			else
 			{
+				console.log("DOIT");
 				_this.add_button_pressed_m();
 				_this.set_autosave(true);
 				_this.autosave_m(true);
@@ -273,47 +226,20 @@ state_table_t.prototype.download_experiments=function()
 		{
 			superstar_sub(this.old_robot,"experiments",function(experiments)
 			{
-				for (k in experiments)
+				for(k in experiments)
 					experiments[k]=decodeURIComponent(experiments[k]);
-
 				experiments=remove_duplicates(experiments);
-				_this.old_experiments_list=experiments;
-				var old_value=_this.last_experiment;
-				_this.experiment.drop.length=0;
-
-				var found=false;
-
-				for(key in experiments)
+				if(experiments.length==0)
 				{
-					var option=document.createElement("option");
-					_this.experiment.drop.appendChild(option);
-					option.text=option.value=experiments[key];
-					if(option.value==old_value)
-					{
-						_this.experiment.drop.value=option.value;
-						found=true;
-					}
+					if(!_this.last_experiment)
+						experiments.push("HelloWorld");
+					else
+						experiments.push("No experiments found.");
 				}
-
-				if(!found)
-				{
-					_this.experiment.drop.selectedIndex=0;
-					_this.last_experiment=_this.get_experiment_name();
-				}
-
-				_this.experiment.drop.disabled=false;
-
+				_this.experiment_drop.build(experiments,_this.last_experiment);
 				_this.update_buttons_m();
 			});
 		}
-
-		if(this.experiment.drop.length<=0)
-		{
-			var option=document.createElement("option");
-			this.experiment.drop.appendChild(option);
-			option.value=option.text="No experiments found.";
-		}
-
 		setTimeout(function(){_this.download_experiments();},1000);
 	}
 }
@@ -344,8 +270,8 @@ state_table_t.prototype.upload_with_check=function(robot,onupload)
 
 state_table_t.prototype.get_experiment_name=function()
 {
-	if(this.experiment.drop.selectedIndex>=0&&this.experiment.drop.selectedIndex<this.experiment.drop.options.length)
-		return this.experiment.drop.options[this.experiment.drop.selectedIndex].value;
+	if(this.experiment_drop.selected_index()>0&&this.experiment_drop.selected())
+		return this.experiment_drop.selected();
 	return "";
 }
 
@@ -901,7 +827,7 @@ state_table_t.prototype.update_buttons_m=function(valid)
 		}
 	}
 
-	if(this.get_experiment_name().length==0)
+	if(!this.experiment_drop.selected())
 		valid=false;
 
 	this.run_button.disabled=!valid;
