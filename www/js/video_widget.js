@@ -40,15 +40,15 @@ function video_widget_t(obj)
 	this.select=document.createElement("select");
 	this.top.appendChild(this.select);
 	this.select.className="form-control";
-	this.select.onchange=function(){myself.download(null,myself.select.options[this.selectedIndex].video_link);};
+	this.select.onchange=function(){myself.download(null,myself.select.options[this.selectedIndex]);};
 
 	this.default_link="http://robotmoose.com/webrtc/";
 	this.create_option("Off",null);
-	this.create_option("WebRTC",this.default_link);
-	this.create_option("Gruveo","https://www.gruveo.com/embed/");
+	//this.create_option("WebRTC",this.default_link,"?robot=");
+	this.create_option("Gruveo","https://www.gruveo.com/embed/","?code=");
 }
 
-video_widget_t.prototype.download=function(robot,link)
+video_widget_t.prototype.download=function(robot,option)
 {
 	if(robot!=null)
 		this.robot=robot;
@@ -59,23 +59,13 @@ video_widget_t.prototype.download=function(robot,link)
 		this.frame=null;
 	}
 
-	if(link)
+	if(option.video_link)
 	{
 		this.frame=document.createElement("iframe");
-		//Commented code attempts to add robot to gruveo...doing so causes a full redirect to gruveo's site...
-		//this.frame.sandbox="allow-same-origin allow-forms allow-scripts";
-
-		/*if(link=="https://www.gruveo.com/embed/"&&this.robot&&this.robot.year&&this.robot.school&&this.robot.name)
-		{
-			var robot_url=this.robot.year+this.robot.school+this.robot.name;
-			link="https://www.gruveo.com/"+robot_url.replace(/_/g,'');
-		}
-		else
-		{*/
-			link+="?robot="+this.robot.name;
-		//}
-
-		this.frame.src=link;
+		var robot_url=this.robot.year+this.robot.school+this.robot.name;
+		var url=option.video_link+option.video_uri+robot_url.replace(/_/g,'');
+		console.log(url);
+		this.frame.src=url;
 		this.frame.style.width="100%";
 		this.frame.style.height="100%";
 		this.frame.style.border="none";
@@ -90,11 +80,12 @@ video_widget_t.prototype.download=function(robot,link)
 	}
 }
 
-video_widget_t.prototype.create_option=function(name,link)
+video_widget_t.prototype.create_option=function(name,link,uri)
 {
 	var option=document.createElement("option");
-	option.video_link=link;
 	option.text=name;
+	option.video_link=link;
+	option.video_uri=uri;
 	this.select.appendChild(option);
 }
 
