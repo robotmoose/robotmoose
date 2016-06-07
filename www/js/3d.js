@@ -289,9 +289,9 @@ function renderer_t(div,setup_func,loop_func)
 		return THREE.ImageUtils.loadTexture(filename);
 	};
 
-	
-	
-	
+
+
+
 	myself.load_obj=function(filename,texture)
 	{
 		var model=new model_t(myself.scene);
@@ -322,7 +322,7 @@ function renderer_t(div,setup_func,loop_func)
 			model.rotation=model.mesh.rotation;
 			model.scale=model.mesh.scale;
 			model.loaded=true;
-			console.log("Loaded OBJ mesh from "+filename);
+			//console.log("Loaded OBJ mesh from "+filename);
 		}
 		);
 
@@ -348,8 +348,8 @@ function renderer_t(div,setup_func,loop_func)
 		var plane=new THREE.Mesh(plane_geometry,plane_material);
 		plane.rotation.set(3*Math.PI/2,0,0);
 		myself.scene.add(plane);
-		
-	
+
+
 
 		var line_geometry=new THREE.Geometry();
 		var line_material=new THREE.LineBasicMaterial({color:0x0488c8,linewidth:1.5});
@@ -376,10 +376,10 @@ function renderer_t(div,setup_func,loop_func)
 
 				var line=new THREE.Line(line_geometry,line_material,THREE.LinePieces);
 		plane.add(line);
-		
-		
-				
-		
+
+
+
+
 		return plane;
 	};
 }
