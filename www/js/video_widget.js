@@ -61,22 +61,21 @@ video_widget_t.prototype.download=function(robot,option)
 
 	if(option.video_link)
 	{
-		this.frame=document.createElement("iframe");
 		var robot_url=this.robot.year+this.robot.school+this.robot.name;
 		var url=option.video_link+option.video_uri+robot_url.replace(/_/g,'');
-		console.log(url);
+
+		this.frame=document.createElement("iframe");
 		this.frame.src=url;
 		this.frame.style.width="100%";
 		this.frame.style.height="100%";
 		this.frame.style.border="none";
 		this.frame.style.overflow="hidden";
+		this.bottom.appendChild(this.frame);
 
 		if(this.obj.active)
 			this.frame.style.pointerEvents="all";
 		else
 			this.frame.style.pointerEvents="none";
-
-		this.bottom.appendChild(this.frame);
 	}
 }
 
