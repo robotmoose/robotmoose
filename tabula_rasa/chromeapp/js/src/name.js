@@ -40,14 +40,6 @@ function name_t(div,on_message,on_selected)
 	this.robot_select.set_width("33%");
 	this.robot_select.onchange=function(){_this.on_selected_m();};
 
-	this.pilot_checkmark=new checkmark_t(this.el);
-	this.pilot_status_text=this.pilot_checkmark.getElement();
-	this.pilot_status_text.align="center";
-	this.pilot_status_text.style.fontSize="x-large";
-	this.pilot_status_text.innerHTML = "Pilot connected";
-
-
-
 	this.disables_interval=setInterval(function()
 	{
 		_this.update_disables_m();

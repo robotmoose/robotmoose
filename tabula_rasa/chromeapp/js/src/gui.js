@@ -11,7 +11,11 @@ function gui_t(div)
 	this.gruveo_div.style.overflow="hidden";
 	this.gruveo=document.getElementById("gruveo");
 	this.gruveo_div.appendChild(gruveo);
-	this.gruveo.addEventListener('permissionrequest',function(evt){if(evt.permission==='media')evt.request.allow();});
+	this.gruveo.addEventListener('permissionrequest',function(evt)
+	{
+		if(evt.permission==='media')
+			evt.request.allow();
+	});
 
 	this.superstar_errored=false;
 
@@ -20,8 +24,15 @@ function gui_t(div)
 	this.connection=new connection_t
 	(
 		function(message){_this.status_viewer.show(message);},
-		function(){_this.name.disabled=false;_this.serial_selector.disconnect();},
-		function(){_this.name.disabled=true;}
+		function()
+		{
+			_this.name.disabled=false;
+			_this.serial_selector.disconnect();
+		},
+		function()
+		{
+			_this.name.disabled=true;
+		}
 	);
 
 	this.name=new name_t
@@ -37,17 +48,33 @@ function gui_t(div)
 	);
 	this.connection.on_name_set=function(robot){_this.name.load(robot);};
 	this.connection.load();
-
 	this.serial_selector=new serial_selector_t
 	(
 		this.name.el,
-		function(port_name){_this.connection.gui_connect(port_name);},
-		function(port_name){_this.connection.gui_disconnect(port_name);},
-		function(){return (_this.name.get_robot().school!=null&&_this.name.get_robot().name!=null&&_this.name.get_robot().year!=null);}
+		function(port_name)
+		{
+			_this.connection.gui_connect(port_name);
+		},
+		function(port_name)
+		{
+			_this.connection.gui_disconnect(port_name);
+		},
+		function()
+		{
+			return (_this.name.get_robot().school!=null&&
+				_this.name.get_robot().name!=null&&
+				_this.name.get_robot().year!=null);
+		}
 	);
-
-	this.pilot_status=new pilot_status_t(this,function(){_this.load_gruveo(_this.name.get_robot());});
 	this.status_viewer=new status_viewer_t(this.main_div);
+
+	this.name.el.appendChild(document.createElement("br"));
+
+	this.pilot_checkmark=new checkmark_t(this.name.el);
+	this.pilot_status_text=this.pilot_checkmark.getElement();
+	this.pilot_status_text.align="center";
+	this.pilot_status_text.style.fontSize="x-large";
+	this.pilot_status_text.innerHTML = "Pilot connected";
 
 	this.state_side_bar=document.createElement("div");
 
@@ -60,6 +87,11 @@ function gui_t(div)
 			{type:'main',resizable:true,content:this.name.el,},
 			{type:'preview',resizable:true,content:this.status_viewer.el,size:"70%"}
 		]
+	});
+
+	this.pilot_status=new pilot_status_t(this.name,this.pilot_checkmark,function()
+	{
+		_this.load_gruveo(_this.name.get_robot());
 	});
 }
 
