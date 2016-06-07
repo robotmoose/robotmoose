@@ -258,6 +258,7 @@ robot_ui_t.prototype.create_widgets=function()
 	}
 	this.widgets.states.onrun=function()
 	{
+		setTimeout(function(){myself.gui.element.activate(myself.doorways.UI);},100);
 		myself.widgets.UI.run();
 		if(myself.robot.name)
 		{
