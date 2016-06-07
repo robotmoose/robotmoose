@@ -22,6 +22,7 @@ function name_t(div,on_message,on_selected)
 
 	var _this=this;
 
+	this.superstar_ok=false;
 	this.superstar_checkmark=new checkmark_t(this.el);
 	this.superstar_select=new dropdown_t(this.superstar_checkmark.getElement());
 	this.superstar_select.el.style.width="100%";
@@ -47,7 +48,10 @@ function name_t(div,on_message,on_selected)
 
 
 
-	this.disables_interval=setInterval(function(){_this.update_disables_m();},250);
+	this.disables_interval=setInterval(function()
+	{
+		_this.update_disables_m();
+	},250);
 }
 
 
@@ -62,7 +66,9 @@ name_t.prototype.get_robot=function()
 {
 	var robot={superstar:"robotmoose.com",school:null,name:null,year:null};
 
-	if(this.year_select.selected_index()>0&&this.school_select.selected_index()>0&&this.robot_select.selected_index()>0)
+	if(this.year_select.selected_index()>0&&
+		this.school_select.selected_index()>0&&
+		this.robot_select.selected_index()>0)
 	{
 		robot.year=this.year_select.selected();
 		robot.school=this.school_select.selected();
@@ -140,7 +146,10 @@ name_t.prototype.build_years_m=function(json)
 	var value=this.year_select.selected();
 	if(this.onloaded_robot.year)
 		value=this.onloaded_robot.year;
-	this.build_select_m(this.year_select,json,"Year",value,function(lhs,rhs){return parseInt(rhs)-parseInt(lhs);});
+	this.build_select_m(this.year_select,json,"Year",value,function(lhs,rhs)
+	{
+		return parseInt(rhs)-parseInt(lhs);
+	});
 }
 
 name_t.prototype.build_schools_m=function(json)
@@ -183,8 +192,16 @@ name_t.prototype.download_years_m=function()
 				name:""
 			},
 			"/",
-			function(json){_this.update_years_m(json);},
-			function(error){_this.on_error_m("Year download error("+error+").");}
+			function(json)
+			{
+				_this.update_years_m(json);
+				_this.superstar_ok=true;
+			},
+			function(error)
+			{
+				_this.on_error_m("Year download error("+error+").");
+				_this.superstar_ok=false;
+			}
 		);
 		return;
 	}
@@ -196,7 +213,8 @@ name_t.prototype.download_schools_m=function()
 	this.build_schools_m();
 	this.build_robots_m();
 
-	if(this.superstar_select.selected_index()>0&&this.year_select.selected_index()>0)
+	if(this.superstar_select.selected_index()>0&&
+		this.year_select.selected_index()>0)
 	{
 		var _this=this;
 		superstar_sub
@@ -208,8 +226,16 @@ name_t.prototype.download_schools_m=function()
 				name:""
 			},
 			"/",
-			function(json){_this.update_schools_m(json);},
-			function(error){_this.on_error_m("School download error ("+error+").");}
+			function(json)
+			{
+				_this.update_schools_m(json);
+				_this.superstar_ok=true;
+			},
+			function(error)
+			{
+				_this.on_error_m("School download error ("+error+").");
+				_this.superstar_ok=false;
+			}
 		);
 		return;
 	}
@@ -220,7 +246,9 @@ name_t.prototype.download_robots_m=function()
 {
 	this.build_robots_m();
 
-	if(this.superstar_select.selected_index()>0&&this.year_select.selected_index()>0&&this.school_select.selected_index()>0)
+	if(this.superstar_select.selected_index()>0&&
+		this.year_select.selected_index()>0&&
+		this.school_select.selected_index()>0)
 	{
 		var _this=this;
 		superstar_sub
@@ -232,8 +260,16 @@ name_t.prototype.download_robots_m=function()
 				name:""
 			},
 			"/",
-			function(json){_this.update_robots_m(json);},
-			function(error){_this.on_error_m("School download error ("+error+").");}
+			function(json)
+			{
+				_this.update_robots_m(json);
+				_this.superstar_ok=true;
+			},
+			function(error)
+			{
+				_this.on_error_m("School download error ("+error+").");
+				_this.superstar_ok=false;
+			}
 		);
 		return;
 	}
@@ -246,8 +282,11 @@ name_t.prototype.update_disables_m=function()
 	this.year_select.set_enable(!this.disabled);
 	this.school_select.set_enable(!this.disabled);
 	this.robot_select.set_enable(!this.disabled);
-	this.superstar_checkmark.check(this.superstar_select.selected_index()>0);
-	this.name_checkmark.check(this.year_select.selected_index()>0&&this.school_select.selected_index()>0&&this.robot_select.selected_index()>0);
+	this.superstar_checkmark.check(this.superstar_select.selected_index()>0&&
+		this.superstar_ok);
+	this.name_checkmark.check(this.year_select.selected_index()>0&&
+		this.school_select.selected_index()>0&&
+		this.robot_select.selected_index()>0);
 }
 
 name_t.prototype.on_selected_m=function(robot)
