@@ -14,7 +14,7 @@
 // Error handling code
 function superstar_error(user_errorhandler,why_string)
 {
-	//console.log("Superstar network error: "+why_string);
+	console.log("Superstar network error: "+why_string);
 	if (user_errorhandler) user_errorhandler(why_string);
 }
 
