@@ -206,7 +206,6 @@ state_table_t.prototype.download=function(robot,skip_get_active,callback)
 			}
 			else
 			{
-				console.log("DOIT");
 				_this.add_button_pressed_m();
 				_this.set_autosave(true);
 				_this.autosave_m(true);
