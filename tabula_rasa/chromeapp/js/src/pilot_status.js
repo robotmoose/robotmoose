@@ -10,6 +10,7 @@ function pilot_status_t(gui,on_connected,on_disconnected)
 	this.on_connected=on_connected;
 	this.on_disconnected=on_disconnected;
 	this.prev_pilot_heartbeat=-1;
+	this.current_pilot_heartbeat=-1;
 	this.last_update_ms=new Date().getTime();
 	this.pilot_connected=false;
 	this.path="pilotHeartbeat";
