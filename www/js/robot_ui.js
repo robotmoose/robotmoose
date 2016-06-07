@@ -116,7 +116,7 @@ robot_ui_t.prototype.download_gui=function()
 	+ "left(45)  // <i>turn left 45 degrees</i><br>"
 	+ "right(90)  // <i>turn right 90 degrees</i><br>"
 	+ "drive(-0.5, 0.5)  // <i>Sets the speed of the left and right wheels</i><br>"
-	+ "<br><a href=\"/code/api/\" title=\"API\"> <h4>Advanced</h4> </a>";
+	+ "<br><a href=\"/code/api/\" title=\"API\" target=\"new\"> <h4>Advanced</h4> </a>";
 	//+ "<h4> Sensors </h4>"
 	//+ "sensors.location.x - <i> Robot location in x-coordinate</i><br>"
 	//+ "sensors.location.angle - <i> Direction robot is facing </i><br>"

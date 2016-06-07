@@ -183,15 +183,14 @@ function validate_robot_name(robot_name,on_ok,on_notok)
 			
 			name_in_path("",year, function() {
 				name_in_path(year,school, function() {
-					name_in_path(year+"/"+school,name, function() {
-						if(on_ok) {
-							var robot={};
-							robot.year=year;
-							robot.school=school;
-							robot.name=name;
-							on_ok(robot);
-						}
-					})
+					// don't check robot name--lets you make new robots via &robot=2016/oldschool/newname trick
+					if(on_ok) {
+						var robot={};
+						robot.year=year;
+						robot.school=school;
+						robot.name=name;
+						on_ok(robot);
+					}
 				})
 			});
 		}

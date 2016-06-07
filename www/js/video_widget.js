@@ -59,7 +59,7 @@ video_widget_t.prototype.download=function(robot,option)
 		this.frame=null;
 	}
 
-	if(option.video_link)
+	if(option && option.video_link)
 	{
 		var robot_url=this.robot.year+this.robot.school+this.robot.name;
 		var url=option.video_link+option.video_uri+robot_url.replace(/_/g,'');
