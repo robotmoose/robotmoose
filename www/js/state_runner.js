@@ -259,8 +259,8 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		}
 	};
 
-	VM.sensors=this.VM_sensors;
-	VM.power=this.VM_pilot.power;
+	if (this.VM_sensors) VM.sensors=this.VM_sensors; else VM.sensors={};
+	if (this.VM_pilot.power) VM.power=this.VM_pilot.power; else VM.power={};
 	VM.store=this.VM_store;
 	VM.robot={sensors:VM.sensors, power:VM.power};
 
