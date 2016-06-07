@@ -25,9 +25,9 @@ pilot_status_t.prototype.check_connected=function(heartbeat)
 
 	var last=this.pilot_connected;
 
-	// +1 is needed since the heartbeat does not update if there is no pilot. 
-	//No update == no pilot connected 
-	if(this.current_pilot_heartbeat==this.prev_pilot_heartbeat+1)
+	// Check if the pilot heartbeat has changed 
+	// No update == no pilot connected 
+	if(this.current_pilot_heartbeat != this.prev_pilot_heartbeat)
 	{
 		this.pilot_connected=true;
 		this.last_update_ms=new Date().getTime();
