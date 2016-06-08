@@ -1114,6 +1114,8 @@ connection_t.prototype.load=function()
 
 			if(_this.on_name_set&&data&&data.superstar&&data.robot&&data.robot.school&&data.robot.name)
 				_this.on_name_set(data.robot);
+			else
+				_this.on_name_set();
 		});
 }
 

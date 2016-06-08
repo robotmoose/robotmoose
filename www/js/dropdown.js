@@ -93,6 +93,8 @@ dropdown_t.prototype.build=function(list,on_loaded_value)
 		}
 		if(!found)
 			this.select.selectedIndex=0;
+		this.value=this.selected_m();
+		this.index=this.selected_index_m();
 		this.select.disabled=(this.disabled||this.enable_callback()||this.select.options.length<=0);
 		return;
 	}
