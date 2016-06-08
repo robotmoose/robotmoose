@@ -1,7 +1,7 @@
 {
-	"name":"RobotMoose test",
-	"description":"Robotics backend software (test version from git)",
-	"version":"2016.6.7.0",
+	"name":"RobotMoose",
+	"description":"Robotics backend software.",
+	"version":"2016.6.7.1",
 	"manifest_version":2,
 	"permissions":
 	[
@@ -11,6 +11,10 @@
 		"http://test.robotmoose.com/",
 		"https://test.robotmoose.com/",
 		"https://www.gruveo.com/embed/",
+		"http://androidantelope.com/",
+		"https://androidantelope.com/",
+		"http://cyborgcaribou.com/",
+		"https://cyborgcaribou.com/",
 		"serial",
 		"storage",
 		"audioCapture",

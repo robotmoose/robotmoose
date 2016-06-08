@@ -96,6 +96,8 @@ name_t.prototype.update_superstars_m=function()
 	[
 		"robotmoose.com",
 		"test.robotmoose.com",
+		"androidantelope.com",
+		"cyborgcaribou.com",
 		"127.0.0.1:8081"
 	];
 
