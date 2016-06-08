@@ -1,7 +1,7 @@
 // Simpler cone-shaped bracket to hold a chunk of EMT tubing
 include <layla_config.scad>;
 
-$fa=5;
+$fa=3;
 
 // Size of floorplate of bracket (center to outside tip)
 radius=50;
