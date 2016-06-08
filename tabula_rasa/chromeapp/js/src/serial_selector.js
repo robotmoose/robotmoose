@@ -101,7 +101,7 @@ serial_selector_t.prototype.build_list_m=function(ports)
 		this.disconnect();
 
 	this.button.disabled=(this.dropdown.size()<=0||!this.is_connectable());
-	this.checkmark.check(this.dropdown.selected());
+	this.checkmark.check(this.dropdown.selected()&&this.connected);
 }
 
 serial_selector_t.prototype.button_m=function()

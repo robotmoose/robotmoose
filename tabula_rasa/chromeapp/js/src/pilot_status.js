@@ -1,11 +1,12 @@
 //callback on_connected() - Called when no pilot is connected and then at least one pilot is connected.
 //callback on_disconnected() - Called when at least one pilot is connected and then no pilot is connected.
 
-function pilot_status_t(gui,on_connected,on_disconnected)
+function pilot_status_t(name,pilot_checkmark,on_connected,on_disconnected)
 {
-	if(!gui)
+	if(!name||!pilot_checkmark)
 		return null;
-	this.gui=gui;
+	this.name=name;
+	this.pilot_checkmark=pilot_checkmark;
 	this.current_pilot_heartbeat=0;
 	this.on_connected=on_connected;
 	this.on_disconnected=on_disconnected;
@@ -26,7 +27,14 @@ function pilot_status_t(gui,on_connected,on_disconnected)
 	this.path="frontendStatus";
 	this.pilot_disconnect_ms=10000;
 	var _this=this;
-	this.current_pilot_status_interval=setInterval(function(){_this.update();},1000);
+
+	this.pilot_interval=setInterval(function(){_this.update();},1000);
+}
+
+pilot_status_t.prototype.destroy=function()
+{
+	this.div.removeChild(this.el);
+	clearInterval(this.pilot_interval);
 }
 
 pilot_status_t.prototype.check_connected=function()
@@ -51,7 +59,7 @@ pilot_status_t.prototype.check_connected=function()
 		this.on_connected();
 	if(last&&!this.pilot_connected&&this.on_disconnected)
 		this.on_disconnected();
-	this.gui.name.pilot_checkmark.check(this.pilot_connected);
+	this.pilot_checkmark.check(this.pilot_connected);
 }
 
 pilot_status_t.prototype.check_video=function()
@@ -71,7 +79,8 @@ pilot_status_t.prototype.update_pilot=function(frontendStatus)
 pilot_status_t.prototype.update=function()
 {
 	var _this=this;
-	superstar_get(this.gui.name.get_robot(),this.path,function(frontendStatus){_this.update_pilot(frontendStatus);});
+
+	superstar_get(this.name.get_robot(),this.path,function(frontendStatus){_this.update_pilot(frontendStatus);});
 }
 
 

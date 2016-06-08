@@ -61,7 +61,8 @@ function state_table_t(doorway)
 	this.createnew.label.style="col-sm-2 control-label";
 	this.createnew.label.style.color="#800000";
 
-	this.make_error_span=function (text) {
+	this.make_error_span=function(text)
+	{
 		var errors=document.createElement("span");
 		if(text)
 			errors.innerHTML=text;
@@ -81,6 +82,7 @@ function state_table_t(doorway)
 	this.experiment_drop=new dropdown_t(this.controls_div);
 	this.experiment_drop.onchange=function()
 	{
+		_this.set_autosave(false);
 		_this.last_experiment=_this.experiment_drop.selected();
 		_this.load_button_pressed_m();
 	};
@@ -269,7 +271,7 @@ state_table_t.prototype.upload_with_check=function(robot,onupload)
 
 state_table_t.prototype.get_experiment_name=function()
 {
-	if(this.experiment_drop.selected_index()>0&&this.experiment_drop.selected())
+	if(this.experiment_drop.selected_index()>=0&&this.experiment_drop.selected())
 		return this.experiment_drop.selected();
 	return "";
 }
@@ -279,6 +281,7 @@ state_table_t.prototype.upload=function(robot,onupload,experiment)
 	if(!robot)
 		return;
 
+
 	var _this=this;
 
 	if(!experiment)
@@ -287,6 +290,7 @@ state_table_t.prototype.upload=function(robot,onupload,experiment)
 	var new_hash=this.calc_save_hash_m(robot,experiment,this.get_states());
 
 	if(new_hash!=this.last_save_hash)
+	{
 		superstar_set(robot,"experiments/"+encodeURIComponent(experiment)+"/code",this.get_states(),
 			function()
 			{
@@ -300,6 +304,7 @@ state_table_t.prototype.upload=function(robot,onupload,experiment)
 							onupload();
 					});
 			});
+	}
 }
 
 state_table_t.prototype.get_states=function()
@@ -554,7 +559,8 @@ state_table_t.prototype.download_m=function(robot,callback)
 {
 	var _this=this;
 
-	superstar_get(robot,"experiments/"+encodeURIComponent(this.last_experiment)+"/code",function(obj)
+	superstar_get(robot,"experiments/"+encodeURIComponent(this.last_experiment)+"/code",
+	function(obj)
 	{
 		if(obj&&obj.length>0)
 			for(var key in obj)
@@ -599,7 +605,8 @@ state_table_t.prototype.load_button_pressed_m=function()
 	this.download_with_check(_this.old_robot,true,
 		function()
 		{
-			_this.upload(_this.old_robot);
+			_this.upload(_this.old_robot,null,_this.last_experiment);
+			_this.set_autosave(true);
 		});
 
 }

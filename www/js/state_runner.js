@@ -27,7 +27,7 @@ function state_runner_t()
 
 	// Send off the pilot data, if it has changed
 	myself.pilot_flush=function() {
-		console.log("Pilot flush: "+myself.VM_pilot.power.L);
+		//console.log("Pilot flush: "+myself.VM_pilot.power.L);
 		var pilot_cur=JSON.stringify(myself.VM_pilot);
 		if (pilot_cur!=myself.VM_pilot_last)
 		{ // Send off autopilot's driving commands
@@ -259,8 +259,8 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		}
 	};
 
-	VM.sensors=this.VM_sensors;
-	VM.power=this.VM_pilot.power;
+	if (this.VM_sensors) VM.sensors=this.VM_sensors; else VM.sensors={};
+	if (this.VM_pilot.power) VM.power=this.VM_pilot.power; else VM.power={};
 	VM.store=this.VM_store;
 	VM.robot={sensors:VM.sensors, power:VM.power};
 
@@ -303,7 +303,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 			var dist=target - 100.0*p.distanceTo(t.start);
 			var slow_dist=10.0; // scale back on approach
 			if (dist<slow_dist) speed*=0.1+0.9*dist/slow_dist;
-			console.log("Forward: distance: "+dist+" -> speed "+speed);
+			//console.log("Forward: distance: "+dist+" -> speed "+speed);
 			VM.power.L=VM.power.R=speed;
 			if (dist <= 0.0)
 			{ // done with move
@@ -344,7 +344,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 
 			var slow_dist=40.0; // scale back on approach
 			if (dist<slow_dist) speed*=0.1+0.9*dist/slow_dist;
-			console.log("Turn: distance: "+dist+" -> speed "+speed);
+			//console.log("Turn: distance: "+dist+" -> speed "+speed);
 			VM.power.L=+speed; VM.power.R=-speed;
 			if (dist <= 0.0)
 			{ // done with move
@@ -368,7 +368,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	VM.button=function(name,next_state,opts) {
 		var ret=VM.UI.element(name,"button",opts);
 		if (next_state && ret.oneshot) {
-			console.log("UI advancing to state "+next_state+" from button "+name);
+			//console.log("UI advancing to state "+next_state+" from button "+name);
 			VM.state=next_state;
 			ret.oneshot=false;
 		}
@@ -433,7 +433,7 @@ state_runner_t.prototype.execute_m=function(state_table)
 
 			if (VM.sequencer.exec_count>=VM.sequencer.code_count)
 			{ // Restart the state if we're at the end of the sequence:
-				console.log("Resetting sequencer back to start");
+				//console.log("Resetting sequencer back to start");
 				_this.do_writes(_this.VM);
 				VM.sequencer.reset();
 			}
@@ -493,7 +493,7 @@ state_runner_t.prototype.continue_m=function(state_table)
 			}
 		}
 	}
-	console.log("State advanced from "+this.state+" to "+next_state+" due to timer");
+	//console.log("State advanced from "+this.state+" to "+next_state+" due to timer");
 
 	if(!next_state)
 		this.stop_m(state_table);

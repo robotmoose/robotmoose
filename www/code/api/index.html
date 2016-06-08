@@ -27,12 +27,33 @@ state = <i>"turnLeft"</i>
 		<br>
 		<br>
 <pre>
+delay(1000)
+</pre>
+		Pause running the code for 1000 milliseconds (1 second) while the robot continues to follow the previous instruction.
+		<br>
+		<br>
+<pre>
 stop()
 </pre>
 		Stops running the code, exiting your states.
-		<br>
 		</p>
-		<h4>Basic User Interface (UI)</h4>
+		<br>
+		<br>
+
+<h4>Basic User Interface (UI)</h4>
+<pre>
+print("string")
+</pre>
+		string will appear to the right side of the state in the
+			code editor
+		<br>
+		<br>
+<pre>
+label("string")
+</pre>
+		string will appear in the UI window.  This is useful for explaining things to the user.
+		<br>
+		<br>
 <pre>
 button("<i>Lefty!</i>", <i>"turnLeft"</i>)
 </pre>
@@ -47,29 +68,11 @@ checkbox("string")
 		<br>
 		<br>
 <pre>
-label("string")
-</pre>
-		string will appear in the UI window.  This is useful for explaining things to the user.
-		<br>
-		<br>
-<pre>
-print("string")
-</pre>
-		string will appear to the right side of the state in the
-			code editor
-		<br>
-		<br>
-<pre>
 power.L=slider("Left", -100, 0, 100)
 </pre>
 		Creates a slider in the UI to control the left wheel, with range -100
 			to 100, and the slider first set to 0
 		<br>
-		<br>
-<pre>
-store.x=j
-</pre>
-		Store a variable named x, initialized to value j
 		<br>
 		<br>
 		<h4>Create2 Driving</h4>
@@ -91,11 +94,13 @@ power.servo[0] = 90
 			180 degrees)
 		<br>
 		<br>
+		<br>
 		<h4>PWM (Pulse Width Modulation)</h4>
 <pre>
 power.pwm[0] = 100
 </pre>
 		Sets the value of the first PWM to 100, full power (range is 0 to 100)
+		<br>
 		<br>
 		<br>
 		<h4>Neopixel LEDs</h4>
@@ -125,6 +130,15 @@ power.neopixel[0].start = time/250
 		Animate a bright red accent down a dim white background.
 		<br>
 		<br>
+		<br>
+				<h4>Variables</h4>
+<pre>
+store.x = 20 // <i>store a variable named x, set to 20</i><br>
+store.x = "String" // <i>store a variable named x, set to "String"</i><br>
+store.y = store.x // <i>store a variable named y, set to the value of x</i><br>
+</pre>
+		<br>
+		<br>
 		<h4>Control Flow</h4>
 <pre>
 if (<i>expression</i>)
@@ -140,12 +154,14 @@ else
 			otherwise executes <i>statement2</i>.
 		<br>
 		<br>
+		<br>
 		<h4>Examples:</h4>
 		<ul>
-		  <li><a href="/quizbot/code/nodding_yes/">Quizbot: Nodding Yes</a></li>
-		  <li><a href="/quizbot/code/nodding_yes_3_times/">Quizbot: Nodding Yes 3 Times</a></li>
-		  <li><a href="/quizbot/code/asking_questions/">Quizbot: Asking Questions with Code</a></li>
-		  <li><a href="/code/ui/">UI Examples</a></li>
+		  <li><a href="/quizbot/code/nodding_yes/" title="Quizbot: Nodding Yes">Quizbot: Nodding Yes</a></li>
+		  <li><a href="/quizbot/code/nodding_yes_3_times/" title="Quizbot: Nodding Yes 3 Times">Quizbot: Nodding Yes 3 Times</a></li>
+		  <li><a href="/quizbot/code/asking_questions/" title="Quizbot: Asking Questions with Code">Quizbot: Asking Questions with Code</a></li>
+		  <li><a href="/code/ui/" title="UI Examples">UI Examples</a></li>
+		  <li><a href="/kt/drive_examples/" title="KT: Drive Examples">KT: Drive Examples</a></li>
 		</ul>
 	  </div>
 	</div>

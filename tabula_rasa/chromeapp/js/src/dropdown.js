@@ -91,7 +91,11 @@ dropdown_t.prototype.build=function(list,on_loaded_value)
 		if(!found)
 			this.select.selectedIndex=0;
 		this.select.disabled=(this.disabled||this.enable_callback()||this.select.options.length<=0);
+		return;
 	}
+
+	var _this=this;
+	setTimeout(function(){_this.build(list,on_loaded_value);},10);
 }
 
 dropdown_t.prototype.set_width=function(w)
