@@ -7,31 +7,59 @@
 /*
 	pilot_status.js
 	Class to handle pilot status.
-	Increments a counter as long as a pilot is connected
-	Used for backend pilot detetcion
+	Used for backend pilot detection
+*/
+
+/*
+	callbacks:
+		update_heartbeats(): Pilot connected
+		update_videobeats(): Pilot has video open
 */
 
 //TO DO: Detect multiple pilots.
 
 function pilot_status_t(ui)
 {
-	this.current_heartbeat = 0;
 	this.ui = ui;
-	this.path = "pilotHeartbeat";
+	this.path = "frontendStatus";
 	var _this = this;
+	this.pilot_status=
+	{
+		heartbeats:0,
+		videobeats:0
+	}; 
 
 	setInterval(function(){_this.upload();},1000);
 
+}
+
+pilot_status_t.prototype.clamp=function(beats)
+{
+	if(beats > 255)
+		return 0;
+	else
+		return beats;
+
+}
+
+//Increments videobeats, signifies a video connection
+pilot_status_t.prototype.update_videobeats=function()
+{
+	this.pilot_status.videobeats=this.clamp(this.pilot_status.videobeats+1);
+}
+
+//Increments heartbeats, signifies a pilot is connected 
+pilot_status_t.prototype.update_heartbeats=function()
+{
+	this.pilot_status.heartbeats=this.clamp(this.pilot_status.heartbeats+1);
 }
 
 pilot_status_t.prototype.upload=function()
 {
 	if(!this.ui || !this.ui.robot || !this.ui.robot.name)
 		return null;
-
-	this.current_heartbeat++
-	if(this.current_heartbeat > 255)
-		this.current_heartbeat = 0;
-	//console.log("Pilot Heartbeat: " + this.current_heartbeat);
-	superstar_set(this.ui.robot,this.path,{"pilotHeartbeat":this.current_heartbeat});
+	this.update_heartbeats();
+	superstar_set(this.ui.robot,this.path,[{"heartbeats":this.pilot_status.heartbeats,"videobeats":this.pilot_status.videobeats}]);
 }
+
+
