@@ -9,30 +9,39 @@ function pilot_status_t(gui,on_connected,on_disconnected)
 	this.current_pilot_heartbeat=0;
 	this.on_connected=on_connected;
 	this.on_disconnected=on_disconnected;
-	this.prev_pilot_heartbeat=-1;
-	this.current_pilot_heartbeat=-1;
+	this.prev_pilot_status=
+	{
+		heartbeats:-1,
+		videobeats:-1
+	}
+
+	this.current_pilot_status=
+	{
+		heartbeats:-1,
+		videobeats:-1
+	}
+
 	this.last_update_ms=new Date().getTime();
 	this.pilot_connected=false;
-	this.path="pilotHeartbeat";
+	this.path="frontendStatus";
 	this.pilot_disconnect_ms=10000;
 	var _this=this;
-	this.current_pilot_heartbeat=setInterval(function(){_this.update();},1000);
+	this.current_pilot_status_interval=setInterval(function(){_this.update();},1000);
 }
 
-pilot_status_t.prototype.check_connected=function(heartbeat)
+pilot_status_t.prototype.check_connected=function()
 {
-	this.prev_pilot_heartbeat=this.current_pilot_heartbeat;
-	this.current_pilot_heartbeat=heartbeat;
-
+	
 	var last=this.pilot_connected;
-
+	
 	// Check if the pilot heartbeat has changed 
 	// No update == no pilot connected 
-	if(this.current_pilot_heartbeat != this.prev_pilot_heartbeat
-		&& this.prev_pilot_heartbeat != -1 )
+	if(this.current_pilot_status.heartbeats != this.prev_pilot_status.heartbeats
+		&& this.prev_pilot_status.heartbeats != -1 )
 	{
 		this.pilot_connected=true;
 		this.last_update_ms=new Date().getTime();
+		this.check_video();
 	}
 
 	if((new Date()).getTime()-this.last_update_ms>this.pilot_disconnect_ms)
@@ -45,10 +54,24 @@ pilot_status_t.prototype.check_connected=function(heartbeat)
 	this.gui.name.pilot_checkmark.check(this.pilot_connected);
 }
 
+pilot_status_t.prototype.check_video=function()
+{
+	console.log("Checking video"); //Dummy function for now
+}
+
+pilot_status_t.prototype.update_pilot=function(frontendStatus)
+{
+	var tmp = JSON.stringify(this.current_pilot_status);
+	this.prev_pilot_status=JSON.parse(tmp);
+	this.current_pilot_status.heartbeats=frontendStatus[0].heartbeats;
+	this.current_pilot_status.videobeats=frontendStatus[0].videobeats;
+
+	this.check_connected();
+}
 pilot_status_t.prototype.update=function()
 {
 	var _this=this;
-	superstar_get(this.gui.name.get_robot(),this.path,function(heartbeat){_this.check_connected(heartbeat.pilotHeartbeat);});
+	superstar_get(this.gui.name.get_robot(),this.path,function(frontendStatus){_this.update_pilot(frontendStatus);});
 }
 
 
