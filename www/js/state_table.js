@@ -110,7 +110,7 @@ function state_table_t(doorway)
 	this.run_button.type="button";
 	this.run_button.className="btn btn-primary";
 	this.run_button.style.marginLeft=10;
-	this.run_button.disabled=true;
+	this.run_button.disabled=false;
 	this.run_button.value="Run";
 	this.run_button.title_run="Click here to save this code and make it execute.";
 	this.run_button.title=this.run_button.title_run;
@@ -294,15 +294,16 @@ state_table_t.prototype.upload=function(robot,onupload,experiment)
 		superstar_set(robot,"experiments/"+encodeURIComponent(experiment)+"/code",this.get_states(),
 			function()
 			{
-				superstar_set(robot,"active_experiment",experiment,
-					function()
-					{
-						_this.last_save_hash=new_hash;
-						_this.last_experiment=experiment;
+				if(experiment)
+					superstar_set(robot,"active_experiment",experiment,
+						function()
+						{
+							_this.last_save_hash=new_hash;
+							_this.last_experiment=experiment;
 
-						if(onupload)
-							onupload();
-					});
+							if(onupload)
+								onupload();
+						});
 			});
 	}
 }
@@ -558,7 +559,6 @@ state_table_t.prototype.clear=function()
 state_table_t.prototype.download_m=function(robot,callback)
 {
 	var _this=this;
-
 	superstar_get(robot,"experiments/"+encodeURIComponent(this.last_experiment)+"/code",
 	function(obj)
 	{
@@ -825,13 +825,8 @@ state_table_t.prototype.update_buttons_m=function(valid)
 	var valid=true;
 
 	for(var key in entries)
-	{
-		if(entries[key])
-		{
-			if(!this.validate_state_m(entries[key].input))
-				valid=false;
-		}
-	}
+		if(entries[key]&&!this.validate_state_m(entries[key].input))
+			valid=false;
 
 	if(!this.experiment_drop.selected())
 		valid=false;

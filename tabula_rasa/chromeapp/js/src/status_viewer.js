@@ -19,7 +19,8 @@ function status_viewer_t(div)
 	// Theoretically speeds up text rendering:
 	this.textarea.style.textRendering="optimizeSpeed";
 	this.textarea.style.webkitFontSmoothing="none";
-	this.textarea.style.overflow="hidden";
+	this.textarea.style.resize="none";
+	this.textarea.style.display="flex";
 
 	this.interval=setInterval(function() {
 		this_.rebuild_textarea_m();

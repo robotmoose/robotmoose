@@ -1,13 +1,27 @@
-function video_widget_t(obj)
+function video_widget_t(obj,pilot)
 {
 	if(!obj)
 		return null;
 
 	this.obj=obj;
+	
+	if(pilot)
+	{
+		this.pilot=pilot;
+	}
+	
+	this.update_videobeats_interval=null;
+	
 	var myself=this;
 
-	this.obj.onactivate=function(){myself.pointer_events(true);};
-	this.obj.ondeactivate=function(){myself.pointer_events(false);};
+	this.obj.onactivate=function()
+	{
+		myself.pointer_events(true);
+	}
+	this.obj.ondeactivate=function()
+	{
+		myself.pointer_events(false);	
+	};
 	this.obj.resizer.onresizing=function(){myself.pointer_events(false);};
 
 	this.table=document.createElement("table");
@@ -40,7 +54,8 @@ function video_widget_t(obj)
 	this.select=document.createElement("select");
 	this.top.appendChild(this.select);
 	this.select.className="form-control";
-	this.select.onchange=function(){myself.download(null,myself.select.options[this.selectedIndex]);};
+	this.select.onchange=function(){
+		myself.download(null,myself.select.options[this.selectedIndex]);};
 
 	this.default_link="http://robotmoose.com/webrtc/";
 	this.create_option("Off",null);
@@ -61,6 +76,7 @@ video_widget_t.prototype.download=function(robot,option)
 
 	if(option && option.video_link)
 	{
+		var myself=this;
 		var robot_url=this.robot.year+this.robot.school+this.robot.name;
 		var url=option.video_link+option.video_uri+robot_url.replace(/_/g,'');
 
@@ -76,7 +92,19 @@ video_widget_t.prototype.download=function(robot,option)
 			this.frame.style.pointerEvents="all";
 		else
 			this.frame.style.pointerEvents="none";
+		if(this.pilot)
+		{
+			this.update_videobeats_interval=setInterval(function (){myself.pilot.update_videobeats();},1000);	
+		}
+		
 	}
+
+	if(this.pilot&& option && !option.video_link)
+	{
+		clearInterval(this.update_videobeats_interval);
+
+	}
+		
 }
 
 video_widget_t.prototype.create_option=function(name,link,uri)
