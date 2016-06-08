@@ -294,15 +294,16 @@ state_table_t.prototype.upload=function(robot,onupload,experiment)
 		superstar_set(robot,"experiments/"+encodeURIComponent(experiment)+"/code",this.get_states(),
 			function()
 			{
-				superstar_set(robot,"active_experiment",experiment,
-					function()
-					{
-						_this.last_save_hash=new_hash;
-						_this.last_experiment=experiment;
+				if(experiment)
+					superstar_set(robot,"active_experiment",experiment,
+						function()
+						{
+							_this.last_save_hash=new_hash;
+							_this.last_experiment=experiment;
 
-						if(onupload)
-							onupload();
-					});
+							if(onupload)
+								onupload();
+						});
 			});
 	}
 }
@@ -558,7 +559,6 @@ state_table_t.prototype.clear=function()
 state_table_t.prototype.download_m=function(robot,callback)
 {
 	var _this=this;
-
 	superstar_get(robot,"experiments/"+encodeURIComponent(this.last_experiment)+"/code",
 	function(obj)
 	{
