@@ -117,6 +117,6 @@ gui_t.prototype.load_gruveo=function(robot)
 	var robot_url="";
 	if(robot&&robot.year&&robot.school&&robot.name)
 		robot_url=robot.year+robot.school+robot.name;
-	url+=encodeURIComponent(robot_url.replace(/_/g,''));
+	url+=encodeURIComponent(robot_url.replace(/[^A-Za-z0-9\s!?]/g,''));
 	this.gruveo.src=url;
 }
