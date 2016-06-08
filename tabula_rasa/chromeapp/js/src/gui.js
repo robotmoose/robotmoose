@@ -76,6 +76,7 @@ function gui_t(div)
 	this.pilot_status_text.style.fontSize="x-large";
 	this.pilot_status_text.innerHTML = "Pilot connected";
 
+
 	this.state_side_bar=document.createElement("div");
 
 	$('#content').w2layout
@@ -93,6 +94,13 @@ function gui_t(div)
 	{
 		_this.load_gruveo(_this.name.get_robot());
 	});
+	this.gruveo_check=setInterval(function(){
+
+		if(_this.pilot_status.last_video&&!_this.pilot_status.video_closed)
+			{
+				_this.load_gruveo(_this.name.get_robot());
+			}
+	},1000);
 }
 
 gui_t.prototype.destroy=function()
