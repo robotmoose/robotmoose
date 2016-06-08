@@ -110,7 +110,7 @@ function state_table_t(doorway)
 	this.run_button.type="button";
 	this.run_button.className="btn btn-primary";
 	this.run_button.style.marginLeft=10;
-	this.run_button.disabled=true;
+	this.run_button.disabled=false;
 	this.run_button.value="Run";
 	this.run_button.title_run="Click here to save this code and make it execute.";
 	this.run_button.title=this.run_button.title_run;
