@@ -43,13 +43,13 @@ pilot_status_t.prototype.destroy=function()
 
 pilot_status_t.prototype.check_connected=function()
 {
-	
+
 	var last=this.pilot_connected;
-	console.log("Pilot Connected:" + this.pilot_connected);
-	
-	// Check if the pilot heartbeat has changed 
-	// No update == no pilot connected 
-	
+	//console.log("Pilot Connected:" + this.pilot_connected);
+
+	// Check if the pilot heartbeat has changed
+	// No update == no pilot connected
+
 	if(this.current_pilot_status.heartbeats != this.prev_pilot_status.heartbeats
 		&& this.prev_pilot_status.heartbeats != -1 )
 	{
@@ -79,27 +79,30 @@ pilot_status_t.prototype.check_video=function()
 	}
 
 	if((new Date()).getTime()-this.last_update_videobeats_ms>this.video_closed_ms)
-	{
 		this.video_closed=true;
-
-	}	
 
 }
 
 pilot_status_t.prototype.update_pilot=function(frontendStatus)
 {
-	var tmp = JSON.stringify(this.current_pilot_status);
-	this.prev_pilot_status=JSON.parse(tmp);
-	this.current_pilot_status.heartbeats=frontendStatus[0].heartbeats;
-	this.current_pilot_status.videobeats=frontendStatus[0].videobeats;
+	if(frontendStatus&&frontendStatus.length>0)
+	{
+		var tmp = JSON.stringify(this.current_pilot_status);
+		this.prev_pilot_status=JSON.parse(tmp);
+		this.current_pilot_status.heartbeats=frontendStatus[0].heartbeats;
+		this.current_pilot_status.videobeats=frontendStatus[0].videobeats;
 
-	this.check_connected();
+		this.check_connected();
+	}
 }
 pilot_status_t.prototype.update=function()
 {
 	var _this=this;
 
-	superstar_get(this.name.get_robot(),this.path,function(frontendStatus){_this.update_pilot(frontendStatus);});
+	var robot=this.name.get_robot();
+
+	if(robot&&robot.superstar&&robot.year&&robot.school&&robot.name)
+		superstar_get(this.name.get_robot(),this.path,function(frontendStatus){_this.update_pilot(frontendStatus);});
 }
 
 

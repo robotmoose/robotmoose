@@ -74,6 +74,10 @@ name_t.prototype.get_robot=function()
 name_t.prototype.load=function(robot)
 {
 	this.onloaded_robot=robot;
+	if(!this.onloaded_robot)
+		this.onloaded_robot={};
+	if(!this.onloaded_robot.superstar)
+		this.onloaded_robot.superstar="robotmoose.com";
 	this.update_superstars_m();
 }
 
@@ -188,7 +192,6 @@ name_t.prototype.download_years_m=function()
 			"/",
 			function(json)
 			{
-				console.log(json);
 				_this.update_years_m(json);
 				_this.superstar_ok=true;
 			},
@@ -223,7 +226,6 @@ name_t.prototype.download_schools_m=function()
 			"/",
 			function(json)
 			{
-				console.log(json);
 				_this.update_schools_m(json);
 				_this.superstar_ok=true;
 			},
@@ -258,7 +260,6 @@ name_t.prototype.download_robots_m=function()
 			"/",
 			function(json)
 			{
-				console.log(json);
 				_this.update_robots_m(json);
 				_this.superstar_ok=true;
 			},
