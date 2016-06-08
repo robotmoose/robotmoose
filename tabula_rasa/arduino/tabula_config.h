@@ -149,6 +149,7 @@ public:
 		
 		long maxPin=1000, maxAnalog=100;
 	#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+    digitalWrite(36,HIGH);  //Enable main board, note: this pin is not usable on the robotmoose frontend...
 		maxPin=53; maxAnalog=16;
 	#elif	defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
 		maxPin=13; maxAnalog=6;
