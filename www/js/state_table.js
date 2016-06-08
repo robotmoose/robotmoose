@@ -836,7 +836,7 @@ state_table_t.prototype.update_buttons_m=function(valid)
 	if(!this.experiment_drop.selected())
 		valid=false;
 
-	this.run_button.disabled=!valid;
+	//this.run_button.disabled=!valid;
 	//this.load_button.disabled=(this.get_experiment_name().length==0);
 
 	if(this.run_button.value=="Run")
