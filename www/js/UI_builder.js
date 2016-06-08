@@ -142,6 +142,7 @@ UI_builder_t.prototype.create_element=function(name,type,opts) {
 		this.div.appendChild(document.createElement("br")); // newline
 	}
 
+	this.minimized = false;
 	return e;
 }
 
