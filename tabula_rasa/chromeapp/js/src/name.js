@@ -188,6 +188,7 @@ name_t.prototype.download_years_m=function()
 			"/",
 			function(json)
 			{
+				console.log(json);
 				_this.update_years_m(json);
 				_this.superstar_ok=true;
 			},
@@ -222,6 +223,7 @@ name_t.prototype.download_schools_m=function()
 			"/",
 			function(json)
 			{
+				console.log(json);
 				_this.update_schools_m(json);
 				_this.superstar_ok=true;
 			},
@@ -256,6 +258,7 @@ name_t.prototype.download_robots_m=function()
 			"/",
 			function(json)
 			{
+				console.log(json);
 				_this.update_robots_m(json);
 				_this.superstar_ok=true;
 			},

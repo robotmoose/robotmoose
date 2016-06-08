@@ -13,12 +13,7 @@ function dropdown_t(div,enable_callback)
 	this.selected_value=null;
 	this.select=document.createElement("select");
 	this.el.appendChild(this.select);
-	this.select.onchange=function(){if(_this.onchange)_this.onchange();_this.select.blur();};
-	this.mouse_listener=document.addEventListener("mousedown",
-		function(){_this.select.blur();});
-	this.key_listener=document.addEventListener("keydown",
-		function(evt){if(evt.keyCode==9)
-		setTimeout(function(){_this.select.blur();},100);});
+	this.select.onchange=function(){if(_this.onchange)_this.onchange();};
 	this.disabled=false;
 }
 
@@ -71,7 +66,7 @@ dropdown_t.prototype.selected_index=function()
 
 dropdown_t.prototype.build=function(list,on_loaded_value)
 {
-	if(document.activeElement!=this.select)
+	//if(document.activeElement!=this.select)
 	{
 		var old="";
 		var found=false;
@@ -91,11 +86,11 @@ dropdown_t.prototype.build=function(list,on_loaded_value)
 		if(!found)
 			this.select.selectedIndex=0;
 		this.select.disabled=(this.disabled||this.enable_callback()||this.select.options.length<=0);
-		return;
+		//return;
 	}
 
-	var _this=this;
-	setTimeout(function(){_this.build(list,on_loaded_value);},10);
+	//var _this=this;
+	//setTimeout(function(){_this.build(list,on_loaded_value);},10);
 }
 
 dropdown_t.prototype.set_width=function(w)
