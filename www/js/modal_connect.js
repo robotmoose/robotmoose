@@ -126,6 +126,8 @@ modal_connect_t.prototype.build_year_list_m=function()
 		this.year_select.appendChild(option);
 	}
 
+	if(this.years.length>0)
+		this.year_select.selectedIndex=1;
 	this.update_disables_m();
 }
 
