@@ -4606,7 +4606,7 @@
 
   option("indentUnit", 2, loadMode, true);
   option("indentWithTabs", false);
-  option("smartIndent", true);
+  option("smartIndent", false);
   option("tabSize", 4, function(cm) {
     resetModeState(cm);
     clearCaches(cm);
