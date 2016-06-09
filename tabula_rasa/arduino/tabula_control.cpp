@@ -16,6 +16,9 @@ bool pc_connected=false;
 tabula_control_storage tabula_sensor_storage;
 tabula_control_storage tabula_command_storage;
 
+// Have most up to date sensor values have been sent
+bool tabula_sensors_sent = false;
+
 
 /** This class manages communication via an A_packet_formatter,
  including timeouts. */
@@ -97,6 +100,7 @@ public:
 		channel.pkt.write_packet(0xC,
 			tabula_sensor_storage.count,
 			tabula_sensor_storage.array);
+		tabula_sensors_sent = true;
 	}
 };
 

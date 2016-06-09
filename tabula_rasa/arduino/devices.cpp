@@ -14,6 +14,10 @@
 #include "NewPing.h" // Conflicts with tone.h
 
 
+// Have most up to date sensor values have been sent
+extern bool tabula_sensors_sent;
+
+
 // Servo output example:
 class servo_device : public action {
 public:
@@ -272,6 +276,7 @@ REGISTER_TABULA_DEVICE(latency,"",
 class neato : public action {
 public:
 	NeatoLDS<Stream> n;
+	NeatoLDSbuffer buffer;
 	tabula_sensor<NeatoLDSbatch> batch;
 	int neatoMotorPin;
 	neato(Stream &s,int motorPin_)
@@ -284,9 +289,16 @@ public:
 		// Incoming comms
 		int leash=1000; // bound maximum latency
 		while (n.read()) { if (--leash<0) break; }
-
-		// Outgoing comms--copy over the last batch
-		batch=n.lastBatch;
+		
+		// Grab latest batch
+		buffer.write(n.lastBatch);
+		
+		// Outgoing sensor values
+		if(tabula_sensors_sent) {
+			// Read latest neato data and note that sensor values are not up to date
+			batch = buffer.read();
+			tabula_sensors_sent = false;
+		}
 
 		// Motor control
 		pinMode(neatoMotorPin,OUTPUT);

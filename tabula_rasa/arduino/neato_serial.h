@@ -48,7 +48,7 @@ serial data protocol.
 */
 class NeatoLDSbatch {
 public:
-	enum {size=12}; // number of reports to accumulate at one time (multiple of 4, evenly divides 360)
+	enum {size=72}; // number of reports to accumulate at one time (multiple of 4, evenly divides 360)
 	short index:10; // starting angle, from 0-359 degrees.  -1 for invalid.
 	unsigned short errors:6; // Neato serial communication errors while receiving this batch
 	unsigned short speed64; // RPM*64
@@ -62,6 +62,54 @@ public:
 };
 
 
+/**
+  This class allows for arbitrary neato batches to be written and updated, storing the most relevant
+  batches in a buffer. Subsequent to read() will return most up to date neato data for the next angle
+  index to be read. Therefore 360/NeatoLDSbatch::size calls to read() will provide full 360 degree
+  range data.
+*/
+class NeatoLDSbuffer {
+public:
+	// Currently set to store full 360 range date, will still work with a smaller buffer size.
+	enum {size=360/NeatoLDSbatch::size};
+	
+	NeatoLDSbuffer() {
+		bufferIndex = 0; startIndex = 0;
+	}
+	
+	NeatoLDSbatch & read() {
+		bufferIndex %= size;
+		startIndex = (startIndex + NeatoLDSbatch::size) % 360;
+		return buffer[bufferIndex++];
+	}
+	
+	void write(const NeatoLDSbatch & batch) {
+		// Furthest angle index away that will fit in the buffer
+		int endIndex = startIndex + size * NeatoLDSbatch::size;
+		bool inRange = false;
+		
+		// Check if the given batch is in the range
+		// NOTE: This is possibly overcomplicated, but allows for arbitrary buffer and batch sizess
+		if(endIndex > 360) {
+			endIndex %= 360;
+			if((batch.index >= startIndex && batch.index < 360) || (batch.index >= 0 && batch.index < endIndex)) {
+				inRange = true;
+			}
+		}
+		else if(batch.index >= startIndex && batch.index < endIndex) {
+			inRange = true;
+		}
+		
+		// Write relevant batch to buffer
+		if(inRange) {
+			buffer[(bufferIndex + (batch.index + (360 - startIndex)) / NeatoLDSbatch::size) % size] = batch;
+		}
+	}
+	
+private:
+	int bufferIndex, startIndex;
+	NeatoLDSbatch buffer[size];
+};
 
 
 /**
