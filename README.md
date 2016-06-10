@@ -1,5 +1,7 @@
 # RobotMoose Web Robotics System
 
+[![Join the chat at https://gitter.im/robotmoose/robotmoose](https://badges.gitter.im/robotmoose/robotmoose.svg)](https://gitter.im/robotmoose/robotmoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This is a simple, modern version of a networked robotics stack, built around the modern web.  The major pieces are:
 
 * A web **front end** for user friendly robot setup, teleoperation, and programming.  See www/js for the code, which is built in JavaScript on bootstrap.
