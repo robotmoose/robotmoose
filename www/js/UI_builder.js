@@ -37,20 +37,9 @@ UI_builder_t.prototype.stop=function() {
 	);
 }
 
-// We're starting this state--gray out all UI elements
+// We're starting this state--delete old UI elements
 UI_builder_t.prototype.start_state=function(state_name) {
-	for (var e_key in this.elements) {
-		var e=this.elements[e_key];
-
-		// Hide element until code checks it again
-		if (e.disabled==false) {
-			e.disabled=true;
-			e.dom.disabled=true;
-		}
-
-		// Clear any stray button presses
-		if (e.oneshot==true) e.oneshot=false;
-	}
+	this.clean();
 }
 
 /**
