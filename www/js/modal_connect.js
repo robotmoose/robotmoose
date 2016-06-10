@@ -46,10 +46,14 @@ function modal_connect_t(div)
 	this.robot_auth.className="form-control";
 	this.robot_auth.type="text";
 	this.robot_auth.placeholder="Enter robot authentication";
+	if (localStorage.previous_auth) {
+		this.robot_auth.value = localStorage.previous_auth;
+	}
 	this.modal.get_content().appendChild(this.robot_auth);
 
 	this.modal.get_content().appendChild(document.createElement("br"));
 
+	
 	this.connect_button.className="btn btn-primary";
 	this.connect_button.disabled=true;
 	this.connect_button.type="button";
@@ -62,6 +66,13 @@ function modal_connect_t(div)
 		robot.school=get_select_value(myself.school_select);
 		robot.name=get_select_value(myself.robot_select);
 		robot.auth=myself.robot_auth.value;
+
+		// Remember selections for later using localStorage API
+		localStorage.previous_year = robot.year;
+		localStorage.previous_school = robot.school;
+		localStorage.previous_robot = robot.name;
+		localStorage.previous_auth = robot.auth;
+
 		if(myself.onconnect)
 			myself.onconnect(robot);
 		
@@ -126,8 +137,12 @@ modal_connect_t.prototype.build_year_list_m=function()
 		this.year_select.appendChild(option);
 	}
 
-	if(this.years.length>0)
+	if (localStorage.previous_year) {
+		this.year_select.value = localStorage.previous_year;
+	} else if(this.years.length>0) {
 		this.year_select.selectedIndex=1;
+	}
+
 	this.update_disables_m();
 }
 
@@ -143,21 +158,23 @@ modal_connect_t.prototype.build_school_list_m=function()
 		var default_option=document.createElement("option");
 		default_option.text="Select a School";
 		this.school_select.appendChild(default_option);
-		this.school_select.selectedIndex=0;
 
 		this.update_disables_m();
 
-		if(this.year_select.selectedIndex!=0)
-		
+		if(this.year_select.selectedIndex!=0)	
 			superstar_sub(null,get_select_value(this.year_select),
 				function(school_list)
 				{
+					var select_index;
 					myself.schools=school_list;
 
 					for(var key in myself.schools)
 					{
 						var option=document.createElement("option");
 						option.text=myself.schools[key];
+						if (localStorage.previous_school == option.text) {
+							option.selected = true;
+						}
 						myself.school_select.appendChild(option);
 					}
 
@@ -186,12 +203,18 @@ modal_connect_t.prototype.build_robot_list_m=function()
 		var default_option=document.createElement("option");
 		default_option.text="Select a Robot";
 		this.robot_select.appendChild(default_option);
-		this.robot_select.selectedIndex=0;
 
 		this.update_disables_m();
+		var school = "";
 
-		if(this.school_select.selectedIndex!=0)
-			superstar_sub(null,get_select_value(this.year_select)+"/"+get_select_value(this.school_select),
+		if (this.school_select.selectedIndex == 0 && localStorage.previous_school) {
+			school = localStorage.previous_school;
+		} else if (this.school_select.selectedIndex!=0) {
+			school = get_select_value(this.school_select);
+		}
+
+		if(school != "")
+			superstar_sub(null,get_select_value(this.year_select)+"/"+school,
 				function(robot_list)
 				{
 					myself.robots=robot_list;
@@ -200,6 +223,10 @@ modal_connect_t.prototype.build_robot_list_m=function()
 					{
 						var option=document.createElement("option");
 						option.text=myself.robots[key];
+						if (localStorage.previous_robot == option.text) {
+							option.selected = true;
+						}
+
 						myself.robot_select.appendChild(option);
 					}
 
