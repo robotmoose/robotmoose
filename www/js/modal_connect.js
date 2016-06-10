@@ -46,9 +46,6 @@ function modal_connect_t(div)
 	this.robot_auth.className="form-control";
 	this.robot_auth.type="text";
 	this.robot_auth.placeholder="Enter robot authentication";
-	if (localStorage.previous_auth) {
-		this.robot_auth.value = localStorage.previous_auth;
-	}
 	this.modal.get_content().appendChild(this.robot_auth);
 
 	this.modal.get_content().appendChild(document.createElement("br"));
@@ -71,7 +68,6 @@ function modal_connect_t(div)
 		localStorage.previous_year = robot.year;
 		localStorage.previous_school = robot.school;
 		localStorage.previous_robot = robot.name;
-		localStorage.previous_auth = robot.auth;
 
 		if(myself.onconnect)
 			myself.onconnect(robot);
