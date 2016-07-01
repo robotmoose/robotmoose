@@ -1,0 +1,236 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - Lessons</title>
+
+		<script type="text/javascript">
+			var verify_button;
+			var run_button;
+			var stop_button;
+			var editor=new editor_t();
+			var emulator=new arduino_emulator_t();
+
+			var renderer;
+			var grid;
+			var lights=new Array();;
+			var roomba;
+			var obstacles;
+
+			function initialize()
+			{
+				verify_button=document.getElementById("verify");
+				run_button=document.getElementById("run");
+				stop_button=document.getElementById("stop");
+				editor.create(document.getElementById("code"));
+				editor.set_value(
+					"#include \"roomba.h\"\n"+
+					"\n"+
+					"roomba_t roomba(Serial3);\n"+
+					"int speed=50;\n"+
+					"\n"+
+					"void setup()\n"+
+					"{\n"+
+					"  Serial.begin(115200);\n"+
+					"  Serial3.begin(115200);\n"+
+					"  roomba.setup(2);\n"+
+					"  Serial.println(\"Roomba Started\");\n"+
+					"}\n"+
+					"\n"+
+					"void loop()\n"+
+					"{\n"+
+					"\t//Things written in here keep happening\n"+
+					"\troomba.drive(100,100);\n"+
+					"\tdelay(500);\n"+
+					"}"
+					);
+				editor.set_size(480,460);
+				editor.on_change=function(){stop(); verify_button.value="Verify"; }
+				editor.on_compiled=function(){ verify_button.value="Verified"; };
+
+				renderer=new renderer_t(document.getElementById("container"),setup,loop);
+
+				if(!renderer)
+					alert("Is WebGL enabled?");
+				else
+					renderer.setup();
+			}
+
+			function setup()
+			{
+				renderer.set_size(480,453); // FIXME: there's a bottom border that is hard to get rid of...
+
+				var grid_feet=32;
+				var per_foot=300;
+				grid=renderer.create_grid(per_foot,grid_feet,grid_feet); // 1 foot grid
+				var grid_size=per_foot*grid_feet;
+				grid.rotation.x=0;
+
+				var size=100000;
+				var intensity=0.8;
+				lights[0]=new renderer.create_light(intensity,
+					new THREE.Vector3(-size/2,-size/2,+size));
+
+				roomba=new roomba_t(renderer,obstacles);
+
+				renderer.controls.center.set(0,0,0); // robot?
+				renderer.controls.object.position.set(0,-1200,1400);
+			}
+
+			function loop(dt)
+			{
+				roomba.loop(dt);
+
+				var left=parseInt(document.getElementById("drive_left").value);
+				var right=parseInt(document.getElementById("drive_right").value);
+
+				if(emulator.running()&&emulator.roomba)
+				{
+					left=emulator.roomba.left;
+					right=emulator.roomba.right;
+
+					document.getElementById("drive_left").value=left;
+					document.getElementById("drive_right").value=right;
+
+					// console.log(left+" "+right);
+				}
+
+				roomba.drive(left,right);
+				drive_update();
+
+				document.getElementById("status").innerHTML=roomba.get_status();
+			}
+
+
+			function verify()
+			{
+				stop();
+				editor.compile();
+			}
+
+
+			function run()
+			{
+				var errors=emulator.compile(editor.get_value(),
+					function(compile_error) {
+						editor.set_status(compile_error);
+						stop();
+					}
+				);
+				run_button.disabled=true;
+				stop_button.disabled=false;
+			}
+
+			function stop()
+			{
+				emulator.stop();
+				run_button.disabled=false;
+				stop_button.disabled=true;
+
+				// Turn off manual commands, so robot actually stops:
+				document.getElementById("drive_left").value=0;
+				document.getElementById("drive_right").value=0;
+			}
+
+			function reset()
+			{
+				roomba.reset();
+				document.getElementById("drive_left").value=0;
+				document.getElementById("drive_right").value=0;
+			}
+
+			function drive_update()
+			{
+				var left=parseInt(document.getElementById("drive_left").value);
+				var right=parseInt(document.getElementById("drive_right").value);
+				document.getElementById("show_left").innerHTML=""+left;
+				document.getElementById("show_right").innerHTML=""+right;
+			}
+		</script>
+	</head>
+
+	<body onload="initialize();" role="document">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>Roomba Motors</h1>
+			</div>
+			<center>
+				<div class="nohighlight">
+					<table data-toggle="table">
+						<tr>
+							<td style="vertical-align:top;height:100%;">
+								<div id="code"></div>
+							</td>
+							<td style="vertical-align:top;">
+								<div id="container" style="border:1px solid #000000;"></div>
+							</td>
+						</tr>
+						<tr>
+							<td style="vertical-align:top;height:100%;">
+								<input type="button" class="btn btn-sm btn-primary" id="verify" value="Verify" onclick="verify();"/>
+								<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();"  title="[alt-shift-r]" accesskey="r"  />
+								<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
+								<input type="button" class="btn btn-sm btn-primary" id="reset" value="Reset" onclick="reset();"/>
+							</td>
+							<td style="vertical-align:top;">
+								Left: <span id="show_left"></span>
+									<input type="range" id="drive_left" min="-500" max="500" value="0" oninput="drive_update();"/>
+								Right: <span id="show_right"></span>
+									<input type="range"id="drive_right" min="-500" max="500" value="0" oninput="drive_update();"/><br/>
+								<p id="status"></p>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</center>
+
+
+
+			<div class="well">
+				How does this work?
+				<ul>
+					<li>Drag the left or right slider, and the left or right wheel will drive back and forth.
+					<li>The wheels keep driving at the speed you set them.  Speed goes from -500 to +500 millimeters per second.
+					<li>The left wheel leaves a purple line, and the right wheel leaves a red line.
+					<li>You can edit the code above, and press Run to have the simulated Roomba run it.</li>
+					<li>When we call roomba.drive(100,100); the Arduino tells the roomba's left and right wheels to go at speed 100 millimeters/second</li>
+					<li>If you call roomba.drive(-100,-100); the Roomba drives backward at the same speed.</li>
+					<li>If you call roomba.drive(-100,100); the Roomba's left wheel drives backwards, and the right wheel drives forwards, turning the robot (which way?).</li>
+					<li><i>roomba</i> is an object, which we declared as type Roomba_t at the top.</li>
+					<li><i>drive</i> is a member function to run with parameters left and right wheel speeds.</li>
+					<li>The semicolon ; ends a function call in many programming languages.</li>
+					<li>This is C++ code (used to build operating systems), but JavaScript (used to build apps) looks very similar.</li>
+				</ul>
+			</div>
+
+			<div class="well">
+				Challenges!
+				<ul>
+					<li>Change the numbers passed into the drive calls, and see where the robot moves.</li>
+					<li>You can animate a series of motions by making more drive calls inside loop.  For example, this drives forward, then turns:
+					<pre>
+	//Things written in here keep happening
+	roomba.drive(200,200); // drive forward
+	delay(1000);
+	roomba.drive(0,400); // turn left
+	delay(700);
+					</pre>
+					Try this!
+
+					<li>The delay(700); command waits for 700 milliseconds.  If you wait less time, like delay(200), the robot doesn't turn as far.
+					<li>What delay is needed to make the robot turn 90 degrees?
+					<li>How far does the robot turn if you wait half as long?  Twice as long?
+					<li>Drive the robot in an octagon pattern (like a stop sign).</li>
+					<li>If you turn slower, like roomba.drive(0,200), now how long do you need to delay to turn 90 degrees?
+					<li>If you turn faster, like roomba.drive(0,400), now how long do you need to delay to turn 90 degrees?
+					<li>Drive the robot in an "I" pattern.  I is a rectangle that is taller than it is wide.</li>
+					<li>Drive the robot in a "T" pattern.  I is a rectangle that is taller than it is wide.</li>
+					<li>Drive the robot in a figure "8" pattern.  8 has an inside curve and an outside curve.</li>
+					<li>Draw a pretty pattern with the robot's wheels.  Take a screenshot to save the picture and code!
+					<li>Make the robot "dance" with a series of delays and drive commands!
+				</ul>
+			</div>
+		</div>
+	</body>
+<br><br><br><font size="1"><div xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/" about="http://www.thingiverse.com/thing:94504"><span property="dct:title">Model used in simulation is "vRoomba - Pull Back Motor Vacuum Robot"</span> (<a rel="cc:attributionURL" property="cc:attributionName" href="http://www.thingiverse.com/halley">halley</a>) / <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a></div></font>
+</html>

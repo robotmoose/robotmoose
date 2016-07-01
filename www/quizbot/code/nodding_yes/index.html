@@ -1,0 +1,130 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - Quizbot Code: Nod Yes</title>
+	</head>
+
+	<body role="document">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>Quizbot Code: Nod Yes</h1>
+			</div>
+
+			<center>
+				<img src="/images/qb_v2.png"/ title="Quizbot connected to an Arduino MCU" style="width:100%;max-width:300px;">
+			</center>
+			<br>
+
+			<div class="well">
+				<h4>Step 1:</h4>
+				Follow the <a href="/quizbot/configuration/">Configuration</a> instructions to connect your Quizbot to RobotMoose.com.
+				<br/><br/>
+				Connect to your robot at the <a href="/pilot">Robots</a> page.
+				<br/><br/>
+				Start by playing with the sliders in the Drive tab. Figure out which one controls the servo that moves the head up and down.
+				<br/><br/>
+				<center><img src="images/01.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 2:</h4>
+				In our example, the up-down servo is on Pin 10 (or the bottom slider). If yours is on the top slider, you can swap it in two ways:
+				<br/><br/>
+				You could physically swap the pins on the Arduino board.
+				<br/><br/>
+				Or, you could swap the order of the servos in the Configure tab. Click and drag one of the crosses on the left side and click "Configure" again.
+				<br/><br/>
+				<center><img src="images/02.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 3:</h4>
+				Since the up-down servo is on Pin 10 on the Arduino we used, we will swap ours back for this example. Leave yours swapped if it is on Pin 9 on your Arduino.
+				<br/><br/>
+				<center><img src="images/01.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 4:</h4>
+				Now switch to the Code tab.
+				<br/><br/>
+				You should resize your browser window so you can see all of the Code window.
+				<br/><br/>
+				<center><img src="images/03.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 5:</h4>
+				Click "New" to create a new experiment. In our example we call it "nod_yes".
+				<br/><br/>
+				<center><img src="images/04.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 6:</h4>
+				Next, use the "start" state to move the servos to the starting position.
+				<br/><br/>
+				For our example we set the up-down servo to 160 degrees and the left-right servo to 90 degrees.
+				<br/><br/>
+				Note: Keep in mind throughout these instructions that programming languages are extremely sensitive to typos. 
+				Be sure to follow the steps carefully and look out for small erros such as missing punctuation.
+				<br/><br/>
+				<center><img src="images/05.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 7:</h4>
+				Save and run the experiment by clicking the Run button.
+				<br/><br/>
+				Your servos should now be centered so that your Quizbot is in its starting position, facing forward and up.
+				<br/><br/>
+				Your servos may be different, so if your Quizbot is not in this position, you may need to try other starting angles in the previous step.
+				<br/><br/>
+				<center><img src="images/06.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 8:</h4>
+				Click the Stop button. Add a new state by clicking the Add State button. Name this state "nod".
+				<br/><br/>
+				<center><img src="images/07.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 9:</h4>
+				In the "nod" state, set the up-down servo to a different angle to make the Quizbot nod. For our Quizbot, we used 90 degrees. 
+				<br/><br/>
+				<center><img src="images/08.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 10:</h4>
+				In the "start" state, add the command <i>delay(1000)</i>. This makes the Quizbot pause in the starting position for 1 second (1000 milliseconds).
+				<br/><br/>
+				Below that, add the line of code <i>state = "nod"</i>. This will change the state to the "nod" state.
+				<br/><br/>
+				Click "Run". The Quizbot should now wait one second in the starting position, then lower its head.
+				<br/><br/>
+				<center><img src="images/09.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 11:</h4>
+				Click the Stop button.
+				<br/><br/>
+				In the "nod" state, add the command <i>delay(1000)</i>. This will make the Quizbot pause in the "nod" state for one second.
+				<br/><br/>
+				Below that, add the line <i>state = "start"</i> to make the Quizbot return to the starting position after nodding.
+				<br/><br/>
+				<center><img src="images/10.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 12:</h4>
+				Your code is now complete. Click "Run" to watch the Quizbot nod its head up and down. It will continue until you click "Stop".
+				<br/><br/>
+				Your code is saved whenever you click "Run", so you can open it again whenever you connect to this robot.
+				<br/><br/>
+				<center><img src="images/11.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Challenge:</h4>
+				Can you make a new experiment named shake_no that shakes Quizbot's head no?
+				<br/><br/>
+
+				<center><a href="../asking_questions/"><h4>Next: Ask a Question</h4></a></center>
+				<br/>
+			</div>
+		</div>
+	</body>
+</html>

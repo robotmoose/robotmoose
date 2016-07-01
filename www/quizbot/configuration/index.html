@@ -1,0 +1,107 @@
+
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - Quizbot Configuration</title>
+	</head>
+
+	<body role="document">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>Quizbot Configuration</h1>
+			</div>
+
+			<center>
+				<img src="/images/qb_v2.png"/ title="Quizbot connected to an Arduino MCU" style="width:100%;max-width:300px;">
+			</center>
+			<br>
+
+			<div class="well">
+
+				<h4>Step 1:</h4>
+				<ul>
+				<li>Plug your Quizbot into your computer
+				<ul>
+				<li>If you have not connected your Quizbot to the web before, you will first need to upload
+				our Arduino code to your Arduino. (In the classrooms, we've done this for you already!)
+				</ul>
+				<li>
+				In a Google Chrome Web Browser, open this page and download the 
+					<a href="https://chrome.google.com/webstore/detail/robotmoose/ecadjbcmgjcekpogchpochjieaimpegf">RobotMoose "backend" app</a>
+				<li> Launch the app. Select the year, your school, robot name, and serial port and click "Connect"
+				<ul>
+				<li>If you don't see your robot name, ask your teacher or facilitator to add it to the server.
+				</ul>
+				<li>The app should begin scrolling and show the heartbeats number changing, like this:
+				<pre>
+Serial data received: 3 bytes
+Arduino incoming sensor data command 0xc payload 1 bytes: ' 0x2 '
+	sensors = {
+	"power": {
+		"servo": [
+			90
+		]
+	},
+	"heartbeats": 2
+}
+</pre>
+				<li>Leave the backend running: it connects your Arduino to the internet.
+				<li>On a different computer, go to robotmoose.com's <a href="http://robotmoose.com/pilot/">Robots page</a>, select the year, your school, and robot name, and Connect to your robot!
+								
+				</ul>
+				<br/>
+
+
+				<h4>Step 2:</h4>
+				Check the Sensors tab to see your robot's heartbeats. If the robot is connected, the heartbeats number will be changing.
+				To set up your servos, first click the Configure tab.
+				<br/><br/>
+				<center><img src="/quizbot/configuration/images/configure_01.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 3:</h4>
+				The Configure tab enables us to tell the Arduino what devices are connected to it.
+				<br/><br/>
+				Our Quizbot has two servos. Select servo from the drop down menu twice to add two servos.
+				<br/><br/>
+				<center><img src="/quizbot/configuration/images/configure_02.png" style="width:100%;max-width:700px;"></img></center>
+				<br/><br/>
+				<center><img src="/quizbot/configuration/images/configure_04.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 4:</h4>
+				Now select the Pins on the Arduino where you plugged in each servo.
+				<br/><br/>
+				For this example, the servos are plugged into Pins 9 and 10.
+				<br/><br/>
+				<center><img src="/quizbot/configuration/images/configure_05.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 5:</h4>
+				Once the Pins are selected, you can now Configure the Quizbot by clicking the Configure button.
+				The servos on the Quizbot should move position to 90 degrees!
+				<br/><br/>
+				<center><img src="/quizbot/configuration/images/configure_06.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 6:</h4>
+				Now that you have Configured the Quizbot, you can check if the servos work by switching to the Drive tab.
+				<br/><br/>
+				<center><img src="/quizbot/configuration/images/configure_07.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<h4>Step 7:</h4>
+				Since you added two servos, you now have two sliders in the Drive window.
+				<br/><br/>
+				Drag them around and make sure that your servos move correctly.
+				<br/><br/>
+				<center><img src="/quizbot/configuration/images/configure_08.png" style="width:100%;max-width:700px;"></img></center>
+				<br/>
+
+				<center><a href="/quizbot/code/nodding_yes/"><h4>Next: Code to Nod Yes</h4></a></center>
+				<br/>
+			</div>
+		</div>
+	</body>
+</html>

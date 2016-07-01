@@ -1,0 +1,49 @@
+Superstar is our web-based robotic information hub.
+Using a "star" topology allows both robot and pilot to sit behind firewalls,
+and communicate by connecting to the superstar server.
+
+
+Protocol examples:
+   beingthere.cs.uaf.edu/superstar/layla/uaf/battery?get
+Read the current (most recent) state of the battery in the UAF layla robot.
+Returns raw JSON object as text/json, or empty object if none available.
+
+   beingthere.cs.uaf.edu/superstar/layla/uaf/battery?set={percent:"84";time:"12345"}
+Set a new value for the battery state, as an URL-encoded string.  
+This overwrites the existing JSON object.
+
+   beingthere.cs.uaf.edu/superstar/layla/?sub
+Extract a JSON array of substrings stored starting at this path.
+In this case, returns ["uaf"].
+
+TODO: comet-style interface, for non-blocking reads:
+   beingthere.cs.uaf.edu/superstar/layla/uaf/battery?after={time:"12345"}
+Read any value for the battery state newer than this version.
+Blocks until the battery state is newer than this, waiting until
+a newer version is set.
+
+
+-------- Performance Benchmarking --------------
+Single roundtrip HTTP request/response.  Configuration:
+	superstar using mongoose, single main thread.
+	netbench using osl/webservice, with or without keepalive.
+
+localhost:
+./netbench http://localhost:8080/superstar/foo 20
+0.5 ms/request, 1901.7 req/sec
+0.3 ms/request, 3669.7 req/sec (keepalive)
+
+Home Wifi to LAN:
+./netbench http://ozzy:8080/superstar/foo 20
+4.4 ms/request, 226.9 req/sec
+2.4 ms/request, 419.2 req/sec (keepalive)
+
+Home ACS DSL to UAF:
+./netbench http://sandy.cs.uaf.edu/superstar/foo 20
+134.6 ms/request, 7.4 req/sec
+35.5 ms/request, 28.2 req/sec (keepalive)
+
+Curiously, DNS is limiting factor on non-keepalive version.  This implies hardcoding an IP is the right thing.
+In keepalive version, "GET" and "OK" are each a single packet, only a few hundred bytes.  Very clean, and UDP wouldn't do much better.
+At 32 req/sec, bandwidth usage is 9KB/s down, 6KB/s up.
+

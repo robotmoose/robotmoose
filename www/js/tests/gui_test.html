@@ -1,0 +1,49 @@
+<html>
+	<head>
+		<!--#include virtual="/sources.html"-->
+	</head>
+	<body>
+		<div id="gui"></div>
+
+		<script type="text/javascript">
+			var robot_name="demo";
+			var widgets=
+			[
+				{
+					name:"Configuration",
+					col:1,
+					row:1,
+					size_x:Math.ceil(480/gui_t_grid_size),
+					size_y:Math.ceil(320/gui_t_grid_size)
+				},
+				{
+					name:"State Editor",
+					col:1,
+					row:Math.ceil(320/gui_t_grid_size+2),
+					size_x:Math.ceil(512/gui_t_grid_size),
+					size_y:Math.ceil(320/gui_t_grid_size)
+				}
+			];
+
+			var div=document.getElementById("gui");
+			var gui=new gui_t(div);
+
+			if(!gui)
+				alert("Could not create gui!");
+
+			gui.load(widgets);
+
+			var config_editor=new config_gui_t(gui.get_widget("Configuration"),robot_name);
+
+			if(!config_editor)
+				alert("Could not create config editor!");
+
+			var state_editor=new state_table_t(gui.get_widget("State Editor"),robot_name);
+			state_editor.create_row("drive","// Drive forward:\nif (robot.location.x<10) \n  robot.drive(100,100); \nelse \n  robot.state=turn; \n");
+			state_editor.create_row("turn","// Turn left:\nif (robot.location.angle<90)\n  robot.drive(-100,100); \nelse  \n  robot.state=forward; \n");
+
+			if(!state_editor)
+				alert("Could not create state editor!");
+		</script>
+	</body>
+</html>

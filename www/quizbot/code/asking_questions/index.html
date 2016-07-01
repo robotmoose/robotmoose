@@ -1,0 +1,109 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - Quizbot Code: Ask a Question</title>
+	</head>
+
+	<body role="document">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>Quizbot Code: Ask a Question</h1>
+			</div>
+
+			<center>
+				<img src="/images/qb_v2.png"/ title="Quizbot connected to an Arduino MCU" style="width:100%;max-width:300px;">
+			</center>
+			<br>
+
+			<div class="well">
+				<h4>Step 1:</h4>
+				<ul>
+				Follow the <a href="/quizbot/configuration/">Configuration</a> instructions to connect your Quizbot to RobotMoose.com.
+				<br/><br/>
+				Connect to your robot at the <a href="/pilot">Robots</a> page.
+				<br/><br/>
+				Open the Code tab and click "New" to create a new experiment. In our example, we call it "Question."
+				<br/><br/>
+				The <i>label()</i> function displays text on the User Interface (UI) tab. 
+				Enter your question into the parentheses of the <i>label()</i> function, as in our example below, and click "Run" to display it.
+				</ul>
+				<br/><br/>
+				<center><img src="images/01.png" style="width:100%;max-width:700px;"></center>
+
+				<br/><br />
+
+
+				<h4>Step 2:</h4>
+				The <i>button()</i> function adds a button to the UI tab.
+				<br/><br/>
+				Add a button for each answer to the question, as many as you want, and click "Run." You will be able to click the buttons, but they won't do anything yet.
+				<br/><br/>
+				<center><img src="images/02.png" style="width:100%;max-width:700px;"></center>
+
+				<br/><br />
+
+
+				<h4>Step 3:</h4>
+				Use the Add State button to create two new states. Call one "yes" and the other "no".				
+				<br/><br/>
+				<center><img src="images/03.png" style="width:100%;max-width:700px;"></center>
+
+				<br/><br />
+
+
+				<h4>Step 4:</h4>
+				In the "yes" state, add three lines of code:
+				<ul>
+				<br/>
+				<li>A label to display the message "Correct!"</li>
+				<br/>
+				<li>A delay of 1000 milliseconds (1 second).</li>
+				<br/>
+				<li>The line <i>state = "start"</i> to return to the start state</li>
+				<br/>
+				</ul>
+				Then add the same three lines to the "no" state, except the label should display "Incorrect".
+				<br/><br/>
+				<center><img src="images/04.png" style="width:100%;max-width:700px;"></center>
+
+				<br/><br />
+
+				<h4>Step 5:</h4>
+				Now we need to make each button connect to one of the "yes" or "no" states.
+				<br/><br/>
+				To connect a button to a state, add the name of the state after the name of the button, separated by a comma, like this: <i>button("Purple", "no")</i>
+				<br/><br/>
+				Connect each correct answer to the "yes" state, and each incorrect answer to the "no" state, as in the example below, and click "Run".
+				<br/><br/>
+				Now each time you click one of the buttons, it will display either "Correct" or "Incorrect" for one second and then return to the question.
+				<br/><br/>
+				<center><img src="images/05.png" style="width:100%;max-width:700px;"></center>
+
+				<br/><br />
+
+				<h4>Step 6:</h4>
+				All that is left is to add code to make the Quizbot respond to the answers.
+				<br/><br/>
+				To begin, experiment with the Drive tab to find which Quizbot servo is servo[0] and which is servo[1]. In our example, the up-down servo is servo[1].
+				Then add these lines of code:
+				<br/><br/>
+				<ul>
+				<li>Anywhere in the "start" state, add code to set the servos to their starting position. We used 90 degrees for the left-right servo and 160 degrees for the up-down servo.</li>
+				<br/>
+				<li>At the top of the "yes" state, set the up-down servo to another angle to make it nod. We used 90 degrees.</li>
+				<br/>
+				<li>At the top of the "no" state, set the left-right servo to another angle to make it shake its head no. We used 120 degrees.</li>
+				</ul>
+				<br/>
+				
+				<center><img src="images/06.png" style="width:100%;max-width:700px;"></center>
+
+				<br/><br />
+				Congratulations, your code is complete! Run the code and try out your question. Ask other students to answer the question as well!
+				<br/>
+				<br/><br />
+			</div>
+		</div>
+	</body>
+</html>

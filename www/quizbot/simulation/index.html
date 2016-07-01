@@ -1,0 +1,219 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - Quizbot Simulation</title>
+
+		<script type="text/javascript">
+			var verify_button;
+			var run_button;
+			var stop_button;
+			var editor=new editor_t();
+			var emulator=new arduino_emulator_t();
+
+			var renderer;
+			var grid;
+			var lights=new Array();;
+			var quizbot;
+
+			function initialize()
+			{
+				verify_button=document.getElementById("verify");
+				run_button=document.getElementById("run");
+				stop_button=document.getElementById("stop");
+				editor.create(document.getElementById("code"));
+				editor.set_value(
+					"//Need this to use servos\n#include <Servo.h>\n\n"+
+					"//Body twist servo is on pin 10\n//Neck tilt servo is on pin 9\n"+
+					"Servo body;\nServo neck;\n"+
+					"\n\nvoid setup()\n{\n\t//Things written in here happen once\n"+
+					"\tbody.attach(10);\n"+
+					"\tneck.attach(9);\n"+
+					"}\n\n"+
+					"void loop()\n"+
+					"{\n\t//Things written in here keep happening\n"+
+					"\tbody.write(80);\n"+
+					"\tneck.write(50);\n"+
+					"\tdelay(500);\n"+
+					"}"
+					);
+				editor.set_size(480,460);
+				editor.on_change=function(){stop(); verify_button.value="Verify"; }
+				editor.on_compiled=function(){stop(); verify_button.value="Verified"; };
+
+				renderer=new renderer_t(document.getElementById("container"),setup,loop);
+
+				if(!renderer)
+					alert("Is WebGL enabled?");
+				else
+					renderer.setup();
+
+				var thing=CodeMirror.fromTextArea(document.getElementById("code_test"),
+					{indentUnit:4,indentWithTabs:true,lineNumbers:true,matchBrackets:true,mode:"text/x-arduino",readOnly:true});
+				thing.setValue(
+					"void loop()\n"+
+					"{\n"+
+					"\tbody.write(80); // face forward\n"+
+					"\tneck.write(50); // look up\n"+
+					"\tdelay(500);\n"+
+					"\tbody.write(80); // still forward\n"+
+					"\tneck.write(20); // look down\n"+
+					"\tdelay(500);\n"+
+					"}"
+				);
+				thing.setSize(400,150);
+			}
+
+			function setup()
+			{
+				renderer.set_size(480,453); // FIXME: there's a bottom border that is hard to get rid of...
+
+				grid=renderer.create_grid(64,8,8);
+
+				var size=1000;
+				var intensity=0.8;
+				lights[0]=new renderer.create_light(intensity,
+					new THREE.Vector3(-size/2,+size,+size/2));
+
+				quizbot=new quizbot_t(renderer);
+				quizbot.set_nod(parseInt(document.getElementById("nod").value));
+				quizbot.set_twist(parseInt(document.getElementById("twist").value));
+				quizbot.set_nod_target(parseInt(document.getElementById("nod").value));
+				quizbot.set_twist_target(parseInt(document.getElementById("twist").value));
+			}
+
+			function loop(dt)
+			{
+				quizbot.loop(dt);
+
+				if(emulator.running())
+				{
+					if(emulator.pin_directions[10]==3)
+						document.getElementById("twist").value=emulator.map(emulator.pin_servos[10],0,255,0,180);
+
+					if(emulator.pin_directions[9]==3)
+						document.getElementById("nod").value=emulator.map(emulator.pin_servos[9],0,255,0,180);
+				}
+
+				nod_update();
+				twist_update();
+			}
+
+
+			function verify()
+			{
+				editor.compile();
+			}
+
+
+			function run()
+			{
+				var errs=emulator.compile(editor.get_value(),
+					function(compile_error) {
+						editor.set_status(compile_error);
+						stop();
+					}
+				);
+				run_button.disabled=true;
+				stop_button.disabled=false;
+			}
+
+			function stop()
+			{
+				emulator.stop();
+				run_button.disabled=false;
+				stop_button.disabled=true;
+			}
+
+			function nod_update()
+			{
+				var V=parseInt(document.getElementById("nod").value);
+				quizbot.set_nod_target(V);
+				document.getElementById("show_nod").innerHTML=""+V;
+			}
+
+			function twist_update()
+			{
+				var V=parseInt(document.getElementById("twist").value);
+				quizbot.set_twist_target(V);
+				document.getElementById("show_twist").innerHTML=""+V;
+			}
+		</script>
+	</head>
+
+	<body onload="initialize();" role="document">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>Quizbot Simulation</h1>
+			</div>
+			<center>
+				<div class="nohighlight">
+					<table data-toggle="table">
+						<tr>
+							<td style="vertical-align:top;height:100%;">
+								<div id="code"></div>
+							</td>
+							<td style="vertical-align:top;">
+								<div id="container" style="border:1px solid #000000;"></div>
+							</td>
+						</tr>
+						<tr>
+							<td style="vertical-align:top;height:100%;">
+								<input type="button" class="btn btn-sm btn-primary" id="verify" value="Verify" onclick="verify();"/>
+								<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();"  title="[alt-shift-r]" accesskey="r"  />
+								<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
+							</td>
+							<td style="vertical-align:top;">
+								Body: <span id="show_twist"></span>
+									<input type="range" id="twist" min="0" max="180" value="90" oninput="twist_update();"/>
+								Neck: <span id="show_nod"></span>
+									<input type="range"id="nod" min="0" max="180" value="40" oninput="nod_update();"/><br/>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</center>
+
+			<div class="well">
+				How does this work?
+				<ul>
+					<li>You can edit the code above, and press Run to have the simulated Arduino run it.</li>
+					<li>When we call body.write(80); the Arduino tells the body servo to rotate to angle 80 degrees.</li>
+				</ul>
+
+				<ul>
+					<li><i>body</i> is an object, which we declared as type Servo at the top.</li>
+					<li><i>write</i> is a member function to run with parameter 80.</li>
+					<li>The semicolon ; ends a function call in many programming languages.</li>
+					<li>This is C++ code (used to build operating systems), but JavaScript (used to build apps) looks very similar.</li>
+				</ul>
+
+				<ul>
+					<li>Body rotates the head left and right (bigger numbers), and is centered at 90.</li>
+					<li>Neck rotates the head down and up (bigger numbers), and is centered at 40.</li>
+					<li>The body and neck make a 2D cartesian coordinate system, like the latitude longitude grid on the Earth.</li>
+					<li>We need the delay so the servo has time to move where you tell it.  Smaller numbers give the servo less time to move.</li>
+				</ul>
+			</div>
+
+			<div class="well">
+				Challenges!
+				<ul>
+					<li>Stop the code and drag the sliders to put the head facing straight up.  What body and neck coordinates are these?</li>
+					<li>Change the numbers passed into the servo write calls, and see where the head moves.</li>
+					<li>You can animate a series of motions by making more write calls in loop.  For example, this moves the neck servo up and down:</li>
+
+					<textarea id="code_test"></textarea>
+					Try this!
+
+					<li>Move the head right, then left, then back to center.</li>
+					<li>Move the head in a diagonal--bottom left, then top right, then back to center.</li>
+					<li>Move the head in a clockwise circle--right, up, left, down.</li>
+					<li>Tune a "good nod" for yes, and a "good shake" for no.</li>
+					<li>Add a robot "twitch", where it jumps back and forth quickly, then looks forward for a while.</li>
+					<li>Move the head in an octagon pattern (like a stop sign).</li>
+				</ul>
+			</div>
+		</div>
+	</body>
+</html>

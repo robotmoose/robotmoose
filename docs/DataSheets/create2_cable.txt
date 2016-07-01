@@ -1,0 +1,20 @@
+DIN7 cable colors for Roomba-to-Arduino cable:
+
+http://www.digikey.com/product-search/en?lang=en&site=us&keywords=839-1094
+MINI DIN, 7 position, right-angle, male
+Tensility International Corp part number: 10-00543
+Digi-Key Part Number	839-1094-ND
+
+
+DIN Yellow: Roomba ground -> black jumper
+DIN Pink(ish): Roomba RX -> red jumper, Arduino TX
+DIN Black (thick, no lettering): Roomba TX -> blue jumper, Arduino RX
+DIN ??? : Roomba BRC -> white jumper, Arduino pin 2
+
+
+Not used:
+Red & Purple: Roomba battery voltage (clip *close* and tape over)
+Black (thin, with white letters): Shield
+Green & orange: baud rate change or ground
+
+

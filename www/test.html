@@ -1,0 +1,51 @@
+<html lang="en">
+  <head>
+	<!--#include virtual="/sources.html"-->
+	<script src="/js/state_editor.js"></script>
+  </head>
+ <body>
+
+<!--<div style= "width:320px;">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>State</th>
+                <th>Code</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style= "width:1%;"><input type = "text"/></td>
+                <td ><textarea></textarea></td>
+              </tr>
+              <tr>
+                <td style= "width:1%;"><input type = "text"/></td>
+                <td ><textarea></textarea></td>
+              </tr>
+              <tr>
+                <td style= "width:1%;"><input type = "text"/></td>
+                <td ><textarea></textarea></td>
+              </tr>
+              <tr>
+                <td style= "width:1%;"><input type = "text"/></td>
+                <td ><textarea></textarea></td>
+              </tr>
+            </tbody>
+          </table>
+           <input type="button" value = "Add State"class="btn btn-primary"/>
+        </div>!-->
+        <div id = "state_editor_gui"></div>
+ <script>
+	 var state_editor;
+	 function setup()
+	 {
+		document.getElementById("state_editor_gui").innerHTML="";
+		state_editor = new state_editor_t(document.getElementById("state_editor_gui"),"demo");
+
+		if(!state_editor)
+			alert("Could not create element");
+	 }
+	 setup();
+ </script>
+ </body>
+</html>

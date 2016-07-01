@@ -1,0 +1,46 @@
+<html>
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<div id="content"></div>
+
+		<script>
+			//This function recursively gets superstar database and prints it as links on page.
+			function get_recursive(source)
+			{
+				superstar_sub
+				(
+					source,
+					function(response1)
+					{
+						for(var key in response1)
+						{
+							(function(the_path,the_value)
+							{
+								superstar_get
+								(
+									the_path,
+									the_value,
+									function(response2)
+									{
+										if(response2!=null)
+										{
+											var value="http://robotmoose.com/superstar"+the_path+the_value+"?set="+encodeURIComponent(JSON.stringify(response2));
+											console.log(value);
+											document.getElementById("content").innerHTML+=value+"<br/>";
+										}
+									}
+								);
+
+								get_recursive(the_path+the_value);
+							})(source+"/",response1[key]);
+						}
+					}
+				);
+			}
+
+			get_recursive("");
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

@@ -1,0 +1,44 @@
+<!-- saved from url=(0014)about:internet -->
+<html>
+<title>SHA2-256 Demo Authenticator</title>
+
+<script src="sha2_auth.js"></script>
+<script type="text/javascript">
+
+function generate() {
+	var pass=document.getElementById("robot_pass").value;
+	var path=document.getElementById("robot_path").value;
+	var message=document.getElementById("robot_msg").value;
+	var seq=document.getElementById("robot_seq").value;
+	var auth=getAuthCode(pass,path,message,seq);
+	var p=document.getElementById("output");
+	p.innerHTML=message+"   ->    "+auth;
+}
+
+</script>
+
+</head>
+<body onload="generate()">
+<h1>SHA-256 Demo Authenticator</h1>
+<form method="post" action="javascript:generate()" enctype="multipart/form-data">
+
+<table border=0>
+<tr>
+<td align="right">Password:</td><td><textarea id="robot_pass" rows="1" cols="30">We are go for lunch!</textarea></td>
+</tr><tr>
+<td align="right">Superstar path:</td><td><textarea id="robot_path" autocomplete="off" style="width:100%" rows="1" cols="30">layla/gray</textarea></td>
+</tr><tr>
+<td align="right">JSON Message</td><td><textarea id="robot_msg" rows="1" cols="30">{"bob":3}</textarea></td>
+</tr><tr>
+<td align="right">Sequence:</td><td><textarea id="robot_seq" rows="1" cols="30">0</textarea></td>
+</tr><tr>
+</td><td><td>
+<input type="submit" name="Generate!" value="Generate!" title="[alt-shift-r]" accesskey="r">
+
+<p id="output">
+</td>
+</tr></table>
+
+
+</body></html>
+

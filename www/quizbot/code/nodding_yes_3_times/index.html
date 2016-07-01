@@ -1,0 +1,73 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - Quizbot</title>
+	</head>
+
+	<body role="document">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>Quizbot Nodding Yes 3 Times</h1>
+			</div>
+
+			<center>
+				<img src="/images/qb_v2.png"/ title="Quizbot connected to an Arduino MCU" style="width:100%;max-width:300px;">
+			</center>
+			<br>
+
+			<div class="well">
+				<h4>Step 1:</h4>
+				Let's start off by loading our nod_yes Experiment. Type in "nod_yes" into the Experiment Name Box, and click load.
+				<br/><br/>
+				<center><img src="images/01.png" style="width:100%;max-width:877px;"></img></center>
+				<br/>
+
+				<h4>Step 2:</h4>
+				Rename the Experiment to "nod_yes_3".
+				<br/><br/>
+				<b>Now, click the Run button.</b> This created a copy of the nod_yes Experiment.
+				<br/><br/>
+				<center><img src="images/02.png" style="width:100%;max-width:877px;"></img></center>
+				<br/>
+
+				<h4>Step 3:</h4>
+				Click the Stop button. Go back up to the start State. Store a Variable named "times" that starts at the Value 0.
+				<br/><br/>
+				<center><img src="images/03.png" style="width:100%;max-width:877px;"></img></center>
+				<br/>
+
+				<h4>Step 4:</h4>
+				Add a new State. Name it "loop". Set the Run Time of the stop State to 1000 ms.
+				<br/><br/>
+				<center><img src="images/04.png" style="width:100%;max-width:877px;"></img></center>
+				<br/>
+
+				<h4>Step 5:</h4>
+				In the loop State, we are going to do two things:
+				<br/><br/>
+				First, add 1 to the Stored Variable times.
+				<br/><br/>
+				Second, add an If Statement that checks if the Stored Variable times is less than 3. If the Stored Variable times is less than 3, Jump to the up State.
+				<br/><br/>
+				<center><img src="images/05.png" style="width:100%;max-width:877px;"></img></center>
+				<br/>
+
+				<h4>Step 6:</h4>
+				Save and Run the Experiment by clicking the Run button.
+				<br/><br/>
+				The Quizbot should now center for 1000 ms, nod yes 3 times, then center.
+				<br/><br/>
+				<center><img src="images/06.png" style="width:100%;max-width:877px;"></img></center>
+				<br/>
+
+				<h4>Challenge:</h4>
+				Can you make a new Experiment named shake_no_3 that shakes Quizbot's head no 3 times?
+				<br/><br/>
+
+				<center><h4><a href="../asking_questions">Next Lesson: Asking Questions</a></h4></center>
+				<br/>
+			</div>
+		</div>
+	</body>
+</html>

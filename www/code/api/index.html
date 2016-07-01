@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+  <head>
+
+	<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+	<!--#include virtual="/sources.html"-->
+	<title>RobotMoose - API</title>
+  </head>
+  <body onload="initialize();" role="document">
+	<!--#include virtual="/navbar.html"-->
+	<div class="container theme-showcase" role="main"
+	  style="padding-top: 70px;">
+	  <div class="page-header">
+		<h1>RobotMoose API (Application Programming Interface)</h1>
+	  </div>
+	  <div class="well">
+		<h4>States</h4>
+		<p>Your code runs in one state at a time.&nbsp; The state runs repeatedly
+		  until the state times out or you switch to a new
+		  state.
+		  <br>
+		  <br>
+		  If a time is entered in the "Run Time" box, the state will run only for that length of time before switching to the next state.
+		  Time is in milliseconds (1000 = 1 second).
+		  <br>
+		  <br>
+<pre>
+state = "turnLeft"
+</pre>
+		Switches to your state named <i>turnLeft</i>.
+		<br>
+		<br>
+<pre>
+delay(1000)
+</pre>
+		Pauses running the code for 1000 milliseconds (1 second) while the robot continues to follow the previous instruction.
+		<br>
+		<br>
+<pre>
+stop()
+</pre>
+		Stops running the code, exiting your states.
+		</p>
+		<br>
+		<br>
+
+<h4>Basic User Interface (UI)</h4>
+<pre>
+print("string")
+</pre>
+		String will appear to the right side of the state in the code editor.
+		<br>
+		<br>
+<pre>
+label("string")
+</pre>
+		String will appear in the UI window.  This is useful for explaining things to the user.
+		<br>
+		<br>
+<pre>
+button("Lefty!", "turnLeft")
+</pre>
+		Creates a button in the UI panel called <i>Lefty!</i>.
+		  Pressing this button will run the state named <i>turnLeft</i>.
+		<br>
+		<br>
+<pre>
+checkbox("string")
+</pre>
+		Creates a checkbox called <i>string</i>. The value of the checkbox is true or false depending on whether it is
+		checked or unchecked, so it can be used as a condition in an "if" statement: if (checkbox("string")) ...
+		<br>
+		<br>
+		<pre>
+checkbox("string", "store.v")
+</pre>
+		If the box is checked, the value of store.v is set to true. If the box is unchecked, it is set to false.
+		<br>
+		<br>
+<pre>
+power.L=slider("Left", -100, 0, 100)
+</pre>
+		Creates a slider in the UI to control the left wheel, with range -100
+			to 100, and the slider first set to 0.
+		<br>
+		<br>
+		<br>
+		<h4>Create2 Driving</h4>
+<pre>
+forward(10)
+</pre>
+Drive forward 10 centimeters.
+<br>
+<br>
+<pre>
+backward(5)
+</pre>
+Drive backward 5 centimeters.
+<br>
+<br>
+<pre>
+left(45) 
+</pre>
+Turn left 45 degrees.
+<br>
+<br>
+<pre>
+right(90)
+</pre>
+Turn right 90 degrees.
+<br>
+<br>
+<pre>
+drive(-5, 10)
+</pre>
+Sets the speed of the left wheel to -5 and the speed of the right wheel to +10 (range is -100 to 100).
+		<br>
+		<br>
+		<h4>Servos</h4>
+<pre>
+power.servo[0] = 90
+</pre>
+		 Moves the first servo to position 90 degrees (range is 0 to
+			180 degrees)
+		<br>
+		<br>
+		<br>
+		<h4>PWM (Pulse Width Modulation)</h4>
+<pre>
+power.pwm[0] = 100
+</pre>
+		Sets the value of the first PWM to 100, full power (range is 0 to 100).
+		<br>
+		<br>
+		<br>
+		<h4>Neopixel LEDs</h4>
+<pre>
+power.neopixel[0].color = {r:20,g:0,b:0}
+</pre>
+		Sets all the neopixels to a dim red color.
+		
+		<br>
+		<br>
+<pre>
+power.neopixel[0].color = {
+	r:slider("Red",0,10,100),
+	g:slider("Green",0,10,100),
+	b:slider("Blue",0,10,100)
+}
+</pre>
+		Adds sliders in the UI panel to control the neopixel colors.
+		<br>
+		<br>
+<pre>
+power.neopixel[0].color = {r:10,g:10,b:10}
+power.neopixel[0].accent = {r:100,g:0,b:0}
+power.neopixel[0].repeat = 4
+power.neopixel[0].start = time/250
+</pre>
+		Animates a bright red accent on a dim white background.
+		<br>
+		<br>
+				<h4>Variables</h4>
+<pre>
+store.x = 20.0 <br>
+store.x = "String" <br>
+store.x = store.y 
+</pre>
+Stores a variable named x and sets it to a number, a string, or the value of another stored variable.
+		<br>
+		<br>
+		<h4>Control Flow</h4>
+<pre>
+if (<i>expression</i>)
+{
+	<i>statement1</i>
+}
+else
+{
+	<i>statement2</i>
+}
+</pre>
+		 If <i>expression</i> evaluates to true, executes <i>statement1</i>,
+			otherwise executes <i>statement2</i>.
+		<br>
+		<br>
+		<br>
+		<h4>Examples:</h4>
+		<ul>
+		  <li><a href="/quizbot/code/nodding_yes/" title="Quizbot: Nodding Yes">Quizbot: Nodding Yes</a></li>
+		  <li><a href="/quizbot/code/asking_questions/" title="Quizbot: Ask a Question">Quizbot: Ask a Question</a></li>
+		  <li><a href="/code/ui/" title="UI Examples">UI Examples</a></li>
+		  <li><a href="/kt/drive_examples/" title="KT: Drive Examples">KT: Drive Examples</a></li>
+		</ul>
+	  </div>
+	</div>
+  </body>
+</html>

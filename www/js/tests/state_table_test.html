@@ -1,0 +1,27 @@
+<html>
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<script>
+			var table;
+
+			function setup()
+			{
+				var div=document.getElementById("tabler");
+				var name=document.getElementById("robot_name").value;
+				table=new state_table_t(div,name);
+				table.create_row("drive","// Drive forward:\nif (robot.location.x<10) \n  robot.drive(100,100); \nelse \n  robot.state=turn; \n");
+				table.create_row("turn","// Turn left:\nif (robot.location.angle<90)\n  robot.drive(-100,100); \nelse  \n  robot.state=forward; \n");
+			}
+
+			function set_robot_name()
+			{
+				var name=document.getElementById("robot_name").value;
+				table.set_robot_name(name);
+			}
+		</script>
+	</head>
+	<body onload="setup();">
+		<div id="tabler"></div>
+		<input type="text" id="robot_name" value="demo" onchange="set_robot_name();"/>
+	</body>
+</html>

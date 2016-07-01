@@ -1,0 +1,7 @@
+#!/bin/sh
+# Logs execution of a script
+date >> log.txt
+echo RUNNING SCRIPT ./"$@" >> log.txt
+exec ./"$@" >> log.txt  2>&1
+echo >> log.txt
+

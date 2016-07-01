@@ -1,0 +1,26 @@
+.gridster ul
+{
+	margin:0;
+	padding:0;
+	list-style-type:none;
+}
+
+.gridster .preview-holder
+{
+	margin:0;
+	padding:0;
+	border:none!important;
+	background:#337ab7!important;
+}
+
+.gridster li header
+{
+	cursor:move;
+}
+
+.gs-resize-handle-both
+{
+	margin:0;
+	padding:0;
+	background-image:none;
+}

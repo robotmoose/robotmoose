@@ -1,0 +1,86 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - Game Demo</title>
+
+		<script src="/games/demo/block.js"></script>
+		<script src="/games/demo/canvas.js"></script>
+		<script src="/games/demo/level.js"></script>
+		<script src="/games/demo/moose.js"></script>
+		<script src="/games/demo/sprite.js"></script>
+		<script>
+
+			var run=true;
+			var simulation;
+
+			function toggle()
+			{
+				run=!run;
+
+				if(run)
+					document.getElementById("runner").innerHTML="Pause";
+				else
+					document.getElementById("runner").innerHTML="Play";
+			}
+
+			function init()
+			{
+				toggle();
+				simulation=new canvas_t(document.getElementById("canvas"),setup,loop,draw);
+
+				if(!simulation)
+					alert("Is WebGL enabled?");
+				else
+					simulation.setup();
+			}
+
+			var moose;
+			var level;
+			var pos={x:320-64*4,y:240-64*2};
+
+			function setup()
+			{
+				moose=new moose_t(pos.x+64,pos.y);
+				level=new level_t([{x:pos.x,y:pos.y},{x:pos.x+64,y:pos.y+64},
+					{x:pos.x+128,y:pos.y+64},{x:pos.x+128+64,y:pos.y}]);
+			}
+
+			function loop(dt)
+			{
+				if(run)
+					moose.loop(simulation,dt,level);
+			}
+
+			function draw()
+			{
+				if(simulation&&!run)
+				{
+					simulation.ctx.font="48px serif";
+					simulation.ctx.textAlign="center";
+					simulation.ctx.fillText("PAUSED",simulation.canvas.width/2.0,
+						simulation.canvas.height/2.0+24);
+				}
+
+				moose.draw(simulation);
+				level.draw(simulation);
+			}
+		</script>
+	</head>
+
+	<body role="document" onload="init();">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>Demo</h1>
+			</div>
+			<center>
+				<div class="nohighlight">
+					<canvas id="canvas" width="320px" height="240px" style="border:1px solid #000000;"></canvas>
+					<br/>
+					<button id="runner" onclick="toggle();" class="btn btn-lg btn-primary"></button>
+				</div>
+			</center>
+
+		</div>
+	</body>
+</html>

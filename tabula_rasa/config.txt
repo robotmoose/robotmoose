@@ -1,0 +1,8 @@
+robot=2016/uaf/laylagray
+superstar=http://robotmoose.com
+#baudrate=57600
+#marker=
+trim=0.85
+#debug=
+delay_ms=100
+#sim=false

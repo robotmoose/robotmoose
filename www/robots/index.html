@@ -1,0 +1,42 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<!--#include virtual="/navbar.html"-->
+
+		<style>
+			.CodeMirror{border:1px solid #000000;height:auto;}
+			.CodeMirror-scroll{overflow:visible;min-height:128;max-height:320;}
+
+			head
+			{
+				overflow:none;
+				padding:0px;
+				margin:0px;
+				width:100%;
+				height:100%;
+			}
+
+			body
+			{
+				overflow:none;
+				padding:0px;
+				margin:0px;
+				width:100%;
+				height:100%;
+			}
+		</style>
+	</head>
+	<body role="document">
+		<div class="nohighlight" style="overflow:none;padding-top:51px;">
+			<div id="gui" style="overflow:none;"></div>
+		</div>
+
+		<script type="text/javascript">
+			var div=document.getElementById("gui");
+			var robot_ui=new robot_ui_t(div);
+
+			if(!robot_ui)
+				alert("Could not create robot_ui!");
+		</script>
+	</body>
+</html>
