@@ -436,6 +436,28 @@ public:
 
 superstar_db_t superstar_db;
 
+
+//	Return true is auth was set succesfully.
+// If false, then we had an error in file operations
+bool set_auth(std::string starpath, std::string new_auth)
+{
+	if(starpath[0]!='/')
+		starpath="/" + starpath;
+	std::ofstream f("auth",std::ios_base::app);
+	if(f.is_open())
+	{
+		f<<starpath+"\t"+new_auth;
+		f<<std::endl;
+		f.close();
+		return true;
+	}	
+	else 
+		return false;
+	
+
+
+}
+
 /**
   Return true if a write to this starpath is allowed.
   The variable orig_starpath refers to the original starpath passed,
@@ -679,6 +701,34 @@ void superstar_http_handler(struct mg_connection *conn, int ev,void *param) {
 				starpath.c_str(), sentauth);
 		}
 	}
+
+
+	else if (0<=mg_get_http_var(&m->query_string,"setauth",buf,NBUF))
+	{
+		std::string new_auth(buf);
+		char sentauth[NBUF];
+
+		if(0>mg_get_http_var(&m->query_string,"auth",sentauth,NBUF))
+			sentauth[0]=0;
+		if(write_is_authorized(starpath,new_auth,sentauth))
+		{
+			content+="<P>Setting new auth+\n";
+			bool set_successfull=set_auth(starpath,new_auth);
+			if(set_successfull)
+				content+="<P> Auth set succesfully";
+			else
+			{
+				content+="<P> Failed to set auth. Check if you have permission";
+			}
+		}
+		else
+		{	
+			content+="<P> Failed to set auth. Do you have permission?";	
+			auth_error=true;
+		}
+	}
+
+
 
 	//Not writing a new value
 	else
