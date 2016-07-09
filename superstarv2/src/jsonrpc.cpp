@@ -84,7 +84,8 @@ Json::Value jsonrpc_handle(superstar_t& superstar,const Json::Value request)
 		else if(params.isObject()&&method=="set"&&params["opts"].isObject())
 		{
 			response["result"]=true;
-			superstar.set(params["opts"]["path"].asString(),params["opts"]["value"]);
+			superstar.set(params["opts"]["path"].asString(),params["opts"]["value"],
+				params["auth"]);
 		}
 		else if(params.isObject()&&method=="sub"&&params["opts"].isObject())
 		{
@@ -95,7 +96,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,const Json::Value request)
 		{
 			response["result"]=true;
 			superstar.push(params["opts"]["path"].asString(),params["opts"]["value"],
-				params["opts"]["length"].asUInt());
+				params["opts"]["length"].asUInt(),params["auth"]);
 		}
 		else
 		{

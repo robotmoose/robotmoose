@@ -33,4 +33,7 @@ std::string replace_all(std::string str,const std::string& find,const std::strin
 //    So str==",1,2," and delim=="," would yield ["","1","2",""].
 std::vector<std::string> split(const std::string& str,const std::string& delim);
 
+//Converts bytes of str into a hex string.
+std::string to_hex_string(const std::string& str);
+
 #endif

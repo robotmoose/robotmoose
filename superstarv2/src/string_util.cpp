@@ -4,6 +4,9 @@
 
 #include "string_util.hpp"
 
+#include <iomanip>
+#include <sstream>
+
 //Returns whether str starts with prefix.
 bool starts_with(const std::string& str,const std::string& prefix)
 {
@@ -84,4 +87,13 @@ std::vector<std::string> split(const std::string& str,const std::string& delim)
 	tokens.push_back(str.substr(old_pos,str.size()-old_pos));
 
 	return tokens;
+}
+
+//Converts bytes of str into a hex string.
+std::string to_hex_string(const std::string& str)
+{
+	std::ostringstream ostr;
+	for(size_t ii=0;ii<str.size();++ii)
+		ostr<<std::hex<<std::setw(2)<<std::setfill('0')<<((int)str[ii]&0x000000ff);
+	return ostr.str();
 }

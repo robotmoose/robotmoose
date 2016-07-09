@@ -103,6 +103,8 @@ void http_handler(mg_connection* conn,int event,void* event_data)
 	}
 }
 
+#include "auth.hpp"
+
 int main()
 {
 	try

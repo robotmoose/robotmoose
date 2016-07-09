@@ -7,7 +7,7 @@ LIB=
 JSONCPP_SRC=$(INC)/jsoncpp/json_reader.cpp $(INC)/jsoncpp/json_value.cpp $(INC)/jsoncpp/json_writer.cpp
 MONGOOSE_SRC=$(INC)/mongoose/mongoose.c
 UTILITY_SRC=$(SRC)/json_util.cpp $(SRC)/string_util.cpp
-COMMON_SRC=$(SRC)/jsonrpc.cpp $(SRC)/superstar.cpp $(JSONCPP_SRC) $(MONGOOSE_SRC) $(UTILITY_SRC)
+COMMON_SRC=$(SRC)/auth.cpp $(SRC)/jsonrpc.cpp $(SRC)/superstar.cpp
 
 ifeq ($(OS),Windows_NT)
 	LIB+=-lWs2_32
@@ -19,10 +19,10 @@ endif
 
 all: superstar unit_tests
 
-superstar: $(COMMON_SRC) $(SRC)/main.cpp
+superstar: $(SRC)/main.cpp $(COMMON_SRC) $(JSONCPP_SRC) $(MONGOOSE_SRC) $(UTILITY_SRC)
 	$(CXX) $(CFLAGS) $^ $(LIB) -o $@
 
-unit_tests: $(COMMON_SRC) $(SRC)/unit_tests.cpp
+unit_tests: $(SRC)/unit_tests.cpp $(COMMON_SRC) $(JSONCPP_SRC) $(MONGOOSE_SRC) $(UTILITY_SRC)
 	$(CXX) $(CFLAGS) $^ $(LIB) -o $@
 
 clean:

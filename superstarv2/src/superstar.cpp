@@ -5,6 +5,7 @@
 
 #include "superstar.hpp"
 
+#include "auth.hpp"
 #include <sstream>
 #include "string_util.hpp"
 
@@ -64,7 +65,7 @@ Json::Value superstar_t::get(const std::string& path) const
 //  Creates full path if path doesn't exist.
 //  If existing key are not objects in the path, they will be afterwards...
 //    So setting /a/b to foo on object {"a":123} would yield {"a":{"b":"foo"}}.
-void superstar_t::set(const std::string& path,const Json::Value& val)
+void superstar_t::set(const std::string& path,const Json::Value& val,const Json::Value& auth)
 {
 	//Tokenize path.
 	std::vector<std::string> paths(pathify(path));
@@ -175,7 +176,7 @@ Json::Value superstar_t::sub(const std::string& path) const
 //Pushes a val into an array located at path and resizes it to len.
 //  Arrays here are treated as queues.
 //  Similar functionality of set when dealing with existing key names in the given path.
-void superstar_t::push(const std::string& path,const Json::Value& val,size_t len)
+void superstar_t::push(const std::string& path,const Json::Value& val,const Json::Value& len,const Json::Value& auth)
 {
 	//Tokenize path.
 	std::vector<std::string> paths(pathify(path));
@@ -225,7 +226,7 @@ void superstar_t::push(const std::string& path,const Json::Value& val,size_t len
 		*obj=Json::arrayValue;
 
 	//Don't bother building the copy array if length 0 (see notes below for why).
-	if(len==0)
+	if(!len.isNull()&&len.asUInt()==0)
 		return;
 
 	//Append value
@@ -236,8 +237,8 @@ void superstar_t::push(const std::string& path,const Json::Value& val,size_t len
 	//  Note, jsoncpp has a VERY expensive removeMember...this is WAY cheaper...
 	Json::Value new_array=Json::arrayValue;
 	size_t min_size=obj->size();
-	if(min_size>len)
-		min_size=len;
+	if(!len.isNull()&&min_size>len.asUInt())
+		min_size=len.asUInt();
 	if(min_size>1000)
 		min_size=1000;
 	for(Json::ArrayIndex ii=0;ii<min_size;++ii)
