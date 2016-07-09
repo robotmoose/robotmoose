@@ -51,3 +51,7 @@ www/downloads/files
 www/latest.tar.gz
 *.o
 a.out
+superstarv2/superstar
+superstarv2/superstar.exe
+superstarv2/unit_tests
+superstarv2/unit_tests.exe
