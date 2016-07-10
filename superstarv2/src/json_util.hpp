@@ -14,4 +14,10 @@ std::string JSON_serialize(const Json::Value& json,bool pretty=false);
 //Converts string to json (or throws error).
 Json::Value JSON_deserialize(const std::string& str);
 
+//Checkes if the given json object is a string.
+//  Note, JSONCPP seems to parse
+//  everything as a string...so check for everything but a string to get
+//  the desired effect....
+bool JSON_isString(const Json::Value json);
+
 #endif

@@ -65,43 +65,121 @@ Json::Value jsonrpc_handle(superstar_t& superstar,const Json::Value request)
 	Json::Value response=jsonrpc_skeleton();
 
 	//Invalid request object.
-	if(!request.isObject()||request["jsonrpc"]!="2.0"
-		||jsonrpc_invalid_id(request)||jsonrpc_invalid_method(request))
+	if(!request.isObject()||
+		request["jsonrpc"].asString()!="2.0"||
+		jsonrpc_invalid_id(request["id"])||
+		JSON_isString(request["method"]))
 	{
 		response["error"]=jsonrpc_error(-32600,"Invalid Request");
 	}
 
 	//Supported methods.
-	else if(jsonrpc_supported_method(request))
+	else if(jsonrpc_supported_method(request["method"]))
 	{
 		Json::Value params=request["params"];
 		Json::Value method=request["method"];
+		bool bad_params=false;
+		std::string error_message="";
+		std::string path;
+		std::string opts_str;
+		Json::Value opts;
+		bool auth=true;
 
-		if(params.isObject()&&method=="get"&&params["opts"].isObject())
+		//We only use objects as params...for now...
+		if(!params.isObject())
 		{
-			response["result"]=superstar.get(params["opts"]["path"].asString());
+			bad_params=true;
+			error_message="Params field must be an object.";
+			goto error_label;
 		}
-		else if(params.isObject()&&method=="set"&&params["opts"].isObject())
+
+		//We only use strings for paths...
+		if(JSON_isString(params["path"]))
+		{
+			bad_params=true;
+			error_message="Path field must be a string.";
+			goto error_label;
+		}
+		path=params["path"].asString();
+
+		//Try to decode opts string.
+		try
+		{
+			//We only use strings for ENCODED opts...or null...
+			//  Note, we aren't using the string helper function here...
+			//  JSONCPP tries to be intelligent by treating string encoded objects
+			//  as objects...so it doesn't work here...but .asString() works as expected...
+			if(!params["opts"].isString()&&!params["opts"].isNull())
+				return 0;
+
+			//Only decode if not actually null (aka "")...
+			opts_str=params["opts"].asString();
+			if(opts_str.size()>0)
+				opts=JSON_deserialize(opts_str);
+
+			//We only use objects for DECODED opts...or null...
+			if(!opts.isObject()&&!opts.isNull())
+				return 0;
+		}
+
+		//Bad opts type or bad decode...
+		catch(...)
+		{
+			bad_params=true;
+			error_message="Opts field must be a string encoded json object or null.";
+			goto error_label;
+		}
+
+		//We only use strings for auths...
+		if(JSON_isString(params["auth"])&&!params["auth"].isNull())
+		{
+			bad_params=true;
+			error_message="Auth field must be a string or null.";
+			goto error_label;
+		}
+
+		//Write based operations - check auth.
+		if((method=="set"||method=="push")&&
+			!superstar.auth_check(path,opts_str,params["auth"]))
+		{
+			auth=false;
+			goto error_label;
+		}
+
+		//Otherwise service method.
+		if(method=="get")
+		{
+			response["result"]=superstar.get(path);
+		}
+		else if(method=="set")
 		{
 			response["result"]=true;
-			superstar.set(params["opts"]["path"].asString(),params["opts"]["value"],
-				params["auth"]);
+			superstar.set(path,opts["value"]);
 		}
-		else if(params.isObject()&&method=="sub"&&params["opts"].isObject())
+		else if(method=="sub")
 		{
-			response["result"]=superstar.sub(params["opts"]["path"].asString());
+			response["result"]=superstar.sub(path);
 		}
-		else if(params.isObject()&&method=="push"&&params["opts"].isObject()&&
-			(params["opts"]["length"].isUInt()||params["opts"]["length"].isNull()))
+		else if(method=="push")
 		{
+			//Length is either null or an integer...optional field...
+			if(!opts["length"].isUInt()&&!opts["length"].isNull())
+			{
+				bad_params=true;
+				error_message="Length field must be an integer or null.";
+				goto error_label;
+			}
+
 			response["result"]=true;
-			superstar.push(params["opts"]["path"].asString(),params["opts"]["value"],
-				params["opts"]["length"].asUInt(),params["auth"]);
+			superstar.push(path,opts["value"],opts["length"]);
 		}
-		else
-		{
-			response["error"]=jsonrpc_error(-32602,"Invalid params");
-		}
+
+		//What have I become?
+		error_label:
+			if(bad_params)
+				response["error"]=jsonrpc_error(-32602,"Invalid params",error_message);
+			if(!auth)
+				response["error"]=jsonrpc_error(-32000,"Not authorized","");
 	}
 
 	//Unsupported methods.
@@ -111,7 +189,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,const Json::Value request)
 	}
 
 	//Set id if it was passed (as per spec).
-	if(request.isObject()&&!jsonrpc_invalid_id(request))
+	if(request.isObject()&&!jsonrpc_invalid_id(request["id"]))
 		response["id"]=request["id"];
 
 	return response;
@@ -141,33 +219,18 @@ Json::Value jsonrpc_skeleton()
 //  Note, id is supposed to be a string/number...JSONCPP seems to parse
 //  everything as a string...so check for everything but a string to get
 //  the desired effect.
-bool jsonrpc_invalid_id(const Json::Value request)
+bool jsonrpc_invalid_id(const Json::Value id)
 {
-	return (request["id"].isBool()||
-		request["id"].isArray()||
-		request["id"].isObject());
-}
-
-//Checkes if the given request's method is a valid one (as in the specification).
-//  Note, same mentality here as in the invalid id function, need a string.
-bool jsonrpc_invalid_method(const Json::Value request)
-{
-	return (request["method"].isNull()||
-			request["method"].isBool()||
-			request["method"].isInt()||
-			request["method"].isUInt()||
-			request["method"].isIntegral()||
-			request["method"].isDouble()||
-			request["method"].isNumeric()||
-			request["method"].isArray()||
-			request["method"].isObject());
+	return (id.isBool()||
+		id.isArray()||
+		id.isObject());
 }
 
 //Checkes if the given request's method is supported (as in a get/set/sub/push).
-bool jsonrpc_supported_method(const Json::Value request)
+bool jsonrpc_supported_method(const Json::Value method)
 {
-	return (request["method"]=="get"||
-		request["method"]=="set"||
-		request["method"]=="sub"||
-		request["method"]=="push");
+	return (method.asString()=="get"||
+		method.asString()=="set"||
+		method.asString()=="sub"||
+		method.asString()=="push");
 }

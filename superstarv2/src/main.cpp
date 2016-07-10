@@ -15,7 +15,7 @@
 mg_serve_http_opts server_options;
 
 //"Database".
-superstar_t superstar;
+superstar_t superstar("auth");
 
 //Helper to send a message to conn with given status and content.
 // Note, status should be in the form "200 OK" or "401 Unauthorized".

@@ -9,6 +9,11 @@
 #include <sstream>
 #include "string_util.hpp"
 
+//Superstar constructor, auth file is the file containing authorizations.
+//  If the file doesn't exist, superstar assumes there are no auth codes...
+superstar_t::superstar_t(const std::string& auth_file):auth_file_m(auth_file)
+{}
+
 //Turn a path into a vector of strings.
 //  "///test//hello//blah/" yields {"test","hello","blah"}.
 std::vector<std::string> superstar_t::pathify(std::string path) const
@@ -65,7 +70,7 @@ Json::Value superstar_t::get(const std::string& path) const
 //  Creates full path if path doesn't exist.
 //  If existing key are not objects in the path, they will be afterwards...
 //    So setting /a/b to foo on object {"a":123} would yield {"a":{"b":"foo"}}.
-void superstar_t::set(const std::string& path,const Json::Value& val,const Json::Value& auth)
+void superstar_t::set(const std::string& path,const Json::Value& val)
 {
 	//Tokenize path.
 	std::vector<std::string> paths(pathify(path));
@@ -176,7 +181,8 @@ Json::Value superstar_t::sub(const std::string& path) const
 //Pushes a val into an array located at path and resizes it to len.
 //  Arrays here are treated as queues.
 //  Similar functionality of set when dealing with existing key names in the given path.
-void superstar_t::push(const std::string& path,const Json::Value& val,const Json::Value& len,const Json::Value& auth)
+void superstar_t::push(const std::string& path,const Json::Value& val,
+	const Json::Value& len)
 {
 	//Tokenize path.
 	std::vector<std::string> paths(pathify(path));
@@ -244,4 +250,15 @@ void superstar_t::push(const std::string& path,const Json::Value& val,const Json
 	for(Json::ArrayIndex ii=0;ii<min_size;++ii)
 		new_array.append((*obj)[(Json::ArrayIndex)(obj->size()-min_size+ii)]);
 	*obj=new_array;
+}
+
+//Authenticates path with opts with the passed auth object (expects a string or null).
+//  FIXME:  Authentication is hardcoded to 123...
+bool superstar_t::auth_check(const std::string& path,const std::string& opts,
+	const Json::Value& auth)
+{
+	std::string auth_str="";
+	if(!auth.isNull())
+		auth_str=auth.asString();
+	return (auth_str==to_hex_string(hmac_sha256("123",path+":"+opts)));
 }

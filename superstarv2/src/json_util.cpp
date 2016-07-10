@@ -36,3 +36,20 @@ Json::Value JSON_deserialize(const std::string& str)
 		throw std::runtime_error(reader.getFormattedErrorMessages());
 	return json;
 }
+
+//Checkes if the given json object is a string.
+//  Note, JSONCPP seems to parse
+//  everything as a string...so check for everything but a string to get
+//  the desired effect....
+bool JSON_isString(const Json::Value json)
+{
+	return (json.isNull()||
+		json.isBool()||
+		json.isInt()||
+		json.isUInt()||
+		json.isIntegral()||
+		json.isDouble()||
+		json.isNumeric()||
+		json.isArray()||
+		json.isObject());
+}
