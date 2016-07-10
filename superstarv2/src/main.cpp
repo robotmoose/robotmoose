@@ -10,12 +10,27 @@
 #include <string>
 #include "string_util.hpp"
 #include "superstar.hpp"
+#include <time.h>
+
+//Gets time in milliseconds...
+int64_t millis()
+{
+	//Seconds...
+	int64_t now=time(0);
+
+	//HOPE YOU DIDN'T NEED MILLISECOND RESOLUTION!
+	return 1000*now;
+}
 
 //Server options...needs to be global/non-local.
 mg_serve_http_opts server_options;
 
 //"Database".
 superstar_t superstar("auth","db.json");
+
+//Backup save time variabels...
+const int64_t backup_time=20000;
+int64_t old_time=millis();
 
 //Helper to send a message to conn with given status and content.
 // Note, status should be in the form "200 OK" or "401 Unauthorized".
@@ -131,13 +146,18 @@ int main()
 		std::cout<<"Superstar started on "<<port<<":"<<std::endl;
 		while(true)
 		{
-			mg_mgr_poll(&manager,5000);
+			mg_mgr_poll(&manager,500);
 
-			//Try to save database...every 5 seconds...
-			if(superstar.save())
-				std::cout<<"Saved backup database."<<std::endl;
-			else
-				std::cout<<"Could not save backup database."<<std::endl;
+			//Try to save database...
+			int64_t new_time=millis();
+			if((new_time-old_time)>=backup_time)
+			{
+				if(superstar.save())
+					std::cout<<"Saved backup database."<<std::endl;
+				else
+					std::cout<<"Could not save backup database."<<std::endl;
+				old_time=new_time;
+			}
 
 		}
 		mg_mgr_free(&manager);
