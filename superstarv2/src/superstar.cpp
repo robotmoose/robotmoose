@@ -1,7 +1,6 @@
 //Mike Moss
 //07/09/2016
 //Contains the superstar "database" object (actually does the set/get operations).
-//FIXME:  Needs authentication.
 
 #include "superstar.hpp"
 
