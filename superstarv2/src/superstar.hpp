@@ -12,9 +12,11 @@
 class superstar_t
 {
 	public:
-		//Superstar constructor, auth file is the file containing authorizations.
+		//Superstar constructor.
+		//	Auth file is the file containing authorizations.
 		//  If the file doesn't exist, superstar assumes there are no auth codes...
-		superstar_t(const std::string& auth_file);
+		//  Backup file is the name of the backup file load saves to.
+		superstar_t(const std::string& auth_file,const std::string& backup_file);
 
 		//Turn a path into a vector of strings.
 		//  "///test//hello//blah/" yields {"test","hello","blah"}.
@@ -50,8 +52,22 @@ class superstar_t
 		bool auth_check(std::string path,const std::string& opts,
 			const Json::Value& auth,std::string recursive_path="");
 
+		//Loads from either an old style binary file (superstar v1).
+		//Or from a JSON file (superstar v2).
+		//  Note, THIS OVERWRITES THE CURRENTLY LOADED DATABASE.
+		bool load();
+
+		//Loads from old style binary files (superstar v1).
+		//  Note, THIS OVERWRITES THE CURRENTLY LOADED DATABASE.
+		bool load_v1();
+
+		//Saves to a JSON file (superstar v2 format).
+		//  Note, THIS OVERWRITES THE OLD DATABASE FILE.
+		bool save();
+
 	private:
 		std::string auth_file_m;
+		std::string backup_file_m;
 		Json::Value database_m;
 };
 

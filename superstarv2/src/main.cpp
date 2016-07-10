@@ -15,7 +15,7 @@
 mg_serve_http_opts server_options;
 
 //"Database".
-superstar_t superstar("auth");
+superstar_t superstar("auth","db.json");
 
 //Helper to send a message to conn with given status and content.
 // Note, status should be in the form "200 OK" or "401 Unauthorized".
@@ -103,12 +103,16 @@ void http_handler(mg_connection* conn,int event,void* event_data)
 	}
 }
 
-#include "auth.hpp"
-
 int main()
 {
 	try
 	{
+		//Try to load database...
+		if(superstar.load())
+			std::cout<<"Loaded backup database."<<std::endl;
+		else
+			std::cout<<"Could not load backup database."<<std::endl;
+
 		//Server settings.
 		std::string port("8081");
 		server_options.document_root="../www";
@@ -123,10 +127,19 @@ int main()
 			throw std::runtime_error("Could not bind to port "+port+".");
 		mg_set_protocol_http_websocket(server_conn);
 
-		//Serve...forever.
+		//Serve...forever...
 		std::cout<<"Superstar started on "<<port<<":"<<std::endl;
 		while(true)
-			mg_mgr_poll(&manager,1000);
+		{
+			mg_mgr_poll(&manager,5000);
+
+			//Try to save database...every 5 seconds...
+			if(superstar.save())
+				std::cout<<"Saved backup database."<<std::endl;
+			else
+				std::cout<<"Could not save backup database."<<std::endl;
+
+		}
 		mg_mgr_free(&manager);
 	}
 	catch(std::exception& error)

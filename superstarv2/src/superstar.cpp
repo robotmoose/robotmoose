@@ -6,12 +6,16 @@
 
 #include "auth.hpp"
 #include <fstream>
+#include "json_util.hpp"
 #include <sstream>
 #include "string_util.hpp"
 
-//Superstar constructor, auth file is the file containing authorizations.
+//Superstar constructor.
+//	Auth file is the file containing authorizations.
 //  If the file doesn't exist, superstar assumes there are no auth codes...
-superstar_t::superstar_t(const std::string& auth_file):auth_file_m(auth_file)
+//  Backup file is the name of the backup file load saves to.
+superstar_t::superstar_t(const std::string& auth_file,const std::string& backup_file):
+	auth_file_m(auth_file),backup_file_m(backup_file)
 {}
 
 //Replace all multiple slashes with a single slash (hacky...but it works...)
@@ -336,4 +340,117 @@ bool superstar_t::auth_check(std::string path,const std::string& opts,
 	if(!auth.isNull())
 		auth_str=auth.asString();
 	return (auth_str==to_hex_string(hmac_sha256(pass,recursive_path+":"+opts)));
+}
+
+//Loads from either an old style binary file (superstar v1).
+//Or from a JSON file (superstar v2).
+bool superstar_t::load()
+{
+	//Empty backup file...return false...
+	if(backup_file_m.size()==0)
+		return false;
+
+	//Try to load old version...
+	if(load_v1())
+		return true;
+
+	//Try to open file.
+	char buffer;
+	std::ifstream istr(backup_file_m.c_str(),std::ios_base::in|std::ios_base::binary);
+	istr.unsetf(std::ios_base::skipws);
+	if(!istr)
+		return false;
+
+	//Read all data in file...
+	std::string data="";
+	while(istr>>buffer)
+		data+=buffer;
+	istr.close();
+
+	//Try to load as JSON...
+	try
+	{
+		set("/",JSON_deserialize(data));
+		return true;
+	}
+	catch(...)
+	{
+		return false;
+	}
+}
+
+//Loads from old style binary files (superstar v1).
+bool superstar_t::load_v1()
+{
+	//Empty backup file...return false...
+	if(backup_file_m.size()==0)
+		return false;
+
+	//Try to open file.
+	std::ifstream istr(backup_file_m.c_str(),std::ios_base::in|std::ios_base::binary);
+	istr.unsetf(std::ios_base::skipws);
+	if(!istr)
+		return false;
+
+	//Read size of data.
+	uint64_t array_length=0;
+	istr.read((char*)&array_length,sizeof(uint64_t));
+
+	//Create an empty superstar...
+	superstar_t superstar_new("","");
+
+	//Read each entry...
+	for(size_t ii=0;ii<array_length;++ii)
+	{
+		//Get key...
+		uint64_t key_size=0;
+		std::string key_str;
+		if(!istr.read((char*)&key_size,sizeof(uint64_t)))
+			return false;
+		key_str.resize(key_size);
+		if(!istr.read(&key_str[0],key_size))
+			return false;
+
+		//Get value...
+		uint64_t value_size=0;
+		std::string value_str;
+		if(!istr.read((char*)&value_size,sizeof(uint64_t)))
+			return false;
+		value_str.resize(value_size);
+		if(!istr.read(&value_str[0],value_size))
+			return false;
+
+		//Decode JSON objects as JSON.
+		Json::Value value;
+		try
+		{
+			value=JSON_deserialize(value_str);
+		}
+		catch(...)
+		{
+			value=value_str;
+		}
+
+		superstar_new.set(key_str,value);
+	}
+	istr.close();
+
+	//Overwrite database...
+	database_m=superstar_new.database_m;
+	return true;
+}
+
+//Saves to a JSON file (superstar v2 format).
+bool superstar_t::save()
+{
+	//Empty backup file...return false...
+	if(backup_file_m.size()==0)
+		return false;
+
+	//Save database...
+	std::string database_json(JSON_serialize(get("/")));
+	std::ofstream ostr(backup_file_m.c_str(),std::ios_base::out|std::ios_base::binary);
+	bool saved=(bool)(ostr<<database_json);
+	ostr.close();
+	return saved;
 }
