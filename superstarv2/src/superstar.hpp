@@ -1,5 +1,5 @@
 //Mike Moss
-//07/09/2016
+//07/10/2016
 //Contains the superstar "database" object (actually does the set/get operations).
 
 #ifndef SUPERSTAR_HPP
@@ -43,7 +43,7 @@ class superstar_t
 		//  the given path.
 		void push(const std::string& path,const Json::Value& val,const Json::Value& len);
 
-		//Authenticates path with opts with the passed auth object
+		//Authenticates path with opts with the passed auth object.
 		//  Note, expects a string or null in the auth object.
 		//  Note, recursive function, passing the original path around in
 		//        recursive_path...

@@ -5,6 +5,7 @@
 #include "superstar.hpp"
 
 #include "auth.hpp"
+#include <cmath>
 #include <fstream>
 #include "json_util.hpp"
 #include <sstream>
@@ -264,7 +265,7 @@ void superstar_t::push(const std::string& path,const Json::Value& val,
 	*obj=new_array;
 }
 
-//Authenticates path with opts with the passed auth object
+//Authenticates path with opts with the passed auth object.
 //  Note, expects a string or null in the auth object.
 //  Note, recursive function, passing the original path around in
 //        recursive_path...
@@ -281,7 +282,7 @@ bool superstar_t::auth_check(std::string path,const std::string& opts,
 		recursive_path=path;
 
 	//Try to open auth file.
-	std::ifstream fstr(auth_file_m);
+	std::ifstream fstr(auth_file_m.c_str());
 
 	//No passwords at all...authenticated...
 	if(!fstr.good())
@@ -339,7 +340,7 @@ bool superstar_t::auth_check(std::string path,const std::string& opts,
 	std::string auth_str="";
 	if(!auth.isNull())
 		auth_str=auth.asString();
-	return (auth_str==to_hex_string(hmac_sha256(pass,recursive_path+":"+opts)));
+	return (auth_str==to_hex_string(hmac_sha256(pass,recursive_path+opts)));
 }
 
 //Loads from either an old style binary file (superstar v1).
@@ -399,41 +400,52 @@ bool superstar_t::load_v1()
 	//Create an empty superstar...
 	superstar_t superstar_new("","");
 
-	//Read each entry...
-	for(size_t ii=0;ii<array_length;++ii)
+	//In case too big of strings are tried to be read...
+	try
 	{
-		//Get key...
-		uint64_t key_size=0;
-		std::string key_str;
-		if(!istr.read((char*)&key_size,sizeof(uint64_t)))
-			return false;
-		key_str.resize(key_size);
-		if(!istr.read(&key_str[0],key_size))
-			return false;
-
-		//Get value...
-		uint64_t value_size=0;
-		std::string value_str;
-		if(!istr.read((char*)&value_size,sizeof(uint64_t)))
-			return false;
-		value_str.resize(value_size);
-		if(!istr.read(&value_str[0],value_size))
-			return false;
-
-		//Decode JSON objects as JSON.
-		Json::Value value;
-		try
+		//Read each entry...
+		for(size_t ii=0;ii<array_length;++ii)
 		{
-			value=JSON_deserialize(value_str);
-		}
-		catch(...)
-		{
-			value=value_str;
-		}
+			//Get key...
+			uint64_t key_size=0;
+			std::string key_str;
+			if(!istr.read((char*)&key_size,sizeof(uint64_t)))
+				return false;
+			key_str.resize(key_size);
+			if(!istr.read(&key_str[0],key_size))
+				return false;
 
-		superstar_new.set(key_str,value);
+			//Get value...
+			uint64_t value_size=0;
+			std::string value_str;
+			if(!istr.read((char*)&value_size,sizeof(uint64_t)))
+				return false;
+			value_str.resize(value_size,'\0');
+			if(!istr.read(&value_str[0],value_size))
+				return false;
+
+			//Decode JSON objects as JSON.
+			Json::Value value;
+			try
+			{
+				value=JSON_deserialize(value_str);
+			}
+			catch(...)
+			{
+				value=value_str;
+			}
+
+			superstar_new.set(key_str,value);
+		}
+		istr.close();
 	}
-	istr.close();
+
+	//Strings were too big...
+	catch(...)
+	{
+		istr.close();
+		return false;
+	}
 
 	//Overwrite database...
 	database_m=superstar_new.database_m;

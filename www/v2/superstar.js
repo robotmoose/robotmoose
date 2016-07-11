@@ -1,5 +1,9 @@
+//Mike Moss
+//07/10/2016
+//Contains client code to get requests from a superstar server.
+
 //Superstar object.
-//  Member variable this.queue to store requests in until .flush is called.
+//  Variable this.queue to store requests in until .flush is called.
 function superstar_t()
 {
 	this.queue=[];
@@ -76,7 +80,7 @@ superstar_t.prototype.build_skeleton_request=function(method,path,opts)
 		method:method,
 		params:
 		{
-			"path":path,
+			path:path
 		},
 		id:null
 	};
@@ -89,8 +93,7 @@ superstar_t.prototype.build_skeleton_request=function(method,path,opts)
 superstar_t.prototype.build_auth=function(path,request,auth)
 {
 	path=this.pathify(path);
-	request.params.auth=CryptoJS.HmacSHA256(path+":"+request.params.opts,auth).
-		toString(CryptoJS.enc.Hex);
+	request.params.auth=auth;
 }
 
 //Adds a build request into the batch queue.
@@ -116,7 +119,14 @@ superstar_t.prototype.flush=function()
 	var batch=[];
 	for(var ii=0;ii<this.queue.length;++ii)
 	{
-		this.queue[ii].request.id=ii;
+		var request=this.queue[ii].request;
+		var path=request.params.path;
+		var opts=request.params.opts;
+		var auth=request.params.auth;
+		request.id=ii;
+		if(auth)
+			request.params.auth=CryptoJS.HmacSHA256(path+opts,auth).
+				toString(CryptoJS.enc.Hex);
 		batch.push(this.queue[ii].request);
 	}
 	var old_queue=this.queue;
@@ -134,24 +144,45 @@ superstar_t.prototype.flush=function()
 				{
 					//Parse response, call responses.
 					var response=JSON.parse(xmlhttp.responseText);
-					for(var key in response)
+
+					//Function to handle errors...
+					var handle_error=function(request,error)
 					{
-						//Error callback...
-						var response_obj=response[key].error;
-						if(response_obj)
+						if(request.error_cb)
+							request.error_cb(error);
+						else
+							console.log("Superstar error ("+error.code+") "+
+								error.message);
+					}
+
+					//Got an array, must be batch data...
+					if(response.constructor===Array)
+						for(var key in response)
 						{
-							if(old_queue[response[key].id].error_cb)
-								old_queue[response[key].id].error_cb(response_obj);
-							else
-								console.log("Superstar error ("+response_obj.code+") "+
-									response_obj.message);
+							if(response[key].id==null)
+								continue;
+
+							//Error callback...
+							var response_obj=response[key].error;
+							if(response_obj)
+							{
+								handle_error(old_queue[response[key].id],response_obj);
+								continue;
+							}
+
+							//Success callback...
+							response_obj=response[key].result;
+							if(old_queue[response[key].id].success_cb)
+								old_queue[response[key].id].success_cb(response_obj);
 						}
 
-						//Success callback...
-						response_obj=response[key].result;
-						if(old_queue[response[key].id].success_cb)
-							old_queue[response[key].id].success_cb(response_obj);
-					}
+					//Server error...
+					else
+						for(var key in old_queue)
+						{
+							handle_error(old_queue[key],response.error);
+							continue;
+						}
 				}
 				catch(error)
 				{

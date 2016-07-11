@@ -1,5 +1,5 @@
 //Mike Moss
-//07/09/2016
+//07/10/2016
 //Contains the actual superstar server (mainly the http server portion).
 
 #include <iostream>
@@ -10,17 +10,7 @@
 #include <string>
 #include "string_util.hpp"
 #include "superstar.hpp"
-#include <time.h>
-
-//Gets time in milliseconds...
-int64_t millis()
-{
-	//Seconds...
-	int64_t now=time(0);
-
-	//HOPE YOU DIDN'T NEED MILLISECOND RESOLUTION!
-	return 1000*now;
-}
+#include "time_util.hpp"
 
 //Server options...needs to be global/non-local.
 mg_serve_http_opts server_options;
