@@ -9,6 +9,7 @@
 #include <fstream>
 #include "json_util.hpp"
 #include <sstream>
+#include <stdint.h>
 #include "string_util.hpp"
 
 //Superstar constructor.
