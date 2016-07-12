@@ -52,6 +52,7 @@ superstarv2/auth
 *.lib
 *.hex
 *.out
+*.json
 
 # python gotchas
 __pycache__/
