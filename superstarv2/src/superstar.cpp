@@ -9,6 +9,7 @@
 #include <fstream>
 #include "json_util.hpp"
 #include <sstream>
+#include <stdexcept>
 #include <stdint.h>
 #include "string_util.hpp"
 
@@ -360,6 +361,8 @@ bool superstar_t::load()
 	char buffer;
 	std::ifstream istr(backup_file_m.c_str(),std::ios_base::in|std::ios_base::binary);
 	istr.unsetf(std::ios_base::skipws);
+
+	//File doesn't exist, this is ok...
 	if(!istr)
 		return false;
 
@@ -375,9 +378,11 @@ bool superstar_t::load()
 		set("/",JSON_deserialize(data));
 		return true;
 	}
+
+	//File isn't json...bad...
 	catch(...)
 	{
-		return false;
+		throw std::runtime_error("Malformed backup file \""+backup_file_m+"\"...");
 	}
 }
 

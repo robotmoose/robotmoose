@@ -30,7 +30,7 @@ std::string JSON_serialize(const Json::Value& json,bool pretty)
 //  JSONCPP doesn't seem to care about trailing crap at the end of the str...
 Json::Value JSON_deserialize(const std::string& str)
 {
-	Json::Reader reader(Json::Features::strictMode());
+	Json::Reader reader;
 	Json::Value json;
 	if(!reader.parse(str,json))
 		throw std::runtime_error(reader.getFormattedErrorMessages());

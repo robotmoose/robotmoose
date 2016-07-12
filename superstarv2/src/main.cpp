@@ -116,7 +116,7 @@ int main()
 		if(superstar.load())
 			std::cout<<"Loaded backup database."<<std::endl;
 		else
-			std::cout<<"Could not load backup database."<<std::endl;
+			std::cout<<"No backup database found."<<std::endl;
 
 		//Server settings.
 		std::string port("8081");
