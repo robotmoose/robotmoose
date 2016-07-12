@@ -7,7 +7,33 @@ Members
 */
 
 
+// Pythagorean Theorem, finds distance between two points.
+function getDistance(p1, p2) {
+    var a = p1.x - p2.x;
+    var b = p1.y - p2.y;
+    return Math.sqrt((a * a) + (b * b));
+}
 
+// Rotates an element by the specified degrees.
+function rotate(el, deg) {
+    el.style.transform = 'rotate(' + deg + 'deg)';
+    el.style.oTransform = 'rotate(' + deg + 'deg)';
+    el.style.msTransform = 'rotate(' + deg + 'deg)';
+    el.style.webkitTransform = 'rotate(' + deg + 'deg)';
+};
+
+// Returns the offset position for the mouse relative to a specified element.
+//http://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element
+function getOffset(el) {
+    var _x = 0;
+    var _y = 0;
+    while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+        _x += el.offsetLeft - el.scrollLeft;
+        _y += el.offsetTop - el.scrollTop;
+        el = el.offsetParent;
+    }
+    return { y: _y, x: _x };
+};
 
 /* Walk the DOM to get the client X,Y position of this element's topleft corner.
   From www.kirupa.com/snippets/examples/move_to_click_position.htm */
@@ -179,14 +205,14 @@ pilot_interface_t.prototype.make_slider=function(config_entry,name,number, minva
 // Add GUI elements for driving around (arrows)
 pilot_interface_t.prototype.make_drive=function(config_entry)
 {
-	var column_left_width=160;
-	var column_right_width=160;
-	var column_padding=10;
+	var column_left_width = 160;
+	var column_right_width = 160;
+	var column_padding = 10;
 
 	// Make arrow div
 	this.arrowDiv=document.createElement("div");
 	this.arrowDiv.title="Click to drive the robot.  Hold down to keep driving.";
-	this.arrowDiv.style.backgroundColor="#808080";
+	this.arrowDiv.style.backgroundColor = "#BBBBBB";
 	this.arrowDiv.style.position="relative";
 	this.arrowDiv.style.width=this.arrowDiv.style.height=column_left_width+column_padding+column_right_width;
 	this.element.appendChild(this.arrowDiv);
@@ -229,7 +255,7 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	this.arrowDiv.onmousedown=function(evt) { myself.pilot_mouse(evt,1,0); };
 	this.arrowDiv.ondragstart=function(evt) { myself.pilot_mouse(evt,1,0); };
 	this.arrowDiv.onmouseup=function(evt) { myself.pilot_mouse(evt,-1,0); };
-	this.arrowDiv.onmouseover=function(evt) { myself.pilot_mouse(evt,0,+1); };
+	this.arrowDiv.onmouseover=function(evt) { myself.pilot_mouse(evt,0,1); };
 	this.arrowDiv.onmouseout=function(evt) { myself.pilot_mouse(evt,-1,-1); };
 	this.arrowDiv.onmousemove=function(evt) { myself.pilot_mouse(evt,0,0); };
 	this.arrowDiv.ondblclick=function(evt) { myself.pilot_mouse(evt,0,0); };
@@ -246,14 +272,102 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 		clearInterval(myself.gamepad_interval);
 	});
 
-	// Add arrow image
-	var img=document.createElement("img");
-	img.src="/images/arrows_hard.png";
-	img.style.position="absolute";
-	img.style.left=img.style.top="0px";
-	img.style.width=img.style.height="100%";
-	img.style.pointerEvents="none";
-	this.arrowDiv.appendChild(img);
+
+	this.images = {};
+
+    // Add wheel image -- rotates, un-restrained motion
+	this.images.wheel = document.createElement("img");
+	this.images.wheel.src = "/images/steering_wheel.png";
+	this.images.wheel.style.position = "absolute";
+	this.images.wheel.style.left = this.images.wheel.style.top = "0px";
+	this.images.wheel.style.width = this.images.wheel.style.height = "100%";
+	this.images.wheel.style.pointerEvents = "none";
+	this.arrowDiv.appendChild(this.images.wheel);
+	this.pilot_send();
+
+    // Add needlewell image -- static
+	this.images.gradient = document.createElement("img");
+	this.images.gradient.src = "/images/gauge_needlewell.png";
+	this.images.gradient.style.position = "absolute";
+	this.images.gradient.style.left = this.images.gradient.style.top = "33.7%";
+	this.images.gradient.style.width = "auto";
+	this.images.gradient.style.height = "32.5%";
+	this.images.gradient.style.pointerEvents = "none";
+	this.arrowDiv.appendChild(this.images.gradient);
+
+    // Add needle image -- rotates, restrained motion
+    // max (in-red) is [-11.75deg] & min (in-green) is [-77.5deg]
+	this.images.needle = document.createElement("img");
+	this.images.needle.src = "/images/gauge_needle.png";
+	this.images.needle.style.position = "absolute";
+	this.images.needle.style.left = this.images.needle.style.top = "33.7%";
+	this.images.needle.style.width = "auto";
+	this.images.needle.style.height = "32.5%";
+	this.images.needle.style.transformOrigin = "83% 83%";
+	this.images.needle.style.oTransformOrigin = "83% 83%";
+	this.images.needle.style.msTransformOrigin = "83% 83%";
+	this.images.needle.style.webkitTransformOrigin = "83% 83%";
+	this.images.needle.style.pointerEvents = "none";
+	this.arrowDiv.appendChild(this.images.needle);
+	this.pilot_send();
+
+    // Add gauge image -- static
+	this.images.shell = document.createElement("img");
+	this.images.shell.src = "/images/gauge_shell.png";
+	this.images.shell.style.position = "absolute";
+	this.images.shell.style.left = this.images.shell.style.top = "33.7%";
+	this.images.shell.style.width = "auto";
+	this.images.shell.style.height = "32.5%";
+	this.images.shell.style.pointerEvents = "none";
+	this.arrowDiv.appendChild(this.images.shell);
+
+	var downfunc = function () { myself.dragging = true; };
+
+	var upfunc = function () {
+	    myself.dragging = false;
+	    rotate(myself.images.wheel, 0); // return to start positions
+	    rotate(myself.images.needle, -77.5);
+	};
+
+	var rotatefunc = function (evt) {
+	    if (myself.dragging) {
+	        // steering wheel rotation
+	        var pos = getOffset(this);
+	        pos.x = evt.pageX - pos.x - window.pageXOffset;
+	        pos.y = evt.pageY - pos.y - window.pageYOffset;
+	        var size = {
+	            w: myself.images.wheel.offsetWidth,
+	            h: myself.images.wheel.offsetHeight
+	        };
+	        var rads = Math.PI / 2 - Math.atan2(size.h / 2 - pos.y, pos.x - size.w / 2);
+	        var degs = rads * 180 / Math.PI;
+	        rotate(myself.images.wheel, degs);
+
+	        // spedometer needle rotation
+	        var n = { x: 171, y: 171 }; // focal point
+	        var dist = getDistance(pos, n);
+	        if (dist < 170) {
+	            var speed = (65.75 / 170) * dist - 77.5;
+	            rotate(myself.images.needle, speed);
+	        }
+	        else if (dist >= 170)
+	        { rotate(myself.images.needle, -11.75); }
+	    }
+	    else { // default positions
+	        rotate(myself.images.wheel, 0);
+	        rotate(myself.images.needle, -77.5);
+	    }
+	};
+	this.arrowDiv.addEventListener('mousedown', downfunc);
+	this.arrowDiv.addEventListener('touchstart', downfunc);
+	this.arrowDiv.addEventListener('mousemove', rotatefunc);
+	this.arrowDiv.addEventListener('touchmove', rotatefunc);
+	this.arrowDiv.addEventListener('mouseup', upfunc);
+	this.arrowDiv.addEventListener('touchend', upfunc);
+	document.addEventListener('mousemove', upfunc); // reset if mouse moves
+	document.addEventListener('touchmove', upfunc); // outside the div
+	document.addEventListener('mouseup', upfunc);
+	document.addEventListener('touchend', upfunc);
 }
 
 pilot_interface_t.prototype.update_drive_text=function()
@@ -305,10 +419,10 @@ pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_d
 	mousePower.R=pretty(clamp(dir.forward-dir.turn,-maxPower,maxPower));
 
 	if (this.mouse_down>0 && this.mouse_in_div>0) {
-		arrowDiv.style.backgroundColor='#222222';
+	    arrowDiv.style.backgroundColor = '#909090';
 		str+=" SENDING";
 	} else {
-		arrowDiv.style.backgroundColor='#404040';
+	    arrowDiv.style.backgroundColor = '#AAAAAA';
 		mousePower.L=mousePower.R=0.0;
 		str+=" (click to send)";
 	}
@@ -354,10 +468,29 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 	if(!keyDown('a','A')&&!keyDown('d','D')&&!keyDown('s','S')&&!keyDown('w','W'))
 		forward=turn=0;
 
-	if (turn==0.0 && forward==0.0)
-		this.keyboardIsDriving=false;
+	if (turn == 0.0 && forward == 0.0)
+	{ this.keyboardIsDriving = false; }
 	else
-		this.keyboardIsDriving=true;
+	{ this.keyboardIsDriving = true; }
+
+    // steering wheel rotation
+	if (forward > 0 || (forward > 0 && turn != 0)) // upper half cases
+	{ dir = turn * 45; }
+	else if (forward < 0 || (forward < 0 && turn != 0)) // lower half cases
+	{ dir = 180 - turn * 45; }
+	else if (forward == 0 && turn != 0) // side cases
+	{ dir = turn * 90; }
+	else { dir = 0; } // starting & ending point
+
+	rotate(this.images.wheel, dir);
+
+    // spedometer needle rotation
+	var ang = maxPower * 65.75 - 77.5;
+	if (this.keyboardIsDriving)
+	{ rotate(this.images.needle, ang); }
+	else
+	{ rotate(this.images.needle, -77.5); }
+
 
 	this.pilot.power.L=100.0*clamp(maxPower*(forward+turn),-maxPower,+maxPower);
 	this.pilot.power.R=100.0*clamp(maxPower*(forward-turn),-maxPower,+maxPower);
@@ -460,5 +593,3 @@ function pilot_send() {
 	sensor_receive(); // Read Sensor Data at every Send
 }
 */
-
-
