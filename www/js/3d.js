@@ -341,7 +341,7 @@ function renderer_t(div,setup_func,loop_func)
 
 	myself.create_grid=function(size,width,height,showOrigin)
 	{
-		var plane_geometry=new THREE.PlaneBufferGeometry(size*width,size*height,size,size);
+		var plane_geometry=new THREE.PlaneBufferGeometry(size*width,size*height,1,1);
 		plane_geometry.normalsNeedUpdate=true;
 		var plane_material=new THREE.MeshBasicMaterial({color:0xd8eef4,depthWrite:false,
 				side:THREE.DoubleSide});
