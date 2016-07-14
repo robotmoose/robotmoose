@@ -146,6 +146,8 @@ state_table_t.prototype.destroy=function()
 
 state_table_t.prototype.get_active_experiment=function(onfinish)
 {
+	var _this = this;
+	if (this.robot.sim) onfinish(_this.robot.active_experiment);
 	onfinish(robot_network.active_experiment);
 	/*if(valid_robot(this.robot))
 		superstar_get(this.robot,"active_experiment",function(active)
@@ -157,12 +159,17 @@ state_table_t.prototype.get_active_experiment=function(onfinish)
 
 state_table_t.prototype.get_experiments=function(active,onfinish)
 {
+	
 	var _this=this;
 	if(valid_robot(this.robot))
 	{
 		/*superstar_sub(this.robot,"experiments",function(json)
-		{*/
-			var json=robot_network.experiments;
+		{*/	if (this.robot.sim) 
+				var json = this.robot.experiments_list;
+			else{
+				var json=robot_network.experiments;
+			}
+			//console.log("getting experiments: " + JSON.stringify(json))
 			_this.drop.build(json,active||_this.next_active_experiment);
 			_this.next_active_experiment=null;
 			if(onfinish)
@@ -203,21 +210,32 @@ state_table_t.prototype.upload=function(robot,onfinish)
 {
 	var _this=this;
 	if(valid_robot(robot))
+	{
+		if(robot.sim) sim_set_experiment(robot, _this.active_experiment, _this.get_states());
+		else
 		superstar_set(robot,"experiments/"+this.active_experiment+"/code",this.get_states(),function()
 		{
 			if(onfinish)
 				onfinish();
 		});
+	}
 }
 
 state_table_t.prototype.get_experiment=function(experiment,onfinish)
 {
 	if(valid_robot(this.robot))
-		superstar_get(this.robot,"experiments/"+experiment+"/code",function(json)
-		{
-			if(onfinish)
-				onfinish(json);
-		});
+		if(this.robot.sim)
+			sim_get_experiment(this.robot,experiment,function(json)
+			{
+				if(onfinish)
+					onfinish(json);
+			});
+		else
+			superstar_get(this.robot,"experiments/"+experiment+"/code",function(json)
+			{
+				if(onfinish)
+					onfinish(json);
+			});
 }
 
 state_table_t.prototype.experiment_exists=function(name,onfinish)
@@ -227,7 +245,10 @@ state_table_t.prototype.experiment_exists=function(name,onfinish)
 		var _this=this;
 		//superstar_sub(this.robot,"experiments",function(experiments)
 		//{
-			var experiments=robot_network.experiments;
+			if (this.robot.sim)
+				var experiments=this.robot.experiments;			
+			else
+				var experiments=robot_network.experiments;
 			var found=false;
 			for(k in experiments)
 				if(decodeURIComponent(experiments[k])==name)
@@ -245,6 +266,7 @@ state_table_t.prototype.experiment_exists=function(name,onfinish)
 //	json should look like: [{name:"state_name",code:"//The Code",time:123},...]
 state_table_t.prototype.build=function(json)
 {
+	//if (json)console.log("Experiments: " + json.toString());
 	this.drag_list.clear(false);
 	this.entries=[];
 	for(var key in json)
@@ -319,6 +341,7 @@ state_table_t.prototype.get_states=function()
 
 state_table_t.prototype.upload_active_experiment=function(experiment)
 {
+	//console.log("State table - Experiment: " + experiment)
 	if(valid_robot(this.robot))
 		superstar_set(this.robot,"active_experiment",experiment);
 }
@@ -578,16 +601,30 @@ state_table_t.prototype.create_new_experiment=function(value)
 {
 	var _this=this;
 	if(valid_robot(this.robot))
-		superstar_set
-		(
-			this.robot,
-			"experiments/"+value+"/code",
-			[{name:"HelloWorld",time:0,code:""}],
-			function()
-			{
-				_this.next_active_experiment=value;
-			}
-		);
+		{
+			if (this.robot.sim)
+				sim_set_experiment(
+					_this.robot,
+					value, 
+					[{name:"HelloWorld",time:0,code:""}],
+					function()
+					{
+						_this.next_active_experiment=value;
+					}					
+				);
+			else
+			superstar_set
+			(
+				this.robot,
+				"experiments/"+value+"/code",
+				[{name:"HelloWorld",time:0,code:""}],
+				function()
+				{
+					_this.next_active_experiment=value;
+				}
+			);
+			
+		}
 }
 
 state_table_t.prototype.load_file_button_pressed_m=function()

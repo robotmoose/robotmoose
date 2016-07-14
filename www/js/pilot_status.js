@@ -59,6 +59,8 @@ pilot_status_t.prototype.upload=function()
 	if(!this.ui || !this.ui.robot || !this.ui.robot.name)
 		return null;
 	this.update_heartbeats();
+	if (this.ui.robot.sim) sim_set(this.ui.robot,this.path,[{"heartbeats":this.pilot_status.heartbeats,"videobeats":this.pilot_status.videobeats}]);
+	else
 	superstar_set(this.ui.robot,this.path,[{"heartbeats":this.pilot_status.heartbeats,"videobeats":this.pilot_status.videobeats}]);
 }
 

@@ -509,10 +509,12 @@ pilot_interface_t.prototype.upload=function(robot)
 {
 	//superstar_set(robot,"pilot",this.pilot);
 	robot_network.pilot=this.pilot;
+	if (robot.sim) robot.update_pilot(this.pilot);
 }
 
 // This is a simple placeholder, to get things working for now:
 pilot_interface_t.prototype.pilot_send=function() {
+	//if (this.onpilot) console.log("Pilot Send - Power L: " + this.pilot.power.L)
 	if (this.onpilot) this.onpilot(this.pilot);
 };
 

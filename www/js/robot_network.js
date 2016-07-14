@@ -37,6 +37,7 @@ function robot_network_t()
 					superstar_sub(_this.robot,"experiments",function(json)
 					{
 						_this.experiments=json;
+
 					});
 
 					superstar_generic(_this.robot,"chat","?get",function(str)

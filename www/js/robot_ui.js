@@ -20,6 +20,8 @@ function robot_ui_t(div)
 		name:null,
 		auth:null
 	};
+	robot_network.sim=false;
+
 	this.disconnected_text="<font style='color:red;'>Not connected.</font>";
 
 	this.state_runner=new state_runner_t();
@@ -73,9 +75,15 @@ robot_ui_t.prototype.create_menus=function()
 
 	this.connect_menu.onconnect=function(robot)
 	{
+		
 		if(robot)
 		{
-			myself.robot=JSON.parse(JSON.stringify(robot));
+			if(robot.sim) myself.robot=robot;
+			else 
+			{
+				myself.robot=JSON.parse(JSON.stringify(robot));
+				robot_network.sim="";
+			}
 			clearInterval(myself.gui.interval);
 			myself.gui.interval=null;
 			myself.menu.get_status_area().innerHTML="Connected to \""+
@@ -215,17 +223,39 @@ robot_ui_t.prototype.run_interval=function() {
 			//function(sensors) // sensor data has arrived:
 			//{
 				myself.sensor_data_count--;
+				if(!myself.robot.sim)
+				{
+					if (!myself.doorways.sensors.minimized)
+						{
+						//console.log("refreshing sensors from robot network: " + JSON.stringify(robot_network.sensors));
+						myself.widgets.sensors.refresh(robot_network.sensors);
+						}	
 
-				if (!myself.doorways.sensors.minimized)
-					myself.widgets.sensors.refresh(robot_network.sensors);
+					if (!myself.doorways.map.minimized)
+						myself.widgets.map.refresh(robot_network.sensors);
 
-				if (!myself.doorways.map.minimized)
-					myself.widgets.map.refresh(robot_network.sensors);
+					if(!myself.doorways.charts.minimized)
+						myself.widgets.charts.refresh(robot_network.sensors);
 
-				if(!myself.doorways.charts.minimized)
-					myself.widgets.charts.refresh(robot_network.sensors);
+					myself.state_runner.VM_sensors=robot_network.sensors;
+				}
+				else
+				{
+					
+					if (!myself.doorways.sensors.minimized)
+					{	var sensors_json = JSON.parse(JSON.stringify(myself.robot.sensors));
+						//console.log("refreshing sensors from simulation: " + JSON.stringify(myself.robot.sensors));
+						myself.widgets.sensors.refresh(sensors_json);
+					}
 
-				myself.state_runner.VM_sensors=robot_network.sensors;
+					if (!myself.doorways.map.minimized)
+						myself.widgets.map.refresh(myself.robot.sensors);
+
+					if(!myself.doorways.charts.minimized)
+						myself.widgets.charts.refresh(myself.robot.sensors);
+
+					myself.state_runner.VM_sensors=myself.robot.sensors;
+				}
 			//});
 	}
 
@@ -253,12 +283,14 @@ robot_ui_t.prototype.create_widgets=function()
 			if(this.widgets[key].destroy)
 				this.widgets[key].destroy();
 
+		
 	this.widgets=
 	{
 		config:new config_editor_t(this.doorways.config.content),
 		states:new state_table_t(this.doorways.states),
 		pilot:new pilot_interface_t(this.doorways.pilot.content),
 		charts:new chart_interface_t(this.doorways.charts.content),
+		
 		sensors:new tree_viewer_t(this.doorways.sensors.content,{},
 		[
 			{key:"bumper",type:"binary"}
@@ -290,6 +322,7 @@ robot_ui_t.prototype.create_widgets=function()
 
 	this.widgets.config.onconfigure=function() // allow configuration upload
 	{
+		
 		if(myself.robot&&myself.robot.name)
 			myself.widgets.config.upload(myself.robot);
 	}

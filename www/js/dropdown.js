@@ -76,7 +76,7 @@ dropdown_t.prototype.build=function(list,on_loaded_value)
 {
 	if(!list)
 		return;
-
+	//console.log("Building dropdown: " + JSON.stringify(list));
 	if(document.activeElement!=this.select)
 	{
 		var old="";
