@@ -5,7 +5,7 @@
  Mike Moss & Orion Lawlor, 2015-12, Public Domain
 */
 
-function connection_t(on_message,on_disconnect,on_connect,on_name_set,on_auth_error,serial_api=chrome.serial)
+function connection_t(on_message,on_disconnect,on_connect,on_name_set,on_auth_error)
 {
 	var _this=this;
 	_this.config="";
@@ -23,22 +23,21 @@ function connection_t(on_message,on_disconnect,on_connect,on_name_set,on_auth_er
 	_this.serial_delay_ms=50; // milliseconds to wait between sensors and commands (saves CPU, costs some latency though)
 
 	// Are there other serial JS apis?  maybe node.js?
-	_this.serial_api=serial_api;
+	serial=serial;
 
 	_this.reset();
 
-	// Set up event listeners:
-	_this.serial_api.onReceive.addListener(
-		function(info) { _this.serial_callback_onReceive(info); }
-	);
-	_this.serial_api.onReceiveError.addListener(
-		function(info) { _this.serial_callback_onReceiveError(info); }
+	// Set up event listener:
+	serial.registerReadCallback(
+		function(info) {
+			 if (!info.registerReadCallback) _this.serial_callback_onReceive(info); 
+		}
 	);
 }
 
 connection_t.prototype.destroy=function()
 {
-	this.gui_disconnect();
+	// nop
 }
 
 
@@ -49,7 +48,6 @@ connection_t.prototype.reset=function() {
 	_this.power={}; // pilot's power commanded values to Arduino
 	_this.sensors={}; // Arduino-reported sensor values
 	_this.sensors.power={}; // Commanded values reflected back up to pilot
-
 	// Cancel all outstanding getnext calls
 	if ( _this.getnexts) {
 		//console.log("Cleaning " + _this.getnexts.length + " getnext sockets.")
@@ -123,7 +121,8 @@ connection_t.prototype.reconnect=function()
 connection_t.prototype.connected=function()
 {
 	var _this=this;
-	return _this.connection!==_this.connection_invalid;
+	// return _this.connection!==_this.connection_invalid;
+	return true;
 }
 
 // Callback to add new robot name
@@ -178,28 +177,17 @@ connection_t.prototype.connect_m=function(port_name,done_callback)
 	_this.port_name=port_name;
 	_this.status_message("Connecting to "+port_name);
 	var options={
-		bitrate:57600,
+		baudRate:57600,
 		receiveTimeout:5*1000 // in ms (must be more than Arduino 1.7 second start delay)
 	};
-	if(port_name=="Sim")
-	{
-		_this.serial_api=new sim_serial_t();
-	}
-	else
-	{
-		_this.serial_api=chrome.serial;
-	}
-	_this.serial_api.connect(port_name, options,
-		function(connectionInfo) {
-			_this.connection=connectionInfo.connectionId;
-			_this.status_message("Connected to "+port_name);
 
-			_this.serial_api.flush(_this.connection, function() {
-				_this.arduino_setup_start();
-				if (done_callback) done_callback();
-			} );
-		}
-	);
+	serial.open(port_name, options,
+	function(connectionInfo) {
+		_this.connection=connectionInfo.connectionId;
+		_this.status_message("Connected.");
+		_this.arduino_setup_start();
+		if (done_callback) done_callback();
+	});
 }
 
 // Disconnect from this device
@@ -210,17 +198,13 @@ connection_t.prototype.disconnect_m=function(done_callback)
 		var connection=_this.connection;
 		var port_name=_this.port_name;
 		_this.reset();
-		_this.status_message("Disconnecting from "+port_name);
-		_this.serial_api.disconnect(connection,
-			function() {
-				if (chrome.runtime.lastError)
-					_this.status_message("Error disconnecting from "+port_name);
-				_this.status_message("Disconnected from "+port_name);
-
-				if (done_callback) done_callback();
-			}
-		);
-	}
+		log("Disconnecting.");
+		serial.close(function() {
+			log('Disconnected.')
+		}, function() {
+			log('Failed to disconnect.');
+		});
+	};
 }
 
 
@@ -896,11 +880,12 @@ connection_t.prototype.serial_callback_onReceiveError=function(info)
 connection_t.prototype.serial_callback_onReceive=function(info)
 {
 	var _this=this;
-	_this.status_message("Serial data received: "+info.data.byteLength+" bytes");
+	console.log(info)
+	_this.status_message("Serial data received: "+info.byteLength+" bytes");
 	if (!_this.connected()) return;
 
 	// parse?
-	var buffer=info.data; // ArrayBuffer
+	var buffer=info; // ArrayBuffer
 	var arr=new Uint8Array(buffer);
 	for (var i=0;i<arr.length;i++) {
 		var v=arr[i];
@@ -972,18 +957,13 @@ connection_t.prototype.serial_send=function(array_like,done_callback)
 			_this.status_message("	sending  \t"+out[i]+"  \t"+String.fromCharCode(out[i]));
 	}
 
-	_this.serial_api.send(_this.connection,out.buffer,
-		function(info) {
-			if (info.error) {
-				_this.bad("Serial port send error: "+info.error);
-			}
-			else if (info.bytesSent!=out.byteLength) {
-				_this.bad("Serial port sent only "+info.bytesSent+" bytes, should be "+out.byteLength+" bytes!");
-			}
-			else {
-				_this.sends_in_progress--;
-				done_callback();
-			}
+	serial.write(out.buffer,
+		function() {
+			_this.sends_in_progress--;
+			done_callback();
+			log('Wrote');
+		}, function() {
+			log('Write error')
 		}
 	);
 }
