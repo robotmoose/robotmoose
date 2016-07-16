@@ -7,7 +7,7 @@ LIB=
 JSONCPP_SRC=$(INC)/jsoncpp/json_reader.cpp $(INC)/jsoncpp/json_value.cpp $(INC)/jsoncpp/json_writer.cpp
 MONGOOSE_SRC=$(INC)/mongoose/mongoose.c
 UTILITY_SRC=$(SRC)/json_util.cpp $(SRC)/string_util.cpp
-COMMON_SRC=$(SRC)/auth.cpp $(SRC)/jsonrpc.cpp $(SRC)/superstar.cpp $(SRC)/time_util.cpp
+COMMON_SRC=$(SRC)/auth.cpp $(SRC)/jsonrpc.cpp $(SRC)/superstar.cpp $(SRC)/time_util.cpp $(SRC)/web_util.cpp
 
 ifeq ($(OS),Windows_NT)
 	LIB+=-lWs2_32

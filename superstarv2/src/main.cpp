@@ -2,6 +2,7 @@
 //07/10/2016
 //Contains the actual superstar server (mainly the http server portion).
 
+#include <fstream>
 #include <iostream>
 #include "json_util.hpp"
 #include "jsonrpc.hpp"
@@ -11,12 +12,17 @@
 #include "string_util.hpp"
 #include "superstar.hpp"
 #include "time_util.hpp"
+#include "web_util.hpp"
 
 //Server options...needs to be global/non-local.
 mg_serve_http_opts server_options;
 
 //"Database".
 superstar_t superstar("auth","db.json");
+
+//Post log.
+std::string post_log_name("superstar.log");
+std::ofstream post_log(post_log_name.c_str());
 
 //Backup save time variabels...
 const int64_t backup_time=20000;
@@ -63,8 +69,22 @@ void http_handler(mg_connection* conn,int event,void* event_data)
 			if(query.size()>0)
 				std::cout<<"?"<<query;
 			std::cout<<std::endl;
+
+			//Log Post into a file.
+			//  One JSON object per line, containing:
+			//  {
+			//      "time":TIME_MS_SINCE_LINUX_EPOCH,
+			//      "client":STR_IP_ADDRESS,
+			//      "data":STR_URL_ENCODED_DATA
+			//  }
 			if(method=="POST")
-				std::cout<<"Post:       "<<post_data<<""<<std::endl;
+			{
+				Json::Value entry;
+				entry["time"]=millis();
+				entry["client"]=client;
+				entry["data"]=url_encode(post_data);
+				post_log<<JSON_serialize(entry)<<std::endl;
+			}
 
 			//Get requests...
 			if(method=="GET")
@@ -117,6 +137,9 @@ int main()
 			std::cout<<"Loaded backup database."<<std::endl;
 		else
 			std::cout<<"No backup database found."<<std::endl;
+
+		if(!post_log)
+			throw std::runtime_error("Could not open log file \""+post_log_name+"\"!");
 
 		//Server settings.
 		std::string port("8081");
