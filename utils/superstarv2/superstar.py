@@ -1,4 +1,4 @@
-#1/usr/bin/env python3
+#!/usr/bin/env python3
 #Mike Moss
 #07/11/2016
 #Contains client code to get requests from a superstar server.
@@ -107,7 +107,7 @@ class superstar_t:
 			opts=request["params"]["opts"]
 			request["id"]=ii
 			if "auth" in request["params"]:
-				tmp = bytearray(request["params"]["auth"], 'utf-8')
+				tmp=bytearray(request["params"]["auth"],"utf-8")
 				request["params"]["auth"]=hmac.new(tmp,digestmod=hashlib.sha256).hexdigest()
 			batch.append(self.queue[ii]["request"])
 
@@ -115,9 +115,8 @@ class superstar_t:
 		self.queue=[]
 
 		try:
-			data=bytes(json.dumps(batch), 'utf-8')
+			data=bytes(json.dumps(batch),"utf-8")
 			server_response=urllib.request.urlopen("http://"+self.superstar+"/superstar/", data)
-			#server_response=urllib.urlopen(server_request)
 
 			#Make the request.
 
@@ -152,24 +151,24 @@ class superstar_t:
 
 	#Function to handle errors...
 	def handle_error(self,request,error):
-			if request["error_cb"]:
-					request["error_cb"](error)
-			else:
-					print("Superstar error ("+str(error["code"])+") "+error["message"])
+		if request["error_cb"]:
+			request["error_cb"](error)
+		else:
+			print("Superstar error ("+str(error["code"])+") "+error["message"])
 
 if __name__=="__main__":
-		def getprint(result):
-				print(result)
+	def getprint(result):
+			print(result)
 
-		def subprint(result):
-				print(result)
+	def subprint(result):
+			print(result)
 
-		ss=superstar_t("127.0.0.1:8081")
+	ss=superstar_t("127.0.0.1:8081")
 
-		ss.get("/blarg",getprint)
-		ss.set("/blarg",4,"123")
-		ss.get("/blarg",getprint)
-		ss.sub("/",subprint)
-		ss.push("/blarg2",2,3,"123")
-		ss.get("/blarg2",getprint)
-		ss.flush()
+	ss.get("/blarg",getprint)
+	ss.set("/blarg",4,"123")
+	ss.get("/blarg",getprint)
+	ss.sub("/",subprint)
+	ss.push("/blarg2",2,3,"123")
+	ss.get("/blarg2",getprint)
+	ss.flush()
