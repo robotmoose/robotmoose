@@ -80,7 +80,7 @@ void http_handler(mg_connection* conn,int event,void* event_data)
 			if(method=="POST")
 			{
 				Json::Value entry;
-				entry["time"]=millis();
+				entry["time"]=Json::Int64(millis());
 				entry["client"]=client;
 				entry["data"]=url_encode(post_data);
 				post_log<<JSON_serialize(entry)<<std::endl;
