@@ -1,0 +1,72 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - Quizbot - Troubleshooting & FAQ</title>
+	</head>
+	<body role="document">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>Quizbot Troubleshooting & FAQ</h1>
+			</div>
+			<center>
+			<h3>Troubleshooting Guide</h3>
+			<div class="well">
+				<table class="table" style="font-size: 14">
+					<thead>
+						<tr>
+							<th>Issue</th>
+							<th>Possible Causes</th>
+							<th>Recommended Course of Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td rowspan="7">Attempting to move Quizbot on RobotMoose, but Quizbot is not moving.</td>
+							<td>Backend is not running.</td>
+							<td>Go to the robot computer and ensure that the Backend Chrome app is open and connected to your robot.</td>
+						</tr>
+						<tr>
+							<td>Pilot is not connected or is connected to the wrong robot.</td>
+							<td>Ensure that the robot year, school, and name that you selected on the Frontend match what was specified on the Backend.</td>
+						</tr>
+						<tr>
+							<td>The Frontend or Backend has lost its connection to the Superstar server.</td>
+							<td>Ensure that the Superstar selected from the dropdown menu on the Backend is robotmoose.com (or your local Superstar if you are running one). Also ensure that in your web browser you are connected to robotmoose.com (or the IP address of your local Superstar). Refresh your page to make sure robotmoose.com (or your local superstar) is still up and running.</td>
+						</tr>
+						<tr>
+							<td>Web browser is causing unpredictable behavior.</td>
+							<td>Make sure you are using Google Chrome to ensure that all elements of the interface work properly.</td>
+						</tr>
+						<tr>
+							<td>Servos are not plugged in or are wired incorrectly.</td>
+							<td>Inspect the servo wiring to ensure that it matches the Quizbot wiring guide on robotmoose.com. Make sure that power, ground, and signal wires are plugged into the appropriate spots on the Arduino. Also make sure that the pins configured for the servo on the Frontend match the pins that the signal wires are plugged in to.</td>
+						</tr>
+						<tr>
+							<td>Servo(s) are broken.</td>
+							<td>Replace the non-functioning servo(s) and try again. Avoid moving the servo gears by hand, as doing such can break them.</td>
+						</tr>
+						<tr>
+							<td>Arduino pins are malfunctioning.</td>
+							<td>In the same row that the signal wires are plugged into, unplug the servo signal wires and plug them into different numbered slots on the Arduino Uno. Make note of those numbers and update your servo configuration on the Frontend with these numbers.</td>
+						</tr>
+
+						<tr>
+							<td>Quizbot rams into its body when the servos are moved.</td>
+							<td>Servos were not at the right angle when the body was assembled.</td>
+							<td>Disconnect the Quizbot body parts from the servo gears, use the servo sliders on the Frontend to set both servos to 90 degrees, then reassemble the Quizbot so that it is facing forward and looking straight up.</td>
+						</tr>
+
+						<tr>
+							<td rowspan="2">There is considerable lag between sending commands to the Quizbot and those commands happening.</td>
+							<td>Backend is being throttled.</td>
+							<td>On the Backend computer, the Backend window must be visible at all times, otherwise the app may be throttled. Ensure that the window is visible (not minimized, covered up by other windows, etc.).</td>
+						</tr>
+						<tr>
+							<td>Network connection is too slow.</td>
+							<td>You may have to start your own Superstar server (more info on our GitHub, for advanced users only).</td>
+					</tbody>
+				</table>
+			</div>
+	</body>
+</html>
