@@ -7,8 +7,8 @@ Currently tests:
 ## Installing dependencies
 Requires Python 3 and pip to be installed.
 
-	pip install -r requirements.txt
+	pip3 install -r requirements.txt
 
 ## Usage
 
-	python main.py http://robotmoose.com/superstar2
+	python3 main.py http://robotmoose.com/superstar2

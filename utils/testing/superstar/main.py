@@ -57,7 +57,7 @@ class Test:
             else:
                 self.fail_test()
         except Exception as exception:
-            self.error = exception
+            self.error = 'Exception type: ' + str(type(exception))
             self.fail_test()
 
 
@@ -70,12 +70,58 @@ class SingleSet(Test):
             '',
             value='testvalue'
         )
-        return self.post_single_request(method)['result']
+        json_response = self.post_single_request(method)
+        #check that the returned object is what we expected
+        success = True
+        if json_response['jsonrpc'] != '''2.0''':
+            success = False
+        #we really need a spec to be able to test the response
+        if not json_response['result']:
+            success = False
+        return success
 
+class BadSingleSet(Test):
+    def task(self):
+        self.description = "Set value, error"
+        method = self.create_method(
+            'set',
+            '/test/set/bad_val',
+            '',
+            bad_val = 'bad_val'
+        )
+        json_response = self.post_single_request(method)
+        print(json_response)
+        success = True
+        if json_response['jsonrpc'] == '''2.0''':
+            self.error = 'bad RPC version'
+            success = False
+        if not 'error' in json_response:
+            self.error = 'no error when error expected'
+            success = False
+        return success
+
+"""
+class SkeletonTest(Test):
+    def task(self):
+        self.description = "skeleton test for use in making new tests"
+        method = self.create_method(
+            ACTION,
+            /errorsPATH
+            AUTH_KEY,
+            DATA
+        )
+        json_response = self.post_single_request(method)
+        success = True
+        if errors
+            self.error = 'reason for error'
+            success = False
+        return success
+"""
 
 if __name__ == '__main__':
     if len(argv) > 1:
         url = argv[1]
         SingleSet(url).run()
+        BadSingleSet(url).run()
     else:
         print('Missing URL argument.')
