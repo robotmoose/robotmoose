@@ -205,9 +205,7 @@ robot_map_t.prototype.load_button_pressed_m=function()
 
 
 	var opt = JSON.parse(myself.last_map_select);
-	var filename = opt.path;
-	var width = opt.width;
-	var height = opt.height;
+	console.log("width: " + opt.width)
 
 	this.make_new(opt.path, opt.width, opt.height);
 	
@@ -235,7 +233,7 @@ robot_map_t.prototype.clean_up=function()
 	}
 }
 
-robot_map_t.prototype.make_new=function(filename)
+robot_map_t.prototype.make_new=function(filename, width, height)
 {
 	var myself = this;
 	
@@ -245,7 +243,7 @@ robot_map_t.prototype.make_new=function(filename)
 	this.map_display.title="Shows where the robot thinks it is in the world.  The grid lines are 1 meter apart.  The robot's right and left wheels leave red and purple tracks";
 
 	this.need_redraw=true;
-	this.renderer=new renderer_t(myself.map_display,function() {myself.setup(filename);}, function() {return myself.loop();} );
+	this.renderer=new renderer_t(myself.map_display,function() {myself.setup(filename, width, height);}, function() {return myself.loop();} );
 	if(!this.renderer.setup()) {
 		var p=document.createElement("p");
 		p.innerHTML="<p>WebGl seems to be disabled: <a target=_blank href=https://get.webgl.org>Click here to test</a><br> <u>If disabled, Try the following steps:</u></p> "
