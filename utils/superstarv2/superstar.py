@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #Mike Moss
 #07/11/2016
 #Contains client code to get requests from a superstar server.
@@ -6,8 +6,7 @@
 import hashlib
 import hmac
 import json
-import urllib
-import urllib2
+import urllib.request
 
 #Superstar object.
 #  Variable self.queue to store requests in until .flush is called.
@@ -57,14 +56,10 @@ class superstar_t:
 	#  Removes all leading and trailing slashes.
 	def pathify(self,path):
 		if not path:
-			path=""
-
-		for ii in range(0,len(path)/2+1):
+			return ""
+		for ii in range(0,len(path)//2+1):
 			path=path.replace("//","/")
-		while len(path)>0 and path[0]=='/':
-			path=path[1:]
-		while len(path)>0 and path[len(path)-1]=='/':
-			path=path[:-1]
+		path = path.strip('/')
 		return path
 
 	#Builds a basic jsonrpc request with given method.
@@ -93,10 +88,10 @@ class superstar_t:
 	#  Note, won't be sent until .flush() is called.
 	def add_request(self,request,success_cb,error_cb):
 		self.queue.append({
-				"request":request,
-				"success_cb":success_cb,
-				"error_cb":error_cb
-			})
+			"request":request,
+			"success_cb":success_cb,
+			"error_cb":error_cb
+		})
 
 	#Builds the batch request object and clears out the current queue.
 	def flush(self):
@@ -112,49 +107,47 @@ class superstar_t:
 			opts=request["params"]["opts"]
 			request["id"]=ii
 			if "auth" in request["params"]:
-				request["params"]["auth"]=hmac.new(request["params"]["auth"],path+opts,digestmod=hashlib.sha256).hexdigest()
+				tmp=bytearray(request["params"]["auth"],"utf-8")
+				request["params"]["auth"]=hmac.new(tmp,digestmod=hashlib.sha256).hexdigest()
 			batch.append(self.queue[ii]["request"])
 
 		old_queue=self.queue
 		self.queue=[]
 
 		try:
-			data=json.dumps(batch)
-			server_request=urllib2.Request("http://"+self.superstar+"/superstar/",data)
-			server_response=urllib2.urlopen(server_request)
+			data=bytes(json.dumps(batch),"utf-8")
+			server_response=urllib.request.urlopen("http://"+self.superstar+"/superstar/", data)
 
 			#Make the request.
-			try:
-				#Parse response, call responses.
-				response=json.loads(server_response.read())
 
-				#Got an array, must be batch data...
-				if isinstance(response,list):
-					for key in range(0,len(response)):
-						if not "id" in response[key]:
-							continue
+			#Parse response, call responses.
+			response=json.loads(server_response.read().decode('utf-8'))
 
-						#Error callback...
-						if "error" in response[key]:
-							response_obj=response[key]["error"]
-							self.handle_error(old_queue[response[key]["id"]],response_obj)
-							continue
-
-						#Success callback...
-						if "result" in response[key]:
-							response_obj=response[key]["result"]
-							if old_queue[response[key]["id"]]["success_cb"]:
-								old_queue[response[key]["id"]]["success_cb"](response_obj);
-
-				#Server error...
-				else:
-					for key in old_queue:
-						self.handle_error(old_queue[key],response["error"])
+			#Got an array, must be batch data...
+			if isinstance(response,list):
+				for key in range(0,len(response)):
+					if not "id" in response[key]:
 						continue
-			except Exception as error:
-				print("Superstar error (unknown) "+str(error))
+
+					#Error callback...
+					if "error" in response[key]:
+						response_obj=response[key]["error"]
+						self.handle_error(old_queue[response[key]["id"]],response_obj)
+						continue
+
+					#Success callback...
+					if "result" in response[key]:
+						response_obj=response[key]["result"]
+						if old_queue[response[key]["id"]]["success_cb"]:
+							old_queue[response[key]["id"]]["success_cb"](response_obj);
+
+			#Server error...
+			else:
+				for key in old_queue:
+					self.handle_error(old_queue[key],response["error"])
+					continue
 		except Exception as error:
-			print("Superstar error (unknown) "+str(error))
+				print("Superstar error (unknown) "+str(error))
 
 	#Function to handle errors...
 	def handle_error(self,request,error):
@@ -165,10 +158,10 @@ class superstar_t:
 
 if __name__=="__main__":
 	def getprint(result):
-		print(result)
+			print(result)
 
 	def subprint(result):
-		print(result)
+			print(result)
 
 	ss=superstar_t("127.0.0.1:8081")
 
