@@ -7,7 +7,7 @@
 function robot_map_t(div)
 {
 	this.div=div;
-	//this.div.title="Shows where the robot thinks it is in the world.  The grid lines are 1 meter apart.  The robot's right and left wheels leave red and purple tracks";
+	this.div.title="Shows where the robot thinks it is in the world.  The grid lines are 1 meter apart.  The robot's right and left wheels leave red and purple tracks";
 	var myself=this;
 
 	this.element=document.createElement("div");
@@ -56,32 +56,52 @@ function robot_map_t(div)
 
 	var option=document.createElement("option");
 	option.text="No Map Image";
-	option.value="none";
+	var opt0 = {};
+	opt0.path="";
+	opt0.width=10;
+	opt0.height=10;
+	option.value=JSON.stringify(opt0);
+	//option.value="";
 	this.map_select.drop.appendChild(option);
 
 	var option1=document.createElement("option");
 	option1.text="Map 1";
-	option1.value="maps/map1.jpg"
+	var opt1 = {};
+	opt1.path="maps/map1.jpg";
+	opt1.width=10;
+	opt1.height=10;
+	option1.value=JSON.stringify(opt1);
+	//option1.value="maps/map1.jpg";
 	this.map_select.drop.appendChild(option1);
 
 	var option2=document.createElement("option");
 	option2.text="Map 2";
-	option2.value="maps/map2.jpg"
+	var opt2 = {};
+	opt2.path="maps/map2.jpg";
+	opt2.width=10;
+	opt2.height=10;
+	option2.value=JSON.stringify(opt2);
+	//option2.value="maps/map2.jpg"
 	this.map_select.drop.appendChild(option2);
 
 	var option3=document.createElement("option");
 	option3.text="Map 3";
-	option3.value="maps/map3.jpg"
+	var opt3 = {};
+	opt3.path="maps/map3.jpg";
+	opt3.width=10;
+	opt3.height=10;
+	option3.value=JSON.stringify(opt3);
+	//option3.value="maps/map3.jpg";
 	this.map_select.drop.appendChild(option3);
 
 
 
 
-	var map_display = document.createElement("div");
-	map_display.title="Shows where the robot thinks it is in the world.  The grid lines are 1 meter apart.  The robot's right and left wheels leave red and purple tracks";
+	this.map_display = document.createElement("div");
+	this.map_display.title="Shows where the robot thinks it is in the world.  The grid lines are 1 meter apart.  The robot's right and left wheels leave red and purple tracks";
 
 	this.need_redraw=true;
-	this.renderer=new renderer_t(map_display,function() {myself.setup();}, function() {return myself.loop();} );
+	this.renderer=new renderer_t(myself.map_display,function() {myself.setup();}, function() {return myself.loop();} );
 	if(!this.renderer.setup()) {
 		var p=document.createElement("p");
 		p.innerHTML="<p>WebGl seems to be disabled: <a target=_blank href=https://get.webgl.org>Click here to test</a><br> <u>If disabled, Try the following steps:</u></p> "
@@ -92,24 +112,27 @@ function robot_map_t(div)
 		this.renderer=null;
 	}
 
-	this.div.appendChild(map_display);
+	this.div.appendChild(myself.map_display);
 
 }
 
-robot_map_t.prototype.setup=function() {
+robot_map_t.prototype.setup=function(texture_file, width, height) {
 	if (this.renderer===null) return;
 	this.renderer.set_size(this.div.offsetWidth,this.div.offsetWidth); // FIXME resize this
 
 	// Add grid
 	var grid_cells=10;
+	if (!width) width = 10;
+	if (!height) height = 10;
 	var per_cell=1000; // one meter cells (in mm)
-	this.grid=this.renderer.create_grid(per_cell,grid_cells,grid_cells,20);
+	this.grid=this.renderer.create_grid(per_cell,width,height,20,texture_file);
 	this.grid.rotation.x=0;
+
 
 	// Add light source
 	var size=100000;
 	var intensity=0.8;
-	var light=new this.renderer.create_light(intensity,
+	this.light=this.renderer.create_light(intensity,
 		new THREE.Vector3(-size/2,-size/2,+size));
 
 	// FIXME: add 2D room overlay
@@ -121,105 +144,7 @@ robot_map_t.prototype.setup=function() {
 	this.renderer.controls.center.set(0,0,0); // robot?
 	this.renderer.controls.object.position.set(0,-1200,1400);
 
-	//console.log("Set up renderer");
 }
-
-robot_map_t.prototype.add_map=function(filename, scale) {
-	if (!scale) scale = 10;
-	var myself = this;
-
-	var size = 1000;
-	var width = scale;
-	var height = scale;
-	showOrigin = 20;
-
-		var texture_file = filename;
-		var texture = this.renderer.load_texture(texture_file);
-		texture.minFilter = THREE.LinearFilter;
-		var plane_material=new THREE.MeshBasicMaterial({map: texture,depthWrite:false,
-			side:THREE.DoubleSide});
-		var plane_geometry=new THREE.PlaneBufferGeometry(size*width,size*height,1,1);
-		//this.grid.geometry=null;
-		//this.grid.material=null;
-		//this.grid.line=null;
-		this.grid.geometry = plane_geometry;
-		this.grid.material = plane_material;
-
-
-		var line_geometry=new THREE.Geometry();
-		var line_material=new THREE.LineBasicMaterial({color:0x0488c8,linewidth:1.5});
-
-		for(var xx=0;xx<=width;++xx)
-		{
-			line_geometry.vertices.push(new THREE.Vector3(-size*width/2,-size*height/2.0+xx*size,0));
-			line_geometry.vertices.push(new THREE.Vector3(size*width/2,-size*height/2.0+xx*size,0));
-		}
-
-		for(var yy=0;yy<=height;++yy)
-		{
-			line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0+yy*size,-size*height/2,0));
-			line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0+yy*size,size*height/2,0));
-		}
-		if (showOrigin) { // add extra lines around origin
-		  for (var del=-showOrigin;del<=showOrigin;del+=showOrigin/32) {
-			line_geometry.vertices.push(new THREE.Vector3(del,-size*height/2,0));
-			line_geometry.vertices.push(new THREE.Vector3(del,+size*height/2,0));
-			line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0,del,0));
-			line_geometry.vertices.push(new THREE.Vector3(+size*width/2.0,del,0));
-		  }
-		}
-
-				var line=new THREE.Line(line_geometry,line_material,THREE.LinePieces);
-		this.grid.add(line);
-
-
-}
-
-robot_map_t.prototype.clear_map=function(){
-
-	var myself = this;
-
-	var size = 1000;
-	var width = 10;
-	var height = 10;
-	showOrigin = 20;
-
-
-	var plane_material=new THREE.MeshBasicMaterial({color:0xd8eef4,depthWrite:false,
-			side:THREE.DoubleSide});
-	var plane_geometry=new THREE.PlaneBufferGeometry(size*width,size*height,size,size);
-	this.grid.geometry = plane_geometry;
-	this.grid.material = plane_material;
-
-	var line_geometry=new THREE.Geometry();
-	var line_material=new THREE.LineBasicMaterial({color:0x0488c8,linewidth:1.5});
-
-	for(var xx=0;xx<=width;++xx)
-	{
-		line_geometry.vertices.push(new THREE.Vector3(-size*width/2,-size*height/2.0+xx*size,0));
-		line_geometry.vertices.push(new THREE.Vector3(size*width/2,-size*height/2.0+xx*size,0));
-	}
-
-	for(var yy=0;yy<=height;++yy)
-	{
-		line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0+yy*size,-size*height/2,0));
-		line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0+yy*size,size*height/2,0));
-	}
-	if (showOrigin) { // add extra lines around origin
-	  for (var del=-showOrigin;del<=showOrigin;del+=showOrigin/32) {
-		line_geometry.vertices.push(new THREE.Vector3(del,-size*height/2,0));
-		line_geometry.vertices.push(new THREE.Vector3(del,+size*height/2,0));
-		line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0,del,0));
-		line_geometry.vertices.push(new THREE.Vector3(+size*width/2.0,del,0));
-	  }
-	}
-
-			var line=new THREE.Line(line_geometry,line_material,THREE.LinePieces);
-	this.grid.add(line);
-
-
-}
-
 
 // Updated sensor data is available:
 robot_map_t.prototype.refresh=function(sensors) {
@@ -270,19 +195,68 @@ robot_map_t.prototype.loop=function() {
 robot_map_t.prototype.load_button_pressed_m=function()
 {
 	var myself=this;
+	
+	if (this.mapRobot)
+	{
+		this.mapRobot.model.destroy();
+		this.mapRobot=null;
+		this.reset_tracks = true;
+	}
 
-	//console.log("New Map Selected.");
 
-	var filename = this.last_map_select;
-	if (filename === "none") this.clear_map();
-	else this.add_map(filename);
+	var opt = JSON.parse(myself.last_map_select);
+	var filename = opt.path;
+	var width = opt.width;
+	var height = opt.height;
 
-	//Reset robot
-	this.mapRobot.model.destroy();
-	this.mapRobot=null;
-	var new_roomba = new roomba_t(this.renderer,null);
-	this.mapRobot=new_roomba;
-	this.reset_tracks = true;
+	this.make_new(opt.path, opt.width, opt.height);
+	
+}
+
+robot_map_t.prototype.clean_up=function()
+{
+	var myself = this;
+
+	if (this.renderer) this.renderer.destroy();
+	this.renderer=null;
+	
+	if (this.grid)
+	{
+		this.grid.geometry.dispose();
+		this.grid.material.dispose();
+		if (this.grid.texture) this.grid.texture.dispose();
+		this.grid = null;
+	}
+	
+	if (this.map_display)
+	{
+	this.div.removeChild(myself.map_display);
+	this.map_display="";
+	}
+}
+
+robot_map_t.prototype.make_new=function(filename)
+{
+	var myself = this;
+	
+	this.clean_up();
+	
+	this.map_display = document.createElement("div");
+	this.map_display.title="Shows where the robot thinks it is in the world.  The grid lines are 1 meter apart.  The robot's right and left wheels leave red and purple tracks";
+
+	this.need_redraw=true;
+	this.renderer=new renderer_t(myself.map_display,function() {myself.setup(filename);}, function() {return myself.loop();} );
+	if(!this.renderer.setup()) {
+		var p=document.createElement("p");
+		p.innerHTML="<p>WebGl seems to be disabled: <a target=_blank href=https://get.webgl.org>Click here to test</a><br> <u>If disabled, Try the following steps:</u></p> "
+		p.innerHTML+="<p><b>Firefox:</b> Go to about:config in your address bar,search for webgl and check if webgl.disabled is true <br> No Luck? <a target=_blank href=https://support.mozilla.com/en-US/kb/how-do-i-upgrade-my-graphics-drivers>Help Page</a></p>";
+		p.innerHTML+="<p><b>Chrome:</b> <ol><li><b>Is hardware acceleration enabled?</b> Type chrome://settings, show advanced settings -> under system > check Use hardware acceleration when available</li><b><li>Check WebGl:</b> Type chrome://flags into the address bar and confirm that Disable WebGl is gray</li></ol></p>";
+		p.innerHTML+= "<p><b>Safari:</b> <ol><li>Go to Safari's Preferences</li><li>Select the Advanced tab</li><li>Check the Show Develop menu in menu bar checkbox</li><li>In the Develop menu, check Enable WebGl</li><li>Confused?<a target=_blank href=http://voicesofaliveness.net/webgl>Pictures</a></li></ol></p>";
+		div.appendChild(p);
+		this.renderer=null;
+	}
+
+	this.div.appendChild(myself.map_display);
 
 }
 

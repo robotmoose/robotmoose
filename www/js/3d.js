@@ -62,6 +62,11 @@ function cube_t(scene)
 	myself.destroy=function()
 	{
 		myself.scene.remove(myself.mesh);
+	
+		if (myself.mesh.geometry) myself.mesh.geometry.dispose();
+		if (myself.mesh.material) myself.mesh.material.dispose();
+		if (myself.mesh.texture) myself.mesh.texture.dispose();
+		
 		myself.mesh=null;
 		myself.scene=null;
 		myself.position=null;
@@ -133,6 +138,11 @@ function model_t(scene)
 		if(myself.loaded)
 		{
 			myself.scene.remove(myself.mesh);
+			
+			if (myself.mesh.geometry) myself.mesh.geometry.dispose();
+			if (myself.mesh.material) myself.mesh.material.dispose();
+			if (myself.mesh.texture) myself.mesh.texture.dispose();
+			
 			myself.loaded=false;
 			myself.mesh=null;
 			myself.scene=null;
@@ -190,6 +200,9 @@ function renderer_t(div,setup_func,loop_func)
 	myself.scene=null;
 	myself.camera=null;
 	myself.controls=null;
+	
+	myself.timeout_f=null;
+	myself.light=null;
 
 	myself.setup=function()
 	{
@@ -231,11 +244,28 @@ function renderer_t(div,setup_func,loop_func)
 
 	myself.destroy=function()
 	{
+		
+		if (myself.light) 
+		{
+		myself.light.destroy();
+		}
+		/*
+		if (myself.plane) // add if changing implementation of plane (from create_grid) to property of renderer
+		{
+			myself.scene.remove(myself.plane);
+			if (myself.plane.geometry) myself.plane.geometry.dispose();
+			if (myself.plane.material) myself.plane.material.dispose();
+			if (myself.plane.line) myself.plane.line.dispose();
+			if (myself.plane.texture) myself.plane.texture.dispose();
+			
+		}
+		*/
 		myself.div=null;
 		myself.viewport=null;
 		myself.scene=null;
 		myself.camera=null;
 		myself.controls=null;
+		clearTimeout(myself.timeout_f);
 	};
 
 	myself.show=function(show)
@@ -281,7 +311,7 @@ function renderer_t(div,setup_func,loop_func)
 		}
 
 		//requestAnimationFrame(myself.loop); // call loop again
-		setTimeout(myself.loop,100); // slower 10Hz updates, to be kind to slow CPUs
+		myself.timeout_f = setTimeout(myself.loop,100); // slower 10Hz updates, to be kind to slow CPUs
 	};
 
 	myself.load_texture=function(filename)
@@ -339,12 +369,26 @@ function renderer_t(div,setup_func,loop_func)
 		return new light_t(myself.scene,intensity,position);
 	};
 
-	myself.create_grid=function(size,width,height,showOrigin)
+	myself.create_grid=function(size,width,height,showOrigin, texture_file)
 	{
+	
+	
 		var plane_geometry=new THREE.PlaneBufferGeometry(size*width,size*height,1,1);
 		plane_geometry.normalsNeedUpdate=true;
-		var plane_material=new THREE.MeshBasicMaterial({color:0xd8eef4,depthWrite:false,
+		if (texture_file)
+		{
+			var texture = this.load_texture(texture_file);
+			texture.minFilter = THREE.LinearFilter;
+			var plane_material=new THREE.MeshBasicMaterial({map: texture,depthWrite:false,
 				side:THREE.DoubleSide});
+		}
+		else
+		{		
+			var plane_material=new THREE.MeshBasicMaterial({color:0xd8eef4,depthWrite:false,
+				side:THREE.DoubleSide});
+		}
+
+		
 		var plane=new THREE.Mesh(plane_geometry,plane_material);
 		plane.rotation.set(3*Math.PI/2,0,0);
 		myself.scene.add(plane);
@@ -374,7 +418,7 @@ function renderer_t(div,setup_func,loop_func)
 		  }
 		}
 
-				var line=new THREE.Line(line_geometry,line_material,THREE.LinePieces);
+		var line=new THREE.Line(line_geometry,line_material,THREE.LinePieces);
 		plane.add(line);
 
 
