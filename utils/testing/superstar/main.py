@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-from sys import argv
+from sys import argv, exc_info
 import requests
 from termcolor import colored
 import hmac
 from hashlib import sha256
 import json
+from traceback import print_tb
 
 
 # These classes should probably be in separate files eventually.
@@ -31,12 +32,11 @@ class Test:
     def post_single_request(self, method):
         return requests.post(self.url, json.dumps(method)).json()
 
-    def post_batch_request(self, *methods):
-        return requests.post(self.url, methods).json()
+    def post_batch_request(self, methods):
+        return requests.post(self.url, json=methods).json()
 
     def pass_test(self):
         print(colored('Passed: ', 'green') + self.description)
-        print(self.error)
 
     def fail_test(self):
         print(colored('Failed: ', 'red') + self.description)
@@ -56,9 +56,12 @@ class Test:
                 self.pass_test()
             else:
                 self.fail_test()
-        except Exception as exception:
-            self.error = 'Exception type: ' + str(type(exception))
+        except:
+            name, info, traceback = exc_info()
+            self.error = name.__name__ + ': ' + str(info)
             self.fail_test()
+            print_tb(traceback)
+            del traceback  # Apparently required to prevent being retained
 
 
 class SingleSet(Test):
@@ -70,15 +73,8 @@ class SingleSet(Test):
             '',
             value='testvalue'
         )
-        json_response = self.post_single_request(method)
-        #check that the returned object is what we expected
-        success = True
-        if json_response['jsonrpc'] != '''2.0''':
-            success = False
-        #we really need a spec to be able to test the response
-        if not json_response['result']:
-            success = False
-        return success
+        return self.post_single_request(method)['result']
+
 
 class BadSingleSet(Test):
     def task(self):
@@ -100,13 +96,172 @@ class BadSingleSet(Test):
             success = False
         return success
 
+
+class SingleGet(Test):
+    def task(self):
+        self.description = "Get previously set value"
+        method = self.create_method(
+            'get',
+            '/test/set/singular',
+            ''
+        )
+        response = self.post_single_request(method)
+        return response['result'] == 'testvalue'
+
+
+class ValidJSONRPC(Test):
+    def task(self):
+        self.description = 'Response is valid JSON-RPC'
+        method = self.create_method(
+            'get',
+            '/test/set/singular',
+            ''
+        )
+        method['id'] = 4  # chosen by fair dice roll, guaranteed to be random
+        response = self.post_single_request(method)
+        if 'jsonrpc' not in response:
+            self.error = 'Missing required JSON-RPC version key.'
+            return False
+        elif response['jsonrpc'] != '2.0':
+            self.error = 'Incorrect JSON-RPC version.'
+            return False
+        elif 'id' not in response:
+            self.error = 'No id was returned.'
+        elif response['id'] != 4:
+            self.error = 'Incorrect id returned.'
+            return False
+        elif 'error' in response:
+            self.error = 'Successful responses MUST NOT contain an error key.'
+            return False
+        elif 'result' not in response:
+            # This probably isn't worth testing for, since pretty much every
+            # other test will fail if there's no result key, but whatever.
+            self.error = 'Successful responses MUST include a result key.'
+        else:
+            return True
+
+
+class BatchMixedSetsAndGets(Test):
+    def task(self):
+        self.description = 'Batched mix of sets and gets'
+        methods = []
+        methods.append(self.create_method(
+            'set',
+            '/test/batch',
+            '',
+            value='firstbatch'
+        ))
+        methods.append(self.create_method(
+            'get',
+            '/test/batch',
+            ''
+        ))
+        methods.append(self.create_method(
+            'set',
+            '/test/batch',
+            '',
+            value='different'
+        ))
+        methods.append(self.create_method(
+            'set',
+            '/test/batch',
+            '',
+            value='moredifferent'
+        ))
+        methods.append(self.create_method(
+            'get',
+            '/test/batch',
+            '',
+        ))
+        response = self.post_batch_request(methods)
+        if (
+            not response[0]['result'] or
+            response[1]['result'] != 'firstbatch' or
+            not response[2]['result'] or
+            not response[3]['result'] or
+            response[4]['result'] != 'moredifferent'
+        ):
+            self.error = 'Unexpected response.'
+            return False
+        else:
+            return True
+
+
+class ExtraneousSlashesInPath(Test):
+    def task(self):
+        self.description = 'Ignores extraneous slashes in path'
+        methods = []
+        methods.append(self.create_method(
+            'set',
+            '//test/////slashes',
+            '',
+            value='I_LOVE_SLASHES'
+        ))
+        methods.append(self.create_method(
+            'get',
+            '/test/slashes',
+            ''
+        ))
+        response = self.post_batch_request(methods)
+        return response[1]['result'] == 'I_LOVE_SLASHES'
+
+
+class SubReturnsList(Test):
+    def task(self):
+        self.description = 'Sub call returns a list'
+        method = self.create_method(
+            'sub',
+            '/test',
+            ''
+        )
+        return isinstance(self.post_single_request(method)['result'], list)
+
+
+class PushWorks(Test):
+    def task(self):
+        self.description = 'Push calls work'
+        methods = []
+        methods.append(self.create_method(
+            'push',
+            '/test/push',
+            '',
+            value='testvalue',
+            length=10
+        ))
+        methods.append(self.create_method(
+            'get',
+            '/test/push',
+            ''
+        ))
+        return self.post_batch_request(methods)[1]['result'][-1] == 'testvalue'
+
+
+class PushRespectsLength(Test):
+    def task(self):
+        self.description = 'Push calls respect length parameter'
+        methods = []
+        for i in range(15):
+            methods.append(self.create_method(
+                'push',
+                '/test/push',
+                '',
+                value=i,
+                length=10
+            ))
+        methods.append(self.create_method(
+            'get',
+            '/test/push',
+            '',
+        ))
+        return len(self.post_batch_request(methods)[15]['result']) == 10
+
 """
 class SkeletonTest(Test):
     def task(self):
-        self.description = "skeleton test for use in making new tests"
+        self.description = 'skeleton test for use in making new tests'
         method = self.create_method(
             ACTION,
-            /errorsPATH
+            PATH
             AUTH_KEY,
             DATA
         )
@@ -123,5 +278,12 @@ if __name__ == '__main__':
         url = argv[1]
         SingleSet(url).run()
         BadSingleSet(url).run()
+        SingleGet(url).run()
+        ValidJSONRPC(url).run()
+        BatchMixedSetsAndGets(url).run()
+        ExtraneousSlashesInPath(url).run()
+        SubReturnsList(url).run()
+        PushWorks(url).run()
+        PushRespectsLength(url).run()
     else:
         print('Missing URL argument.')
