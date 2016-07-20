@@ -83,7 +83,7 @@ class BadSingleSet(Test):
             'set',
             '/test/set/bad_val',
             '',
-            bad_val = 'bad_val'
+            bad_val='bad_val'
         )
         json_response = self.post_single_request(method)
         print(json_response)
@@ -91,7 +91,7 @@ class BadSingleSet(Test):
         if json_response['jsonrpc'] == '''2.0''':
             self.error = 'bad RPC version'
             success = False
-        if not 'error' in json_response:
+        if 'error' not in json_response:
             self.error = 'no error when error expected'
             success = False
         return success
