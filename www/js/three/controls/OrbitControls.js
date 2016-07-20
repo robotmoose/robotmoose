@@ -668,18 +668,21 @@ THREE.OrbitControls = function ( object, domElement ) {
 	window.addEventListener( 'keydown', this.onKeyDown, false );
 
 	// force an update at start
+	
+	
+	this.cleanup=function() // hack to clean up event listener
+	{
+		if(this.onKeyDown)
+		{
+			window.removeEventListener( 'keydown', this.onKeyDown);
+			this.onKeyDown=null;
+		}
+	}
+	
 	this.update();
 
 };
 
-THREE.OrbitControls.prototype.cleanup=function()
-{
-	if(this.onKeyDown)
-	{
-		windowremoveEventListener( 'keydown', this.onKeyDown);
-		this.onKeyDown=null;
-	}
-}
 
 THREE.OrbitControls.prototype = Object.create( THREE.EventDispatcher.prototype );
 THREE.OrbitControls.prototype.constructor = THREE.OrbitControls;
