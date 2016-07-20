@@ -228,6 +228,7 @@ function renderer_t(div,setup_func,loop_func)
 			myself.controls.lookSpeed=0.2;
 			myself.controls.center.set(0,64,0);
 			myself.controls.object.position.set(0,100,250);
+		
 
 			myself.user_setup();
 			myself.loop();
@@ -244,7 +245,9 @@ function renderer_t(div,setup_func,loop_func)
 
 	myself.destroy=function()
 	{
-		
+
+		myself.controls.cleanup();
+		myself.controls=null;
 		if (myself.light) 
 		{
 		myself.light.destroy();
@@ -264,7 +267,10 @@ function renderer_t(div,setup_func,loop_func)
 		myself.viewport=null;
 		myself.scene=null;
 		myself.camera=null;
-		myself.controls=null;
+		
+		window.removeEventListener("resize",myself.resize,false);
+
+		
 		clearTimeout(myself.timeout_f);
 	};
 

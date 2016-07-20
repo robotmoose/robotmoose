@@ -205,7 +205,6 @@ robot_map_t.prototype.load_button_pressed_m=function()
 
 
 	var opt = JSON.parse(myself.last_map_select);
-	console.log("width: " + opt.width)
 
 	this.make_new(opt.path, opt.width, opt.height);
 	
