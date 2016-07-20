@@ -70,6 +70,10 @@ void http_handler(mg_connection* conn,int event,void* event_data)
 				std::cout<<"?"<<query;
 			std::cout<<std::endl;
 
+			//Starting "/superstar/"...
+			bool starts_with_superstar=starts_with(strip_end(request,"/"),
+				"/superstar");
+
 			//Log Post into a file.
 			//  One JSON object per line, containing:
 			//  {
@@ -79,18 +83,28 @@ void http_handler(mg_connection* conn,int event,void* event_data)
 			//  }
 			if(method=="POST")
 			{
-				Json::Value entry;
-				entry["time"]=Json::Int64(millis());
-				entry["client"]=client;
-				entry["data"]=url_encode(post_data);
-				post_log<<JSON_serialize(entry)<<std::endl;
+				//Starting "/superstar/" means a JSON-RPC request.
+				if(starts_with_superstar)
+				{
+					Json::Value entry;
+					entry["time"]=Json::Int64(millis());
+					entry["client"]=client;
+					entry["data"]=url_encode(post_data);
+					post_log<<JSON_serialize(entry)<<std::endl;
+				}
+
+				//Normal post (status 200 apparently if POST does nothing).
+				else
+				{
+					mg_send(conn,"200 OK","");
+				}
 			}
 
 			//Get requests...
 			if(method=="GET")
 			{
 				//Starting "/superstar/" means a database query.
-				if(starts_with(strip_end(request,"/"),"/superstar"))
+				if(starts_with_superstar)
 				{
 					request=request.substr(10,request.size()-10);
 					mg_send(conn,"200 OK",JSON_serialize(superstar.get(request)));
