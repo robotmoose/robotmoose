@@ -58,3 +58,6 @@ superstarv2/auth
 __pycache__/
 *.py[cod]
 *$py.class
+
+# any log files
+*.log
