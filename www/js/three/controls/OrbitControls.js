@@ -1,3 +1,4 @@
+//HACKED to have a .cleanup...
 /**
  * @author qiao / https://github.com/qiao
  * @author mrdoob / http://mrdoob.com
@@ -491,7 +492,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	function onKeyDown( event ) {
+	this.onKeyDown=function( event ) {
 
 		if ( scope.enabled === false || scope.noKeys === true || scope.noPan === true ) return;
 
@@ -664,12 +665,21 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'touchend', touchend, false );
 	this.domElement.addEventListener( 'touchmove', touchmove, false );
 
-	window.addEventListener( 'keydown', onKeyDown, false );
+	window.addEventListener( 'keydown', this.onKeyDown, false );
 
 	// force an update at start
 	this.update();
 
 };
+
+THREE.OrbitControls.prototype.cleanup=function()
+{
+	if(this.onKeyDown)
+	{
+		windowremoveEventListener( 'keydown', this.onKeyDown);
+		this.onKeyDown=null;
+	}
+}
 
 THREE.OrbitControls.prototype = Object.create( THREE.EventDispatcher.prototype );
 THREE.OrbitControls.prototype.constructor = THREE.OrbitControls;
