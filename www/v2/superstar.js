@@ -1,5 +1,5 @@
 //Mike Moss
-//07/10/2016
+//07/20/2016
 //Contains client code to get requests from a superstar server.
 
 //Superstar object.
@@ -195,7 +195,7 @@ superstar_t.prototype.flush=function()
 			}
 		}
 	};
-	xmlhttp.open("POST","",true);
+	xmlhttp.open("POST","/superstar/",true);
 	xmlhttp.send(JSON.stringify(batch));
 }
 
