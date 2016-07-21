@@ -1,0 +1,156 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - Lessons</title>
+
+		<script type="text/javascript">
+			var verify_button;
+			var run_button;
+			var stop_button;
+			var editor=new editor_t();
+			var emulator=new arduino_emulator_t();
+
+			var renderer;
+			var grid;
+			var lights=new Array();;
+			var aerobeam;
+
+			function initialize()
+			{
+				verify_button=document.getElementById("verify");
+				run_button=document.getElementById("run");
+				stop_button=document.getElementById("stop");
+				editor.create(document.getElementById("code"));
+				editor.set_value(
+					"void setup()\n{\n\t//Things written in here happen once\n"+
+					"}\n\n"+
+					"void loop()\n"+
+					"{\n\t//Things written in here keep happening\n"+
+					"}"
+					);
+				editor.set_size(480,460);
+				editor.on_change=function(){stop(); verify_button.value="Verify"; }
+				editor.on_compiled=function(){stop(); verify_button.value="Verified"; };
+
+				renderer=new renderer_t(document.getElementById("container"),setup,loop);
+
+				if(!renderer)
+					alert("Is WebGL enabled?");
+				else
+					renderer.setup();
+
+				renderer.controls.object.position.set(-800,100,0);
+			}
+
+			function setup()
+			{
+				renderer.set_size(480,453); // FIXME: there's a bottom border that is hard to get rid of...
+
+				grid=renderer.create_grid(64,8,8);
+
+				var size=1000;
+				var intensity=0.8;
+				lights[0]=new renderer.create_light(intensity,
+					new THREE.Vector3(-size/2,+size,+size/2));
+
+				aerobeam=new aerobeam_t(renderer);
+				aerobeam.set_throttle(parseInt(document.getElementById("throttle").value));
+				aerobeam.set_arm(parseInt(document.getElementById("rotation").value));
+				aerobeam.set_throttle_target(parseInt(document.getElementById("throttle").value));
+				aerobeam.set_arm_target(parseInt(document.getElementById("rotation").value));
+				aerobeam.set_position(0,128,128);
+			}
+
+			function loop(dt)
+			{
+				aerobeam.loop(dt);
+
+				if(emulator.running())
+				{
+					if(emulator.pin_directions[10]==3)
+						document.getElementById("rotation").value=emulator.map(emulator.pin_servos[10],0,255,0,180);
+
+					if(emulator.pin_directions[9]==3)
+						document.getElementById("throttle").value=emulator.map(emulator.pin_servos[9],0,255,0,180);
+				}
+
+				throttle_update();
+				rotation_update();
+			}
+
+
+			function verify()
+			{
+				editor.compile();
+			}
+
+
+			function run()
+			{
+				var errs=emulator.compile(editor.get_value(),
+					function(compile_error) {
+						editor.set_status(compile_error);
+						stop();
+					}
+				);
+				run_button.disabled=true;
+				stop_button.disabled=false;
+			}
+
+			function stop()
+			{
+				emulator.stop();
+				run_button.disabled=false;
+				stop_button.disabled=true;
+			}
+
+			function throttle_update()
+			{
+				var V=parseInt(document.getElementById("throttle").value);
+				aerobeam.set_throttle_target(V);
+				document.getElementById("show_throttle").innerHTML=""+V;
+			}
+
+			function rotation_update()
+			{
+				var V=parseInt(document.getElementById("rotation").value);
+				aerobeam.set_arm_target(V);
+				document.getElementById("show_rotation").innerHTML=""+V;
+			}
+		</script>
+	</head>
+
+	<body onload="initialize();" role="document">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>Aerobeam</h1>
+			</div>
+			<center>
+				<table data-toggle="table">
+					<tr>
+						<td style="vertical-align:top;height:100%;">
+							<div id="code"></div>
+						</td>
+						<td style="vertical-align:top;">
+							<div id="container" style="border:1px solid #000000;"></div>
+						</td>
+					</tr>
+					<tr>
+						<td style="vertical-align:top;height:100%;">
+							<input type="button" class="btn btn-sm btn-primary" id="verify" value="Verify" onclick="verify();"/>
+							<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();"  title="[alt-shift-r]" accesskey="r"  />
+							<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
+						</td>
+						<td style="vertical-align:top;">
+							Throttle: <span id="show_throttle"></span>
+								<input type="range" id="throttle" min="0" max="100" value="0" oninput="throttle_update();"/>
+							Rotation: <span id="show_rotation"></span>
+								<input type="range"id="rotation" min="-60" max="60" value="0" oninput="rotation_update();"/><br/>
+						</td>
+					</tr>
+				</table>
+			</center>
+		</div>
+	</body>
+</html>

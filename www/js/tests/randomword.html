@@ -1,0 +1,41 @@
+<html>
+	<head>
+
+<script src="../../js/wordlist.js"></script>
+
+		<script>
+
+function generate()
+{
+	var size=parseInt(document.getElementById("data_size").value,10);
+
+	if(!size)
+		size=3;
+
+	var array=new Uint32Array(size);
+
+	if(!window.crypto)
+		for(var ii=0;ii<size;++ii)
+			array[ii]=Math.floor(Math.random()*4294967296);
+	else
+		window.crypto.getRandomValues(array);
+
+	var textarea=document.getElementById("data");
+
+	textarea.value="";
+
+	for(var ii=0;ii<size;++ii) {
+		var list=wordlist.noun;
+		if (ii!=size-1) list=wordlist.adj;
+		textarea.value+=array[ii]+" -> "+list[array[ii]%list.length]+"\n";
+	}
+}
+		</script>
+	</head>
+	<body onload="generate();">
+		<textarea id="data" rows="20" cols="40" readonly></textarea>
+		<br/>
+		<input type="button" value="Generate" onclick="generate();"/>
+		<input type="text" id="data_size" value="3"/>
+	</body>
+</html

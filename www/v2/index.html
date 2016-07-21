@@ -1,0 +1,43 @@
+<html>
+	<head>
+		<button id="tester">Click!</button>
+		<script src="cryptojs/hmac-sha256.js"></script>
+		<script src="superstar.js"></script>
+		<script>
+			var button=document.getElementById("tester");
+			var value=0;
+
+			button.onclick=function()
+			{
+				superstar.get("/robots/2016/test/mybot",function(response)
+				{
+					console.log(JSON.stringify(response));
+				});
+				superstar.set("/blarg",value,"123",function()
+				{
+					console.log("success!");
+				});
+				superstar.get("/robots/2016/test/mybot",function(response)
+				{
+					console.log(JSON.stringify(response));
+				});
+				++value;
+				/*superstar.push("/test/abc",1,null,"444");
+				superstar.get("/",function(response)
+				{
+					console.log(JSON.stringify(response));
+				});
+				superstar.sub("/",function(response)
+				{
+					console.log(JSON.stringify(response));
+				},function(error)
+				{
+					console.log(error);
+				});*/
+				superstar.flush();
+			}
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

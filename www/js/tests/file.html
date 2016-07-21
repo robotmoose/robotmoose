@@ -1,0 +1,31 @@
+<html>
+	<head>
+		<!--#include virtual="/sources.html"-->
+	</head>
+	<body>
+		<div id="filediv"></div>
+
+		<script>
+			function load(filename,data)
+			{
+				alert("loaded "+filename+"\n"+data);
+			}
+
+			function save(filename)
+			{
+				var data="hello world!";
+				alert("saved "+filename+"\n"+data);
+				return data;
+			}
+
+			var file_div=document.getElementById("filediv");
+			var file_manager=new file_manager_t(file_div);
+
+			if(!file_manager)
+				alert("Could not create file manager!");
+
+			file_manager.onload=load;
+			file_manager.onsave=save;
+		</script>
+	</body>
+</html>

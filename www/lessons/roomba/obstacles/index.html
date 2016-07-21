@@ -1,0 +1,213 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - Lessons</title>
+
+		<script type="text/javascript">
+			var verify_button;
+			var run_button;
+			var stop_button;
+			var editor=new editor_t();
+			var emulator=new arduino_emulator_t();
+
+			var renderer;
+			var grid;
+			var lights=new Array();;
+			var roomba;
+			var obstacles;
+
+			function initialize()
+			{
+				verify_button=document.getElementById("verify");
+				run_button=document.getElementById("run");
+				stop_button=document.getElementById("stop");
+				editor.create(document.getElementById("code"));
+				editor.set_value(
+					"#include \"roomba.h\"\n"+
+					"\n"+
+					"roomba_t roomba(Serial3);\n"+
+					"int speed=50;\n"+
+					"\n"+
+					"void setup()\n"+
+					"{\n"+
+					"  Serial.begin(115200);\n"+
+					"  Serial3.begin(115200);\n"+
+					"  roomba.setup(2);\n"+
+					"  Serial.println(\"Roomba Started\");\n"+
+					"}\n"+
+					"\n"+
+					"void loop()\n"+
+					"{\n"+
+					"\t//Things written in here keep happening\n"+
+					"\troomba.update();\n"+
+					"\troomba_sensor_t robot=roomba.get_sensors();\n"+
+					"\troomba.drive(-10,-10); // back up slowly by default\n"+
+					"\tif (robot.floor[0]>500) { // floor exists!  Drive forward\n"+
+					"\t\troomba.drive(400,400);\n"+
+					"\t}\n"+
+					"\tdelay(100);\n"+
+					"}"
+					);
+				editor.set_size(480,460);
+				editor.on_change=function(){stop(); verify_button.value="Verify"; }
+				editor.on_compiled=function(){ verify_button.value="Verified"; };
+
+				renderer=new renderer_t(document.getElementById("container"),setup,loop);
+
+				if(!renderer)
+					alert("Is WebGL enabled?");
+				else
+					renderer.setup();
+			}
+
+			function setup()
+			{
+				renderer.set_size(480,453); // FIXME: there's a bottom border that is hard to get rid of...
+
+				var grid_feet=8;
+				var per_foot=300;
+				grid=renderer.create_grid(per_foot,grid_feet,grid_feet); // 1 foot grid
+				var grid_size=per_foot*grid_feet;
+				grid.rotation.x=0;
+
+				var size=100000;
+				var intensity=0.8;
+				lights[0]=new renderer.create_light(intensity,
+					new THREE.Vector3(-size/2,-size/2,+size));
+
+				// Add randomly created obstacles
+				obstacles=new obstacles_t(renderer);
+				for (var i=0;i<20;i++) {
+					var options={
+						position:new vec3().rand(grid_size),
+						radius:Math.random()*200+100,
+						ht:Math.random()*100+300,
+						color:(Math.random()*0xffFFff)&0xffFFff
+					}
+					options.position.z=0.0;
+					if (options.position.length()>500)
+					{
+						options.position.z=options.ht/2.0;
+						obstacles.add(options);
+					}
+				}
+
+				roomba=new roomba_t(renderer,obstacles);
+				roomba.add_sensors();
+
+				renderer.controls.center.set(0,0,0); // robot?
+				renderer.controls.object.position.set(0,-1200,1400);
+			}
+
+			function loop(dt)
+			{
+				roomba.loop(dt);
+
+				var left=parseInt(document.getElementById("drive_left").value);
+				var right=parseInt(document.getElementById("drive_right").value);
+
+				if(emulator.running()&&emulator.roomba)
+				{
+					left=emulator.roomba.left;
+					right=emulator.roomba.right;
+
+					document.getElementById("drive_left").value=left;
+					document.getElementById("drive_right").value=right;
+
+					// console.log(left+" "+right);
+				}
+
+				roomba.drive(left,right);
+				drive_update();
+
+				document.getElementById("status").innerHTML=roomba.get_status();
+			}
+
+
+			function verify()
+			{
+				stop();
+				editor.compile();
+			}
+
+
+			function run()
+			{
+				var errors=emulator.compile(editor.get_value(),
+					function(compile_error) {
+						editor.set_status(compile_error);
+						stop();
+					}
+				);
+				run_button.disabled=true;
+				stop_button.disabled=false;
+			}
+
+			function stop()
+			{
+				emulator.stop();
+				run_button.disabled=false;
+				stop_button.disabled=true;
+
+				// Turn off manual commands, so robot actually stops:
+				document.getElementById("drive_left").value=0;
+				document.getElementById("drive_right").value=0;
+			}
+
+			function reset()
+			{
+				roomba.reset();
+				document.getElementById("drive_left").value=0;
+				document.getElementById("drive_right").value=0;
+			}
+
+			function drive_update()
+			{
+				var left=parseInt(document.getElementById("drive_left").value);
+				var right=parseInt(document.getElementById("drive_right").value);
+				document.getElementById("show_left").innerHTML=""+left;
+				document.getElementById("show_right").innerHTML=""+right;
+			}
+		</script>
+	</head>
+
+	<body onload="initialize();" role="document">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>Roomba Motors</h1>
+			</div>
+			<center>
+				<div class="nohighlight">
+					<table data-toggle="table">
+						<tr>
+							<td style="vertical-align:top;height:100%;">
+								<div id="code"></div>
+							</td>
+							<td style="vertical-align:top;">
+								<div id="container" style="border:1px solid #000000;"></div>
+							</td>
+						</tr>
+						<tr>
+							<td style="vertical-align:top;height:100%;">
+								<input type="button" class="btn btn-sm btn-primary" id="verify" value="Verify" onclick="verify();"/>
+								<input type="button" class="btn btn-sm btn-primary" id="run" value="Run" onclick="run();"  title="[alt-shift-r]" accesskey="r"  />
+								<input type="button" class="btn btn-sm btn-primary" id="stop" value="Stop" onclick="stop();" disabled/>
+								<input type="button" class="btn btn-sm btn-primary" id="reset" value="Reset" onclick="reset();"/>
+							</td>
+							<td style="vertical-align:top;">
+								Left: <span id="show_left"></span>
+									<input type="range" id="drive_left" min="-500" max="500" value="0" oninput="drive_update();"/>
+								Right: <span id="show_right"></span>
+									<input type="range"id="drive_right" min="-500" max="500" value="0" oninput="drive_update();"/><br/>
+								<p id="status"></p>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</center>
+
+		</div>
+	</body>
+<br><br><br><font size="1"><div xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/" about="http://www.thingiverse.com/thing:94504"><span property="dct:title">Model used in simulation is "vRoomba - Pull Back Motor Vacuum Robot"</span> (<a rel="cc:attributionURL" property="cc:attributionName" href="http://www.thingiverse.com/halley">halley</a>) / <a rel="license" href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a></div></font>
+</html>

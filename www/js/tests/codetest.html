@@ -1,0 +1,27 @@
+<!--Test html file for js/code_execution.js
+	Arsh Chauhan
+	07/06/15
+-->
+<html>
+<head>
+<script src = "/js/code_execution.js"></script>
+<script>
+execute = function()
+{
+	console.log("In execute");
+	var currentcode = [{state:"state1",code:"pilot.L = 1.0; console.log(pilot.L); robot.state = state2;"},
+						{state:"state2",code:"pilot.L = 3.0; console.log(pilot.L);"}];
+	var code_execute = new code_execution_t (currentcode);
+	console.log(currentcode);
+	code_execute.collectSubmission();
+	code_execute.createFunction();
+	code_execute.runCode();
+	code_execute.runCode();
+}
+</script>
+</head>
+<body>
+	<textarea id="code_exec"></textarea>
+	<button type = "button" onclick = "execute()" >Run</button>
+</body>
+</html>

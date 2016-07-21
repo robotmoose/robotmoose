@@ -1,0 +1,190 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+
+
+<script type=text/javascript>
+/*
+
+  Dr. Orion Lawlor, lawlor@alaska.edu, 2015-06-24
+*/
+
+var current_user_output="";
+var current_user_target=0.0;
+var current_user_state_ID={"id":0};
+
+/// Extract the DOM element corresponding to this ID
+function get_dom(ID,type) {
+	return document.getElementById('state'+ID.id+type);
+}
+
+/// Enumerate all existing state names/IDs
+function for_state_name_ID(callback)
+{
+	for (var id=0;;id++) {
+		var ID={"id":id};
+		var dom=get_dom(ID,'name');
+		if (!dom) break;
+		var name=dom.value;
+		callback(name,ID);
+	}
+}
+
+/// Return the name corresponding to this state ID
+function state_ID_to_name(state_ID) {
+	var dom=get_dom(state_ID,'name');
+	if (!dom) return "invalid ID "+state_ID.id;
+	return dom.value;
+}
+
+/// Return the ID corresponding to this string state name
+function name_to_state_ID(state_name) {
+	var ret=0;
+	for_state_name_ID(function(name,ID) {
+		if (name==state_name) ret=ID;
+	});
+	return ret;
+}
+
+/// Return a string version of this state ID
+function print_state(state_ID) {
+	return state_ID_to_name(state_ID)+" ("+state_ID.id+")";
+}
+
+/// Global robot fields
+var pilot={
+	L:0.0,
+	R:0.0
+};
+
+var robot={
+	pilot:pilot,
+	location: {
+		x:0,
+		y:0,
+		z:0,
+		angle:0
+	}
+};
+
+/// Run this user's snippet of code
+function run_code(code) {
+  	// Bind all state names into this function object:
+  	for_state_name_ID(function(name,ID) {
+		// console.log("  Run adding state "+name+" as ID "+ID.id);
+		this[name]=ID;
+	});
+
+	// Local variable "target":
+	var target=current_user_target;
+
+	// User accessible robot object:
+	robot.drive=function(L,R) {
+		pilot.L=L; pilot.R=R;
+	}
+
+	// User callable state transition function:
+	robot.state=function(new_state_ID,new_target) {
+		if (new_state_ID.id!==undefined) {
+			// var new_state_ID=name_to_state_ID(new_state_name);
+			current_user_output+="Switching to state "+print_state(new_state_ID)+"<br>";
+			current_user_state_ID=new_state_ID;
+			current_user_target=0.0;
+			robot.drive(0,0); // stop robot
+		} else {
+			throw "state() called with invalid "+new_state_ID;
+		}
+	}
+
+	eval(code);
+
+  	// Clean state names out of our function object
+  	//  (otherwise they build up!)
+  	for_state_name_ID(function(name,ID) {
+		this[name]="old state name '"+name+"'";
+	});
+}
+
+function run() {
+	current_user_output="";
+  try {
+	current_user_output+="Now in state "+print_state(current_user_state_ID)+"<br>";
+  	// Simulation
+  	var angrad=robot.location.angle*Math.PI/180.0;
+  	var r=(pilot.L+pilot.R)*0.005; // forward
+  	robot.location.x+=Math.cos(angrad)*r;
+  	robot.location.y+=Math.sin(angrad)*r;
+  	robot.location.angle+=(pilot.R-pilot.L)*0.05;
+  	current_user_output+="target="+current_user_target+"<br>";
+  	current_user_output+="robot.location.x="+robot.location.x+"<br>";
+  	current_user_output+="robot.location.y="+robot.location.y+"<br>";
+  	current_user_output+="robot.location.angle="+robot.location.angle+"<br><br>";
+
+  	// Control
+  	var code=get_dom(current_user_state_ID,'code').value;
+	current_user_output+="Running code "+code+"<br>";
+
+	run_code(code);
+
+	current_user_output+="Code ran OK.<br>";
+  } catch (err) {
+	current_user_output+="Exception: "+err;
+  }
+  	document.getElementById('output').innerHTML=current_user_output;
+}
+
+</script>
+
+
+<head><title>State Transition Test</title>
+
+</head>
+
+<body onLoad="run()">
+<h1>State Transition Test</h1>
+
+<form name="daForm">
+<p><input name="Run" value="Run!" type="button" onClick="run()"></p>
+</form>
+
+<TABLE BORDER=2>
+  <TR>
+    <TD>
+      <b>State name</b>
+	</TD>
+    <TD>
+     <b>Code to run during state</b>
+	</TD>
+  </TR>
+  <TR>
+    <TD valign="top">
+      <input id="state0name" type="text" size="10" onChange="run()" value="forward"/></input>
+	</TD>
+    <TD>
+      <textarea id="state0code" onChange="run()" rows="5" cols="50" >
+if (robot.location.x<10) {
+    robot.drive(255,255);
+} else {
+    robot.state(backward);
+}
+</textarea>
+	</TD>
+  </TR>
+  <TR>
+    <TD valign="top">
+      <input id="state1name" type="text" size="10" onChange="run()" value="backward"/></input>
+	</TD>
+    <TD>
+      <textarea id="state1code"  onChange="run()"  rows="5" cols="50">
+if (robot.location.x>0.0) {
+    robot.drive(-255,-255);
+} else {
+    robot.state(forward);
+}
+</textarea>
+	</TD>
+  </TR>
+</TABLE>
+
+<p id="output">Starting up</p>
+
+
+</body></html>
