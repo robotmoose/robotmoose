@@ -59,7 +59,7 @@ function robot_sim_t()
 	this.heartbeats = 0;
 	var location = {};
 	location.ID = 0;
-	location.angle = 180;
+	location.angle = 0;
 	location.count = 0;
 	location.x = 0.0;
 	location.y = 0.0;
@@ -73,15 +73,27 @@ function robot_sim_t()
 	this.reset_wheels();
 }
 	
-
-
+/*
+// Move robot to location
+robot_sim_t.prototype.change_location=function(x_cord, y_cord, z_cord)
+{
+	if (!x_cord) x_cord = 0;
+	if (!y_cord) y_cord = 0;
+	if (!z_cord) z_cord = 0;
+	
+	this.wheel[0]=new vec3(x_cord,y_cord+0.5*this.wheelbase,z_cord);
+	this.wheel[1]=new vec3(x_cord,y_cord-0.5*this.wheelbase,z_cord);	
+	
+	this.drive_wheels(0.0,0.0);
+}
+*/
 
 // Reset positions of wheels:
 // Taken from robot_2wd
 robot_sim_t.prototype.reset_wheels=function()
 {
-	this.wheel[0]=new vec3(0.0,-0.5*this.wheelbase,0.01);
-	this.wheel[1]=new vec3(0.0,+0.5*this.wheelbase,0.01);
+	this.wheel[0]=new vec3(0.0,+0.5*this.wheelbase,0.0);
+	this.wheel[1]=new vec3(0.0,-0.5*this.wheelbase,0.0);
 	
 	// Robot coordinate system:
 	this.P=new vec3(0,0,0); // position of robot (between wheels)
@@ -91,6 +103,8 @@ robot_sim_t.prototype.reset_wheels=function()
 	
 	this.drive_wheels(0.0,0.0); // set up coordinates
 }
+
+
 
 // Drive the robot's wheels this far.
 // Taken from robot_2wd
