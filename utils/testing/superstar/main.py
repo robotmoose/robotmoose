@@ -9,10 +9,13 @@ from traceback import print_tb
 
 
 # These classes should probably be in separate files eventually.
-class Test:
+class Test(object):
     def __init__(self, url):
         self.url = url
         self.error = 'No error message provided.'
+
+    def class_name(self):
+        return type(self).__name__
 
     def create_method(self, method_name, path, auth_key, **opts):
         json_opts = json.dumps(opts)
