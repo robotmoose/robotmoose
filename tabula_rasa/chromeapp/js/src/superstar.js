@@ -1,335 +1,209 @@
-/**
-  Superstar network interface
-  Talks to superstar server.
+//Mike Moss
+//07/10/2016
+//Contains client code to get requests from a superstar server.
 
-  robot fields:
-  	superstar: string name of superstar server
-  	name: string name of robot (URI encoded)
-  	school: string name of robot's organization (URI encoded)
-  	auth: authentication code (password for robot), or empty
-
-  This file is shared between the chrome app backend and web front end.
-*/
-
-// Error handling code
-function superstar_error(user_errorhandler,why_string)
+//Superstar object.
+//  Variable this.queue to store requests in until .flush is called.
+function superstar_t(superstar)
 {
-	console.log("Superstar network error: "+why_string);
-	if (user_errorhandler) user_errorhandler(why_string);
+	if(!superstar)
+		superstar="";
+	this.superstar=superstar;
+	this.queue=[];
 }
 
-function calc_auth(robot,path,str)
+//Gets the value of path.
+//  Calls success_cb on success with the server response.
+//  Calls error_cb on error with the server error object (as per spec).
+superstar_t.prototype.get=function(path,success_cb,error_cb)
 {
-	var auth=robot.auth;
-	if(!robot.auth)
-		auth="";
-
-	if (robot.auth) {
-		var starpath=superstar_path(robot,path);
-		var seq="0"; // <- fixme: fight replay by getting sequence number from server first
-		auth = "&auth="+getAuthCode(robot.auth,starpath,str,seq);
-		//console.log(path,"Authentication code "+auth);
-	}
-	return auth;
+	path=this.pathify(path);
+	var request=this.build_skeleton_request("get",path);
+	this.add_request(request,success_cb,error_cb);
 }
 
-// Build the full request string for this path on this robot
-function superstar_path(robot,path) {
-	var fullpath="robots/";
-	if (robot.year) fullpath+=robot.year+"/";
-	if (robot.school) fullpath+=robot.school+"/";
-	if (robot.name) fullpath+=robot.name+"/";
-	if (path) fullpath+=path;
-	return fullpath;
+//Sets path to the value using the given auth.
+//  Calls success_cb on success with the server response.
+//  Calls error_cb on error with the server error object (as per spec).
+superstar_t.prototype.set=function(path,value,auth,success_cb,error_cb)
+{
+	path=this.pathify(path);
+	var opts=JSON.stringify({value:value});
+	var request=this.build_skeleton_request("set",path,opts);
+	this.build_auth(path,request,auth);
+	this.add_request(request,success_cb,error_cb);
 }
 
-// Generic string-in string-out network communication code.
-function superstar_generic(robot,path,request,on_success,on_error)
+//Gets sub keys of the given path.
+//  Calls success_cb on success with the server response.
+//  Calls error_cb on error with the server error object (as per spec).
+superstar_t.prototype.sub=function(path,success_cb,error_cb)
 {
-	var starpath=superstar_path(robot,path);
-	var url="";
-	if (robot.superstar) url="http://"+robot.superstar;
-	url+="/superstar/"+starpath+request;
+	path=this.pathify(path);
+	var request=this.build_skeleton_request("sub",path);
+	this.add_request(request,success_cb,error_cb);
+}
 
-	try
+//Pushes the given value onto path using the given auth.
+//  Calls success_cb on success with the server response.
+//  Calls error_cb on error with the server error object (as per spec).
+//  Note, if the path is not an array, it will be after this.
+superstar_t.prototype.push=function(path,value,len,auth,success_cb,error_cb)
+{
+	path=this.pathify(path);
+	var opts=JSON.stringify({value:value,length:len});
+	var request=this.build_skeleton_request("push",path,opts);
+	this.build_auth(path,request,auth)
+	this.add_request(request,success_cb,error_cb);
+}
+
+//Replaces multiple slashes in path with a single slash.
+//  Removes all leading and trailing slashes.
+superstar_t.prototype.pathify=function(path)
+{
+	if(!path)
+		path=""
+	path=path.replace(/\/+/g,"\/");
+	while(path.length>0&&path[0]=='/')
+		path=path.substring(1,path.length);
+	while(path.length>0&&path[path.length-1]=='/')
+		path=path.substring(0,path.length-1);
+	return path;
+}
+
+//Builds a basic jsonrpc request with given method.
+//  Adds path as path and opts as opts to the params object.
+//  Note, opts is optional.
+superstar_t.prototype.build_skeleton_request=function(method,path,opts)
+{
+	path=this.pathify(path);
+	var request=
 	{
-		var xhr=new XMLHttpRequest();
-		xhr.open("GET",url,true);
-		xhr.onreadystatechange=function()
+		jsonrpc:"2.0",
+		method:method,
+		params:
 		{
-			if(xhr.readyState==4)
-			{
-				if(xhr.status==200)
-				{
-					try
-					{
-						//console.log("Network "+url+" -> "+xhr.responseText);
-						if(on_success)
-							on_success(xhr.responseText);
-					}
-					catch(error)
-					{
-						superstar_error(on_error,"Error handling response \""+xhr.responseText+"\" ("+error+") from "+url);
-					}
-				}
-				else
-				{
-					superstar_error(on_error,"Error receiving from server (status "+xhr.status+") from "+url);
-				}
-			}
-		}
-
-		xhr.send();
-		return xhr;
-	}
-	catch(error)
-	{
-		superstar_error(on_error,"Network error ("+error+") from "+url);
-		return null;
-	}
+			path:path
+		},
+		id:null
+	};
+	if(opts)
+		request.params.opts=opts;
+	return request;
 }
 
-// Get JSON object from a robot path
-function superstar_get(robot,path,on_success,on_error)
+//Builds HMACSHA256 for given path and request object with given auth.
+superstar_t.prototype.build_auth=function(path,request,auth)
 {
-	superstar_generic(robot,path,"?get",
-		function(str) {
-			var json=null;
-			if(str!="") json=JSON.parse(str);
-			on_success(json);
-		}
-	,on_error);
+	path=this.pathify(path);
+	request.params.auth=auth;
 }
 
-// Get multiple JSON object from multiple robot paths
-function superstar_get_multiple(robot,paths,on_success,on_error)
+//Adds a build request into the batch queue.
+//  Note, won't be sent until .flush() is called.
+superstar_t.prototype.add_request=function(request,success_cb,error_cb)
 {
-	var request="?get=";
-	for(var ii=0;ii<paths.length;++ii)
+	this.queue.push
+	({
+		request:request,
+		success_cb:success_cb,
+		error_cb:error_cb
+	});
+}
+
+//Builds the batch request object and clears out the current queue.
+superstar_t.prototype.flush=function()
+{
+	//No requests, return.
+	if(this.queue.length==0)
+		return;
+
+	//Build batch of current requests.
+	var batch=[];
+	for(var ii=0;ii<this.queue.length;++ii)
 	{
-		request+="/"+superstar_path(robot,paths[ii]);
-		if(ii+1<paths.length)
-			request+=",";
+		var request=this.queue[ii].request;
+		var path=request.params.path;
+		var opts=request.params.opts;
+		var auth=request.params.auth;
+		request.id=ii;
+		if(auth)
+			request.params.auth=CryptoJS.HmacSHA256(path+opts,auth).
+				toString(CryptoJS.enc.Hex);
+		batch.push(this.queue[ii].request);
 	}
+	var old_queue=this.queue;
+	this.queue=[];
 
-	var starpath=superstar_path(robot,"");
-	var url="";
-	if (robot.superstar) url="http://"+robot.superstar;
-	url+="/superstar/"+starpath+request;
-
-	try
+	//Make the request.
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.onreadystatechange=function()
 	{
-		var xhr=new XMLHttpRequest();
-		xhr.open("GET",url,true);
-		xhr.onreadystatechange=function()
+		if(xmlhttp.readyState==4)
 		{
-			if(xhr.readyState==4)
+			if(xmlhttp.status==200)
 			{
-				if(xhr.status==200)
-				{
-					try
+				//try
+				//{
+					//Parse response, call responses.
+					var response=JSON.parse(xmlhttp.responseText);
+
+					//Function to handle errors...
+					var handle_error=function(request,error)
 					{
-						//console.log("Network "+url+" -> "+xhr.responseText);
-						if(on_success)
-							on_success(JSON.parse(xhr.responseText));
+						//FIXME
+						if(request.error_cb)
+							request.error_cb(error);
+						else
+							console.log("Superstar error ("+error.code+") "+
+								error.message);
 					}
-					catch(error)
+
+					//Got an array, must be batch data...
+					if(response.constructor===Array)
 					{
-						superstar_error(on_error,"Error handling response \""+xhr.responseText+"\" ("+error+") from "+url);
+						for(var key in response)
+						{
+							if(response[key].id==null)
+								continue;
+
+							//Error callback...
+							var response_obj=response[key].error;
+							if(response_obj)
+							{
+								handle_error(old_queue[response[key].id],response_obj);
+								continue;
+							}
+
+							//Success callback...
+							response_obj=response[key].result;
+							if(old_queue[response[key].id].success_cb)
+								old_queue[response[key].id].success_cb(response_obj);
+						}
 					}
-				}
-				else
-				{
-					superstar_error(on_error,"Error receiving from server (status "+xhr.status+") from "+url);
-				}
+					//Server error...
+					else
+					{
+						for(var key in old_queue)
+						{
+							handle_error(old_queue[key],response.error);
+							continue;
+						}
+					}
+				//}
+				//catch(error)
+				//{
+				//	console.log("Superstar error (unknown) "+error);
+				//}
 			}
-		}
-
-		xhr.send();
-		return xhr;
-	}
-	catch(error)
-	{
-		superstar_error(on_error,"Network error ("+error+") from "+url);
-		return null;
-	}
-}
-
-// Get multiple JSON object from multiple robot paths
-function superstar_set_and_get_multiple(robot,set_path,set_json,get_paths,on_success,on_error)
-{
-	var set_json_str=JSON.stringify(set_json);
-	var request="?set="+set_json_str+"&get=";
-	for(var ii=0;ii<get_paths.length;++ii)
-	{
-		request+="/"+superstar_path(robot,get_paths[ii]);
-		if(ii+1<get_paths.length)
-			request+=",";
-	}
-
-	var auth=calc_auth(robot,set_path,set_json_str);
-
-	request+=auth;
-	var starpath=superstar_path(robot,set_path);
-	var url="";
-	if (robot.superstar) url="http://"+robot.superstar;
-	url+="/superstar/"+starpath+request;
-
-	try
-	{
-		var xhr=new XMLHttpRequest();
-		xhr.open("GET",url,true);
-		xhr.onreadystatechange=function()
-		{
-			if(xhr.readyState==4)
+			else
 			{
-				if(xhr.status==200)
-				{
-					try
-					{
-						//console.log("Network "+url+" -> "+xhr.responseText);
-						if(on_success)
-							on_success(JSON.parse(xhr.responseText));
-					}
-					catch(error)
-					{
-						superstar_error(on_error,"Error handling response \""+xhr.responseText+"\" ("+error+") from "+url);
-					}
-				}
-				else
-				{
-					superstar_error(on_error,"Error receiving from server (status "+xhr.status+") from "+url);
-				}
+				console.log("Superstar error (connection error) HTTP "+xmlhttp.status+".");
 			}
 		}
-
-		xhr.send();
-		return xhr;
-	}
-	catch(error)
-	{
-		superstar_error(on_error,"Network error ("+error+") from "+url);
-		return null;
-	}
+	};
+	xmlhttp.open("POST",this.superstar+"/superstar/",true);
+	xmlhttp.send(JSON.stringify(batch));
 }
 
-
-// Subscribe to JSON changes at this robot path.
-//  This repeatedly calls on_success with the updated objects
-//  until you call .abort on the object this returns.
-function superstar_getnext(robot,path,on_success,on_error)
-{
-	var state={};
-	state.current=""; // assume current string value of path is empty
-
-	// Fetch the next value from the server
-	state.getnext=function() {
-		state.abort(); // stop any previous work
-		state.timeout=setTimeout(state.repeat,2*60*1000); // getnext will time out every 5 minutes, so repeat request every few minutes.
-
-		// Send off network request:
-		state.xhr=superstar_generic(robot,path,"?getnext="+encodeURIComponent(state.current),
-			function(str) {
-				// Done with this request:
-				state.xhr=undefined;
-				state.abort_timeout();
-
-				state.current=str;
-				if (str!="")
-					state.json=JSON.parse(str);
-				else state.json=null;
-
-				on_success(state.json);
-
-				state.getnext(); // call ourselves to do it again
-			}
-		,on_error);
-	}
-
-	// Reload the request from the server
-	state.repeat=function() {
-		state.getnext();
-	}
-
-	// Stop all in-progress requests.
-	state.abort=function() {
-		state.abort_xhr();
-		state.abort_timeout();
-	}
-
-	// Stop any in-progress XmlHttpRequest network request
-	state.abort_xhr=function() {
-		if (state.xhr) {
-			state.xhr.abort();
-			state.xhr=undefined;
-		}
-	}
-
-	// Stop any in-progress timeout
-	state.abort_timeout=function() {
-		if (state.timeout) {
-			clearTimeout(state.timeout);
-			state.timeout=undefined;
-		}
-	}
-
-	state.getnext(); // start first one
-	return state; // hand back access object
-}
-
-// Write this object to this path
-function superstar_set(robot,path,json,on_success,on_error)
-{
-	var json_str=JSON.stringify(json);
-	var auth=calc_auth(robot,path,json_str);
-
-	json_str=encodeURIComponent(json_str);
-	superstar_generic(robot,path,"?set="+json_str+auth,
-		function(response) {
-			if (on_success) on_success();
-		}
-	,on_error);
-}
-
-// Append this object to this path
-function superstar_append(robot,path,json,on_success,on_error)
-{
-	var json_str=JSON.stringify(json);
-	var auth=calc_auth(robot,path,json_str);
-
-	json_str=encodeURIComponent(json_str);
-	superstar_generic(robot,path,"?append="+json_str+auth,
-		function(response) {
-			if (on_success) on_success();
-		}
-	,on_error);
-}
-
-// Trim this path to this size
-function superstar_trim(robot,path,size,on_success,on_error)
-{
-	var auth=calc_auth(robot,path,size);
-
-	superstar_generic(robot,path,"?trim="+size+auth,
-		function(response) {
-			if (on_success) on_success();
-		}
-	,on_error);
-}
-
-
-// List this subdirectories to this path
-//   Return them to on_success as an array of strings
-function superstar_sub(robot,path,on_success,on_error)
-{
-	if (!robot) robot={};
-	superstar_generic(robot,path,"?sub",
-		function(response) {
-			if (response=="") response="[]"; // empty array
-			var json=JSON.parse(response);
-			on_success(json);
-		}
-	,on_error);
-}
-
-
+var superstar=new superstar_t();
