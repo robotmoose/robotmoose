@@ -120,17 +120,15 @@ class superstar_t:
 				auth=bytearray(request["params"]["auth"],"utf-8")
 				data=bytearray(path+opts,"utf-8")
 				request["params"]["auth"]=hmac.new(auth,data,digestmod=hashlib.sha256).hexdigest()
-				print(request["params"]["auth"])
 			batch.append(self.queue[ii]["request"])
 
 		old_queue=self.queue
 		self.queue=[]
 
 		try:
+			#Make the request.
 			data=bytes(json.dumps(batch),"utf-8")
 			server_response=urllib.request.urlopen("http://"+self.superstar+"/superstar/", data)
-
-			#Make the request.
 
 			#Parse response, call responses.
 			response=json.loads(server_response.read().decode('utf-8'))
@@ -157,16 +155,19 @@ class superstar_t:
 			else:
 				for key in old_queue:
 					self.handle_error(old_queue[key],response["error"])
-					continue
 		except Exception as error:
-				print("Superstar error (unknown) "+str(error))
+			error_obj={}
+			error_obj["code"]=0
+			error_obj["message"]=str(error)
+			for key in old_queue:
+				self.handle_error(key,error_obj)
 
 	#Function to handle errors...
 	def handle_error(self,request,error):
 		if request["error_cb"]:
 			request["error_cb"](error)
 		else:
-			print("Superstar error ("+str(error["code"])+") "+error["message"])
+			print("Superstar error ("+str(error["code"])+") - "+error["message"])
 
 if __name__=="__main__":
 	def getprint(result):
@@ -177,8 +178,8 @@ if __name__=="__main__":
 
 	ss=superstar_t("127.0.0.1:8081")
 
-	#ss.get("/blarg",getprint)
-	#ss.set("/blarg",4,"123")
+	ss.get("/blarg",getprint)
+	ss.set("/blarg",4,"123")
 	#ss.get("/blarg",getprint)
 	#ss.sub("/",subprint)
 	#ss.push("/blarg2",2,3,"123")
