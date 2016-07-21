@@ -139,7 +139,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,const Json::Value request)
 		}
 
 		//Write based operations - check auth.
-		if((method=="set"||method=="push")&&
+		if((method=="set"||method=="push"||method=="change_auth")&&
 			!superstar.auth_check(path,opts_str,params["auth"]))
 		{
 			auth=false;
@@ -172,6 +172,10 @@ Json::Value jsonrpc_handle(superstar_t& superstar,const Json::Value request)
 
 			response["result"]=true;
 			superstar.push(path,opts["value"],opts["length"]);
+		}
+		else if(method=="change_auth")
+		{
+			response["result"]=superstar.change_auth(path,opts["value"]);
 		}
 
 		//What have I become?
@@ -229,8 +233,10 @@ bool jsonrpc_invalid_id(const Json::Value id)
 //Checkes if the given request's method is supported (as in a get/set/sub/push).
 bool jsonrpc_supported_method(const Json::Value method)
 {
-	return (method.asString()=="get"||
-		method.asString()=="set"||
-		method.asString()=="sub"||
-		method.asString()=="push");
+	std::string method_str=method.asString();
+	return (method_str=="get"||
+		method_str=="set"||
+		method_str=="sub"||
+		method_str=="push"||
+		method_str=="change_auth");
 }

@@ -9,15 +9,15 @@
 
 			button.onclick=function()
 			{
-				superstar.get("/robots/2016/test/mybot",function(response)
+				/*superstar.get("/robots/2016/test/mybot",function(response)
 				{
 					console.log(JSON.stringify(response));
-				});
-				superstar.set("/blarg",value,"123",function()
+				});*/
+				/*superstar.set("/blarg",{a:"world"},"456",function()
 				{
 					console.log("success!");
-				});
-				superstar.get("/robots/2016/test/mybot",function(response)
+				});*/
+				/*superstar.get("/robots/2016/test/mybot",function(response)
 				{
 					console.log(JSON.stringify(response));
 				});
@@ -34,6 +34,14 @@
 				{
 					console.log(error);
 				});*/
+				superstar.change_auth("/123","blarg!!!","123",function(response)
+				{
+					console.log("Reponse: "+response);
+				},
+				function(error)
+				{
+					console.log("Error: "+JSON.stringify(error));
+				});
 				superstar.flush();
 			}
 		</script>

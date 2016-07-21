@@ -267,82 +267,128 @@ void superstar_t::push(const std::string& path,const Json::Value& val,
 	*obj=new_array;
 }
 
+//Changes auth code for a given path to the given value.
+//  Returns whether new auth was set or not.
+//  Note, min auth code length is 8 characters.
+//  Note, valid characters are ASCII 33-126 inclusive.
+//  Note, relies on HTTPS for secure transport.
+//  Note, traverses auth until a matching code is found for a path.
+//        This is NOT create new auth codes, only changes existing ones.
+bool superstar_t::change_auth(std::string path,const Json::Value& value)
+{
+	//Check auth length.
+	std::string new_auth_str="";
+	if(!value.isNull())
+		new_auth_str=value.asString();
+	if(new_auth_str.size()<8)
+		return false;
+
+	//Check for invalid characters.
+	for(size_t ii=0;ii<new_auth_str.size();++ii)
+		if(new_auth_str[ii]<33||new_auth_str[ii]>126)
+			return false;
+
+	//Remove multiple,leading, and trailing slashes...
+	path=remove_double_slashes(strip(path,"/"));
+
+	//Try to open auth file.
+	std::ifstream ifstr(auth_file_m.c_str());
+
+	//No auth file...can't change anything...
+	if(!ifstr.good())
+		return false;
+
+	//Open auth file and parse passwords in line based format "PATH PASSWORD" (without quotes).
+	std::vector<std::pair<std::string,std::string> > auths;
+	std::string line;
+	while(std::getline(ifstr,line))
+	{
+		//Separate line into path and pass, push to auths array...
+		std::istringstream istr(line);
+		std::pair<std::string,std::string> path_and_auth;
+		istr>>path_and_auth.first;
+		if(!(istr>>path_and_auth.second))
+			path_and_auth.second="";
+		auths.push_back(path_and_auth);
+	}
+	ifstr.close();
+
+	//Open auth file in write mode.
+	std::ofstream ofstr(auth_file_m.c_str());
+	if(!ofstr.good())
+		return false;
+
+	//Write all auths and replace the one with our path with the new auth code.
+	bool replaced=false;
+	for(size_t ii=0;ii<auths.size();++ii)
+	{
+		ofstr<<auths[ii].first;
+		if(auths[ii].second.size()>0)
+		{
+			//If path for auth change and current path are the same, change.
+			std::string cur_path=remove_double_slashes(strip(auths[ii].first,"/"));
+			if(cur_path==path)
+			{
+				ofstr<<" "<<new_auth_str;
+				replaced=true;
+			}
+			else
+			{
+				ofstr<<" "<<auths[ii].second;
+			}
+		}
+		ofstr<<std::endl;
+	}
+	ofstr.close();
+	return replaced;
+}
+
 //Authenticates path with opts with the passed auth object.
 //  Note, expects a string or null in the auth object.
-//  Note, recursive function, passing the original path around in
-//        recursive_path...
 //  Note, PATH IS STRIPPED OF ALL PRECEEDING /'s and ENDING /'s,
 //        AND MULTIPLE /'s ARE CHANGED TO A SINGLE /.
 bool superstar_t::auth_check(std::string path,const std::string& opts,
-	const Json::Value& auth,std::string recursive_path)
+	const Json::Value& auth)
 {
 	//Remove multiple,leading, and trailing slashes...
 	path=remove_double_slashes(strip(path,"/"));
 
-	//This is a recursive function, need to pass the path around...
-	if(recursive_path.size()==0)
-		recursive_path=path;
-
-	//Try to open auth file.
-	std::ifstream fstr(auth_file_m.c_str());
-
-	//No passwords at all...authenticated...
-	if(!fstr.good())
-		return true;
-
-	//Open auth file and parse passwords in line based format "PATH PASSWORD" (without quotes).
-	bool found=false;
-	std::string pass;
-	while(std::getline(fstr,pass))
-	{
-		//Read whole line into pass...need to separate into path and pass...
-		std::istringstream istr(pass);
-		std::string challenge_path;
-		istr>>challenge_path;
-
-		//Strip beginning and ending slashes to make path checks easier...
-		challenge_path=remove_double_slashes(strip(challenge_path,"/"));
-
-		//Found path, grab password...
-		if(challenge_path==path)
-		{
-			//Empty password...
-			if(!(istr>>pass))
-				pass="";
-			found=true;
-			break;
-		}
-	}
-	fstr.close();
-
-	//No password found...
-	if(!found)
-	{
-		//Remove top level of path.
-		std::string next_path=path;
-		while(next_path.size()>0&&next_path[next_path.size()-1]!='/')
-			next_path=next_path.substr(0,next_path.size()-1);
-
-		//Remove multiple,leading, and trailing slashes...
-		next_path=remove_double_slashes(strip(next_path,"/"));
-
-		//If top level path isn't blank and not the same as the old one, try it's auth.
-		if(next_path!=path)
-			return auth_check(next_path,opts,auth,recursive_path);
-
-		//Else no auth, authenticated.
-		return true;
-	}
-
-	//Blank password is the same as no password.
-	if(pass.size()<=0)
-		return true;
-
-	//Perform HMAC.
+	//Auth as string..
 	std::string auth_str="";
 	if(!auth.isNull())
 		auth_str=auth.asString();
-	return (auth_str==to_hex_string(hmac_sha256(pass,recursive_path+opts)));
+
+	//Try to open auth file.
+	std::ifstream ifstr(auth_file_m.c_str());
+
+	//No auth file...no authentication.
+	if(!ifstr.good())
+		return true;
+
+	//Open auth file and parse passwords in line based format "PATH PASSWORD" (without quotes).
+	bool authorized=false;
+	std::string line;
+	while(std::getline(ifstr,line))
+	{
+		std::istringstream istr(line);
+
+		//Parse path from line...
+		std::string challenge_path;
+		istr>>challenge_path;
+		challenge_path=remove_double_slashes(strip(challenge_path,"/"));
+
+		//Parse pass from line...
+		std::string pass;
+		if(!(istr>>pass))
+			pass="";
+
+		//Check auth...
+		if(path.find(challenge_path)==0&&
+			(to_hex_string(hmac_sha256(pass,path+opts))==auth_str||pass.size()==0))
+			authorized=true;
+	}
+	ifstr.close();
+	return authorized;
 }
 
 //Loads from either an old style binary file (superstar v1).
