@@ -118,7 +118,8 @@ function robot_map_t(div)
 
 robot_map_t.prototype.setup=function(texture_file, width, height) {
 	if (this.renderer===null) return;
-	this.renderer.set_size(this.div.offsetWidth,this.div.offsetWidth); // FIXME resize this
+	var rend_width = this.div.offsetWidth-this.element.offsetHeight;
+	this.renderer.set_size(rend_width,rend_width); // FIXME resize this
 
 	// Add grid
 	var grid_cells=10;
