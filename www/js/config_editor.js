@@ -95,7 +95,7 @@ config_editor_t.prototype.download=function(robot)
 
 	var myself=this;
 
-	robot_get(robot,"options",function(options)
+	superstar_get(robot,"options",function(options)
 	{
 		myself.get_options_m(options);
 		myself.download_m(robot);
@@ -139,7 +139,7 @@ config_editor_t.prototype.upload=function(robot)
 		}
 	}
 
-	robot_set(robot,"config",data);
+	superstar_set(robot,"config",data);
 }
 
 config_editor_t.prototype.get_entries=function()
@@ -198,7 +198,7 @@ config_editor_t.prototype.download_m=function(robot)
 
 	this.entries=[];
 
-	robot_get(robot,"config",function(obj)
+	superstar_get(robot,"config",function(obj)
 	{
 		if(obj==null) { // backend not connected, make fake config object
 			obj={counter:0};

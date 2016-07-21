@@ -159,12 +159,12 @@ state_table_t.prototype.get_active_experiment=function(onfinish)
 
 state_table_t.prototype.get_experiments=function(active,onfinish)
 {
-
+	
 	var _this=this;
 	if(valid_robot(this.robot))
 	{
 		/*superstar_sub(this.robot,"experiments",function(json)
-		{*/	if (this.robot.sim)
+		{*/	if (this.robot.sim) 
 				var json = this.robot.experiments_list;
 			else{
 				var json=robot_network.experiments;
@@ -213,7 +213,7 @@ state_table_t.prototype.upload=function(robot,onfinish)
 	{
 		if(robot.sim) sim_set_experiment(robot, _this.active_experiment, _this.get_states());
 		else
-		robot_set(robot,"experiments/"+this.active_experiment+"/code",this.get_states(),function()
+		superstar_set(robot,"experiments/"+this.active_experiment+"/code",this.get_states(),function()
 		{
 			if(onfinish)
 				onfinish();
@@ -231,7 +231,7 @@ state_table_t.prototype.get_experiment=function(experiment,onfinish)
 					onfinish(json);
 			});
 		else
-			robot_get(this.robot,"experiments/"+experiment+"/code",function(json)
+			superstar_get(this.robot,"experiments/"+experiment+"/code",function(json)
 			{
 				if(onfinish)
 					onfinish(json);
@@ -246,7 +246,7 @@ state_table_t.prototype.experiment_exists=function(name,onfinish)
 		//superstar_sub(this.robot,"experiments",function(experiments)
 		//{
 			if (this.robot.sim)
-				var experiments=this.robot.experiments;
+				var experiments=this.robot.experiments;			
 			else
 				var experiments=robot_network.experiments;
 			var found=false;
@@ -343,7 +343,7 @@ state_table_t.prototype.upload_active_experiment=function(experiment)
 {
 	//console.log("State table - Experiment: " + experiment)
 	if(valid_robot(this.robot))
-		robot_set(this.robot,"active_experiment",experiment);
+		superstar_set(this.robot,"active_experiment",experiment);
 }
 
 state_table_t.prototype.rebuild_dropdown_m=function(value)
@@ -605,15 +605,15 @@ state_table_t.prototype.create_new_experiment=function(value)
 			if (this.robot.sim)
 				sim_set_experiment(
 					_this.robot,
-					value,
+					value, 
 					[{name:"HelloWorld",time:0,code:""}],
 					function()
 					{
 						_this.next_active_experiment=value;
-					}
+					}					
 				);
 			else
-			robot_set
+			superstar_set
 			(
 				this.robot,
 				"experiments/"+value+"/code",
@@ -623,7 +623,7 @@ state_table_t.prototype.create_new_experiment=function(value)
 					_this.next_active_experiment=value;
 				}
 			);
-
+			
 		}
 }
 

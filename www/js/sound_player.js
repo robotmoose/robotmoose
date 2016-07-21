@@ -66,7 +66,7 @@ sound_player_t.prototype.download=function()
 {
 	var _this=this;
 
-	robot_get(this.robot,this.path,function(json){_this.get_sounds(json);});
+	superstar_get(this.robot,this.path,function(json){_this.get_sounds(json);});
 }
 
 sound_player_t.prototype.build_sound_list=function()
@@ -88,14 +88,14 @@ sound_player_t.prototype.request_sound=function()
 		this.play_sound=!this.play_sound;
 		this.play_sound_button.disabled=true;
 		this.stop_sound_button.disabled=false;
-		robot_set(this.robot,this.path,{"options":this.sounds,"sound":this.sound_requested,"play":this.play_sound});
+		superstar_set(this.robot,this.path,{"options":this.sounds,"sound":this.sound_requested,"play":this.play_sound});
 	}
 }
 
 sound_player_t.prototype.stop_sound=function()
 {
 	this.play_sound=!this.play_sound;
-	robot_set(this.robot,this.path,{"options":this.sounds,"sound":this.sound_requested,"play":this.play_sound});
+	superstar_set(this.robot,this.path,{"options":this.sounds,"sound":this.sound_requested,"play":this.play_sound});
 	this.play_sound_button.disabled=false;
 	this.stop_sound_button.disabled=true;
 }
