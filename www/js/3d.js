@@ -406,14 +406,16 @@ function renderer_t(div,setup_func,loop_func)
 
 		for(var xx=0;xx<=width;++xx)
 		{
-			line_geometry.vertices.push(new THREE.Vector3(-size*width/2,-size*height/2.0+xx*size,0));
-			line_geometry.vertices.push(new THREE.Vector3(size*width/2,-size*height/2.0+xx*size,0));
+			
+			line_geometry.vertices.push(new THREE.Vector3(-size*width/2+xx*size,-size*height/2.0,0));
+			line_geometry.vertices.push(new THREE.Vector3(-size*width/2+xx*size,size*height/2.0,0));
 		}
 
 		for(var yy=0;yy<=height;++yy)
 		{
-			line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0+yy*size,-size*height/2,0));
-			line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0+yy*size,size*height/2,0));
+			
+			line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0,-size*height/2+yy*size,0));
+			line_geometry.vertices.push(new THREE.Vector3(size*width/2.0,-size*height/2+yy*size,0));
 		}
 		if (showOrigin) { // add extra lines around origin
 		  for (var del=-showOrigin;del<=showOrigin;del+=showOrigin/32) {

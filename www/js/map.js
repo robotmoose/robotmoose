@@ -68,7 +68,7 @@ function robot_map_t(div)
 	option1.text="Map 1";
 	var opt1 = {};
 	opt1.path="maps/map1.jpg";
-	opt1.width=10;
+	opt1.width=3;
 	opt1.height=10;
 	option1.value=JSON.stringify(opt1);
 	//option1.value="maps/map1.jpg";
