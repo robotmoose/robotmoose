@@ -75,11 +75,11 @@ robot_ui_t.prototype.create_menus=function()
 
 	this.connect_menu.onconnect=function(robot)
 	{
-		
+
 		if(robot)
 		{
 			if(robot.sim) myself.robot=robot;
-			else 
+			else
 			{
 				myself.robot=JSON.parse(JSON.stringify(robot));
 				robot_network.sim="";
@@ -171,7 +171,7 @@ robot_ui_t.prototype.download_gui=function()
 			div.removeChild(div.firstChild);
 	}
 
-	superstar_get(this.robot,"gui",function(json)
+	robot_get(this.robot,"gui",function(json)
 	{
 		myself.doorways=
 		{
@@ -229,7 +229,7 @@ robot_ui_t.prototype.run_interval=function() {
 						{
 						//console.log("refreshing sensors from robot network: " + JSON.stringify(robot_network.sensors));
 						myself.widgets.sensors.refresh(robot_network.sensors);
-						}	
+						}
 
 					if (!myself.doorways.map.minimized)
 						myself.widgets.map.refresh(robot_network.sensors);
@@ -241,7 +241,7 @@ robot_ui_t.prototype.run_interval=function() {
 				}
 				else
 				{
-					
+
 					if (!myself.doorways.sensors.minimized)
 					{	var sensors_json = JSON.parse(JSON.stringify(myself.robot.sensors));
 						//console.log("refreshing sensors from simulation: " + JSON.stringify(myself.robot.sensors));
@@ -269,7 +269,7 @@ robot_ui_t.prototype.upload_gui=function()
 
 	if(valid_robot(this.robot)&&this.gui.old!=stringified)
 	{
-		superstar_set(this.robot,"gui",save);
+		robot_set(this.robot,"gui",save);
 		this.gui.old=stringified;
 	}
 }
@@ -283,14 +283,14 @@ robot_ui_t.prototype.create_widgets=function()
 			if(this.widgets[key].destroy)
 				this.widgets[key].destroy();
 
-		
+
 	this.widgets=
 	{
 		config:new config_editor_t(this.doorways.config.content),
 		states:new state_table_t(this.doorways.states),
 		pilot:new pilot_interface_t(this.doorways.pilot.content),
 		charts:new chart_interface_t(this.doorways.charts.content),
-		
+
 		sensors:new tree_viewer_t(this.doorways.sensors.content,{},
 		[
 			{key:"bumper",type:"binary"}
@@ -322,7 +322,7 @@ robot_ui_t.prototype.create_widgets=function()
 
 	this.widgets.config.onconfigure=function() // allow configuration upload
 	{
-		
+
 		if(myself.robot&&myself.robot.name)
 			myself.widgets.config.upload(myself.robot);
 	}

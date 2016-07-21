@@ -4,7 +4,7 @@
 function modal_connect_t(div)
 {
 	div.style["z-index"]=1000;
-	this.superstar_root="/superstar/robots";
+	this.superstar_root="/robots/";
 	this.schools=[];
 	this.robots=[];
 
@@ -87,7 +87,7 @@ function modal_connect_t(div)
 		localStorage.previous_robot = robot.name;
 
 		// Check connection validity
-		superstar_set(robot, 'authtest', 'authtest', function() {
+		robot_set(robot, 'authtest', 'authtest', function() {
 			if(_this.onconnect) _this.onconnect(robot);
 			_this.hide();
 		}, function(err) {
@@ -119,14 +119,14 @@ function modal_connect_t(div)
 	this.cancel_button.value="Cancel";
 	this.cancel_button.onclick=function(){_this.hide();};
 	this.modal.get_footer().appendChild(this.cancel_button);
-	
+
 	this.sim_button.className="btn btn-primary";
 	this.sim_button.type="button";
 	this.sim_button.value="Simulate a Robot";
 	this.sim_button.onclick=function()
 	{
 		var robot= new robot_sim_t();
-		
+
 		robot_network.sim = true;
 		if(_this.onconnect)_this.onconnect(robot);
 		_this.hide();
@@ -141,7 +141,7 @@ modal_connect_t.prototype.show=function()
 
 	try
 	{
-		superstar_sub(null,"",
+		superstar.sub(this.superstar_root,
 			function(year_list)
 			{
 				_this.years=year_list;
@@ -156,6 +156,7 @@ modal_connect_t.prototype.show=function()
 			{
 				throw error;
 			});
+		superstar.flush();
 	}
 	catch(error)
 	{
@@ -211,7 +212,8 @@ modal_connect_t.prototype.build_school_list_m=function()
 		this.update_disables_m();
 
 		if(this.year_select.selectedIndex!=0)
-			superstar_sub(null,get_select_value(this.year_select),
+		{
+			superstar.sub(this.superstar_root+get_select_value(this.year_select),
 				function(school_list)
 				{
 					var select_index;
@@ -232,6 +234,8 @@ modal_connect_t.prototype.build_school_list_m=function()
 				{
 					throw error;
 				});
+			superstar.flush();
+		}
 	}
 	catch(error)
 	{
@@ -261,7 +265,8 @@ modal_connect_t.prototype.build_robot_list_m=function()
 			school = get_select_value(this.school_select);
 
 		if(school != "")
-			superstar_sub(null,get_select_value(this.year_select)+"/"+school,
+		{
+			superstar.sub(this.superstar_root+get_select_value(this.year_select)+"/"+school,
 				function(robot_list)
 				{
 					_this.robots=robot_list;
@@ -284,6 +289,8 @@ modal_connect_t.prototype.build_robot_list_m=function()
 					throw error;
 				},
 				"application/json");
+			superstar.flush();
+		}
 	}
 	catch(error)
 	{

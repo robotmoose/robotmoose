@@ -9,22 +9,24 @@ function robot_network_t()
 			int:null,
 			func:function()
 			{
-				if(valid_robot(_this.robot))
+				robot_get(_this.robot,"active_experiment",function(data)
 				{
-					superstar_set_and_get_multiple
-					(
-						_this.robot,
-						"pilot",
-						_this.pilot,
-						["active_experiment","config","frontendStatus"],
-						function(json)
-						{
-							_this.active_experiment=json[0];
-							_this.config=json[1];
-							_this.frontendStatus=json[2];
-						}
-					);
-				}
+					_this.active_experiment=data;
+				});
+				robot_get(_this.robot,"config",function(data)
+				{
+					_this.config=data;
+				});
+				robot_get(_this.robot,"frontendStatus",function(data)
+				{
+					_this.frontendStatus=data;
+				});
+				robot_get(_this.robot,"sensors",function(data)
+				{
+					_this.sensors=data;
+				});
+				robot_set(_this.robot,"pilot",_this.pilot);
+				superstar.flush();
 			},
 			ms:300
 		},
@@ -32,19 +34,15 @@ function robot_network_t()
 			int:null,
 			func:function()
 			{
-				if(valid_robot(_this.robot))
+				robot_sub(_this.robot,"experiments",function(data)
 				{
-					superstar_sub(_this.robot,"experiments",function(json)
-					{
-						_this.experiments=json;
+					_this.experiments=data;
 
-					});
-
-					superstar_generic(_this.robot,"chat","?get",function(str)
-					{
-						_this.chat=str;
-					});
-				}
+				});
+				robot_set(_this.robot,"chat",function(data)
+				{
+					_this.chat=data;
+				});
 			},
 			ms:1000
 		}
@@ -74,8 +72,40 @@ robot_network_t.prototype.set_robot=function(robot)
 {
 	this.robot=robot;
 	var _this=this;
-	superstar_getnext(this.robot,"sensors",function(json)
+}
+
+function robot_get(robot,path,onsuccess,onfail)
+{
+	if(valid_robot(robot))
 	{
-		_this.sensors=json;
-	});
+		var starpath="/robots/"+robot.year+"/"+robot.school+"/"+robot.name+"/"+path;
+		superstar.get(starpath,onsuccess,onfail);
+	}
+}
+
+function robot_set(robot,path,value,onsuccess,onfail)
+{
+	if(valid_robot(robot))
+	{
+		var starpath="/robots/"+robot.year+"/"+robot.school+"/"+robot.name+"/"+path;
+		superstar.set(starpath,value,robot.auth,onsuccess,onfail);
+	}
+}
+
+function robot_sub(robot,path,onsuccess,onfail)
+{
+	if(valid_robot(robot))
+	{
+		var starpath="/robots/"+robot.year+"/"+robot.school+"/"+robot.name+"/"+path;
+		superstar.sub(starpath,onsuccess,onfail);
+	}
+}
+
+function robot_push(robot,path,value,length,onsuccess,onfail)
+{
+	if(valid_robot(robot))
+	{
+		var starpath="/robots/"+robot.year+"/"+robot.school+"/"+robot.name+"/"+path;
+		superstar.push(starpath,value,length,robot.auth,onsuccess,onfail);
+	}
 }
