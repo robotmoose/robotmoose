@@ -29,6 +29,9 @@ class Test:
             'id': None
         }
 
+    def get(self, path):
+        return requests.get(self.url + '/' + path).json()
+
     def post_single_request(self, method):
         return requests.post(self.url, json.dumps(method)).json()
 
