@@ -142,11 +142,18 @@ void http_handler(mg_connection* conn,int event,void* event_data)
 	}
 }
 
-int main()
+int main(int argc,char* argv[])
 {
 	try
 	{
-		//Try to load database...
+		//Get address via command line args (if given).
+		std::string address("0.0.0.0:8081");
+		if(argc==2)
+			address=std::string(argv[1]);
+		else if(argc!=1)
+			throw std::runtime_error("Invalid command line args (./superstar [[ADDRESS:]PORT]).");
+
+			//Try to load database...
 		if(superstar.load())
 			std::cout<<"Loaded backup database."<<std::endl;
 		else
@@ -156,7 +163,6 @@ int main()
 			throw std::runtime_error("Could not open log file \""+post_log_name+"\"!");
 
 		//Server settings.
-		std::string port("8081");
 		server_options.document_root="../www";
 		server_options.enable_directory_listing="no";
 		server_options.ssi_pattern="**.html$";
@@ -164,13 +170,13 @@ int main()
 		//Create server.
 		mg_mgr manager;
 		mg_mgr_init(&manager,NULL);
-		mg_connection* server_conn=mg_bind(&manager,port.c_str(),http_handler);
+		mg_connection* server_conn=mg_bind(&manager,address.c_str(),http_handler);
 		if(server_conn==NULL)
-			throw std::runtime_error("Could not bind to port "+port+".");
+			throw std::runtime_error("Could not bind to "+address+".");
 		mg_set_protocol_http_websocket(server_conn);
 
 		//Serve...forever...
-		std::cout<<"Superstar started on "<<port<<":"<<std::endl;
+		std::cout<<"Superstar started on "<<address<<":"<<std::endl;
 		while(true)
 		{
 			mg_mgr_poll(&manager,500);
