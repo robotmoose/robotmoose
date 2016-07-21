@@ -54,6 +54,18 @@ superstar_t.prototype.push=function(path,value,len,auth,success_cb,error_cb)
 	this.add_request(request,success_cb,error_cb);
 }
 
+//Changes auth for the given path and auth to the given value.
+//  Calls success_cb on success with the server response.
+//  Calls error_cb on error with the server error object (as per spec).
+superstar_t.prototype.change_auth=function(path,value,auth,success_cb,error_cb)
+{
+	path=this.pathify(path);
+	var opts=JSON.stringify({value:value});
+	var request=this.build_skeleton_request("change_auth",path,opts);
+	this.build_auth(path,request,auth);
+	this.add_request(request,success_cb,error_cb);
+}
+
 //Replaces multiple slashes in path with a single slash.
 //  Removes all leading and trailing slashes.
 superstar_t.prototype.pathify=function(path)

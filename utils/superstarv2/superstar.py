@@ -52,6 +52,16 @@ class superstar_t:
 		self.build_auth(path,request,auth)
 		self.add_request(request,success_cb,error_cb)
 
+	#Changes auth for the given path and auth to the given value.
+	#  Calls success_cb on success with the server response.
+	#  Calls error_cb on error with the server error object (as per spec).
+	def change_auth(self,path,value,auth="",success_cb=None,error_cb=None):
+		path=self.pathify(path)
+		opts=json.dumps({"value":value})
+		request=self.build_skeleton_request("change_auth",path,opts)
+		self.build_auth(path,request,auth)
+		self.add_request(request,success_cb,error_cb)
+
 	#Replaces multiple slashes in path with a single slash.
 	#  Removes all leading and trailing slashes.
 	def pathify(self,path):
@@ -107,8 +117,10 @@ class superstar_t:
 			opts=request["params"]["opts"]
 			request["id"]=ii
 			if "auth" in request["params"]:
-				tmp=bytearray(request["params"]["auth"],"utf-8")
-				request["params"]["auth"]=hmac.new(tmp,digestmod=hashlib.sha256).hexdigest()
+				auth=bytearray(request["params"]["auth"],"utf-8")
+				data=bytearray(path+opts,"utf-8")
+				request["params"]["auth"]=hmac.new(auth,data,digestmod=hashlib.sha256).hexdigest()
+				print(request["params"]["auth"])
 			batch.append(self.queue[ii]["request"])
 
 		old_queue=self.queue
@@ -158,17 +170,18 @@ class superstar_t:
 
 if __name__=="__main__":
 	def getprint(result):
-			print(result)
+		print(result)
 
 	def subprint(result):
-			print(result)
+		print(result)
 
 	ss=superstar_t("127.0.0.1:8081")
 
-	ss.get("/blarg",getprint)
-	ss.set("/blarg",4,"123")
-	ss.get("/blarg",getprint)
-	ss.sub("/",subprint)
-	ss.push("/blarg2",2,3,"123")
-	ss.get("/blarg2",getprint)
+	#ss.get("/blarg",getprint)
+	#ss.set("/blarg",4,"123")
+	#ss.get("/blarg",getprint)
+	#ss.sub("/",subprint)
+	#ss.push("/blarg2",2,3,"123")
+	#ss.get("/blarg2",getprint)
+	ss.change_auth("/123","12341234","123",getprint)
 	ss.flush()

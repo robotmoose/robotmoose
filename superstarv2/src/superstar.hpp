@@ -43,14 +43,20 @@ class superstar_t
 		//  the given path.
 		void push(const std::string& path,const Json::Value& val,const Json::Value& len);
 
+		//Changes auth code for a given path to the given value.
+		//  Returns whether new auth was set or not.
+		//  Note, min auth code length is 8 characters.
+		//  Note, valid characters are ASCII 33-126 inclusive.
+		//  Note, relies on HTTPS for secure transport.
+		//  Note, traverses auth until a matching code is found for a path.
+		//        This is NOT create new auth codes, only changes existing ones.
+		bool change_auth(std::string path,const Json::Value& value);
+
 		//Authenticates path with opts with the passed auth object.
 		//  Note, expects a string or null in the auth object.
-		//  Note, recursive function, passing the original path around in
-		//        recursive_path...
 		//  Note, PATH IS STRIPPED OF ALL PRECEEDING /'s and ENDING /'s,
 		//        AND MULTIPLE /'s ARE CHANGED TO A SINGLE /.
-		bool auth_check(std::string path,const std::string& opts,
-			const Json::Value& auth,std::string recursive_path="");
+		bool auth_check(std::string path,const std::string& opts,const Json::Value& auth);
 
 		//Loads from either an old style binary file (superstar v1).
 		//Or from a JSON file (superstar v2).
