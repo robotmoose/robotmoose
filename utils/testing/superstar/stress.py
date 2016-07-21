@@ -21,6 +21,8 @@ class SetLargeValue(StressTest):
 
 
 class GetEverything(StressTest):
+    # Superstar normally handles this fine, but if the other methods
+    # don't kill it this is usually an effective finishing move.
     def task(self):
         self.get('')
 
