@@ -1,38 +1,53 @@
 #!/usr/bin/env python3
 #Mike Moss
-#07/21/2016
+#07/22/2016
 #Copies a robot.
 
+import argparse
 import getpass
 import superstar
 import sys
 
 if __name__=="__main__":
 	try:
-		usage="Usage: "+sys.argv[0]+" SUPERSTAR FROM TO"
+		#Parse CLI args...
+		parser=argparse.ArgumentParser(description="Copies robotmoose robots.")
+		parser.add_argument("-s","--superstar",
+			dest="superstar",
+			default="https://robotmoose.com",
+			help="Superstar to use (default: robotmoose.com).")
+		parser.add_argument("-l","--local",
+			action='store_true',
+			help="Sets superstar to local superstar.")
+		parser.add_argument("-d","--dev",
+			action='store_true',
+			help="Sets superstar to test.robotmoose.com.")
+		parser.add_argument("FROM",
+			help="Name of robot to copy.")
+		parser.add_argument("TO",
+			help="Name for the robot copy.")
+		args=parser.parse_args()
 
-		#Check number of args...
-		if len(sys.argv)!=4:
-			print(usage)
-			exit(1)
+		#Figure out superstar...
+		superstar_url=args.superstar
+		if args.dev:
+			superstar_url="https://test.robotmoose.com"
+		if args.local:
+			superstar_url="127.0.0.1:8081"
+		ss=superstar.superstar_t(superstar_url)
 
 		#Valid from robot...
-		if sys.argv[2].count("/")!=2:
-			print("Invalid FROM robot path.")
-			print(usage)
+		if ss.pathify(args.FROM).count("/")!=2:
+			print("Invalid argument \"FROM\".")
 			exit(1)
 
 		#Valid to robot...
-		if sys.argv[3].count("/")!=2:
-			print("Invalid TO robot path.")
-			print(usage)
+		if ss.pathify(args.TO).count("/")!=2:
+			print("Invalid argument \"TO\".")
 			exit(1)
 
 		#Get auth...
 		auth=getpass.getpass(prompt='Enter auth:  ')
-
-		#Create superstar...
-		ss=superstar.superstar_t(sys.argv[1])
 
 		#Print errors...
 		def onerror(error):
@@ -45,13 +60,16 @@ if __name__=="__main__":
 
 		#Do this copy...
 		def do_copy(data):
+			if not data:
+				print("Robot does not exist!")
+				exit(1)
 			global auth
 			global ss
-			ss.set("/robots/"+sys.argv[3],data,auth,onsuccess,onerror)
+			ss.set("/robots/"+args.TO,data,auth,onsuccess,onerror)
 			ss.flush()
 
 		#Get original...
-		ss.get("/robots/"+sys.argv[2],do_copy,onerror)
+		ss.get("/robots/"+args.FROM,do_copy,onerror)
 		ss.flush()
 
 	except:

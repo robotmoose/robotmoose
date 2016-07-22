@@ -86,28 +86,8 @@ class superstar_t:
 		except Exception as error:
 			error_obj={}
 			error_obj["code"]=0
-			error_obj["message"]=str(error)
+			error_obj["message"]="{0}".format(error)
 			self.handle_error(request_error_handler,error_obj)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	#Changes auth for the given path and auth to the given value.
 	#  Calls success_cb on success with the server response.
@@ -215,7 +195,7 @@ class superstar_t:
 		except Exception as error:
 			error_obj={}
 			error_obj["code"]=0
-			error_obj["message"]=str(error)
+			error_obj["message"]="{0}".format(error)
 			for key in old_queue:
 				self.handle_error(key,error_obj)
 

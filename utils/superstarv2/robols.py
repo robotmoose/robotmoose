@@ -1,29 +1,30 @@
 #!/usr/bin/env python3
 #Mike Moss
 #07/22/2016
-#Removes a robot.
+#Lists directories...
 
 import argparse
-import getpass
 import superstar
 import sys
 
 if __name__=="__main__":
 	try:
 		#Parse CLI args...
-		parser=argparse.ArgumentParser(description="Removes robotmoose robots.")
+		parser=argparse.ArgumentParser(description="Lists superstar directories.")
 		parser.add_argument("-s","--superstar",
 			dest="superstar",
 			default="https://robotmoose.com",
-			help="Superstar to use (default: robotmoose.com).")
+			help="Superstar to query (default: robotmoose.com).")
 		parser.add_argument("-l","--local",
 			action='store_true',
 			help="Sets superstar to local superstar.")
 		parser.add_argument("-d","--dev",
 			action='store_true',
 			help="Sets superstar to test.robotmoose.com.")
-		parser.add_argument("ROBOT",
-			help="Name of robot to remove.")
+		parser.add_argument("path",
+			default="/",
+			nargs='?',
+			help="Path to list.")
 		args=parser.parse_args()
 
 		#Figure out superstar...
@@ -34,14 +35,6 @@ if __name__=="__main__":
 			superstar_url="127.0.0.1:8081"
 		ss=superstar.superstar_t(superstar_url)
 
-		#Valid robot...
-		if ss.pathify(args.ROBOT).count("/")!=2:
-			print("Invalid argument \"ROBOT\".")
-			exit(1)
-
-		#Get auth...
-		auth=getpass.getpass(prompt='Enter auth:  ')
-
 		#Print errors...
 		def onerror(error):
 			print(str("Error("+str(error["code"])+") - "+error["message"]))
@@ -49,18 +42,11 @@ if __name__=="__main__":
 
 		#Print success...
 		def onsuccess(result):
-			print("Success!")
+			for key in result:
+				print(key);
 
-		#Remove
-		def remove(data):
-			if not data:
-				print("Robot does not exist!")
-				exit(1)
-			ss.set("/robots/"+args.ROBOT,None,auth,onsuccess,onerror)
-			ss.flush()
-
-		#Get original...
-		ss.get("/robots/"+args.ROBOT,remove,onerror)
+		#Make request...
+		ss.sub(args.path,onsuccess,onerror)
 		ss.flush()
 
 	except:
