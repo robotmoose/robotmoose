@@ -38,12 +38,12 @@ if __name__=="__main__":
 
 		#Valid from robot...
 		if ss.pathify(args.FROM).count("/")!=2:
-			print("Invalid argument \"FROM\".")
+			print("Invalid robot path \""+args.FROM+"\".")
 			exit(1)
 
 		#Valid to robot...
 		if ss.pathify(args.TO).count("/")!=2:
-			print("Invalid argument \"TO\".")
+			print("Invalid robot path \""+args.TO+"\".")
 			exit(1)
 
 		#Get auth...
@@ -70,7 +70,7 @@ if __name__=="__main__":
 		#Do this copy...
 		def do_copy(data):
 			if not data:
-				print("Robot does not exist!")
+				print("Robot \""+args.ROBOT+"\" does not exist!")
 				exit(1)
 			global auth
 			global ss

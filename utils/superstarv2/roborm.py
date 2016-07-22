@@ -36,7 +36,7 @@ if __name__=="__main__":
 
 		#Valid robot...
 		if ss.pathify(args.ROBOT).count("/")!=2:
-			print("Invalid argument \"ROBOT\".")
+			print("Invalid robot path \""+args.ROBOT+"\".")
 			exit(1)
 
 		#Get auth...
@@ -54,7 +54,7 @@ if __name__=="__main__":
 		#Remove
 		def remove(data):
 			if not data:
-				print("Robot does not exist!")
+				print("Robot \""+args.ROBOT+"\" does not exist!")
 				exit(1)
 			ss.set("/robots/"+args.ROBOT,None,auth,onsuccess,onerror)
 			ss.flush()
