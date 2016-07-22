@@ -54,6 +54,82 @@ superstar_t.prototype.push=function(path,value,len,auth,success_cb,error_cb)
 	this.add_request(request,success_cb,error_cb);
 }
 
+//Gets the value of path when it changes.
+//  Calls success_cb on success with the server response.
+//  Calls error_cb on error with the server error object (as per spec).
+superstar_t.prototype.get_next=function(path,success_cb,error_cb)
+{
+	path=this.pathify(path);
+	var request=this.build_skeleton_request("get_next",path);
+	request.id=0;
+
+	//Function to handle errors...
+	var handle_error=function(error)
+	{
+		if(error_cb)
+			error_cb(error);
+		else
+			console.log("Superstar error ("+error.code+") "+error.message);
+	}
+
+	//Make the request.
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.onreadystatechange=function()
+	{
+		if(xmlhttp.readyState==4)
+		{
+			if(xmlhttp.status==200)
+			{
+				try
+				{
+					//Parse response, call responses.
+					var response=JSON.parse(xmlhttp.responseText);
+
+					//Got an array, must be batch data...
+					if(response.constructor===Object)
+					{
+						//Error callback...
+						if(response.error)
+							handle_error(response.error);
+
+						//Success callback...
+						else if(success_cb)
+							success_cb(response.result);
+					}
+
+					//Server error...
+					else
+						handle_error(response.error);
+				}
+
+				//Handle bad parse or throw...
+				catch(error)
+				{
+					var error_obj=
+					{
+						code:0,
+						message:error
+					};
+					handle_error(error_obj);
+				}
+			}
+
+			//Handle bad connection...
+			else
+			{
+				var error_obj=
+				{
+					code:0,
+					message:"HTTP returned "+xmlhttp.status+"."
+				};
+				handle_error(error_obj);
+			}
+		}
+	};
+	xmlhttp.open("POST","/superstar/",true);
+	xmlhttp.send(JSON.stringify(request));
+}
+
 //Changes auth for the given path and auth to the given value.
 //  Calls success_cb on success with the server response.
 //  Calls error_cb on error with the server error object (as per spec).
@@ -119,6 +195,8 @@ superstar_t.prototype.add_request=function(request,success_cb,error_cb)
 		error_cb:error_cb
 	});
 }
+
+
 
 //Builds the batch request object and clears out the current queue.
 superstar_t.prototype.flush=function()
@@ -221,82 +299,6 @@ superstar_t.prototype.flush=function()
 	};
 	xmlhttp.open("POST","/superstar/",true);
 	xmlhttp.send(JSON.stringify(batch));
-}
-
-//Gets the value of path when it changes.
-//  Calls success_cb on success with the server response.
-//  Calls error_cb on error with the server error object (as per spec).
-superstar_t.prototype.get_next=function(path,success_cb,error_cb)
-{
-	path=this.pathify(path);
-	var request=this.build_skeleton_request("get_next",path);
-	request.id=0;
-
-	//Function to handle errors...
-	var handle_error=function(error)
-	{
-		if(error_cb)
-			error_cb(error);
-		else
-			console.log("Superstar error ("+error.code+") "+error.message);
-	}
-
-	//Make the request.
-	var xmlhttp=new XMLHttpRequest();
-	xmlhttp.onreadystatechange=function()
-	{
-		if(xmlhttp.readyState==4)
-		{
-			if(xmlhttp.status==200)
-			{
-				try
-				{
-					//Parse response, call responses.
-					var response=JSON.parse(xmlhttp.responseText);
-
-					//Got an array, must be batch data...
-					if(response.constructor===Object)
-					{
-						//Error callback...
-						if(response.error)
-							handle_error(response.error);
-
-						//Success callback...
-						else if(success_cb)
-							success_cb(response.result);
-					}
-
-					//Server error...
-					else
-						handle_error(response.error);
-				}
-
-				//Handle bad parse or throw...
-				catch(error)
-				{
-					var error_obj=
-					{
-						code:0,
-						message:error
-					};
-					handle_error(error_obj);
-				}
-			}
-
-			//Handle bad connection...
-			else
-			{
-				var error_obj=
-				{
-					code:0,
-					message:"HTTP returned "+xmlhttp.status+"."
-				};
-				handle_error(error_obj);
-			}
-		}
-	};
-	xmlhttp.open("POST","/superstar/",true);
-	xmlhttp.send(JSON.stringify(request));
 }
 
 //Singleton superstar...

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #Mike Moss
-#07/11/2016
+#07/22/2016
 #Contains client code to get requests from a superstar server.
 
 import hashlib
@@ -52,6 +52,63 @@ class superstar_t:
 		self.build_auth(path,request,auth)
 		self.add_request(request,success_cb,error_cb)
 
+	#Gets the value of path when it changes.
+	#  Calls success_cb on success with the server response.
+	#  Calls error_cb on error with the server error object (as per spec).
+	#  Note, python version is unique because it is BLOCKING.
+	def get_next(self,path,success_cb=None,error_cb=None):
+		path=self.pathify(path)
+		request=self.build_skeleton_request("get_next",path)
+		request["id"]=0
+		request_error_handler={"error_cb":error_cb}
+		try:
+			#Make the request.
+			data=bytes(json.dumps(request),"utf-8")
+			server_response=urllib.request.urlopen("http://"+self.superstar+"/superstar/", data)
+
+			#Parse response, call responses.
+			response=json.loads(server_response.read().decode('utf-8'))
+
+			#Got an array, must be batch data...
+			if isinstance(response,dict):
+				#Error callback...
+				if "error" in response:
+					self.handle_error(request_error_handler,response["error"])
+
+				#Success callback...
+				elif "result" in response:
+					if success_cb:
+						success_cb(response["result"])
+
+			#Server error...
+			else:
+				self.handle_error(request_error_handler,response["error"])
+		except Exception as error:
+			error_obj={}
+			error_obj["code"]=0
+			error_obj["message"]=str(error)
+			self.handle_error(request_error_handler,error_obj)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	#Changes auth for the given path and auth to the given value.
 	#  Calls success_cb on success with the server response.
 	#  Calls error_cb on error with the server error object (as per spec).
@@ -76,7 +133,7 @@ class superstar_t:
 	#  Adds path as path and opts as opts to the params object.
 	#  Note, opts is optional.
 	def build_skeleton_request(self,method,path,opts=None):
-		path=self.pathify(path);
+		path=self.pathify(path)
 		request={
 			"jsonrpc":"2.0",
 			"method":method,
@@ -149,7 +206,7 @@ class superstar_t:
 					if "result" in response[key]:
 						response_obj=response[key]["result"]
 						if old_queue[response[key]["id"]]["success_cb"]:
-							old_queue[response[key]["id"]]["success_cb"](response_obj);
+							old_queue[response[key]["id"]]["success_cb"](response_obj)
 
 			#Server error...
 			else:
@@ -176,6 +233,9 @@ if __name__=="__main__":
 	def subprint(result):
 		print(result)
 
+	def errprint(error):
+		print(error)
+
 	ss=superstar_t("127.0.0.1:8081")
 
 	ss.get("/blarg",getprint)
@@ -184,5 +244,8 @@ if __name__=="__main__":
 	#ss.sub("/",subprint)
 	#ss.push("/blarg2",2,3,"123")
 	#ss.get("/blarg2",getprint)
-	ss.change_auth("/123","12341234","123",getprint)
-	ss.flush()
+	#ss.change_auth("/123","12341234","123",getprint)
+	#ss.flush()
+
+	#Again, note this is blocking...
+	ss.get_next("/blarg",getprint,errprint)
