@@ -91,10 +91,11 @@ class BadSingleSet(Test):
             '',
             bad_val='bad_val'
         )
+        print(method)
         json_response = self.post_single_request(method)
         print(json_response)
         success = True
-        if json_response['jsonrpc'] == '''2.0''':
+        if json_response['jsonrpc'] != '''2.0''':
             self.error = 'bad RPC version'
             success = False
         if 'error' not in json_response:
