@@ -79,10 +79,11 @@ Json::Value superstar_t::get(const std::string& path) const
 }
 
 //Sets value of the "JSON" object path to val.
-//  Note, Creates full path if path doesn't exist.
-//  Note, If existing key are not objects in the path,
+//  Note, creates full path if path doesn't exist.
+//  Note, if existing key are not objects in the path,
 //        they will be afterwards... So setting /a/b to foo in
 //        object {"a":123} would yield: {"a":{"b":"foo"}}...
+//  Note, setting someting to null removes it from the database.
 void superstar_t::set(const std::string& path,const Json::Value& val)
 {
 	//Tokenize path.
@@ -90,6 +91,7 @@ void superstar_t::set(const std::string& path,const Json::Value& val)
 
 	//JSON starts at root.
 	Json::Value* obj=&database_m;
+	Json::Value* par=&database_m;
 
 	//Traverse paths.
 	for(size_t ii=0;ii<paths.size();++ii)
@@ -124,11 +126,17 @@ void superstar_t::set(const std::string& path,const Json::Value& val)
 			((*obj)[paths[ii]])=Json::objectValue;
 
 		//Next path.
+		par=obj;
 		obj=&((*obj)[paths[ii]]);
 	}
 
 	//Set value of path.
-	*obj=val;
+	if(val!=Json::nullValue)
+		*obj=val;
+	else if(par!=obj&&paths.size()>0)
+		par->removeMember(paths[paths.size()-1]);
+	else
+		*obj=Json::nullValue;
 }
 
 //Lists all keys in an object or array.

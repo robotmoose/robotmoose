@@ -25,11 +25,11 @@ class superstar_t
 		//Get the value from the "JSON" object path, or null if it doesn't exist.
 		Json::Value get(const std::string& path) const;
 
-		//Sets value of the "JSON" object path to val.
-		//  Note, Creates full path if path doesn't exist.
-		//  Note, If existing key are not objects in the path,
+		//  Note, creates full path if path doesn't exist.
+		//  Note, if existing key are not objects in the path,
 		//        they will be afterwards... So setting /a/b to foo in
 		//        object {"a":123} would yield: {"a":{"b":"foo"}}...
+		//  Note, setting someting to null removes it from the database.
 		void set(const std::string& path,const Json::Value& val);
 
 		//Lists all keys in an object or array.

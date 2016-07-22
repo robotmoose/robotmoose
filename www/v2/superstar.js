@@ -144,6 +144,15 @@ superstar_t.prototype.flush=function()
 	var old_queue=this.queue;
 	this.queue=[];
 
+	//Function to handle errors...
+	var handle_error=function(request,error)
+	{
+		if(request.error_cb)
+			request.error_cb(error);
+		else
+			console.log("Superstar error ("+error.code+") "+error.message);
+	}
+
 	//Make the request.
 	var xmlhttp=new XMLHttpRequest();
 	xmlhttp.onreadystatechange=function()
@@ -156,16 +165,6 @@ superstar_t.prototype.flush=function()
 				{
 					//Parse response, call responses.
 					var response=JSON.parse(xmlhttp.responseText);
-
-					//Function to handle errors...
-					var handle_error=function(request,error)
-					{
-						if(request.error_cb)
-							request.error_cb(error);
-						else
-							console.log("Superstar error ("+error.code+") "+
-								error.message);
-					}
 
 					//Got an array, must be batch data...
 					if(response.constructor===Array)
@@ -196,14 +195,30 @@ superstar_t.prototype.flush=function()
 							continue;
 						}
 				}
+
+				//Handle bad parse or throw...
 				catch(error)
 				{
-					console.log("Superstar error (unknown) "+error);
+					var error_obj=
+					{
+						code:0,
+						message:error
+					};
+					for(var key in old_queue)
+						handle_error(old_queue[key],error_obj);
 				}
 			}
+
+			//Handle bad connection...
 			else
 			{
-				console.log("Superstar error (connection error) HTTP "+xmlhttp.status+".");
+				var error_obj=
+				{
+					code:0,
+					message:"HTTP returned "+xmlhttp.status+"."
+				};
+				for(var key in old_queue)
+					handle_error(old_queue[key],error_obj);
 			}
 		}
 	};
