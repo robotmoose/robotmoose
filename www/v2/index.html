@@ -1,14 +1,26 @@
 <html>
 	<head>
 		<button id="tester">Click!</button>
+		<button id="tester2">Click2!</button>
+		<button id="tester3">Click3!</button>
 		<script src="cryptojs/hmac-sha256.js"></script>
 		<script src="superstar.js"></script>
 		<script>
 			var button=document.getElementById("tester");
+			var button2=document.getElementById("tester2");
+			var button3=document.getElementById("tester3");
 			var value=0;
 
 			button.onclick=function()
 			{
+				/*superstar.set("/",null,"123",function(response)
+				{
+					console.log("Response: "+response);
+				},
+				function(error)
+				{
+					console.log("Error: "+JSON.stringify(error));
+				});*/
 				/*superstar.get("/robots/2016/test/mybot",function(response)
 				{
 					console.log(JSON.stringify(response));
@@ -26,24 +38,58 @@
 				superstar.get("/",function(response)
 				{
 					console.log(JSON.stringify(response));
-				});
-				superstar.sub("/",function(response)
+				});*/
+				/*superstar.sub("/robots/2016/uaf/",function(response)
 				{
 					console.log(JSON.stringify(response));
 				},function(error)
 				{
 					console.log(error);
 				});*/
-				superstar.set("/","soijsdf","123",function(response)
+				/*superstar.set("/","soijsdf","123",function(response)
 				{
 					console.log("Reponse: "+response);
 				},
 				function(error)
 				{
 					console.log("Error: "+JSON.stringify(error));
+				});*/
+				//superstar.flush();
+				superstar.get_next("/blarg",function(result)
+				{
+					console.log("Success! - "+JSON.stringify(result));
+				},
+				function(error)
+				{
+					console.log("Error! - "+JSON.stringify(error));
+				});
+			}
+
+			button2.onclick=function()
+			{
+				superstar.set("/blarg","123","123",function(response)
+				{
+					console.log("Response: "+response);
+				},
+				function(error)
+				{
+					console.log("Error: "+JSON.stringify(error));
 				});
 				superstar.flush();
-			}
+			};
+
+			button3.onclick=function()
+			{
+				superstar.set("/blarg","456","123",function(response)
+				{
+					console.log("Response: "+response);
+				},
+				function(error)
+				{
+					console.log("Error: "+JSON.stringify(error));
+				});
+				superstar.flush();
+			};
 		</script>
 	</head>
 	<body>

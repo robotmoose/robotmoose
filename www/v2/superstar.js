@@ -190,10 +190,7 @@ superstar_t.prototype.flush=function()
 					//Server error...
 					else
 						for(var key in old_queue)
-						{
 							handle_error(old_queue[key],response.error);
-							continue;
-						}
 				}
 
 				//Handle bad parse or throw...
@@ -224,6 +221,79 @@ superstar_t.prototype.flush=function()
 	};
 	xmlhttp.open("POST","/superstar/",true);
 	xmlhttp.send(JSON.stringify(batch));
+}
+
+superstar_t.prototype.get_next=function(path,success_cb,error_cb)
+{
+	path=this.pathify(path);
+	var request=this.build_skeleton_request("get_next",path);
+	request.id=0;
+
+	//Function to handle errors...
+	var handle_error=function(error)
+	{
+		if(error_cb)
+			error_cb(error);
+		else
+			console.log("Superstar error ("+error.code+") "+error.message);
+	}
+
+	//Make the request.
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.onreadystatechange=function()
+	{
+		if(xmlhttp.readyState==4)
+		{
+			if(xmlhttp.status==200)
+			{
+				try
+				{
+					//Parse response, call responses.
+					var response=JSON.parse(xmlhttp.responseText);
+
+					//Got an array, must be batch data...
+					if(response.constructor===Object)
+					{
+						//Error callback...
+						if(response.error)
+							handle_error(response.error);
+
+						//Success callback...
+						else if(success_cb)
+							success_cb(response.result);
+					}
+
+					//Server error...
+					else
+						handle_error(response.error);
+				}
+
+				//Handle bad parse or throw...
+				catch(error)
+				{
+					var error_obj=
+					{
+						code:0,
+						message:error
+					};
+					handle_error(error_obj);
+				}
+			}
+
+			//Handle bad connection...
+			else
+			{
+				var error_obj=
+				{
+					code:0,
+					message:"HTTP returned "+xmlhttp.status+"."
+				};
+				handle_error(error_obj);
+			}
+		}
+	};
+	xmlhttp.open("POST","/superstar/",true);
+	xmlhttp.send(JSON.stringify(request));
 }
 
 //Singleton superstar...

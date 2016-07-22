@@ -1,12 +1,14 @@
 //Mike Moss
-//07/10/2016
+//07/21/2016
 //Contains the actual superstar server (mainly the http server portion).
 
+#include "comet.hpp"
 #include <fstream>
 #include <iostream>
 #include "json_util.hpp"
 #include "jsonrpc.hpp"
 #include <mongoose/mongoose.h>
+#include "mongoose_util.hpp"
 #include <stdexcept>
 #include <string>
 #include "string_util.hpp"
@@ -17,29 +19,19 @@
 //Server options...needs to be global/non-local.
 mg_serve_http_opts server_options;
 
-//"Database".
+//"Database" and comet manager.
 superstar_t superstar("auth","db.json");
+comet_mgr_t comet_mgr;
 
 //Post log.
 std::string post_log_name("superstar.log");
 std::ofstream post_log(post_log_name.c_str());
 
-//Backup save time variabels...
+//Time variables...
 const int64_t backup_time=20000;
-int64_t old_time=millis();
-
-//Helper to send a message to conn with given status and content.
-// Note, status should be in the form "200 OK" or "401 Unauthorized".
-void mg_send(mg_connection* conn,const std::string& status,const std::string& content)
-{
-	mg_printf(conn,
-		"HTTP/1.1 %s\r\n"
-		"Content-Type: text/html\r\n"
-		"Content-Length: %ld\r\n"
-		"\r\n"
-		"%s",
-		status.c_str(),content.size(),content.c_str());
-}
+int64_t backup_old_time=millis();
+const int64_t comet_time=1000;
+int64_t comet_old_time=millis();
 
 void http_handler(mg_connection* conn,int event,void* event_data)
 {
@@ -91,17 +83,19 @@ void http_handler(mg_connection* conn,int event,void* event_data)
 					entry["client"]=client;
 					entry["data"]=url_encode(post_data);
 					post_log<<JSON_serialize(entry)<<std::endl;
+					jsonrpc(superstar,comet_mgr,post_data,conn);
 				}
 
 				//Normal post (status 200 apparently if POST does nothing).
 				else
 				{
 					mg_send(conn,"200 OK","");
+					return;
 				}
 			}
 
 			//Get requests...
-			if(method=="GET")
+			else if(method=="GET")
 			{
 				//Starting "/superstar/" means a database query.
 				if(starts_with_superstar)
@@ -115,12 +109,6 @@ void http_handler(mg_connection* conn,int event,void* event_data)
 				{
 					mg_serve_http(conn,msg,server_options);
 				}
-			}
-
-			//Posts are setting, so JSON RPC actions...
-			else if(method=="POST")
-			{
-				mg_send(conn,"200 OK",jsonrpc(superstar,post_data));
 			}
 
 			//Everything else is not allowed...
@@ -179,17 +167,27 @@ int main(int argc,char* argv[])
 		std::cout<<"Superstar started on "<<address<<":"<<std::endl;
 		while(true)
 		{
+			//Update web...
 			mg_mgr_poll(&manager,500);
+			int64_t new_time;
+
+			//Update comet...
+			new_time=millis();
+			if((new_time-comet_old_time)>=comet_time)
+			{
+				comet_mgr.update();
+				comet_old_time=new_time;
+			}
 
 			//Try to save database...
-			int64_t new_time=millis();
-			if((new_time-old_time)>=backup_time)
+			new_time=millis();
+			if((new_time-backup_old_time)>=backup_time)
 			{
 				if(superstar.save())
 					std::cout<<"Saved backup database."<<std::endl;
 				else
 					std::cout<<"Could not save backup database."<<std::endl;
-				old_time=new_time;
+				backup_old_time=new_time;
 			}
 
 		}

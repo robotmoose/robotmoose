@@ -1,14 +1,18 @@
 //Mike Moss
-//07/10/2016
-//Contains an implementation of the jsonrpc 2.0 specification: http://www.jsonrpc.org/specification
+//07/21/2016
+//Contains an implementation of the jsonrpc 2.0 specification:
+//  http://www.jsonrpc.org/specification
 
 #include "jsonrpc.hpp"
 
 #include "json_util.hpp"
+#include "mongoose_util.hpp"
 
-//Attempts to handle and return the response of the jsonrpc request(s) object in
+//Attempts to handle and send the response of the jsonrpc request(s) object in
 //  post_data via the passed superstar object.
-std::string jsonrpc(superstar_t& superstar,const std::string& post_data)
+//  Note, also handles comet connections.
+void jsonrpc(superstar_t& superstar,comet_mgr_t& comet_mgr,
+	const std::string& post_data,mg_connection* conn)
 {
 	//Might be one or a batch of responses.
 	Json::Value responses;
@@ -31,13 +35,24 @@ std::string jsonrpc(superstar_t& superstar,const std::string& post_data)
 
 			//Handle each invidual request.
 			for(size_t ii=0;ii<requests.size();++ii)
-				responses.append(jsonrpc_handle(superstar,requests[(Json::ArrayIndex)ii]));
+				responses.append(jsonrpc_handle(superstar,comet_mgr,
+					requests[(Json::ArrayIndex)ii]));
 		}
 
 		//Single request...
 		else
 		{
-			responses=jsonrpc_handle(superstar,requests);
+			Json::Value response(jsonrpc_handle(superstar,comet_mgr,requests));
+
+			//Comet requests...
+			if(response["comet"].asBool())
+			{
+				comet_mgr.handle(conn,response);
+				return;
+			}
+
+			//Regular response...
+			responses=response;
 		}
 	}
 
@@ -56,11 +71,12 @@ std::string jsonrpc(superstar_t& superstar,const std::string& post_data)
 	}
 
 	//Either batch response or single response.
-	return JSON_serialize(responses);
+	mg_send(conn,"200 OK",JSON_serialize(responses));
 }
 
-//Handles individual jsonrpc request via the passed superstar object.
-Json::Value jsonrpc_handle(superstar_t& superstar,const Json::Value request)
+//Handles individual jsonrpc request via the passed superstar/comet_mgr objects.
+Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
+	const Json::Value request)
 {
 	Json::Value response=jsonrpc_skeleton();
 
@@ -155,6 +171,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,const Json::Value request)
 		{
 			response["result"]=true;
 			superstar.set(path,opts["value"]);
+			comet_mgr.update_path(path,opts["value"]);
 		}
 		else if(method=="sub")
 		{
@@ -172,10 +189,17 @@ Json::Value jsonrpc_handle(superstar_t& superstar,const Json::Value request)
 
 			response["result"]=true;
 			superstar.push(path,opts["value"],opts["length"]);
+			comet_mgr.update_path(path,superstar.get(path));
 		}
 		else if(method=="change_auth")
 		{
 			response["result"]=superstar.change_auth(path,opts["value"]);
+		}
+		else if(method=="get_next")
+		{
+			response["comet"]=true;
+			response["path"]=path;
+			response["result"]=superstar.get(path);
 		}
 
 		//What have I become?
@@ -230,7 +254,7 @@ bool jsonrpc_invalid_id(const Json::Value id)
 		id.isObject());
 }
 
-//Checkes if the given request's method is supported (as in a get/set/sub/push).
+//Checkes if the given request's method is supported (as in a get/set/sub/push/get_next).
 bool jsonrpc_supported_method(const Json::Value method)
 {
 	std::string method_str=method.asString();
@@ -238,5 +262,6 @@ bool jsonrpc_supported_method(const Json::Value method)
 		method_str=="set"||
 		method_str=="sub"||
 		method_str=="push"||
-		method_str=="change_auth");
+		method_str=="change_auth"||
+		method_str=="get_next");
 }
