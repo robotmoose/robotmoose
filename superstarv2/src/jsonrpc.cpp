@@ -171,7 +171,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 		{
 			response["result"]=true;
 			superstar.set(path,opts["value"]);
-			comet_mgr.update_path(path,opts["value"]);
+			comet_mgr.update_path(path,superstar);
 		}
 		else if(method=="sub")
 		{
@@ -189,7 +189,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 
 			response["result"]=true;
 			superstar.push(path,opts["value"],opts["length"]);
-			comet_mgr.update_path(path,superstar.get(path));
+			comet_mgr.update_path(path,superstar);
 		}
 		else if(method=="change_auth")
 		{

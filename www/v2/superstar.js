@@ -1,5 +1,5 @@
 //Mike Moss
-//07/20/2016
+//07/21/2016
 //Contains client code to get requests from a superstar server.
 
 //Superstar object.
@@ -223,6 +223,9 @@ superstar_t.prototype.flush=function()
 	xmlhttp.send(JSON.stringify(batch));
 }
 
+//Gets the value of path when it changes.
+//  Calls success_cb on success with the server response.
+//  Calls error_cb on error with the server error object (as per spec).
 superstar_t.prototype.get_next=function(path,success_cb,error_cb)
 {
 	path=this.pathify(path);

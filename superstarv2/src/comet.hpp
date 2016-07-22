@@ -9,6 +9,7 @@
 #include "json_util.hpp"
 #include <mongoose/mongoose.h>
 #include <string>
+#include "superstar.hpp"
 #include <vector>
 
 //Client stucture used in comet_mgr_t...
@@ -39,7 +40,7 @@ class comet_mgr_t
 		//  value is different, sends new value.
 		//  Note, also clears expired clients.
 		//  Note, path should be in pathify form.
-		void update_path(const std::string& path,const Json::Value& value);
+		void update_path(const std::string& path,superstar_t& superstar);
 
 
 		//Cancels a connection and sends a response.
