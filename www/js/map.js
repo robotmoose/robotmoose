@@ -118,8 +118,13 @@ function robot_map_t(div)
 
 robot_map_t.prototype.setup=function(texture_file, width, height) {
 	if (this.renderer===null) return;
-	var rend_width = this.div.offsetWidth-this.element.offsetHeight;
-	this.renderer.set_size(rend_width,rend_width); // FIXME resize this
+	
+	var myself=this;
+	var edge_offset = 20;
+	var rend_width = this.div.offsetWidth;
+	var rend_height = this.div.offsetHeight-this.element.offsetHeight;
+	var rend_size = Math.min(rend_width, rend_height) - edge_offset;
+	this.renderer.set_size(rend_size,rend_size);
 
 	// Add grid
 	var grid_cells=10;
@@ -146,6 +151,17 @@ robot_map_t.prototype.setup=function(texture_file, width, height) {
 	this.renderer.controls.object.position.set(0,-1200,1400);
 
 }
+/*
+robot_map_t.prototype.resize_map=function(event)
+{
+	console.log("resizing map")
+	
+	if (this.renderer===null) return;
+	var rend_width = this.div.offsetWidth-this.element.offsetHeight;
+	this.renderer.set_size(rend_width,rend_width);
+	
+}
+*/
 
 // Updated sensor data is available:
 robot_map_t.prototype.refresh=function(sensors) {
