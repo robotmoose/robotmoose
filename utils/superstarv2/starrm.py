@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #Mike Moss
 #07/22/2016
-#Moves a robot.
+#Removes a path.
 
 import argparse
 import getpass
@@ -11,7 +11,7 @@ import sys
 if __name__=="__main__":
 	try:
 		#Parse CLI args...
-		parser=argparse.ArgumentParser(description="Moves robotmoose robots.")
+		parser=argparse.ArgumentParser(description="Removes superstar paths.")
 		parser.add_argument("-s","--superstar",
 			dest="superstar",
 			default="https://robotmoose.com",
@@ -22,10 +22,8 @@ if __name__=="__main__":
 		parser.add_argument("-d","--dev",
 			action='store_true',
 			help="Sets superstar to test.robotmoose.com.")
-		parser.add_argument("FROM",
-			help="Name of robot to move.")
-		parser.add_argument("TO",
-			help="New name of the robot.")
+		parser.add_argument("PATH",
+			help="Name of path to remove.")
 		args=parser.parse_args()
 
 		#Figure out superstar...
@@ -35,16 +33,6 @@ if __name__=="__main__":
 		if args.local:
 			superstar_url="127.0.0.1:8081"
 		ss=superstar.superstar_t(superstar_url)
-
-		#Valid from robot...
-		if ss.pathify(args.FROM).count("/")!=2:
-			print("Invalid robot path \""+args.FROM+"\".")
-			exit(1)
-
-		#Valid to robot...
-		if ss.pathify(args.TO).count("/")!=2:
-			print("Invalid robot path \""+args.TO+"\".")
-			exit(1)
 
 		#Get auth...
 		auth=getpass.getpass(prompt='Enter auth:  ')
@@ -59,26 +47,15 @@ if __name__=="__main__":
 			print("Success!")
 
 		#Remove
-		def remove(result):
-			if result:
-				ss.set("/robots/"+args.FROM,None,auth,onsuccess,onerror)
-				ss.flush()
-			else:
-				print("Server returned non-true for set, aborting.")
-				exit(1)
-
-		#Do this copy...
-		def do_copy(data):
+		def remove(data):
 			if not data:
-				print("Robot \""+args.ROBOT+"\" does not exist!")
+				print("Path \""+args.PATH+"\" does not exist!")
 				exit(1)
-			global auth
-			global ss
-			ss.set("/robots/"+args.TO,data,auth,remove,onerror)
+			ss.set(args.PATH,None,auth,onsuccess,onerror)
 			ss.flush()
 
 		#Get original...
-		ss.get("/robots/"+args.FROM,do_copy,onerror)
+		ss.get(args.PATH,remove,onerror)
 		ss.flush()
 
 	except:

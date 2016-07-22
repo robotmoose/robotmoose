@@ -10,7 +10,7 @@ import sys
 if __name__=="__main__":
 	try:
 		#Parse CLI args...
-		parser=argparse.ArgumentParser(description="Lists superstar directories.")
+		parser=argparse.ArgumentParser(description="Lists superstar paths.")
 		parser.add_argument("-s","--superstar",
 			dest="superstar",
 			default="https://robotmoose.com",
