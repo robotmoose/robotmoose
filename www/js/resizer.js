@@ -1,4 +1,5 @@
 //onresizing() - callback called when resizing is started.
+//onresized() - callback called when resizing is completed.
 
 function resizer_t(div,options)
 {

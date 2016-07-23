@@ -348,6 +348,12 @@ robot_ui_t.prototype.create_widgets=function()
 		if(myself.robot.name)
 			myself.widgets.pilot.upload(myself.robot);
 	}
+	
+	if(this.doorways.map&&this.widgets.map)
+	{
+	var myself = this;
+	this.doorways.map.resizer.onresized=function(){myself.widgets.map.resize_map()};
+	}
 }
 
 robot_ui_t.prototype.create_doorway=function(title,tooltip,help_text)
