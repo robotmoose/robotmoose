@@ -352,7 +352,7 @@ robot_ui_t.prototype.create_widgets=function()
 	if(this.doorways.map&&this.widgets.map)
 	{
 	var myself = this;
-	this.doorways.map.resizer.onresized=function(){myself.widgets.map.resize_map()};
+	this.doorways.map.resizer.onresize=function(){myself.widgets.map.resize_map()};
 	}
 }
 

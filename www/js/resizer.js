@@ -1,5 +1,5 @@
 //onresizing() - callback called when resizing is started.
-//onresized() - callback called when resizing is completed.
+//onresize() - callback called when resizing is completed - formerly onresized()
 
 function resizer_t(div,options)
 {
@@ -126,8 +126,8 @@ resizer_t.prototype.onmouseup=function(event)
 {
 	this.dragging.on=false;
 
-	if(this.onresized)
-		this.onresized();
+	if(this.onresize)
+		this.onresize();
 
 	return false;
 }
