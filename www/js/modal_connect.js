@@ -123,6 +123,7 @@ function modal_connect_t(div)
 	this.sim_button.className="btn btn-primary";
 	this.sim_button.type="button";
 	this.sim_button.value="Simulate a Robot";
+	this.sim_button.style.left=10;
 	this.sim_button.onclick=function()
 	{
 		var robot= new robot_sim_t();
