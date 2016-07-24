@@ -113,11 +113,15 @@ resizer_t.prototype.onmousemove=function(event)
 		this.handle.style.top=parseInt(this.div.offsetTop);
 
 	if(this.dragging.on)
+	{
 		this.resize
 		({
 			width:parseInt(this.handle.offsetLeft)+this.dragging.size.width-parseInt(this.div.offsetLeft),
 			height:parseInt(this.handle.offsetTop)+this.dragging.size.height-parseInt(this.div.offsetTop)
 		});
+		if(this.onresize)
+			this.onresize();
+	}
 
 	return false;
 }
@@ -125,9 +129,6 @@ resizer_t.prototype.onmousemove=function(event)
 resizer_t.prototype.onmouseup=function(event)
 {
 	this.dragging.on=false;
-
-	if(this.onresize)
-		this.onresize();
 
 	return false;
 }

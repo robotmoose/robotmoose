@@ -11,103 +11,79 @@ function robot_map_t(div)
 	var myself=this;
 
 	this.element=document.createElement("div");
+	this.div.appendChild(this.element);
 	this.element.title="Select map image overlay";
-	this.drag_list_div=document.createElement("div");
-	this.drag_list=new drag_list_t(this.drag_list_div);
+
 	this.controls_div=document.createElement("div");
-	this.map_select=
+	this.element.appendChild(this.controls_div);
+	this.controls_div.className="form-horizontal";
+
+	//Map dropdown...
+	this.map_select=document.createElement("select");
+	this.controls_div.appendChild(this.map_select);
+	this.change_map_image=function()
 	{
-		div:document.createElement("div"),
-		drop:document.createElement("select")
+		myself.last_map_select=myself.map_select.value;
+		myself.load_button_pressed_m();
 	};
+	this.map_select.addEventListener("change",this.change_map_image);
+	this.map_select.className="form-control";
+	this.map_select.style.marginBottom="10px";
+
+	// ********** Add maps here:
+		var option=document.createElement("option");
+		option.text="No Map Image";
+		var opt0 = {};
+		opt0.path="";
+		opt0.width=10;
+		opt0.height=10;
+		option.value=JSON.stringify(opt0);
+		//option.value="";
+		this.map_select.appendChild(option);
+
+		var option1=document.createElement("option");
+		option1.text="Map 1";
+		var opt1 = {};
+		opt1.path="maps/map1.jpg";
+		opt1.width=3;
+		opt1.height=10;
+		option1.value=JSON.stringify(opt1);
+		//option1.value="maps/map1.jpg";
+		this.map_select.appendChild(option1);
+
+		var option2=document.createElement("option");
+		option2.text="Map 2";
+		var opt2 = {};
+		opt2.path="maps/map2.jpg";
+		opt2.width=10;
+		opt2.height=10;
+		option2.value=JSON.stringify(opt2);
+		//option2.value="maps/map2.jpg"
+		this.map_select.appendChild(option2);
+
+		var option3=document.createElement("option");
+		option3.text="Map 3";
+		var opt3 = {};
+		opt3.path="maps/map3.jpg";
+		opt3.width=10;
+		opt3.height=10;
+		option3.value=JSON.stringify(opt3);
+		//option3.value="maps/map3.jpg";
+		this.map_select.appendChild(option3);
+
+	//Upload button...
 	this.upload_map_button=document.createElement("input");
-	this.upload_map_button.className="btn btn-primary";
+	this.controls_div.appendChild(this.upload_map_button);
+	this.upload_map_button.className="btn btn-primary form-control";
+	this.upload_map_button.style.marginBottom="10px";
 	this.upload_map_button.disabled=false;
 	this.upload_map_button.type="button";
 	this.upload_map_button.value="Upload Map Image";
 	this.upload_map_button.title="Click here to upload a map image";
-	this.upload_map_button.style.float="right";
-	this.upload_map_button.onclick=function(event)
+	this.upload_map_button.addEventListener("click",function(event)
 	{
 		myself.upload_map_button_pressed_m();
-	};
-	
-	
-	
-	
-	this.controls_div.appendChild(this.upload_map_button);
-
-	this.entries=[];
-
-	if(!this.drag_list)
-	{
-		this.div=null;
-		this.element=null;
-	}
-
-	this.element.style.width="auto";
-	this.element.style.minWidth=640;
-	this.div.appendChild(this.element);
-
-	this.element.appendChild(this.controls_div);
-	this.element.appendChild(document.createElement("br"));
-
-	this.element.appendChild(this.drag_list_div);
-
-	this.map_select.div.className="form-group";
-	this.map_select.div.style.float="left";
-	this.controls_div.appendChild(this.map_select.div);
-
-	this.map_select.div.appendChild(this.map_select.drop);
-	this.map_select.drop.onchange=function()
-	{
-		myself.last_map_select=myself.map_select.drop.value;
-		myself.load_button_pressed_m();
-	};
-	this.map_select.drop.className="form-control";
-
-
-	// ********** Add maps here:
-
-	var option=document.createElement("option");
-	option.text="No Map Image";
-	var opt0 = {};
-	opt0.path="";
-	opt0.width=10;
-	opt0.height=10;
-	option.value=JSON.stringify(opt0);
-	//option.value="";
-	this.map_select.drop.appendChild(option);
-
-	var option1=document.createElement("option");
-	option1.text="Map 1";
-	var opt1 = {};
-	opt1.path="maps/map1.jpg";
-	opt1.width=3;
-	opt1.height=10;
-	option1.value=JSON.stringify(opt1);
-	//option1.value="maps/map1.jpg";
-	this.map_select.drop.appendChild(option1);
-
-	var option2=document.createElement("option");
-	option2.text="Map 2";
-	var opt2 = {};
-	opt2.path="maps/map2.jpg";
-	opt2.width=10;
-	opt2.height=10;
-	option2.value=JSON.stringify(opt2);
-	//option2.value="maps/map2.jpg"
-	this.map_select.drop.appendChild(option2);
-
-	var option3=document.createElement("option");
-	option3.text="Map 3";
-	var opt3 = {};
-	opt3.path="maps/map3.jpg";
-	opt3.width=10;
-	opt3.height=10;
-	option3.value=JSON.stringify(opt3);
-	//option3.value="maps/map3.jpg";
-	this.map_select.drop.appendChild(option3);
+	});
 
 
 
@@ -133,9 +109,9 @@ function robot_map_t(div)
 
 robot_map_t.prototype.setup=function(texture_file, width, height) {
 	if (this.renderer===null) return;
-	
+
 	var myself=this;
-	
+
 	this.resize_map();
 
 	// Add grid
@@ -167,11 +143,10 @@ robot_map_t.prototype.setup=function(texture_file, width, height) {
 robot_map_t.prototype.resize_map=function()
 {
 	var edge_offset = 20;
-	var rend_width = this.div.offsetWidth;
+	var rend_width = this.element.offsetWidth;
 	var rend_height = this.div.offsetHeight-this.element.offsetHeight;
-	var rend_size = Math.min(rend_width, rend_height) - edge_offset;
-	this.renderer.set_size(rend_size,rend_size);
-	
+	this.renderer.set_size(rend_width,rend_height);
+
 }
 
 
@@ -224,7 +199,7 @@ robot_map_t.prototype.loop=function() {
 robot_map_t.prototype.load_button_pressed_m=function()
 {
 	var myself=this;
-	
+
 	if (this.mapRobot)
 	{
 		this.mapRobot.model.destroy();
@@ -236,31 +211,29 @@ robot_map_t.prototype.load_button_pressed_m=function()
 	var opt = JSON.parse(myself.last_map_select);
 
 	this.make_new(opt.path, opt.width, opt.height);
-	
+
 }
 
 robot_map_t.prototype.upload_map_button_pressed_m=function()
 {
 	var myself = this;
-	
+
 	// new modal popup
 	this.modal=new modal_t(div);
 	this.modal.set_title("Upload Map Image");
-	
-	
+
+
 	// upload button
 	this.file_input=document.createElement("input");
 	this.file_input.type='file';
-	this.file_input.onchange=function(event){
-	
-		
-		
+	this.file_input.addEventListener("change",function(event)
+	{
 		if (myself.file_input.files[0].type.split('/')[0]=='image')
 		{
-			
-				if (myself.upload_error_div&&myself.modal.get_content().contains(myself.upload_error_div)) 
+
+				if (myself.upload_error_div&&myself.modal.get_content().contains(myself.upload_error_div))
 					myself.modal.get_content().removeChild(myself.upload_error_div); // remove error message
-				
+
 				var reader = new FileReader();
 				reader.onload=function()
 				{
@@ -268,30 +241,30 @@ robot_map_t.prototype.upload_map_button_pressed_m=function()
 					myself.uploaded_map=document.createElement("img");
 					myself.uploaded_map.src=reader.result;
 					myself.uploaded_map.style["max-width"]=myself.modal.get_content().offsetWidth - 30;
-					
-			
+
+
 					// preview image:
-					if (myself.upload_preview_div&&myself.modal.get_content().contains(myself.upload_preview_div)) 
+					if (myself.upload_preview_div&&myself.modal.get_content().contains(myself.upload_preview_div))
 					{
 						myself.modal.get_content().removeChild(myself.upload_preview_div); // remove old preview
 					}
-					
-					
+
+
 					var dim_text = "Image Dimensions: "  + myself.uploaded_map.width + ":" + myself.uploaded_map.height;
 					myself.dim_text_node = document.createTextNode(dim_text);
-					
+
 					myself.upload_preview_div=document.createElement("div");
-					
+
 
 					myself.upload_preview_div.appendChild(document.createElement("br"));
 					myself.upload_preview_div.appendChild(myself.uploaded_map);
 					myself.upload_preview_div.appendChild(document.createElement("br"));
 					myself.upload_preview_div.appendChild(myself.dim_text_node);
 
-					
+
 					myself.modal.get_content().appendChild(myself.upload_opts_div);
 					myself.modal.get_content().appendChild(myself.upload_preview_div);
-			
+
 				}
 				reader.readAsDataURL(myself.file_input.files[0]);
 
@@ -301,47 +274,47 @@ robot_map_t.prototype.upload_map_button_pressed_m=function()
 			myself.file_input_form.reset();
 			myself.display_upload_message("Error: selected file is not an image. Please select an image and try again.");
 		}
-	};
-	
+	});
+
 	this.display_upload_message=function(msg) // display error message to modal
 	{
-			if (myself.upload_error_div&&myself.modal.get_content().contains(myself.upload_error_div)) 
+			if (myself.upload_error_div&&myself.modal.get_content().contains(myself.upload_error_div))
 				myself.modal.get_content().removeChild(myself.upload_error_div); // remove error message
-				
-			if (myself.upload_opts_div&&myself.modal.get_content().contains(myself.upload_opts_div)) 
+
+			if (myself.upload_opts_div&&myself.modal.get_content().contains(myself.upload_opts_div))
 				myself.modal.get_content().removeChild(myself.upload_opts_div); // remove height, width, and confirm button
-				
-			if (myself.upload_preview_div&&myself.modal.get_content().contains(myself.upload_preview_div)) 
+
+			if (myself.upload_preview_div&&myself.modal.get_content().contains(myself.upload_preview_div))
 				myself.modal.get_content().removeChild(myself.upload_preview_div); // remove preview image
-			
+
 			myself.upload_error_div=document.createElement("div")
 			myself.upload_error=document.createTextNode(msg);
-			
+
 			myself.upload_error_div.appendChild(document.createElement("br"));
 			myself.upload_error_div.appendChild(myself.upload_error);
-			
+
 			myself.modal.get_content().appendChild(myself.upload_error_div);
 	}
 
 	this.file_input_form=document.createElement("form");
 	this.file_input_form.appendChild(this.file_input);
-	
-	
-	
+
+
+
 	// create objects: title input, width input, height input, and confirm upload button
-	
+
 	this.upload_opts_div=document.createElement("div");
-	
+
 	// text prompt
-	var scale_prompt="A preview of your map image is shown below. Choose a width and height between 1 and 100 meters and click \"Load Map Image\" to confirm."	
+	var scale_prompt="A preview of your map image is shown below. Choose a width and height between 1 and 100 meters and click \"Load Map Image\" to confirm."
 	this.upload_text=document.createTextNode(scale_prompt)
-	
+
 	// map title (optional)
 	this.upload_title=document.createElement("input");
 	this.upload_title.className="form-control";
 	this.upload_title.width="100%";
 	this.upload_title.placeholder="Map Title (optional)";
-	
+
 	// map scale
 	this.scale_div=document.createElement("div"); // create row element to store height and width input boxes
 	this.scale_div.className="row";
@@ -351,24 +324,24 @@ robot_map_t.prototype.upload_map_button_pressed_m=function()
 	this.scale_column_h.className="col-xs-4";
 	this.scale_column_b=document.createElement("div"); // column element to store button
 	this.scale_column_b.className="col-xs-4";
-	
+
 	this.upload_width=document.createElement("input"); // width input
 	this.upload_width.className="form-control";
 	this.upload_width.placeholder="width (in meters)";
-	this.upload_width.onchange=function(event)
+	this.upload_width.addEventListener("change",function(event)
 	{
 		myself.scale_onchange_m();
-	}
-	
+	});
+
 	this.upload_height=document.createElement("input"); // height input
 	this.upload_height.className="form-control";
 	this.upload_height.placeholder="height (in meters)";
-	this.upload_height.onchange=function(event)
+	this.upload_height.addEventListener("change",function(event)
 	{
 		myself.scale_onchange_m();
-	}
-	
-	
+	});
+
+
 	// confirm upload button
 	this.confirm_upload_button=document.createElement("input");
 	this.confirm_upload_button.className="btn btn-primary";
@@ -377,37 +350,37 @@ robot_map_t.prototype.upload_map_button_pressed_m=function()
 	this.confirm_upload_button.value="Load Map Image";
 	this.confirm_upload_button.title="Click Here to Load the Map Image";
 	this.confirm_upload_button.style.float="right";
-	this.confirm_upload_button.onclick=function(event)
+	this.confirm_upload_button.addEventListener("click",function(event)
 	{
 		myself.confirm_upload_button_pressed_m();
-	};
-	
-	
+	});
+
+
 	// add text prompt to div
 	this.upload_opts_div.appendChild(document.createElement("br"));
 	this.upload_opts_div.appendChild(this.upload_text);
 	this.upload_opts_div.appendChild(document.createElement("br"));
 	this.upload_opts_div.appendChild(document.createElement("br"));
-	
+
 	//add title to div
 	this.upload_opts_div.appendChild(this.upload_title);
 	this.upload_opts_div.appendChild(document.createElement("br"));
-	
-	
+
+
 	// add objects to columns
 	this.scale_column_w.appendChild(this.upload_width);
 	this.scale_column_h.appendChild(this.upload_height);
 	this.scale_column_b.appendChild(this.confirm_upload_button);
-	
+
 	// add columns to row
 	this.scale_div.appendChild(this.scale_column_w);
 	this.scale_div.appendChild(this.scale_column_h);
 	this.scale_div.appendChild(this.scale_column_b);
-	
+
 	// add row to div
 	this.upload_opts_div.appendChild(this.scale_div);
-	
-	
+
+
 	// append divs to modal
 	this.modal.get_content().appendChild(document.createElement("br"));
 	this.modal.get_content().appendChild(this.file_input_form);
@@ -435,7 +408,7 @@ robot_map_t.prototype.confirm_upload_button_pressed_m=function()
 	if (myself.uploaded_map)
 	{
 		// add image to map options
-		
+
 		myself.uploaded_option=document.createElement("option");
 		if (myself.upload_title.value) myself.uploaded_option.text=myself.upload_title.value;
 		else myself.uploaded_option.text="Uploaded Map";
@@ -444,11 +417,11 @@ robot_map_t.prototype.confirm_upload_button_pressed_m=function()
 		opt.width=myself.upload_width.value; // width
 		opt.height=myself.upload_height.value; // height
 		myself.uploaded_option.value=JSON.stringify(opt);
-		myself.map_select.drop.appendChild(myself.uploaded_option);
+		myself.map_select.appendChild(myself.uploaded_option);
 		myself.modal.hide();
-	
-		myself.map_select.drop.selectedIndex=myself.map_select.drop.length - 1;
-		myself.map_select.drop.onchange();
+
+		myself.map_select.selectedIndex=myself.map_select.length - 1;
+		myself.change_map_image();
 	}
 
 }
@@ -459,7 +432,7 @@ robot_map_t.prototype.clean_up=function()
 
 	if (this.renderer) this.renderer.destroy();
 	this.renderer=null;
-	
+
 	if (this.grid)
 	{
 		this.grid.geometry.dispose();
@@ -467,7 +440,7 @@ robot_map_t.prototype.clean_up=function()
 		if (this.grid.texture) this.grid.texture.dispose();
 		this.grid = null;
 	}
-	
+
 	if (this.map_display)
 	{
 	this.div.removeChild(myself.map_display);
@@ -478,9 +451,9 @@ robot_map_t.prototype.clean_up=function()
 robot_map_t.prototype.make_new=function(filename, width, height)
 {
 	var myself = this;
-	
+
 	this.clean_up();
-	
+
 	this.map_display = document.createElement("div");
 	this.map_display.title="Shows where the robot thinks it is in the world.  The grid lines are 1 meter apart.  The robot's right and left wheels leave red and purple tracks";
 
