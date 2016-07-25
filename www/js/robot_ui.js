@@ -114,7 +114,16 @@ robot_ui_t.prototype.download_gui=function()
 	"<h3>When configuring devices:</h3>"
 	+"<h4><b>wheel_encoder</b></h4>"
 	+"<ul><li>Pin: Left wheel encoder pin</li><li>Pin: Right wheel encoder pin</li><li>"
-	+"Number: Robot wheelbase <ul><li>Distance between wheel centers (mm)</li></ul></li></ul>";
+	+"Number: Robot wheelbase <ul><li>Distance between wheel centers (mm)</li></ul></li></ul>"
+	
+	var help_text_pilot = 
+	"<h4>Sliders</h4>"
+	+ "A slider will appear here for each pwm and servo device you configure in the Configure tab.<br><br>"
+	+ "<h4>Steering Wheel</h4>"
+	+ "A steering wheel will appear if you connect to a robot and configure it with a create2 device in the Configure tab.<br><br>"
+	+ "To drive using the mouse, click and hold the wheel. The speed of the robot is determined by how far the cursor is from the center of the wheel.<br><br>"
+	+ "The maximum speed is determined by the drive power slider<br><br>"
+	+ "To drive using the keyboard, hold the mouse cursor over the wheel and drive using the keys w, a, s, d.<br><br>"
 
 	var help_text_sensors =
 	"<h3>How to Interpret Sensor Data</h3>"
@@ -151,7 +160,7 @@ robot_ui_t.prototype.download_gui=function()
 	+ "right(90)  // <i>turn right 90 degrees</i><br>"
 	+ "drive(-50, 50)  // <i>Sets the speed of the left and right wheels</i><br>"
 	+ "<h4>Servos</h4>"
-	+ "power.servo[0] = 90 // <i>Moves the first servo to position 90 degrees (range is 0 to 180)"
+	+ "power.servo[0] = 90 // <i>Moves the first servo to position 90 degrees (range is 0 to 180)<br>"
 	+ "<br><a href=\"/code/api/\" title=\"API\" target=\"new\"> <h4>Advanced</h4> </a>";
 	//+ "<h4> Sensors </h4>"
 	//+ "sensors.location.x - <i> Robot location in x-coordinate</i><br>"
@@ -160,11 +169,11 @@ robot_ui_t.prototype.download_gui=function()
 
 
 	var help_text_map = 
-	"<h4>Driving on the Map</h4>"
+	"<h3>Driving on the Map</h3>"
 	+ "Connect to a robot or simulation and configure a create2 device in the Configure tab.<br><br>"
 	+ "You can drive by using the wheel in the Drive tab or by using code in the Code tab.<br><br>"
 	+ "If the 3D robot is not responding, check that the robot is connected by opening the Sensors tab. If the heartbeats value is changing, the robot is connected.<br><br>"
-	+ "<h4>Uploading a Map Image</h4>"
+	+ "<h3>Uploading a Map Image</h3>"
 	+ "Click on the Upload Map Image button to use an image from your computer as the map.<br><br>"
 	+ "You will be asked to choose a file from your computer and to enter the width and height of the space (in meters).<br><br>"
 	+ "You can upload any number of map images and switch between them.<br><br>"
@@ -177,7 +186,8 @@ robot_ui_t.prototype.download_gui=function()
 	+ "label(\"This will appear in the UI\")<br>"
 	+ "button(\"Press me\", state1)<br>"
 	+ "slider(\"Slider!\", -1.0, 0.0, 1.0) <br>"
-	+ "checkbox(\"Would you like to check this box?\")<br>";
+	+ "checkbox(\"Would you like to check this box?\")<br>"
+	+ "<br><a href=\"/code/api/\" title=\"API\" target=\"new\"> <h4>Advanced</h4> </a>";
 
 	var clear_out=function(div)
 	{
@@ -190,7 +200,7 @@ robot_ui_t.prototype.download_gui=function()
 		myself.doorways=
 		{
 			config:myself.create_doorway("Configure","Set up robot hardware",help_text_config),
-			pilot:myself.create_doorway("Drive","Manually drive the robot",null),
+			pilot:myself.create_doorway("Drive","Manually drive the robot",help_text_pilot),
 			sensors:myself.create_doorway("Sensors","Examine sensor data from robot",help_text_sensors),
 			charts:myself.create_doorway("Charts", "Chart sensor data received from robot",null),
 			states:myself.create_doorway("Code","Automatically drive the robot",help_text_states),
