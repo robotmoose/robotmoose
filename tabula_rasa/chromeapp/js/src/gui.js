@@ -82,8 +82,6 @@ function gui_t(div)
 	
 	this.connection.on_name_set=function(robot)
 	{
-		console.log("In on_name_set");
-		console.log(robot);
 		_this.name.load(robot);
 		_this.sound_player.load(robot);
 	};

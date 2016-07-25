@@ -5,8 +5,10 @@
  Mike Moss & Orion Lawlor, 2015-12, Public Domain
 */
 
-function connection_t(on_message,on_disconnect,on_connect,on_name_set,on_auth_error,serial_api=chrome.serial)
+function connection_t(on_message,on_disconnect,on_connect,on_name_set,on_auth_error,serial_api)
 {
+	if(!serial_api)
+		serial_api=chrome.serial;
 	var _this=this;
 	_this.config="";
 	_this.status_message=on_message;
