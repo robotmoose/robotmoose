@@ -109,31 +109,12 @@ robot_ui_t.prototype.download_gui=function()
 
 	var myself=this;
 
-	var help_text_states =
-	//"<h3> Code Examples </h3>"
-	"<h4>Basic</h4>"
-	+ "print(\"This will appear to the right of the state\") <br>"
-	+ "stop() <br>"
-	+ "state = \"turnLeft\" // <i>Runs your state named \"turnLeft\"</i><br>"
-	+ "<h4>UI</h4>"
-	+ "label(\"This will appear in the UI\")<br>"
-	+ "button(\"Press me\", \"turnLeft\")<br>"
-	+ "power.L=slider(\"left wheel\", -1.0, 0.0, 1.0) <br>"
-	+ "checkbox(\"Would you like to check this box?\")<br>"
-	//+ "if (checkbox(\"Would you like to check this box?\")) { print(\"Yes!\") } <br>"
-	+ "<h4>Drive</h4>"
-	+ "forward(10)  // <i>drive forward 10 centimeters</i><br>"
-	+ "backward(5)  // <i>drive backward 5 centimeters</i><br>"
-	+ "left(45)  // <i>turn left 45 degrees</i><br>"
-	+ "right(90)  // <i>turn right 90 degrees</i><br>"
-	+ "drive(-0.5, 0.5)  // <i>Sets the speed of the left and right wheels</i><br>"
-	+ "<h4>Servos</h4>"
-	+ "power.servo[0] = 90 // <i>Moves the first servo to position 90 degrees (range is 0 to 180)"
-	+ "<br><a href=\"/code/api/\" title=\"API\" target=\"new\"> <h4>Advanced</h4> </a>";
-	//+ "<h4> Sensors </h4>"
-	//+ "sensors.location.x - <i> Robot location in x-coordinate</i><br>"
-	//+ "sensors.location.angle - <i> Direction robot is facing </i><br>"
-	//+ "sensors.floor[2] - <i> Floor sensor 2 </i><br>";
+
+	var help_text_config =
+	"<h3>When configuring devices:</h3>"
+	+"<h4><b>wheel_encoder</b></h4>"
+	+"<ul><li>Pin: Left wheel encoder pin</li><li>Pin: Right wheel encoder pin</li><li>"
+	+"Number: Robot wheelbase <ul><li>Distance between wheel centers (mm)</li></ul></li></ul>";
 
 	var help_text_sensors =
 	"<h3>How to Interpret Sensor Data</h3>"
@@ -150,7 +131,46 @@ robot_ui_t.prototype.download_gui=function()
 	+ "<ul><li>0: Bumper Left</li><li>1: Bumper Front Left</li><li>2: Bumper Center Left</li>"
 	+ "<li>3: Bumper Center Right</li><li>4: Bumper Front Right</li><li>5: Bumper Right</li></ul></li>"
 	+ "</ul>";
+	
+	var help_text_states =
+	//"<h3> Code Examples </h3>"
+	"<h4>Basic</h4>"
+	+ "print(\"This will appear to the right of the state\") <br>"
+	+ "stop() <br>"
+	+ "state = \"turnLeft\" // <i>Runs your state named \"turnLeft\"</i><br>"
+	+ "<h4>UI</h4>"
+	+ "label(\"This will appear in the UI\")<br>"
+	+ "button(\"Press me\", \"turnLeft\")<br>"
+	+ "power.L=slider(\"left wheel\", -100.0, 0.0, 100.0) <br>"
+	+ "checkbox(\"Would you like to check this box?\")<br>"
+	//+ "if (checkbox(\"Would you like to check this box?\")) { print(\"Yes!\") } <br>"
+	+ "<h4>Drive</h4>"
+	+ "forward(10)  // <i>drive forward 10 centimeters</i><br>"
+	+ "backward(5)  // <i>drive backward 5 centimeters</i><br>"
+	+ "left(45)  // <i>turn left 45 degrees</i><br>"
+	+ "right(90)  // <i>turn right 90 degrees</i><br>"
+	+ "drive(-50, 50)  // <i>Sets the speed of the left and right wheels</i><br>"
+	+ "<h4>Servos</h4>"
+	+ "power.servo[0] = 90 // <i>Moves the first servo to position 90 degrees (range is 0 to 180)"
+	+ "<br><a href=\"/code/api/\" title=\"API\" target=\"new\"> <h4>Advanced</h4> </a>";
+	//+ "<h4> Sensors </h4>"
+	//+ "sensors.location.x - <i> Robot location in x-coordinate</i><br>"
+	//+ "sensors.location.angle - <i> Direction robot is facing </i><br>"
+	//+ "sensors.floor[2] - <i> Floor sensor 2 </i><br>";
 
+
+	var help_text_map = 
+	"<h4>Driving on the Map</h4>"
+	+ "Connect to a robot or simulation and configure a create2 device in the Configure tab.<br><br>"
+	+ "You can drive by using the wheel in the Drive tab or by using code in the Code tab.<br><br>"
+	+ "If the 3D robot is not responding, check that the robot is connected by opening the Sensors tab. If the heartbeats value is changing, the robot is connected.<br><br>"
+	+ "<h4>Uploading a Map Image</h4>"
+	+ "Click on the Upload Map Image button to use an image from your computer as the map.<br><br>"
+	+ "You will be asked to choose a file from your computer and to enter the width and height of the space (in meters).<br><br>"
+	+ "You can upload any number of map images and switch between them.<br><br>"
+	+ "Uploaded images are not saved on the web server, so you will need to upload them again each time you connect to a robot.";
+	
+	
 	var help_text_ui =
 	"Run your Code to add elements to the UI <br>"
 	+ "<h4>UI elements:</h4>"
@@ -158,12 +178,6 @@ robot_ui_t.prototype.download_gui=function()
 	+ "button(\"Press me\", state1)<br>"
 	+ "slider(\"Slider!\", -1.0, 0.0, 1.0) <br>"
 	+ "checkbox(\"Would you like to check this box?\")<br>";
-
-	var help_text_config =
-	"<h3>When configuring devices:</h3>"
-	+"<h4><b>wheel_encoder</b></h4>"
-	+"<ul><li>Pin: Left wheel encoder pin</li><li>Pin: Right wheel encoder pin</li><li>"
-	+"Number: Robot wheelbase <ul><li>Distance between wheel centers (mm)</li></ul></li></ul>";
 
 	var clear_out=function(div)
 	{
@@ -180,7 +194,7 @@ robot_ui_t.prototype.download_gui=function()
 			sensors:myself.create_doorway("Sensors","Examine sensor data from robot",help_text_sensors),
 			charts:myself.create_doorway("Charts", "Chart sensor data received from robot",null),
 			states:myself.create_doorway("Code","Automatically drive the robot",help_text_states),
-			map:myself.create_doorway("Map","See where the robot thinks it is",null),
+			map:myself.create_doorway("Map","See where the robot thinks it is",help_text_map),
 			video:myself.create_doorway("Video","Show the robot's video camera",null),
 			UI:myself.create_doorway("UI","Customized robot user interface",help_text_ui),
 			sound:myself.create_doorway("Sound","Play sounds on the backend to get attention",null),

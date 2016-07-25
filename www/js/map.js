@@ -250,7 +250,7 @@ robot_map_t.prototype.upload_map_button_pressed_m=function()
 					}
 
 
-					var dim_text = "Image Dimensions: "  + myself.uploaded_map.width + ":" + myself.uploaded_map.height;
+					var dim_text = "Image Dimensions (in pixels): "  + myself.uploaded_map.width + ":" + myself.uploaded_map.height;
 					myself.dim_text_node = document.createTextNode(dim_text);
 
 					myself.upload_preview_div=document.createElement("div");
