@@ -13,6 +13,7 @@ class Test(object):
     def __init__(self, url):
         self.url = url
         self.error = 'No error message provided.'
+        self.request_session = requests.Session()
 
     def class_name(self):
         return type(self).__name__
@@ -33,13 +34,13 @@ class Test(object):
         }
 
     def get(self, path):
-        return requests.get(self.url + '/' + path).json()
+        return self.request_session.get(self.url + '/' + path).json()
 
     def post_single_request(self, method):
-        return requests.post(self.url, json.dumps(method)).json()
+        return self.request_session.post(self.url, json.dumps(method)).json()
 
     def post_batch_request(self, methods):
-        return requests.post(self.url, json=methods).json()
+        return self.request_session.post(self.url, json=methods).json()
 
     def pass_test(self):
         print(colored('Passed: ', 'green') + self.description)
@@ -91,9 +92,7 @@ class BadSingleSet(Test):
             '',
             bad_val='bad_val'
         )
-        print(method)
         json_response = self.post_single_request(method)
-        print(json_response)
         success = True
         if json_response['jsonrpc'] != '''2.0''':
             self.error = 'bad RPC version'
@@ -101,6 +100,45 @@ class BadSingleSet(Test):
         if 'error' not in json_response:
             self.error = 'no error when error expected'
             success = False
+        return success
+
+class BadJson(Test):
+    def task(self):
+        self.description = "Response to bad JSON is correct"
+        method = '''{some ill formated json'''
+        json_response = self.post_single_request(method)
+        success = True
+        if json_response['jsonrpc'] != '''2.0''':
+            self.error = 'bad RPC version'
+            success = False
+        if 'error' not in json_response:
+            self.error = 'no error when error expected'
+            success = False
+        else:
+            if json_response['error']['code'] != -32700:
+                self.error = 'Wrong error code was received. expected: %d, got %d' % (-32700, json_response['error']['code'])
+                success = False
+        return success
+
+class BadMethod(Test):
+    def task(self):
+        self.description = "Response to a bad method is correct"
+        success = True
+        method = self.create_method(
+            'no_method_here',
+            '/test/bad_method',
+            ''
+        )
+        if json_response['jsonrpc'] != '''2.0''':
+            self.error = 'bad RPC version'
+            success = False
+        if 'error' not in json_response:
+            self.error = 'no error when error expected'
+            success = False
+        else:
+            if json_response['error']['code'] != -32602:
+                self.error = 'Wrong error code was received. expected: %d, got %d' % (-32602, json_response['error']['code'])
+                success = False
         return success
 
 
@@ -285,6 +323,7 @@ if __name__ == '__main__':
         url = argv[1]
         SingleSet(url).run()
         BadSingleSet(url).run()
+        BadJson(url).run()
         SingleGet(url).run()
         ValidJSONRPC(url).run()
         BatchMixedSetsAndGets(url).run()
