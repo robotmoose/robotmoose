@@ -1,50 +1,85 @@
 #!/usr/bin/env python3
 from main import Test
 from time import time
-from sys import argv
+import argparse
+import gc
+import random
+import string
 
 
 class Benchmark(Test):
+    """Benchmark 'interface'
+
+    not intended to be created, only inherited from classes that inherit from
+    this class need only to implement the function req_gen req_gen should
+    return a JSON rpc request object, usually via the create_method method.
+    When using this class, the with syntax should be used, so that garbage
+    collection is only done at times when the benchmarks aren't running
+    """
+    def __enter__(self):
+        return self
+    def __exit__(self, *err):
+        gc.collect()
     def run(self, runs):
-        start_time = time()
+        tests = []
         for _ in range(runs):
-            self.task()
+            tests.append(self.task())
+        start_time = time()
+        for test in tests:
+            test()
         elapsed_time = time() - start_time
         print('Performed ' + str(runs) + 'x' + self.class_name() + ' in ' +
               str(elapsed_time) + 'sec.')
         print('Average time/run: ' + str(elapsed_time / runs * 1000) +
               ' msec.\n')
+    def task(self):
+        req = self.req_gen()
+        return lambda : self.post_single_request(req)
 
+
+class RandomSet(Benchmark):
+    """Produces a bunch of random keys to set to random paths, then sets them"""
+    def req_gen(self):
+        def rs(size):
+            return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(size))
+        path = [rs(random.randint(5, 10)) for _ in range(random.randint(1,10))]
+        value = rs(random.randint(5,20))
+        return self.create_method(
+                    'set',
+                    path,
+                    '',
+                    value = value
+               )
 
 class SingleSet(Benchmark):
-    def task(self):
-        response = self.post_single_request(self.create_method(
-            'set',
-            '/benchmark/set',
+    def req_gen(self):
+        return self.create_method(
+            'get',
+            '/benchmark/test',
             '',
-            value='test_value'
-        ))
-        return response['result']
+            value='foobar'
+        )
 
 
 class SingleGet(Benchmark):
-    def task(self):
-        response = self.post_single_request(self.create_method(
+    def req_gen(self):
+        return self.create_method(
             'get',
             '/',
             ''
-        ))
-        return response['result']
-
+        )
 
 if __name__ == '__main__':
-    if len(argv) > 2:
-        url = argv[1]
-        runs = int(argv[2])
-        SingleSet(url).run(runs)
-        SingleGet(url).run(runs)
-    else:
-        print('Arguments missing.')
-        print('Format: ./benchmark.py address:port/superstar/ '
-              + 'numberOfIterations')
-        print('Ex: ./benchmark.py http://localhost:8081/superstar/ 100')
+    parser = argparse.ArgumentParser(description = 'Benchmark utility for superstar v2')
+    parser.add_argument('--url', metavar='URL', type=str, default='http://localhost:8081/superstar', help='url to run the benchmark on')
+    parser.add_argument('--runs', metavar='N', type=int, default=1000, help='number of iterations per test')
+    args =parser.parse_args()
+    url = args.url
+    runs = args.runs
+
+    with SingleGet(url) as r:
+        r.run(runs)
+    with SingleSet(url) as r:
+        r.run(runs)
+    with RandomSet(url) as r:
+        r.run(runs)
