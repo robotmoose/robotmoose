@@ -38,6 +38,12 @@ void http_handler(mg_connection* conn,int event,void* event_data)
 	//Giant paranoia try/catch...
 	try
 	{
+		if(event==MG_EV_CLOSE)
+		{
+			comet_mgr.cancel(conn);
+			return;
+		}
+
 		//We really only care about HTTP requests.
 		if(event==MG_EV_HTTP_REQUEST)
 		{

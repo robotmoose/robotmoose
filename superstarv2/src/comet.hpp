@@ -46,6 +46,9 @@ class comet_mgr_t
 		//Cancels a connection and sends a response.
 		void cancel(comet_client_t& client);
 
+		//Cancels a connection when mongoose kills it.
+		void cancel(mg_connection* conn);
+
 
 		//Services a connection with the given value.
 		void service(comet_client_t& client,const Json::Value& value);

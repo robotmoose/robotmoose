@@ -106,6 +106,22 @@ void comet_mgr_t::cancel(comet_client_t& client)
 	client.conn->flags&=~MG_F_USER_1;
 }
 
+//Cancels a connection when mongoose kills it.
+void comet_mgr_t::cancel(mg_connection* conn)
+{
+	//Go through clients.
+	std::vector<comet_client_t> remaining;
+	for(size_t ii=0;ii<clients_m.size();++ii)
+		//Disconnecting, kill...
+		if(clients_m[ii].conn==conn)
+			cancel(clients_m[ii]);
+
+		//Still waiting...
+		else
+			remaining.push_back(clients_m[ii]);
+	clients_m=remaining;
+}
+
 //Services a connection with the given value.
 void comet_mgr_t::service(comet_client_t& client,const Json::Value& value)
 {
