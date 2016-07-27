@@ -10,11 +10,11 @@ import string
 class Benchmark(Test):
     """Benchmark 'interface'
 
-    not intended to be created, only inherited from classes that inherit from
-    this class need only to implement the function req_gen req_gen should
-    return a JSON rpc request object, usually via the create_method method.
-    When using this class, the with syntax should be used, so that garbage
-    collection is only done at times when the benchmarks aren't running
+Not intended to be created, only inherited from classes that inherit from
+this class need only to implement the function req_gen req_gen should
+return a JSON rpc request object, usually via the create_method method.
+When using this class, the with syntax should be used, so that garbage
+collection is only done at times when the benchmarks aren't running
     """
     def __enter__(self):
         return self
