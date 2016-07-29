@@ -6,8 +6,6 @@ import gc
 import random
 import string
 
-from multiprocessing.pool import ThreadPool
-
 
 class Benchmark(Test):
     """Benchmark 'interface'
@@ -27,8 +25,8 @@ collection is only done at times when the benchmarks aren't running
         for _ in range(runs):
             tests.append(self.task())
         start_time = time()
-        with ThreadPool(processes=2) as tp:
-            tp.map(lambda t : t(), tests)
+        for test in tests:
+            test()
         elapsed_time = time() - start_time
         print('Performed ' + str(runs) + 'x' + self.class_name() + ' in ' +
               str(elapsed_time) + 'sec.')
