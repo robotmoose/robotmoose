@@ -96,7 +96,7 @@ drag_list_t.prototype.create_entry=function()
 	entry.close_button.style.marginLeft=10;
 	entry.close_button.innerHTML="&times;";
 	entry.close_button.drag_list_t=entry;
-	entry.close_button.onclick=function(event){myself.remove_entry(this.drag_list_t);};
+	entry.close_button.onclick=function(event){myself.remove_entry(this.drag_list_t,true);};
 
 	entry.table.right.appendChild(entry.close_button);
 
