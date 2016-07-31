@@ -42,7 +42,7 @@ class RandomSet(Benchmark):
     def req_gen(self):
         def rs(size):
             return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(size))
-        path = [rs(random.randint(5, 10)) for _ in range(random.randint(1,10))]
+        path = '/'.join([rs(random.randint(5, 10)) for _ in range(random.randint(1,10))])
         value = rs(random.randint(5,20))
         return self.create_method(
                     'set',
