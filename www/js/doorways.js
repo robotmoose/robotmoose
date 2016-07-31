@@ -100,7 +100,7 @@ doorway_manager_t.prototype.create=function(title,pos,tooltip,help_text)
 	if(!help_text)
 		help_text="";
 	var doorway=new doorway_t(this,title,help_text);
-	this.menu.create(doorway,function()
+	this.menu.create(title,function()
 	{
 		doorway.activate();
 	},

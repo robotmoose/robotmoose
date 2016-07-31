@@ -65,13 +65,12 @@ robot_ui_t.prototype.create_menus=function()
 	this.connect_menu=new modal_connect_t(this.modal_div);
 
 	this.menu.get_status_area().innerHTML=this.disconnected_text;
-	/*this.menu.create_button
+	this.menu.create
 	(
 		"Connect",
-		function(){_this.connect_menu.show();},//null,
-		"glyphicon glyphicon-off",//"glyphicon glyphicon-cog",
+		function(){_this.connect_menu.show();},
 		"Connect to a new robot over the network"
-	);*/
+	);
 
 	this.connect_menu.onconnect=function(robot)
 	{

@@ -21,18 +21,18 @@ robot_menu_t.prototype.destroy=function()
 	this.div=this.el=null;
 }
 
-robot_menu_t.prototype.create=function(doorway,onclick,tooltip)
+robot_menu_t.prototype.create=function(title,onclick,tooltip)
 {
 	var button=document.createElement("button");
 	this.el.appendChild(button);
-	button.innerHTML=doorway.title;
+	button.innerHTML=title;
 	button.className="robot menu button";
 	button.addEventListener("click",function(event)
 	{
 		if(onclick)
 			onclick(event);
 	});
-	button.doorway=doorway;
+	button.title=tooltip;
 	this.buttons.push(button);
 }
 
