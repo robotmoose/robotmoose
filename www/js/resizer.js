@@ -33,36 +33,9 @@ function resizer_t(div,options)
 	this.handle.onmousedown=function(event){return myself.onmousedown(event);}
 	this.div.appendChild(this.handle);
 
-	this.mousemove_listener=function(event){return myself.onmousemove(event);};
-	document.addEventListener("mousemove",this.mousemove_listener);
-	this.mouseup_listener=function(event){return myself.onmouseup(event);};
-	document.addEventListener("mouseup",this.mouseup_listener);
-	this.blur_listener=function(event){myself.onblur(event);};
-	window.addEventListener("blur",this.blur_listener);
-}
-
-resizer_t.prototype.destroy=function()
-{
-	if(this.mousemove_listener)
-	{
-		document.removeEventListener("mousemove",this.mousemove_listener);
-		this.mousemove_listener=null;
-	}
-	if(this.mouseup_listener)
-	{
-		document.removeEventListener("mouseup",this.mouseup_listener);
-		this.mouseup_listener=null;
-	}
-	if(this.blur_listener)
-	{
-		window.removeEventListener("blur",this.blur_listener);
-		this.blur_listener=null;
-	}
-	if(this.div&&this.handle)
-	{
-		this.div.removeChild(this.handle);
-		this.div=this.handle=null;
-	}
+	document.addEventListener("mousemove",function(event){return myself.onmousemove(event);});
+	document.addEventListener("mouseup",function(event){return myself.onmouseup(event);});
+	window.addEventListener("blur",function(event){myself.onblur(event);});
 }
 
 resizer_t.prototype.resize=function(size)
