@@ -31,6 +31,7 @@ function resizer_t(div,containing_div,options)
 	this.handle.style.width=this.dragging.size.width;
 	this.handle.style.height=this.dragging.size.height;
 	this.handle.style.backgroundColor="red";
+	this.handle.style.opacity=0;
 	this.handle.style.zIndex=999999;
 	this.handle.onmousedown=function(event){return myself.onmousedown(event);}
 	this.div.appendChild(this.handle);

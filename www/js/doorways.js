@@ -169,6 +169,7 @@ doorway_manager_t.prototype.onmousedown=function(event,doorway)
 		this.dragging.doorway=doorway;
 		var offset_left=-parseInt(this.dragging.doorway.panel.offsetLeft);
 		var offset_top=-parseInt(this.dragging.doorway.panel.offsetTop);
+		console.log(this.div.scrollTop);
 
 		if(!offset_left)
 			offset_left=0;
@@ -188,8 +189,8 @@ doorway_manager_t.prototype.onmousedown=function(event,doorway)
 
 doorway_manager_t.prototype.onmousemove=function(event)
 {
-	this.dragging.mouse.x=event.pageX;
-	this.dragging.mouse.y=event.pageY;
+	this.dragging.mouse.x=event.pageX+parseInt(this.div.scrollLeft);
+	this.dragging.mouse.y=event.pageY+parseInt(this.div.scrollTop);
 
 	if(document.all)
 	{
