@@ -362,7 +362,7 @@ function doorway_t(manager,title,help_text)
 	this.content.style.width="100%";
 	this.content.style.height="100%";
 
-	this.resizer=new resizer_t(this.body,{min_size:{width:200,height:100}});
+	this.resizer=new resizer_t(this.body,this.manager.div,{min_size:{width:200,height:100}});
 
 	this.activate();
 	this.move(this.pos);

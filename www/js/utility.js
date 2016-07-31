@@ -47,3 +47,21 @@ function valid_robot(robot)
 {
 	return (robot&&robot.year&&robot.school&&robot.name);
 }
+
+//Returns the global offset for an element via iterative looping of parents...
+//  http://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element
+function get_absolute_offset(el)
+{
+	var offset=
+	{
+		x:0,
+		y:0
+	};
+	while(el)
+	{
+		offset.x+=parseInt(el.offsetLeft)-parseInt(el.scrollLeft);
+		offset.y+=parseInt(el.offsetTop)-parseInt(el.scrollTop);
+		el=el.offsetParent;
+	}
+	return offset;
+};

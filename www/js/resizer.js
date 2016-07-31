@@ -1,10 +1,11 @@
 //onresizing() - callback called when resizing is started.
 //onresize() - callback called when resizing is completed - formerly onresized()
 
-function resizer_t(div,options)
+function resizer_t(div,containing_div,options)
 {
 	if(!div)
 		return null;
+	this.containing_div=containing_div;
 
 	var myself=this;
 	this.div=div;
@@ -29,7 +30,8 @@ function resizer_t(div,options)
 	this.handle.style.cursor="se-resize";
 	this.handle.style.width=this.dragging.size.width;
 	this.handle.style.height=this.dragging.size.height;
-	this.handle.style.backgroundColor="#ff000000";
+	this.handle.style.backgroundColor="red";
+	this.handle.style.zIndex=999999;
 	this.handle.onmousedown=function(event){return myself.onmousedown(event);}
 	this.div.appendChild(this.handle);
 
@@ -74,8 +76,10 @@ resizer_t.prototype.resize=function(size)
 
 	this.div.style.width=size.width;
 	this.div.style.height=size.height;
-	this.handle.style.left=parseInt(this.div.offsetLeft)+parseInt(this.div.offsetWidth)-this.dragging.size.width;
-	this.handle.style.top=parseInt(this.div.offsetTop)+parseInt(this.div.offsetHeight)-this.dragging.size.height;
+	this.handle.style.left=parseInt(this.div.offsetLeft)+
+		parseInt(this.div.offsetWidth)-this.dragging.size.width;
+	this.handle.style.top=parseInt(this.div.offsetTop)+
+		parseInt(this.div.offsetHeight)-this.dragging.size.height;
 }
 
 
@@ -91,8 +95,10 @@ resizer_t.prototype.onmousedown=function(event)
 	{
 		this.dragging.on=true;
 
-		var offset_left=-parseInt(this.handle.offsetLeft);
-		var offset_top=-parseInt(this.handle.offsetTop);
+		var offset_left=-parseInt(this.handle.offsetLeft)+
+			parseInt(this.containing_div.scrollLeft);
+		var offset_top=-parseInt(this.handle.offsetTop)+
+			parseInt(this.containing_div.scrollTop);
 
 		if(!offset_left)
 			offset_left=0;
@@ -123,6 +129,14 @@ resizer_t.prototype.onmousemove=function(event)
 		this.dragging.mouse.y=window.event.clientY;
 	}
 
+	var div_ol=parseInt(this.div.offsetLeft);
+	var div_ot=parseInt(this.div.offsetTop);
+	var div_ow=parseInt(this.div.offsetWidth);
+	var div_oh=parseInt(this.div.offsetHeight);
+
+	var handle_ol=parseInt(this.div.offsetLeft);
+	var handle_ot=parseInt(this.div.offsetTop);
+
 	if(this.dragging.on)
 	{
 		this.handle.style.left=this.dragging.mouse.x-this.dragging.offset.x;
@@ -130,21 +144,25 @@ resizer_t.prototype.onmousemove=function(event)
 	}
 	else
 	{
-		this.handle.style.left=parseInt(this.div.offsetLeft)+parseInt(this.div.offsetWidth)-this.dragging.size.width;
-		this.handle.style.top=parseInt(this.div.offsetTop)+parseInt(this.div.offsetHeight)-this.dragging.size.height;
+		this.handle.style.left=div_ol+div_ow-this.dragging.size.width;
+		this.handle.style.top=div_ot+div_oh-this.dragging.size.height;
 	}
 
-	if(parseInt(this.handle.offsetLeft)<parseInt(this.div.offsetLeft))
-		this.handle.style.left=parseInt(this.div.offsetLeft);
-	if(parseInt(this.handle.offsetTop)<parseInt(this.div.offsetTop))
-		this.handle.style.top=parseInt(this.div.offsetTop);
+	if(handle_ol<div_ol)
+		this.handle.style.left=handle_ol;
+	if(handle_ot<div_ot)
+		this.handle.style.top=handle_ot;
 
 	if(this.dragging.on)
 	{
 		this.resize
 		({
-			width:parseInt(this.handle.offsetLeft)+this.dragging.size.width-parseInt(this.div.offsetLeft),
-			height:parseInt(this.handle.offsetTop)+this.dragging.size.height-parseInt(this.div.offsetTop)
+			width:parseInt(this.handle.offsetLeft)+
+				this.dragging.size.width-div_ol+
+					parseInt(this.containing_div.scrollLeft),
+			height:parseInt(this.handle.offsetTop)+
+				this.dragging.size.height-div_ot+
+					parseInt(this.containing_div.scrollTop)
 		});
 		if(this.onresize)
 			this.onresize();
