@@ -119,7 +119,7 @@ function modal_connect_t(div)
 	this.cancel_button.value="Cancel";
 	this.cancel_button.onclick=function(){_this.hide();};
 	this.modal.get_footer().appendChild(this.cancel_button);
-	
+
 	this.sim_button.className="btn btn-primary";
 	this.sim_button.type="button";
 	this.sim_button.value="Simulate a Robot";
@@ -127,7 +127,7 @@ function modal_connect_t(div)
 	this.sim_button.onclick=function()
 	{
 		var robot= new robot_sim_t();
-		
+
 		robot_network.sim = true;
 		if(_this.onconnect)_this.onconnect(robot);
 		_this.hide();

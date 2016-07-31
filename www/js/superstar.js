@@ -61,19 +61,19 @@ function superstar_generic(robot,path,request,on_success,on_error)
 			{
 				if(xhr.status==200)
 				{
-					//try
-					//{
+					try
+					{
 						//console.log("Network "+url+" -> "+xhr.responseText);
 						if(on_success)
 						{
 							//console.log("Response: " + xhr.responseText);
 							on_success(xhr.responseText);
 						}
-					//}
-					//catch(error)
-					//{
-					//	superstar_error(on_error,"Error handling response \""+xhr.responseText+"\" ("+error+") from "+url);
-					//}
+					}
+					catch(error)
+					{
+						superstar_error(on_error,"Error handling response \""+xhr.responseText+"\" ("+error+") from "+url);
+					}
 				}
 				else
 				{

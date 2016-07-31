@@ -7,12 +7,13 @@
 //if the widget has a download method, it will be called.
 //if the widget has a upload method, add the callback in create_widgets.
 
-function robot_ui_t(div,menu_div)
+function robot_ui_t(gui_div,menu_div,modal_div)
 {
-	if(!div||!menu_div)
+	if(!gui_div||!menu_div||!modal_div)
 		return null;
-	this.div=div;
+	this.gui_div=gui_div;
 	this.menu_div=menu_div;
+	this.modal_div=modal_div;
 
 	this.robot=
 	{
@@ -60,8 +61,8 @@ robot_ui_t.prototype.create_menus=function()
 {
 	var _this=this;
 
-	this.menu=new robot_menu_t(menu_div);
-	this.connect_menu=new modal_connect_t(div);
+	this.menu=new robot_menu_t(this.menu_div);
+	this.connect_menu=new modal_connect_t(this.modal_div);
 
 	this.menu.get_status_area().innerHTML=this.disconnected_text;
 	/*this.menu.create_button
@@ -77,7 +78,8 @@ robot_ui_t.prototype.create_menus=function()
 
 		if(robot)
 		{
-			if(robot.sim) _this.robot=robot;
+			if(robot.sim)
+				_this.robot=robot;
 			else
 			{
 				_this.robot=JSON.parse(JSON.stringify(robot));
@@ -100,7 +102,7 @@ robot_ui_t.prototype.create_menus=function()
 robot_ui_t.prototype.create_gui=function()
 {
 	this.create_menus();
-	this.doorway_manager=new doorway_manager_t(div,this.menu);
+	this.doorway_manager=new doorway_manager_t(this.gui_div,this.menu);
 }
 
 robot_ui_t.prototype.download_gui=function()
@@ -312,7 +314,7 @@ robot_ui_t.prototype.create_widgets=function()
 	this.widgets=
 	{
 		config:new config_editor_t(this.doorways.config.content),
-		states:new state_table_t(this.doorways.states,this.div),
+		states:new state_table_t(this.doorways.states,this.modal_div),
 		pilot:new pilot_interface_t(this.doorways.pilot.content),
 		charts:new chart_interface_t(this.doorways.charts.content),
 

@@ -34,7 +34,13 @@ function get_time()
 
 function get_select_value(select)
 {
-	return select.options[select.selectedIndex].text
+	if(!select||!select.options||select.options.length<=0)
+		return "";
+	if(select.selectedIndex>select.options.length)
+		select.selectedIndex=0;
+	if(!select.options[select.selectedIndex])
+		return "";
+	return select.options[select.selectedIndex].text;
 }
 
 function valid_robot(robot)

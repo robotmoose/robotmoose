@@ -4,14 +4,15 @@
 		<!--#include virtual="/navbar.html"-->
 	</head>
 	<body role="document">
-		<div class="nohighlight">
-			<div id="menu" class="robots menu_div"></div>
-			<div id="gui" class="robots gui_div"></div>
+		<div id="modal_div" class="nohighlight">
+			<div id="menu_div" class="robots menu_div"></div>
+			<div id="gui_div" class="robots gui_div"></div>
 		</div>
 		<script type="text/javascript">
-			var div=document.getElementById("gui");
-			var menu_div=document.getElementById("menu");
-			var robot_ui=new robot_ui_t(div,menu_div);
+			var modal_div=document.getElementById("modal_div");
+			var gui_div=document.getElementById("gui_div");
+			var menu_div=document.getElementById("menu_div");
+			var robot_ui=new robot_ui_t(gui_div,menu_div,modal_div);
 			if(!robot_ui)
 				alert("Could not create robot_ui!");
 		</script>

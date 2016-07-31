@@ -252,13 +252,13 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	var myself=this;
 	this.mouse_down=0;
 	this.mouse_in_div=0;
-	this.arrowDiv.onmousedown=function(evt) { myself.pilot_mouse(evt,1,0); };
-	this.arrowDiv.ondragstart=function(evt) { myself.pilot_mouse(evt,1,0); };
-	this.arrowDiv.onmouseup=function(evt) { myself.pilot_mouse(evt,-1,0); };
-	this.arrowDiv.onmouseover=function(evt) { myself.pilot_mouse(evt,0,1); };
-	this.arrowDiv.onmouseout=function(evt) { myself.pilot_mouse(evt,-1,-1); };
-	this.arrowDiv.onmousemove=function(evt) { myself.pilot_mouse(evt,0,0); };
-	this.arrowDiv.ondblclick=function(evt) { myself.pilot_mouse(evt,0,0); };
+	this.arrowDiv.addEventListener("mousedown",function(evt) { myself.pilot_mouse(evt,1,0); });
+	this.arrowDiv.addEventListener("dragstart",function(evt) { myself.pilot_mouse(evt,1,0); });
+	this.arrowDiv.addEventListener("mouseup",function(evt) { myself.pilot_mouse(evt,-1,0); });
+	this.arrowDiv.addEventListener("mouseover",function(evt) { myself.pilot_mouse(evt,0,1); });
+	this.arrowDiv.addEventListener("mouseout",function(evt) { myself.pilot_mouse(evt,-1,-1); });
+	this.arrowDiv.addEventListener("mousemove",function(evt) { myself.pilot_mouse(evt,0,0); });
+	this.arrowDiv.addEventListener("dblclick",function(evt) { myself.pilot_mouse(evt,0,0); });
 
 	// Gamepad event handlers
 	window.addEventListener('gamepadconnected', function(e) {
