@@ -61,19 +61,19 @@ function superstar_generic(robot,path,request,on_success,on_error)
 			{
 				if(xhr.status==200)
 				{
-					try
-					{
+					//try
+					//{
 						//console.log("Network "+url+" -> "+xhr.responseText);
 						if(on_success)
 						{
 							//console.log("Response: " + xhr.responseText);
 							on_success(xhr.responseText);
 						}
-					}
-					catch(error)
-					{
-						superstar_error(on_error,"Error handling response \""+xhr.responseText+"\" ("+error+") from "+url);
-					}
+					//}
+					//catch(error)
+					//{
+					//	superstar_error(on_error,"Error handling response \""+xhr.responseText+"\" ("+error+") from "+url);
+					//}
 				}
 				else
 				{
@@ -95,13 +95,13 @@ function superstar_generic(robot,path,request,on_success,on_error)
 // Get JSON object from a robot path
 function superstar_get(robot,path,on_success,on_error)
 {
-	if(robot.sim) 
+	if(robot.sim)
 	{
 	//console.log("sim_get: " + path)
 	sim_get(robot,path,on_success);
 	return;
 	}
-	
+
 	superstar_generic(robot,path,"?get",
 		function(str) {
 			var json=null;
@@ -114,7 +114,7 @@ function superstar_get(robot,path,on_success,on_error)
 // Get multiple JSON object from multiple robot paths
 function superstar_get_multiple(robot,paths,on_success,on_error)
 {
-	if (robot.sim) 
+	if (robot.sim)
 	{
 		//console.log("Skipping get_multiple")
 		return;
@@ -178,7 +178,7 @@ function superstar_set_and_get_multiple(robot,set_path,set_json,get_paths,on_suc
 		//console.log("Skipping set_and_get_multiple")
 		return;
 	}
-	
+
 	var set_json_str=JSON.stringify(set_json);
 	var request="?set="+set_json_str+"&get=";
 	for(var ii=0;ii<get_paths.length;++ii)
@@ -245,7 +245,7 @@ function superstar_getnext(robot,path,on_success,on_error)
 		//console.log("Skipping getnext")
 		return;
 	}
-	
+
 	var state={};
 	state.current=""; // assume current string value of path is empty
 
@@ -328,7 +328,7 @@ function superstar_set(robot,path,json,on_success,on_error)
 function superstar_append(robot,path,json,on_success,on_error)
 {
 	if (robot.sim) return;
-	
+
 	var json_str=JSON.stringify(json);
 	var auth=calc_auth(robot,path,json_str);
 
@@ -344,7 +344,7 @@ function superstar_append(robot,path,json,on_success,on_error)
 function superstar_trim(robot,path,size,on_success,on_error)
 {
 	if (robot.sim) return;
-	
+
 	var auth=calc_auth(robot,path,size);
 
 	superstar_generic(robot,path,"?trim="+size+auth,
@@ -360,7 +360,7 @@ function superstar_trim(robot,path,size,on_success,on_error)
 function superstar_sub(robot,path,on_success,on_error)
 {
 	if (robot_network.sim) return;
-	
+
 	if (!robot) robot={};
 	superstar_generic(robot,path,"?sub",
 		function(response) {

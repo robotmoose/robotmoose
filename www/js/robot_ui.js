@@ -7,12 +7,13 @@
 //if the widget has a download method, it will be called.
 //if the widget has a upload method, add the callback in create_widgets.
 
-function robot_ui_t(div)
+function robot_ui_t(div,menu_div)
 {
-	if(!div)
+	if(!div||!menu_div)
 		return null;
-
 	this.div=div;
+	this.menu_div=menu_div;
+
 	this.robot=
 	{
 		year:null,
@@ -29,7 +30,6 @@ function robot_ui_t(div)
 	this.connect_menu=null;
 	this.gui=
 	{
-		element:null,
 		interval:null,
 		old:""
 	};
@@ -39,57 +39,58 @@ function robot_ui_t(div)
 
 	this.create_gui();
 
-	var myself=this;
+	var _this=this;
 	var options=parse_uri(location.search);
 	validate_robot_name(options.robot,
 		// good robot:
 		function(robot)
 		{
 			//console.log("Connecting to URL robot "+JSON.stringify(robot));
-			myself.connect_menu.onconnect(robot);
+			_this.connect_menu.onconnect(robot);
 		},
 		// bad robot:
 		function()
 		{
-			myself.connect_menu.show();
+			_this.connect_menu.show();
 		});
 	this.pilot_heartbeat = new pilot_status_t(this);
 }
 
 robot_ui_t.prototype.create_menus=function()
 {
-	var myself=this;
+	var _this=this;
 
-	this.menu=new robot_menu_t(div);
+	this.menu=new robot_menu_t(menu_div);
 	this.connect_menu=new modal_connect_t(div);
 
 	this.menu.get_status_area().innerHTML=this.disconnected_text;
-	this.menu.create_button
+	/*this.menu.create_button
 	(
 		"Connect",
-		function(){myself.connect_menu.show();},//null,
+		function(){_this.connect_menu.show();},//null,
 		"glyphicon glyphicon-off",//"glyphicon glyphicon-cog",
-		null,
 		"Connect to a new robot over the network"
-	);
+	);*/
 
 	this.connect_menu.onconnect=function(robot)
 	{
-		
+
 		if(robot)
 		{
-			if(robot.sim) myself.robot=robot;
-			else 
+			if(robot.sim) _this.robot=robot;
+			else
 			{
-				myself.robot=JSON.parse(JSON.stringify(robot));
+				_this.robot=JSON.parse(JSON.stringify(robot));
 				robot_network.sim="";
 			}
-			clearInterval(myself.gui.interval);
-			myself.gui.interval=null;
-			myself.menu.get_status_area().innerHTML="Connected to \""+
-				myself.robot.year+"/"+myself.robot.school+"/"+myself.robot.name+"\"";
-			myself.download_gui();
-			//myself.widgets.chat.set_robot(robot);
+			clearInterval(_this.gui.interval);
+			_this.gui.interval=null;
+			_this.menu.get_status_area().innerHTML="Connected<br/>"+
+				_this.robot.year+"<br/>"+
+				_this.robot.school+"<br/>"+
+				_this.robot.name+"<br/>";
+			_this.download_gui();
+			//_this.widgets.chat.set_robot(robot);
 			robot_network.set_robot(robot);
 		}
 	};
@@ -99,7 +100,7 @@ robot_ui_t.prototype.create_menus=function()
 robot_ui_t.prototype.create_gui=function()
 {
 	this.create_menus();
-	this.gui.element=new doorways_t(div,this.menu.get_menu_bar());
+	this.doorway_manager=new doorway_manager_t(div,this.menu);
 }
 
 robot_ui_t.prototype.download_gui=function()
@@ -107,7 +108,7 @@ robot_ui_t.prototype.download_gui=function()
 	if(!valid_robot(this.robot))
 		return;
 
-	var myself=this;
+	var _this=this;
 
 
 	var help_text_config =
@@ -115,8 +116,8 @@ robot_ui_t.prototype.download_gui=function()
 	+"<h4><b>wheel_encoder</b></h4>"
 	+"<ul><li>Pin: Left wheel encoder pin</li><li>Pin: Right wheel encoder pin</li><li>"
 	+"Number: Robot wheelbase <ul><li>Distance between wheel centers (mm)</li></ul></li></ul>"
-	
-	var help_text_pilot = 
+
+	var help_text_pilot =
 	"<h4>Sliders</h4>"
 	+ "A slider will appear here for each pwm and servo device you configure in the Configure tab.<br><br>"
 	+ "<h4>Steering Wheel</h4>"
@@ -140,7 +141,7 @@ robot_ui_t.prototype.download_gui=function()
 	+ "<ul><li>0: Bumper Left</li><li>1: Bumper Front Left</li><li>2: Bumper Center Left</li>"
 	+ "<li>3: Bumper Center Right</li><li>4: Bumper Front Right</li><li>5: Bumper Right</li></ul></li>"
 	+ "</ul>";
-	
+
 	var help_text_states =
 	//"<h3> Code Examples </h3>"
 	"<h4>Basic</h4>"
@@ -168,7 +169,7 @@ robot_ui_t.prototype.download_gui=function()
 	//+ "sensors.floor[2] - <i> Floor sensor 2 </i><br>";
 
 
-	var help_text_map = 
+	var help_text_map =
 	"<h3>Driving on the Map</h3>"
 	+ "Connect to a robot or simulation and configure a create2 device in the Configure tab.<br><br>"
 	+ "You can drive by using the wheel in the Drive tab or by using code in the Code tab.<br><br>"
@@ -178,8 +179,8 @@ robot_ui_t.prototype.download_gui=function()
 	+ "You will be asked to choose a file from your computer and to enter the width and height of the space (in meters).<br><br>"
 	+ "You can upload any number of map images and switch between them.<br><br>"
 	+ "Uploaded images are not saved on the web server, so you will need to upload them again each time you connect to a robot.";
-	
-	
+
+
 	var help_text_ui =
 	"Run your Code to add elements to the UI <br>"
 	+ "<h4>UI elements:</h4>"
@@ -197,88 +198,88 @@ robot_ui_t.prototype.download_gui=function()
 
 	superstar_get(this.robot,"gui",function(json)
 	{
-		myself.doorways=
+		_this.doorways=
 		{
-			config:myself.create_doorway("Configure","Set up robot hardware",help_text_config),
-			pilot:myself.create_doorway("Drive","Manually drive the robot",help_text_pilot),
-			sensors:myself.create_doorway("Sensors","Examine sensor data from robot",help_text_sensors),
-			charts:myself.create_doorway("Charts", "Chart sensor data received from robot",null),
-			states:myself.create_doorway("Code","Automatically drive the robot",help_text_states),
-			map:myself.create_doorway("Map","See where the robot thinks it is",help_text_map),
-			video:myself.create_doorway("Video","Show the robot's video camera",null),
-			UI:myself.create_doorway("UI","Customized robot user interface",help_text_ui),
-			sound:myself.create_doorway("Sound","Play sounds on the backend to get attention",null),
-			chat:myself.create_doorway("Chat","Chat with the caretaker of the robot.",null)
+			config:_this.create_doorway("Configure","Set up robot hardware",help_text_config),
+			pilot:_this.create_doorway("Drive","Manually drive the robot",help_text_pilot),
+			sensors:_this.create_doorway("Sensors","Examine sensor data from robot",help_text_sensors),
+			charts:_this.create_doorway("Charts", "Chart sensor data received from robot",null),
+			states:_this.create_doorway("Code","Automatically drive the robot",help_text_states),
+			map:_this.create_doorway("Map","See where the robot thinks it is",help_text_map),
+			video:_this.create_doorway("Video","Show the robot's video camera",null),
+			UI:_this.create_doorway("UI","Customized robot user interface",help_text_ui),
+			sound:_this.create_doorway("Sound","Play sounds on the backend to get attention",null),
+			chat:_this.create_doorway("Chat","Chat with the caretaker of the robot.",null)
 		};
 
-		clear_out(myself.doorways.config.content);
-		clear_out(myself.doorways.pilot.content);
-		clear_out(myself.doorways.sensors.content);
-		clear_out(myself.doorways.charts.content);
-		clear_out(myself.doorways.states.content);
-		clear_out(myself.doorways.map.content);
-		clear_out(myself.doorways.video.content);
-		clear_out(myself.doorways.UI.content);
-		clear_out(myself.doorways.sound.content);
-		clear_out(myself.doorways.chat.content);
+		clear_out(_this.doorways.config.content);
+		clear_out(_this.doorways.pilot.content);
+		clear_out(_this.doorways.sensors.content);
+		clear_out(_this.doorways.charts.content);
+		clear_out(_this.doorways.states.content);
+		clear_out(_this.doorways.map.content);
+		clear_out(_this.doorways.video.content);
+		clear_out(_this.doorways.UI.content);
+		clear_out(_this.doorways.sound.content);
+		clear_out(_this.doorways.chat.content);
 
-		myself.gui.element.hide_all();
-		myself.gui.element.minimize(myself.doorways.config,false);
+		_this.doorway_manager.hide_all();
+		_this.doorways.config.set_minimized(false);
 
-		myself.gui.element.load(json);
-		myself.create_widgets();
+		_this.doorway_manager.load(json);
+		_this.create_widgets();
 
-		for(var key in myself.widgets)
-			if(myself.widgets[key].download)
-				myself.widgets[key].download(myself.robot);
+		for(var key in _this.widgets)
+			if(_this.widgets[key].download)
+				_this.widgets[key].download(_this.robot);
 
-		myself.gui.interval=setInterval(function(){myself.run_interval();},100);
+		_this.gui.interval=setInterval(function(){_this.run_interval();},100);
 	});
 }
 
 robot_ui_t.prototype.run_interval=function() {
 	// Update sensor data
-	var myself=this;
+	var _this=this;
 
-	if (myself.sensor_data_count<2)
+	if (_this.sensor_data_count<2)
 	{ // request more sensor data
 		this.sensor_data_count++;
 		//superstar_get(this.robot,"sensors",
 			//function(sensors) // sensor data has arrived:
 			//{
-				myself.sensor_data_count--;
-				if(!myself.robot.sim)
+				_this.sensor_data_count--;
+				if(!_this.robot.sim)
 				{
-					if (!myself.doorways.sensors.minimized)
+					if (!_this.doorways.sensors.minimized)
 						{
 						//console.log("refreshing sensors from robot network: " + JSON.stringify(robot_network.sensors));
-						myself.widgets.sensors.refresh(robot_network.sensors);
-						}	
+						_this.widgets.sensors.refresh(robot_network.sensors);
+						}
 
-					if (!myself.doorways.map.minimized)
-						myself.widgets.map.refresh(robot_network.sensors);
+					if (!_this.doorways.map.minimized)
+						_this.widgets.map.refresh(robot_network.sensors);
 
-					if(!myself.doorways.charts.minimized)
-						myself.widgets.charts.refresh(robot_network.sensors);
+					if(!_this.doorways.charts.minimized)
+						_this.widgets.charts.refresh(robot_network.sensors);
 
-					myself.state_runner.VM_sensors=robot_network.sensors;
+					_this.state_runner.VM_sensors=robot_network.sensors;
 				}
 				else
 				{
-					
-					if (!myself.doorways.sensors.minimized)
-					{	var sensors_json = JSON.parse(JSON.stringify(myself.robot.sensors));
-						//console.log("refreshing sensors from simulation: " + JSON.stringify(myself.robot.sensors));
-						myself.widgets.sensors.refresh(sensors_json);
+
+					if (!_this.doorways.sensors.minimized)
+					{	var sensors_json = JSON.parse(JSON.stringify(_this.robot.sensors));
+						//console.log("refreshing sensors from simulation: " + JSON.stringify(_this.robot.sensors));
+						_this.widgets.sensors.refresh(sensors_json);
 					}
 
-					if (!myself.doorways.map.minimized)
-						myself.widgets.map.refresh(myself.robot.sensors);
+					if (!_this.doorways.map.minimized)
+						_this.widgets.map.refresh(_this.robot.sensors);
 
-					if(!myself.doorways.charts.minimized)
-						myself.widgets.charts.refresh(myself.robot.sensors);
+					if(!_this.doorways.charts.minimized)
+						_this.widgets.charts.refresh(_this.robot.sensors);
 
-					myself.state_runner.VM_sensors=myself.robot.sensors;
+					_this.state_runner.VM_sensors=_this.robot.sensors;
 				}
 			//});
 	}
@@ -288,7 +289,7 @@ robot_ui_t.prototype.run_interval=function() {
 
 robot_ui_t.prototype.upload_gui=function()
 {
-	var save=this.gui.element.save();
+	var save=this.doorway_manager.save();
 	var stringified=JSON.stringify(save);
 
 	if(valid_robot(this.robot)&&this.gui.old!=stringified)
@@ -300,89 +301,76 @@ robot_ui_t.prototype.upload_gui=function()
 
 robot_ui_t.prototype.create_widgets=function()
 {
-	var myself=this;
+	var _this=this;
 
 	if(this.widgets)
 		for(key in this.widgets)
 			if(this.widgets[key].destroy)
 				this.widgets[key].destroy();
 
-		
+
 	this.widgets=
 	{
 		config:new config_editor_t(this.doorways.config.content),
-		states:new state_table_t(this.doorways.states),
+		states:new state_table_t(this.doorways.states,this.div),
 		pilot:new pilot_interface_t(this.doorways.pilot.content),
 		charts:new chart_interface_t(this.doorways.charts.content),
-		
+
 		sensors:new tree_viewer_t(this.doorways.sensors.content,{},
 		[
 			{key:"bumper",type:"binary"}
 		]),
 		map:new robot_map_t(this.doorways.map.content,{}),
-		video:new video_widget_t(this.doorways.video,myself.pilot_heartbeat),
+		video:new video_widget_t(this.doorways.video,_this.pilot_heartbeat),
 		UI:new UI_builder_t(this.doorways.UI.content),
-		sound:new sound_player_t(this.doorways.sound.content,myself.robot),
-		chat:new chatter_t(this.doorways.chat.content,myself.robot,20,"Pilot")
+		sound:new sound_player_t(this.doorways.sound.content,_this.robot),
+		chat:new chatter_t(this.doorways.chat.content,_this.robot,20,"Pilot")
 	};
 	this.state_runner.set_UI(this.widgets.UI);
 
-/* // This blanks out the map entirely when it's not on top--bad way to save CPU!
-	this.doorways.map.ondeactivate=function()
-	{
-		if(myself.widgets.map.renderer)
-			myself.widgets.map.renderer.show(false);
-	};
-	this.doorways.map.onactivate=function()
-	{
-		if(myself.widgets.map.renderer)
-			myself.widgets.map.renderer.show(true);
-	};
-*/
-
 	this.widgets.config.onchange=function() { // recreate pilot GUI when configuration changes
-		myself.widgets.pilot.reconfigure(myself.widgets.config);
+		_this.widgets.pilot.reconfigure(_this.widgets.config);
 	}
 
 	this.widgets.config.onconfigure=function() // allow configuration upload
 	{
-		
-		if(myself.robot&&myself.robot.name)
-			myself.widgets.config.upload(myself.robot);
+
+		if(_this.robot&&_this.robot.name)
+			_this.widgets.config.upload(_this.robot);
 	}
 	this.widgets.states.onrun=function()
 	{
-		setTimeout(function(){myself.gui.element.activate(myself.doorways.UI);},100);
-		myself.widgets.UI.run();
-		if(myself.robot.name)
+		setTimeout(function(){_this.doorway_manager.activate(_this.doorways.UI);},100);
+		_this.widgets.UI.run();
+		if(_this.robot.name)
 		{
-			myself.state_runner.VM_pilot=myself.widgets.pilot.pilot;
-			myself.state_runner.run(myself.robot,myself.widgets.states);
+			_this.state_runner.VM_pilot=_this.widgets.pilot.pilot;
+			_this.state_runner.run(_this.robot,_this.widgets.states);
 		}
 	}
 	this.widgets.states.onstop=function()
 	{
-		if(myself.robot.name)
-			myself.state_runner.stop(myself.widgets.states);
-		myself.widgets.UI.stop();
+		if(_this.robot.name)
+			_this.state_runner.stop(_this.widgets.states);
+		_this.widgets.UI.stop();
 	}
-	this.widgets.pilot.onpilot=myself.state_runner.onpilot=function(power)
+	this.widgets.pilot.onpilot=_this.state_runner.onpilot=function(power)
 	{
-		//console.log("Pilot data upload: "+myself.robot.name);
-		if(myself.robot.name)
-			myself.widgets.pilot.upload(myself.robot);
+		//console.log("Pilot data upload: "+_this.robot.name);
+		if(_this.robot.name)
+			_this.widgets.pilot.upload(_this.robot);
 	}
-	
+
 	if(this.doorways.map&&this.widgets.map)
 	{
-	var myself = this;
-	this.doorways.map.resizer.onresize=function(){myself.widgets.map.resize_map()};
+	var _this = this;
+	this.doorways.map.resizer.onresize=function(){_this.widgets.map.resize_map()};
 	}
 }
 
 robot_ui_t.prototype.create_doorway=function(title,tooltip,help_text)
 {
-	var doorway=this.gui.element.get_by_title(title);
+	var doorway=this.doorway_manager.get_by_title(title);
 
 	if(!help_text)
 		help_text="";
@@ -390,5 +378,5 @@ robot_ui_t.prototype.create_doorway=function(title,tooltip,help_text)
 	if(doorway)
 		return doorway;
 	else
-		return this.gui.element.create(title,undefined,tooltip,help_text);
+		return this.doorway_manager.create(title,undefined,tooltip,help_text);
 }

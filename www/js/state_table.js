@@ -9,7 +9,7 @@
 //		onrun() - callback triggered when run button is hit
 //		onstop() - callback triggered when stop button is hit
 
-function state_table_t(doorway)
+function state_table_t(doorway,modal_el)
 {
 	if(!doorway||!doorway.content)
 		return null;
@@ -34,7 +34,7 @@ function state_table_t(doorway)
 
 	this.createnew_modal=new modal_createnew_t
 	(
-		this.doorway.parent_div,
+		modal_el,
 		"New Experiment",
 		"",
 		function(value)
@@ -83,7 +83,7 @@ function state_table_t(doorway)
 		_this.run_button_pressed_m();
 	};
 
-	this.load_file_modal=new modal_loadstate_t(this.doorway.parent_div, this);
+	this.load_file_modal=new modal_loadstate_t(modal_el, this);
 
 	this.load_file_button=document.createElement("input");
 	this.el.appendChild(this.load_file_button);
@@ -159,12 +159,12 @@ state_table_t.prototype.get_active_experiment=function(onfinish)
 
 state_table_t.prototype.get_experiments=function(active,onfinish)
 {
-	
+
 	var _this=this;
 	if(valid_robot(this.robot))
 	{
 		/*superstar_sub(this.robot,"experiments",function(json)
-		{*/	if (this.robot.sim) 
+		{*/	if (this.robot.sim)
 				var json = this.robot.experiments_list;
 			else{
 				var json=robot_network.experiments;
@@ -246,7 +246,7 @@ state_table_t.prototype.experiment_exists=function(name,onfinish)
 		//superstar_sub(this.robot,"experiments",function(experiments)
 		//{
 			if (this.robot.sim)
-				var experiments=this.robot.experiments;			
+				var experiments=this.robot.experiments;
 			else
 				var experiments=robot_network.experiments;
 			var found=false;
@@ -605,12 +605,12 @@ state_table_t.prototype.create_new_experiment=function(value)
 			if (this.robot.sim)
 				sim_set_experiment(
 					_this.robot,
-					value, 
+					value,
 					[{name:"HelloWorld",time:0,code:""}],
 					function()
 					{
 						_this.next_active_experiment=value;
-					}					
+					}
 				);
 			else
 			superstar_set
@@ -623,7 +623,7 @@ state_table_t.prototype.create_new_experiment=function(value)
 					_this.next_active_experiment=value;
 				}
 			);
-			
+
 		}
 }
 
