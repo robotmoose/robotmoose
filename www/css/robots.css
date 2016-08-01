@@ -22,7 +22,7 @@ head,body
 .robots
 {
 	--top-menu-height:50px;
-	--side-menu-width:128px;
+	--side-menu-width:100px;
 }
 
 .robots.menu_div
@@ -33,6 +33,7 @@ head,body
 	height:calc(100% - var(--top-menu-height));
 	width:var(--side-menu-width);
 	overflow-y:auto;
+	border-right:1px #337ab7 solid;
 }
 
 .robots.gui_div
@@ -48,14 +49,27 @@ head,body
 .robot.menu
 {
 	width:100%;
+	font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size:16px;
+	font-weight:500;
 }
 
 .robot.menu.button
 {
 	height:40px;
+	border:0px solid;
+	background-color:white;
+	color:black;
+	text-align:left;
+}
+
+.robot.menu.button:hover
+{
+	background-color:#337ab7;
+	color:white;
 }
 
 .robot.menu.status_area
 {
-	height:80px;
+	height:96px;
 }
