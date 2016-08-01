@@ -8,31 +8,35 @@ Members
 
 
 // Pythagorean Theorem, finds distance between two points.
-function getDistance(p1, p2) {
-    var a = p1.x - p2.x;
-    var b = p1.y - p2.y;
-    return Math.sqrt((a * a) + (b * b));
+function getDistance(p1, p2)
+{
+	var a=p1.x-p2.x;
+	var b=p1.y-p2.y;
+	return Math.sqrt((a*a)+(b*b));
 }
 
 // Rotates an element by the specified degrees.
-function rotate(el, deg) {
-    el.style.transform = 'rotate(' + deg + 'deg)';
-    el.style.oTransform = 'rotate(' + deg + 'deg)';
-    el.style.msTransform = 'rotate(' + deg + 'deg)';
-    el.style.webkitTransform = 'rotate(' + deg + 'deg)';
+function rotate(el, deg)
+{
+	el.style.transform='rotate('+deg+'deg)';
+	el.style.oTransform='rotate('+deg+'deg)';
+	el.style.msTransform='rotate('+deg+'deg)';
+	el.style.webkitTransform='rotate('+deg+'deg)';
 };
 
 // Returns the offset position for the mouse relative to a specified element.
 //http://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element
-function getOffset(el) {
-    var _x = 0;
-    var _y = 0;
-    while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
-        _x += el.offsetLeft - el.scrollLeft;
-        _y += el.offsetTop - el.scrollTop;
-        el = el.offsetParent;
-    }
-    return { y: _y, x: _x };
+function getOffset(el)
+{
+	var _x=0;
+	var _y=0;
+	while(el&&!isNaN(el.offsetLeft)&&!isNaN(el.offsetTop))
+	{
+		_x+=el.offsetLeft-el.scrollLeft;
+		_y+=el.offsetTop-el.scrollTop;
+		el=el.offsetParent;
+	}
+	return {y:_y,x:_x};
 };
 
 /* Walk the DOM to get the client X,Y position of this element's topleft corner.
@@ -64,30 +68,33 @@ function emptyPower()
 
 
 // Round this number to the nearest thousandth, making it look pretty.
-function pretty(number) {
+function pretty(number)
+{
 	return Math.round(number*1000)/1000.0;
 }
 
 // Clamp this value between lo and hi
-function clamp(v,lo,hi) {
-	if (v<lo) return lo;
-	if (v>hi) return hi;
-	else return v;
+function clamp(v,lo,hi)
+{
+	if(v<lo)
+		return lo;
+	if(v>hi)
+		return hi;
+	return v;
 }
 
 
 
 // Return the current wall clock time, in seconds
-function pilot_time() {
+function pilot_time()
+{
 	return (new Date()).getTime()/1000.0;
 }
 
-
-
-function pilot_interface_t(div)
+function pilot_interface_t(div,doorway)
 {
-	var myself=this;
-	if(!div)
+	var _this=this;
+	if(!div||!doorway)
 		return null;
 
 	this.pilot={
@@ -101,8 +108,8 @@ function pilot_interface_t(div)
 		cmd: { run: "", arg:"" }
 	};
 
-
 	this.div=div;
+	this.doorway=doorway;
 
 	this.element=document.createElement("div");
 	this.element.style.display="table";
@@ -110,18 +117,21 @@ function pilot_interface_t(div)
 	this.div.appendChild(this.element);
 
 	// Keyboard driving
-	this.mouse_in_div=0;
 	this.keyboardIsDriving=false;
-	this.keyInput=new input_t(function() {myself.pilot_keyboard()},window);
+	this.keyInput=new input_t(function() {_this.pilot_keyboard()},window);
 
 	// Gamepad support
-	if (navigator.getGamepads()[0]) {
+	if(navigator.getGamepads()[0])
+	{
 		$.notify({message: 'Gamepad connected.'}, {type: 'success'});
-		myself.gamepad_interval = setInterval(function() {
-			myself.handle_gamepad_input(myself);
-		}, 50);
+		_this.gamepad_interval = setInterval(function() {
+			_this.handle_gamepad_input(_this);
+		},50);
 	}
-	else this.gamepad_interval = null;
+	else
+	{
+		this.gamepad_interval=null;
+	}
 }
 
 // Configure our pilot GUI for the current firmware setup
@@ -174,8 +184,8 @@ pilot_interface_t.prototype.reconfigure=function(config_editor)
 // Add GUI element for a simple adjustable value, stored in pilot.name[number]
 pilot_interface_t.prototype.make_slider=function(config_entry,name,number, minval,maxval)
 {
-	var myself=this;
-	var pilotpower=myself.pilot.power;
+	var _this=this;
+	var pilotpower=_this.pilot.power;
 	if (!pilotpower[name]) pilotpower[name]=[];
 	var value=pilotpower[name][number];
 	if (!value) value=0.0;
@@ -190,11 +200,17 @@ pilot_interface_t.prototype.make_slider=function(config_entry,name,number, minva
 	slider.min=minval;
 	slider.max=maxval;
 	slider.value=value;
-	slider.onchange=slider.oninput=function() {
+
+	var set_power=function()
+	{
 		pilotpower[name][number]=parseInt(slider.value);
-		myself.pilot_send();
+		_this.pilot_send();
 		label_value.nodeValue=""+(0xffFFffFF&pilotpower[name][number]);
-	}
+	};
+
+
+	slider.addEventListener("change",set_power);
+	slider.addEventListener("input",set_power);
 
 	p.appendChild(label_name);
 	p.appendChild(label_value);
@@ -233,8 +249,10 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	this.drive.label.style.width=column_left_width;
 	this.drive.label.style.float="left";
 	this.drive.label.style.marginRight=column_padding;
-	this.drive.slider.onchange=function(){myself.update_drive_text();}
-	this.drive.slider.oninput=function(){myself.update_drive_text();}
+
+	var update_text=function(){_this.update_drive_text();};
+	this.drive.slider.addEventListener("change",update_text);
+	this.drive.slider.addEventListener("input",update_text);
 	this.drive.div.appendChild(this.drive.label);
 
 	this.drive.slider.type="range";
@@ -248,28 +266,18 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 
 	this.update_drive_text();
 
-	// Mouse event handlers for arrow div
-	var myself=this;
-	this.mouse_down=0;
-	this.mouse_in_div=0;
-	this.arrowDiv.addEventListener("mousedown",function(evt) { myself.pilot_mouse(evt,1,0); });
-	this.arrowDiv.addEventListener("dragstart",function(evt) { myself.pilot_mouse(evt,1,0); });
-	this.arrowDiv.addEventListener("mouseup",function(evt) { myself.pilot_mouse(evt,-1,0); });
-	this.arrowDiv.addEventListener("mouseover",function(evt) { myself.pilot_mouse(evt,0,1); });
-	this.arrowDiv.addEventListener("mouseout",function(evt) { myself.pilot_mouse(evt,-1,-1); });
-	this.arrowDiv.addEventListener("mousemove",function(evt) { myself.pilot_mouse(evt,0,0); });
-	this.arrowDiv.addEventListener("dblclick",function(evt) { myself.pilot_mouse(evt,0,0); });
+	var _this=this;
 
 	// Gamepad event handlers
 	window.addEventListener('gamepadconnected', function(e) {
 		$.notify({message: 'Gamepad connected.'}, {type: 'success'});
-		myself.gamepad_interval = setInterval(function() {
-			myself.handle_gamepad_input(myself);
+		_this.gamepad_interval = setInterval(function() {
+			_this.handle_gamepad_input();
 		}, 50);
 	});
 	window.addEventListener('gamepaddisconnected', function(e) {
 		$.notify({message: 'Gamepad disconnected.'}, {type: 'danger'});
-		clearInterval(myself.gamepad_interval);
+		clearInterval(_this.gamepad_interval);
 	});
 
 
@@ -320,54 +328,79 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	this.images.shell.style.height = "32.5%";
 	this.images.shell.style.pointerEvents = "none";
 	this.arrowDiv.appendChild(this.images.shell);
+	rotate(this.images.wheel,0);
+	rotate(this.images.needle,-77.5);
 
-	var downfunc = function () { myself.dragging = true; };
-
-	var upfunc = function () {
-	    myself.dragging = false;
-	    rotate(myself.images.wheel, 0); // return to start positions
-	    rotate(myself.images.needle, -77.5);
+	var downfunc=function()
+	{
+		_this.dragging=true;
 	};
 
-	var rotatefunc = function (evt) {
-	    if (myself.dragging) {
-	        // steering wheel rotation
-	        var pos = getOffset(this);
-	        pos.x = evt.pageX - pos.x - window.pageXOffset;
-	        pos.y = evt.pageY - pos.y - window.pageYOffset;
-	        var size = {
-	            w: myself.images.wheel.offsetWidth,
-	            h: myself.images.wheel.offsetHeight
-	        };
-	        var rads = Math.PI / 2 - Math.atan2(size.h / 2 - pos.y, pos.x - size.w / 2);
-	        var degs = rads * 180 / Math.PI;
-	        rotate(myself.images.wheel, degs);
-
-	        // spedometer needle rotation
-	        var n = { x: 171, y: 171 }; // focal point
-	        var dist = getDistance(pos, n);
-	        if (dist < 170) {
-	            var speed = (65.75 / 170) * dist - 77.5;
-	            rotate(myself.images.needle, speed);
-	        }
-	        else if (dist >= 170)
-	        { rotate(myself.images.needle, -11.75); }
-	    }
-	    else { // default positions
-	        rotate(myself.images.wheel, 0);
-	        rotate(myself.images.needle, -77.5);
-	    }
+	var upfunc=function()
+	{
+		_this.dragging=false;
+		rotate(_this.images.wheel,0);
+		rotate(_this.images.needle,-77.5);
+		_this.pilot.power.L=0;
+		_this.pilot.power.R=0;
+		_this.pilot_send();
 	};
-	this.arrowDiv.addEventListener('mousedown', downfunc);
-	this.arrowDiv.addEventListener('touchstart', downfunc);
-	this.arrowDiv.addEventListener('mousemove', rotatefunc);
-	this.arrowDiv.addEventListener('touchmove', rotatefunc);
-	this.arrowDiv.addEventListener('mouseup', upfunc);
-	this.arrowDiv.addEventListener('touchend', upfunc);
-	document.addEventListener('mousemove', upfunc); // reset if mouse moves
-	document.addEventListener('touchmove', upfunc); // outside the div
-	document.addEventListener('mouseup', upfunc);
-	document.addEventListener('touchend', upfunc);
+
+	var rotatefunc=function(evt)
+	{
+		if(_this.dragging)
+		{
+			var size=
+			{
+				w:_this.images.wheel.offsetWidth,
+				h:_this.images.wheel.offsetHeight
+			};
+
+			var pos=
+			{
+				x:evt.pageX+_this.doorway.manager.div.scrollLeft,
+				y:evt.pageY+_this.doorway.manager.div.scrollTop
+			};
+
+			var focal_point=getOffset(_this.arrowDiv);
+			focal_point.x+=size.w/2+_this.doorway.manager.div.scrollLeft;
+			focal_point.y+=size.h/2+_this.doorway.manager.div.scrollTop;
+
+			var rads=Math.PI/2-Math.atan2(focal_point.y-pos.y,pos.x-focal_point.x);
+			var degs=rads*180/Math.PI;
+			rotate(_this.images.wheel,degs);
+
+			var dist=getDistance(pos,focal_point);
+			var max_dist=Math.min(size.w/2,size.h/2);
+
+			if(dist>max_dist)
+				dist=max_dist;
+
+			var speed_rot=(65.75/max_dist)*dist-77.5;
+			rotate(_this.images.needle,speed_rot);
+
+			var max_power=parseInt(""+_this.get_pilot_power()*100);
+			var forward=max_power*(pos.x-focal_point.x)/size.w*2;
+			var turn=max_power*(pos.y-focal_point.y)/size.h*2;
+
+			_this.pilot.power.L=parseInt(""+clamp(forward-turn,
+				-max_power,max_power));
+			_this.pilot.power.R=parseInt(""+clamp(-forward-turn,
+				-max_power,max_power));
+			_this.pilot_send();
+		}
+	};
+	this.arrowDiv.addEventListener('mousedown', downfunc,true);
+	document.addEventListener('mousemove', rotatefunc,true);
+	document.addEventListener('mouseup', upfunc,true);
+
+	//Kill power when tab/window isn't in focus.
+	window.addEventListener("blur",function()
+	{
+		_this.pilot.power.L=0;
+		_this.pilot.power.R=0;
+		_this.pilot_send();
+	});
 }
 
 pilot_interface_t.prototype.update_drive_text=function()
@@ -377,7 +410,8 @@ pilot_interface_t.prototype.update_drive_text=function()
 
 
 // Return the drive power the user has currently selected
-pilot_interface_t.prototype.get_pilot_power=function() {
+pilot_interface_t.prototype.get_pilot_power=function()
+{
 	var maxPower=1.0;
 
 	var powerUI=0.2;
@@ -388,109 +422,68 @@ pilot_interface_t.prototype.get_pilot_power=function() {
 	return maxPower;
 }
 
-// This function is called at every mouse event.
-//   mouse_down_del: +1 if down, -1 if up, 0 if unchanged (move)
-//   mouse_in_del: +1 if entering, -1 if leaving, 0 if unchanged
-pilot_interface_t.prototype.pilot_mouse=function(event,mouse_down_del,mouse_in_del) {
-	if (mouse_in_del) this.mouse_in_div=mouse_in_del;
-
-	if (mouse_down_del>0) this.mouse_down=1;
-	if (mouse_down_del<0) this.mouse_down=-1;
-
-	// console.log("Mouse event: down="+this.mouse_down+"  down del="+mouse_down_del+"   in="+this.mouse_in_div+"  in del="+mouse_in_del);
-
-// Allow user to set maximum power
-	var maxPower=this.get_pilot_power();
-
-	var arrowDiv=this.arrowDiv;
-	var frac=getMouseFraction(event,arrowDiv);
-	var str="";
-
-	var dir={ forward: pretty(0.5-frac.y), turn:pretty(frac.x-0.5) };
-
-	str+="Move "+dir.forward+" forward, "+dir.turn+" turn<br>\n";
-
-//Proportional control.  The 2.0 is because mouse is from -0.5 to +0.5
-	dir.forward=dir.forward*2.0*maxPower;
-	dir.turn=dir.turn*2.0*maxPower;
-
-	var mousePower={"L":0.0, "R":0.0};
-	mousePower.L=pretty(clamp(dir.forward+dir.turn,-maxPower,maxPower));
-	mousePower.R=pretty(clamp(dir.forward-dir.turn,-maxPower,maxPower));
-
-	if (this.mouse_down>0 && this.mouse_in_div>0) {
-	    arrowDiv.style.backgroundColor = '#909090';
-		str+=" SENDING";
-	} else {
-	    arrowDiv.style.backgroundColor = '#AAAAAA';
-		mousePower.L=mousePower.R=0.0;
-		str+=" (click to send)";
-	}
-
-	this.pilot.power.L=100.0*mousePower.L;
-	this.pilot.power.R=100.0*mousePower.R;
-	this.pilot_send();
-
-	// document.getElementById('p_outputPilot').innerHTML=str;
-	event.stopPropagation();
-};
-
-//This function is called at every keypress event
-// FIXME: Add proportional control
 pilot_interface_t.prototype.pilot_keyboard=function()
 {
-	if (this.mouse_in_div<1)
+	if(!this.doorway.active||this.dragging)
 		return;
 
-	// console.log("Keyboard activity");
 	var maxPower=this.get_pilot_power();
 
-	// Return true if this key (as a string) is pressed
+	//Return true if this key (as a string) is pressed
 	var keyInput=this.keyInput;
-	var keyDown=function(key,alternateKey) {
+	var keyDown=function(key,alternateKey)
+	{
 		var code=key.charCodeAt(0);
-		// console.log("Key code "+code+" : "+keyInput.keys_down[code]);
+		if(keyInput.keys_down[code])
+			return true;
 
-		if (keyInput.keys_down[code]) return true;
-
-		if (alternateKey) return keyDown(alternateKey);  // hacky recursion
+		//hacky recursion
+		if(alternateKey)
+			return keyDown(alternateKey);
 		return false;
 	}
 
-	var forward=0.0, turn=0.0;
-
-	if(keyDown('a','A')) turn-=1.0; // 'a' is pressed, turn left
-	if(keyDown('d','D')) turn+=1.0; //'d' is pressed, turn right
-	if(keyDown('s','S')) forward-=1.0; //'s' is pressed, reverse
-	if(keyDown('w','W')) forward+=1.0;
-	if(keyDown(' ')) turn=forward=0.0; // stop!
-
+	var forward=0.0;
+	var turn=0.0;
+	if(keyDown('a','A'))
+		turn-=1.0;
+	if(keyDown('d','D'))
+		turn+=1.0;
+	if(keyDown('s','S'))
+		forward-=1.0;
+	if(keyDown('w','W'))
+		forward+=1.0;
+	if(keyDown(' '))
+		turn=forward=0.0;
 	if(!keyDown('a','A')&&!keyDown('d','D')&&!keyDown('s','S')&&!keyDown('w','W'))
 		forward=turn=0;
 
-	if (turn == 0.0 && forward == 0.0)
-	{ this.keyboardIsDriving = false; }
+	this.keyboardIsDriving=(turn!=0.0||forward!=0.0);
+
+	//steering wheel rotation
+	//upper half cases
+	if(forward>0||(forward>0&&turn!=0))
+		dir=turn*45;
+
+	//lower half cases
+	else if(forward<0||(forward<0&&turn!=0))
+		dir=180-turn*45;
+
+	//side cases
+	else if(forward==0&&turn!=0)
+		dir=turn*90;
+
+	//starting & ending point
 	else
-	{ this.keyboardIsDriving = true; }
+		dir=0;
 
-    // steering wheel rotation
-	if (forward > 0 || (forward > 0 && turn != 0)) // upper half cases
-	{ dir = turn * 45; }
-	else if (forward < 0 || (forward < 0 && turn != 0)) // lower half cases
-	{ dir = 180 - turn * 45; }
-	else if (forward == 0 && turn != 0) // side cases
-	{ dir = turn * 90; }
-	else { dir = 0; } // starting & ending point
+	rotate(this.images.wheel,dir);
 
-	rotate(this.images.wheel, dir);
-
-    // spedometer needle rotation
+	//spedometer needle rotation
 	var ang = maxPower * 65.75 - 77.5;
-	if (this.keyboardIsDriving)
-	{ rotate(this.images.needle, ang); }
-	else
-	{ rotate(this.images.needle, -77.5); }
-
+	if(!this.keyboardIsDriving)
+		ang=-77.5;
+	rotate(this.images.needle, ang);
 
 	this.pilot.power.L=100.0*clamp(maxPower*(forward+turn),-maxPower,+maxPower);
 	this.pilot.power.R=100.0*clamp(maxPower*(forward-turn),-maxPower,+maxPower);
@@ -498,51 +491,60 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 }
 
 
-// It's not clear a pilot needs to download data, but it's easy:
 pilot_interface_t.prototype.download=function(robot)
 {
-	//superstar_get(robot,"pilot",function(newPilot) { this.pilot=newPilot; });
-	//this.pilot=robot_network.pilot;
 }
 
 pilot_interface_t.prototype.upload=function(robot)
 {
-	//superstar_set(robot,"pilot",this.pilot);
 	robot_network.pilot=this.pilot;
-	if (robot.sim) robot.update_pilot(this.pilot);
+	if(robot.sim)
+		robot.update_pilot(this.pilot);
 }
 
 // This is a simple placeholder, to get things working for now:
-pilot_interface_t.prototype.pilot_send=function() {
-	//if (this.onpilot) console.log("Pilot Send - Power L: " + this.pilot.power.L)
-	if (this.onpilot) this.onpilot(this.pilot);
+pilot_interface_t.prototype.pilot_send=function()
+{
+	if(this.onpilot)
+		this.onpilot(this.pilot);
 };
 
-pilot_interface_t.prototype.handle_gamepad_input=function(myself) {
-	var axes = navigator.getGamepads()[0].axes;
-	myself.pilot.power.L = 0;
-	myself.pilot.power.R = 0;
+pilot_interface_t.prototype.handle_gamepad_input=function()
+{
+	var axes=navigator.getGamepads()[0].axes;
+	this.pilot.power.L=0;
+	this.pilot.power.R=0;
 
-	if (axes[0] < -0.1) {
-		myself.pilot.power.R += -axes[0];
+	if(axes[0]<-0.1)
+		this.pilot.power.R-=axes[0];
+	if(axes[0]>0.1)
+		this.pilot.power.L+=axes[0];
+	if(axes[1]<-0.1)
+	{
+		this.pilot.power.L-=axes[1];
+		this.pilot.power.R-=axes[1];
 	}
-	if (axes[0] > 0.1) {
-		myself.pilot.power.L+= axes[0];
+	if(axes[1]>0.1)
+	{
+		this.pilot.power.L-=axes[1];
+		this.pilot.power.R-=axes[1];
 	}
-	if (axes[1] < -0.1) {
-		myself.pilot.power.L+= -axes[1];
-		myself.pilot.power.R += -axes[1];
-	}
-	if (axes[1] > 0.1) {
-		myself.pilot.power.L+= -axes[1];
-		myself.pilot.power.R += -axes[1];
-	}
-	myself.pilot.power.L*= 50;
-	myself.pilot.power.R *= 50;
-	// console.log(`L: ${myself.pilot.power.L}`);
-	// console.log(`R: ${myself.pilot.power.R}`);
-	myself.pilot_send();
+	this.pilot.power.L*=50;
+	this.pilot.power.R*=50;
+	this.pilot_send();
 }
+
+
+
+
+
+
+
+
+
+
+
+
 /*
   This is the real version, with network spam prevention and authentication and such.
 

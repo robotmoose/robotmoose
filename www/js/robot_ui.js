@@ -314,7 +314,7 @@ robot_ui_t.prototype.create_widgets=function()
 	{
 		config:new config_editor_t(this.doorways.config.content),
 		states:new state_table_t(this.doorways.states,this.modal_div),
-		pilot:new pilot_interface_t(this.doorways.pilot.content),
+		pilot:new pilot_interface_t(this.doorways.pilot.content,this.doorways.pilot),
 		charts:new chart_interface_t(this.doorways.charts.content),
 
 		sensors:new tree_viewer_t(this.doorways.sensors.content,{},
