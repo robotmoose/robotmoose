@@ -661,7 +661,6 @@ config_editor_t.prototype.refresh_m=function()
 				break;
 		}
 	}
-
 	this.configure_button.disabled=!configureable;
 
 	if(this.onrefresh)

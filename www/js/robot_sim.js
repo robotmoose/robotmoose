@@ -73,20 +73,35 @@ function robot_sim_t()
 	this.reset_wheels();
 }
 	
-/*
+
 // Move robot to location
-robot_sim_t.prototype.change_location=function(x_cord, y_cord, z_cord)
+robot_sim_t.prototype.change_location=function(x_cord, y_cord, z_cord, angle)
 {
 	if (!x_cord) x_cord = 0;
 	if (!y_cord) y_cord = 0;
 	if (!z_cord) z_cord = 0;
+	if (!angle) angle = 0;
 	
-	this.wheel[0]=new vec3(x_cord,y_cord+0.5*this.wheelbase,z_cord);
-	this.wheel[1]=new vec3(x_cord,y_cord-0.5*this.wheelbase,z_cord);	
+	var angle_rad = angle*Math.PI/180
+	
+	w_0_x = x_cord - 0.5*this.wheelbase*Math.sin(angle_rad);
+	w_0_y = y_cord + 0.5*this.wheelbase*Math.cos(angle_rad);
+	
+	w_1_x = x_cord + 0.5*this.wheelbase*Math.sin(angle_rad);
+	w_1_y = y_cord - 0.5*this.wheelbase*Math.cos(angle_rad);
+	
+	console.log("angle_rad: " + angle_rad);
+	
+
+	this.wheel[0]=new vec3(w_0_x, w_0_y, z_cord);
+	this.wheel[1]=new vec3(w_1_x, w_1_y, z_cord);
+
+	//this.wheel[0]=new vec3(x_cord,y_cord+0.5*this.wheelbase,z_cord);
+	//this.wheel[1]=new vec3(x_cord,y_cord-0.5*this.wheelbase,z_cord);	
 	
 	this.drive_wheels(0.0,0.0);
 }
-*/
+
 
 // Reset positions of wheels:
 // Taken from robot_2wd

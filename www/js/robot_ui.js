@@ -321,7 +321,7 @@ robot_ui_t.prototype.create_widgets=function()
 		[
 			{key:"bumper",type:"binary"}
 		]),
-		map:new robot_map_t(this.doorways.map.content,{}),
+		map:new robot_map_t(this.doorways.map.content,this.modal_div, _this.robot),
 		video:new video_widget_t(this.doorways.video,_this.pilot_heartbeat),
 		UI:new UI_builder_t(this.doorways.UI.content),
 		sound:new sound_player_t(this.doorways.sound.content,_this.robot),
