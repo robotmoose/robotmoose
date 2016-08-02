@@ -1,5 +1,5 @@
 //Mike Moss
-//07/21/2016
+//08/02/2016
 //Contains client code to get requests from a superstar server.
 
 //Superstar object.
