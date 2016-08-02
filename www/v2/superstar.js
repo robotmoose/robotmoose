@@ -4,8 +4,16 @@
 
 //Superstar object.
 //  Variable this.queue to store requests in until .flush is called.
-function superstar_t()
+function superstar_t(superstar)
 {
+	if(!this.superstar)
+		this.superstar=window.location.host;
+	if(this.superstar.substr(0,9)=="127.0.0.1"||
+		this.superstar.substr(0,9)=="localhost")
+			this.superstar="http://"+this.superstar;
+	else if(this.superstar.substr(0,7)!="http://"&&
+		this.superstar.substr(0,8)!="https://")
+		this.superstar="https://"+this.superstar;
 	this.queue=[];
 	this.comets=[];
 }
@@ -93,7 +101,7 @@ superstar_t.prototype.get_next=function(path,success_cb,error_cb)
 			if(xmlhttp.status==200)
 			{
 				//Cleanup
-				xmlhttp.needs_to_die=true;
+				xmlhttp.already_dead=true;
 				_this.cleanup_comets();
 
 				try
@@ -142,7 +150,7 @@ superstar_t.prototype.get_next=function(path,success_cb,error_cb)
 			}
 		}
 	};
-	xmlhttp.open("POST","/superstar/",true);
+	xmlhttp.open("POST",this.superstar+"/superstar/",true);
 	xmlhttp.send(JSON.stringify(request));
 
 	//Limit to 5 comet connections...
@@ -226,7 +234,7 @@ superstar_t.prototype.cleanup_comets=function()
 	for(var ii in this.comets)
 		if(this.comets[ii].needs_to_die)
 			this.comets[ii].abort();
-		else
+		else if(!this.comets[ii].already_dead)
 			new_comets.push(this.comets[ii]);
 	this.comets=new_comets;
 }
@@ -330,7 +338,7 @@ superstar_t.prototype.flush=function()
 			}
 		}
 	};
-	xmlhttp.open("POST","/superstar/",true);
+	xmlhttp.open("POST",this.superstar+"/superstar/",true);
 	xmlhttp.send(JSON.stringify(batch));
 }
 
