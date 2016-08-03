@@ -56,7 +56,7 @@ name_t.prototype.destroy=function()
 
 name_t.prototype.get_robot=function()
 {
-	var robot={superstar:"127.0.0.1:8081",school:null,name:null,year:null};
+	var robot={superstar:"robotmoose.com",school:null,name:null,year:null};
 
 	if(this.year_select.selected_index()>0&&
 		this.school_select.selected_index()>0&&
@@ -77,7 +77,7 @@ name_t.prototype.load=function(robot)
 	if(!this.onloaded_robot)
 		this.onloaded_robot={};
 	if(!this.onloaded_robot.superstar)
-		this.onloaded_robot.superstar="127.0.0.1:8081";
+		this.onloaded_robot.superstar="robotmoose.com";
 	this.update_superstars_m();
 }
 
@@ -98,11 +98,11 @@ name_t.prototype.update_superstars_m=function()
 {
 	var superstar_options=
 	[
-		"127.0.0.1:8081",
+		"robotmoose.com",
 		"test.robotmoose.com",
 		"androidantelope.com",
 		"cyborgcaribou.com",
-		"robotmoose.com"
+		"127.0.0.1:8081"
 	];
 
 	this.build_superstars_m(superstar_options);
@@ -174,6 +174,7 @@ name_t.prototype.on_error_m=function(error)
 
 name_t.prototype.download_years_m=function()
 {
+	robot_set_superstar(this.superstar_select.selected());
 	this.build_years_m();
 	this.build_schools_m();
 	this.build_robots_m();
@@ -201,6 +202,7 @@ name_t.prototype.download_years_m=function()
 				_this.superstar_ok=false;
 			}
 		);
+		superstar.flush();
 		return;
 	}
 	this.update_years_m();
@@ -235,6 +237,7 @@ name_t.prototype.download_schools_m=function()
 				_this.superstar_ok=false;
 			}
 		);
+		superstar.flush();
 		return;
 	}
 	this.update_schools_m();
@@ -269,6 +272,7 @@ name_t.prototype.download_robots_m=function()
 				_this.superstar_ok=false;
 			}
 		);
+		superstar.flush();
 		return;
 	}
 	this.update_robots_m();

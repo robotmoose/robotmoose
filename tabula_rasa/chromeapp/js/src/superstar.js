@@ -377,37 +377,32 @@ function robot_to_starpath(robot)
 	return path;
 }
 
-function robot_set_superstar(robot)
+function robot_set_superstar(url)
 {
-	if(!robot)
-		return;
-	if(superstar.fix_url(robot.superstar)!=superstar.superstar)
+	if(superstar.fix_url(url)!=superstar.superstar)
 	{
 		superstar.destroy();
-		superstar=new superstar_t(robot.superstar);
+		superstar=new superstar_t(url);
+		console.log("SETTING SUPERSTAR TO: "+JSON.stringify(url));
 	}
 }
 
 function superstar_get(robot,path,on_success,on_error)
 {
-	robot_set_superstar(robot);
 	superstar.get(robot_to_starpath(robot)+path,on_success,on_error);
 }
 
 function superstar_set(robot,path,json,on_success,on_error)
 {
-	robot_set_superstar(robot);
 	superstar.set(robot_to_starpath(robot)+path,json,robot.auth,on_success,on_error);
 }
 
 function superstar_sub(robot,path,on_success,on_error)
 {
-	robot_set_superstar(robot);
 	superstar.sub(robot_to_starpath(robot)+path,on_success,on_error);
 }
 
 function superstar_append(robot,path,json,length,on_success,on_error)
 {
-	robot_set_superstar(robot);
 	superstar.push(robot_to_starpath(robot)+path,json,length,robot.auth,on_success,on_error);
 }

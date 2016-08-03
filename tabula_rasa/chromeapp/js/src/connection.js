@@ -506,16 +506,16 @@ connection_t.prototype.arduino_setup_complete=function()
 	{
 		for (var field in pilot.power)
 			_this.power[field]=pilot.power[field];
-	}
-	);
+		console.log("CALLED PILOT");
+	});
 
 	_this.network_getnext(robot_to_starpath(this.robot)+"config",function(config)
 	{
 		//need to reconfigure Arduino
 		if(config.counter!=_this.last_config.counter)
 			_this.reconnect();
-	}
-	);
+		console.log("CALLED CONFIG");
+	});
 }
 
 // Look up all the properties for our currently configured set of devices,
