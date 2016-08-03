@@ -92,7 +92,7 @@ function modal_connect_t(div)
 			_this.hide();
 		}, function(err) {
 			// window.alert("GOSH!");
-			if (err.includes("(status 401)"))
+			if (err.message.includes("auth"))
 			{
 				_this.robot_auth_group.className="form-group has-feedback has-error";
 				_this.robot_auth_span.style.visibility="visible";
@@ -104,7 +104,7 @@ function modal_connect_t(div)
 					});*/
 			} else {
 				$.notify({
-					message: "Error connecting to Superstar: " + err
+					message: "Superstar error("+err.code+") - "+err.message
 				}, {
 					type: 'danger',
 					z_index: 1050
