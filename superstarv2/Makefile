@@ -17,13 +17,10 @@ ifeq ($(shell uname),Darwin)
 	CFLAGS+=-Wno-deprecated-register
 endif
 
-all: superstar unit_tests
+all: superstar
 
 superstar: $(SRC)/main.cpp $(COMMON_SRC) $(JSONCPP_SRC) $(MONGOOSE_SRC) $(UTILITY_SRC)
 	$(CXX) $(CFLAGS) $^ $(LIB) -o $@
 
-unit_tests: $(SRC)/unit_tests.cpp $(COMMON_SRC) $(JSONCPP_SRC) $(MONGOOSE_SRC) $(UTILITY_SRC)
-	$(CXX) $(CFLAGS) $^ $(LIB) -o $@
-
 clean:
-	-rm -f superstar superstar.exe unit_tests unit_tests.exe
+	-rm -f superstar superstar.exe
