@@ -7,8 +7,6 @@
 function superstar_t(superstar)
 {
 	this.superstar=superstar;
-	if(!this.superstar)
-		this.superstar=window.location.host;
 	this.superstar=this.fix_url(this.superstar);
 	this.queue=[];
 	this.comets=[];
@@ -22,11 +20,11 @@ superstar_t.prototype.destroy=function()
 
 superstar_t.prototype.fix_url=function(url)
 {
-	if(url.substr(0,9)=="127.0.0.1"||
-		url.substr(0,9)=="localhost")
+	if(!url)
+		url=window.location.host;
+	if(url.substr(0,9)=="127.0.0.1"||url.substr(0,9)=="localhost")
 			url="http://"+url;
-	else if(url.substr(0,7)!="http://"&&
-		url.substr(0,8)!="https://")
+	else if(url.substr(0,7)!="http://"&&url.substr(0,8)!="https://")
 		url="https://"+url;
 	return url;
 }
@@ -383,9 +381,7 @@ function robot_set_superstar(robot)
 {
 	if(!robot)
 		return;
-	if(!robot.superstar)
-		robot.superstar="127.0.0.1:8081";
-	if(robot.superstar&&superstar.fix_url(robot.superstar)!=superstar.superstar)
+	if(superstar.fix_url(robot.superstar)!=superstar.superstar)
 	{
 		superstar.destroy();
 		superstar=new superstar_t(robot.superstar);
