@@ -19,7 +19,7 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 	this.current_pilot=null;
 
 	var _this=this;
-	this.timeout_time=5000;
+	this.timeout_time=2500;
 	this.timeout=null;
 	this.video_timer=null;
 
