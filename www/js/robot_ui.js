@@ -40,6 +40,8 @@ function robot_ui_t(gui_div,menu_div,modal_div)
 
 	this.create_gui();
 
+	this.request_uuid();
+
 	var _this=this;
 	var options=parse_uri(location.search);
 	validate_robot_name(options.robot,
@@ -386,4 +388,43 @@ robot_ui_t.prototype.create_doorway=function(title,tooltip,help_text)
 		return doorway;
 	else
 		return this.doorway_manager.create(title,undefined,tooltip,help_text);
+}
+
+robot_ui_t.prototype.request_uuid=function()
+{
+	var _this=this;
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.onreadystatechange=function()
+	{
+		if(xmlhttp.readyState==4)
+		{
+			if(xmlhttp.status==200)
+			{
+				_this.uuid=xmlhttp.responseText;
+				try
+				{
+					_this.widgets.video.uuid=_this.uuid;
+				}
+				catch(error)
+				{
+					var set_uuid=function()
+					{
+						try
+						{
+							_this.widgets.video.uuid=_this.uuid;
+						}
+						catch(error)
+						{
+							setTimeout(set_uuid,100);
+						}
+					};
+					set_uuid();
+				}
+			}
+			else
+				setTimeout(function(){_this.request_uuid();},100);
+		}
+	};
+	xmlhttp.open("GET","/superstar/?uuid=true&rand="+Date.now(),true);
+	xmlhttp.send(null);
 }

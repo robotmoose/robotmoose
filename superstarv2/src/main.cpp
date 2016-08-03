@@ -10,6 +10,7 @@
 #include <mongoose/mongoose.h>
 #include "mongoose_util.hpp"
 #include <stdexcept>
+#include <sstream>
 #include <string>
 #include "string_util.hpp"
 #include "superstar.hpp"
@@ -26,6 +27,9 @@ comet_mgr_t comet_mgr;
 //Post log.
 std::string post_log_name("superstar.log");
 std::ofstream post_log(post_log_name.c_str());
+
+//UUID variables...
+int64_t last_uuid=0;
 
 //Time variables...
 const int64_t backup_time=20000;
@@ -103,9 +107,25 @@ void http_handler(mg_connection* conn,int event,void* event_data)
 			//Get requests...
 			else if(method=="GET")
 			{
-				//Starting "/superstar/" means a database query.
+
+				//Starting "/superstar/" means a database query or UUID.
 				if(starts_with_superstar)
 				{
+					//Query for UUID
+					char buffer[10];
+					if(mg_get_http_var(&msg->query_string,"uuid",buffer,10)>0)
+					{
+						int64_t uuid=millis();
+						while(uuid<=last_uuid)
+							++uuid;
+						last_uuid=uuid;
+						std::ostringstream ostr;
+						ostr<<uuid;
+						mg_send(conn,"200 OK",ostr.str());
+						return;
+					}
+
+					//Database Query
 					request=request.substr(10,request.size()-10);
 					mg_send(conn,"200 OK",JSON_serialize(superstar.get(request)));
 				}

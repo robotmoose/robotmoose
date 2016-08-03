@@ -19,6 +19,7 @@ function gui_t(div)
 		if(evt.permission==="media"||evt.permission==="fullscreen")
 			evt.request.allow();
 	});
+	this.last_uuid=null;
 
 	this.superstar_errored=false;
 
@@ -33,6 +34,7 @@ function gui_t(div)
 			_this.auth_input.enable();
 			_this.serial_selector.disconnect();
 			_this.sound_player.disconnect();
+			_this.pilot_status.reset();
 		},
 		function()
 		{
@@ -49,7 +51,7 @@ function gui_t(div)
 		function(robot)
 		{
 			_this.connection.gui_robot(robot);
-			_this.load_gruveo(robot);
+			_this.load_gruveo(robot,this.last_uuid);
 			_this.chat.load(robot);
 		}
 
@@ -73,12 +75,9 @@ function gui_t(div)
 		},
 		function()
 		{
-			return (_this.name.get_robot().school!=null&&
-				_this.name.get_robot().name!=null&&
-				_this.name.get_robot().year!=null);
+			return valid_robot(_this.name.get_robot());
 		}
 	);
-
 
 	this.connection.on_name_set=function(robot)
 	{
@@ -111,14 +110,6 @@ function gui_t(div)
 			{type:"bottom",resizable:true,content:this.chat_div,size:"20%"}
 		]
 	});
-
-	this.gruveo_check=setInterval(function(){
-
-		if(_this.pilot_status.last_video&&!_this.pilot_status.video_closed)
-			{
-				_this.load_gruveo(_this.name.get_robot());
-			}
-	},1000);
 
 	this.fullscreen_button=document.createElement("input");
 	this.serial_selector.el.appendChild(this.fullscreen_button);
@@ -153,14 +144,24 @@ function gui_t(div)
 	this.pilot_checkmark=new checkmark_t(this.main_div);
 	this.pilot_status_text=this.pilot_checkmark.getElement();
 	this.pilot_status_text.align="center";
-	this.pilot_status_text.style.fontSize="x-large";
-	this.pilot_status_text.innerHTML="Pilot connected";
+	this.pilot_status_text.style.fontSize="large";
+	this.pilot_status_text.innerHTML="Pilots connected (0)";
 	this.main_div.appendChild(document.createElement("br"));
 
-	this.pilot_status=new pilot_status_t(this.name,this.pilot_checkmark,function()
+	this.pilot_status=new pilot_status_t(this.name,this.pilot_checkmark);
+	this.pilot_status.onchange=function(num)
 	{
-		_this.load_gruveo(_this.name.get_robot());
-	});
+		_this.pilot_status_text.innerHTML="Pilots connected ("+num+")";
+	}
+	this.pilot_status.onvideohangup=function(uuid)
+	{
+		_this.load_gruveo(_this.name.get_robot(),uuid);
+	}
+	this.pilot_status.onvideocall=function(uuid)
+	{
+		_this.load_gruveo(_this.name.get_robot(),uuid);
+	}
+
 	this.chat=new chatter_t(this.chat_div,this.name.get_robot(),20,"Caretaker");
 }
 
@@ -172,12 +173,16 @@ gui_t.prototype.destroy=function()
 	this.div.removedChild(this.el);
 }
 
-gui_t.prototype.load_gruveo=function(robot)
+gui_t.prototype.load_gruveo=function(robot,uuid)
 {
-	var url="https://gruveo.com/";
-	var robot_url="";
-	if(robot&&robot.year&&robot.school&&robot.name)
-		robot_url=superstar.superstar+robot.year+robot.school+robot.name;
-	url+=encodeURIComponent(robot_url.replace(/[^A-Za-z0-9\s!?]/g,''));
-	this.gruveo.src=url;
+	if(uuid!=this.last_uuid)
+	{
+		this.last_uuid=uuid;
+		var url="https://gruveo.com/";
+		var robot_url="";
+		if(valid_robot(robot)&&uuid)
+			robot_url=uuid+superstar.superstar+robot.year+robot.school+robot.name;
+		url+=encodeURIComponent(robot_url.replace(/[^A-Za-z0-9\s!?]/g,''));
+		this.gruveo.src=url;
+	}
 }
