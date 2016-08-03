@@ -477,13 +477,15 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 	else
 		dir=0;
 
-	rotate(this.images.wheel,dir);
+	if(this.images&&this.images.wheel)
+		rotate(this.images.wheel,dir);
 
 	//spedometer needle rotation
 	var ang = maxPower * 65.75 - 77.5;
 	if(!this.keyboardIsDriving)
 		ang=-77.5;
-	rotate(this.images.needle, ang);
+	if(this.images&&this.images.needle)
+		rotate(this.images.needle, ang);
 
 	this.pilot.power.L=100.0*clamp(maxPower*(forward+turn),-maxPower,+maxPower);
 	this.pilot.power.R=100.0*clamp(maxPower*(forward-turn),-maxPower,+maxPower);

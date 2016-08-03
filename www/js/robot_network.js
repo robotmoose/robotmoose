@@ -11,19 +11,19 @@ function robot_network_t()
 			{
 				if(valid_robot(_this.robot))
 				{
-					superstar_set_and_get_multiple
-					(
-						_this.robot,
-						"pilot",
-						_this.pilot,
-						["active_experiment","config","frontendStatus"],
-						function(json)
-						{
-							_this.active_experiment=json[0];
-							_this.config=json[1];
-							_this.frontendStatus=json[2];
-						}
-					);
+					superstar_set(_this.robot,"pilot",_this.pilot);
+					superstar_get(_this.robot,"active_experiment",function(data)
+					{
+						_this.active_experiment=data;
+					});
+					superstar_get(_this.robot,"config",function(data)
+					{
+						_this.config=data;
+					});
+					superstar_get(_this.robot,"frontendStatus",function(data)
+					{
+						_this.frontendStatus=data;
+					});
 				}
 			},
 			ms:300
@@ -40,9 +40,9 @@ function robot_network_t()
 
 					});
 
-					superstar_generic(_this.robot,"chat","?get",function(str)
+					superstar_get(_this.robot,"chat",function(data)
 					{
-						_this.chat=str;
+						_this.chat=data;
 					});
 				}
 			},
@@ -74,8 +74,24 @@ robot_network_t.prototype.set_robot=function(robot)
 {
 	this.robot=robot;
 	var _this=this;
-	superstar_getnext(this.robot,"sensors",function(json)
+
+	robot_set_superstar(robot);
+	superstar_get(_this.robot,"sensors",function(data)
 	{
-		_this.sensors=json;
+		_this.sensors=data;
 	});
+
+	var func=function()
+	{
+		superstar.get_next(robot_to_starpath(_this.robot)+"sensors",function(json)
+		{
+			_this.sensors=json;
+			func();
+		},
+		function()
+		{
+			func();
+		});
+	}
+	func();
 }

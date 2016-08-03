@@ -79,7 +79,7 @@ function gui_t(div)
 		}
 	);
 
-	
+
 	this.connection.on_name_set=function(robot)
 	{
 		_this.name.load(robot);
@@ -176,7 +176,7 @@ gui_t.prototype.load_gruveo=function(robot)
 	var url="https://gruveo.com/";
 	var robot_url="";
 	if(robot&&robot.year&&robot.school&&robot.name)
-		robot_url=robot.year+robot.school+robot.name;
+		robot_url=superstar.superstar+robot.year+robot.school+robot.name;
 	url+=encodeURIComponent(robot_url.replace(/[^A-Za-z0-9\s!?]/g,''));
 	this.gruveo.src=url;
 }

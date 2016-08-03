@@ -77,9 +77,8 @@ video_widget_t.prototype.download=function(robot,option)
 	if(option && option.video_link)
 	{
 		var myself=this;
-		var robot_url=this.robot.year+this.robot.school+this.robot.name;
+		var robot_url=superstar.superstar+this.robot.year+this.robot.school+this.robot.name;
 		var url=option.video_link+option.video_uri+robot_url.replace(/[^A-Za-z0-9\s!?]/g,'');
-
 		this.frame=document.createElement("iframe");
 		this.frame.src=url;
 		this.frame.style.width="100%";

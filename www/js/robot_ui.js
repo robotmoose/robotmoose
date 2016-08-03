@@ -74,16 +74,11 @@ robot_ui_t.prototype.create_menus=function()
 
 	this.connect_menu.onconnect=function(robot)
 	{
-
 		if(robot)
 		{
-			if(robot.sim)
-				_this.robot=robot;
-			else
-			{
-				_this.robot=JSON.parse(JSON.stringify(robot));
+			_this.robot=JSON.parse(JSON.stringify(robot));
+			if(!robot.sim)
 				robot_network.sim="";
-			}
 			clearInterval(_this.gui.interval);
 			_this.gui.interval=null;
 			_this.menu.get_status_area().innerHTML="Connected<br/>"+
@@ -341,7 +336,7 @@ robot_ui_t.prototype.create_widgets=function()
 	}
 	this.widgets.states.onrun=function()
 	{
-		setTimeout(function(){_this.doorway_manager.activate(_this.doorways.UI);},100);
+		setTimeout(function(){_this.doorways.UI.activate();},100);
 		_this.widgets.UI.run();
 		if(_this.robot.name)
 		{
@@ -357,7 +352,6 @@ robot_ui_t.prototype.create_widgets=function()
 	}
 	this.widgets.pilot.onpilot=_this.state_runner.onpilot=function(power)
 	{
-		//console.log("Pilot data upload: "+_this.robot.name);
 		if(_this.robot.name)
 			_this.widgets.pilot.upload(_this.robot);
 	}

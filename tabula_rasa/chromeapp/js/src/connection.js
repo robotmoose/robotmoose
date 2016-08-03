@@ -52,16 +52,7 @@ connection_t.prototype.reset=function() {
 	_this.sensors={}; // Arduino-reported sensor values
 	_this.sensors.power={}; // Commanded values reflected back up to pilot
 
-	// Cancel all outstanding getnext calls
-	if ( _this.getnexts) {
-		//console.log("Cleaning " + _this.getnexts.length + " getnext sockets.")
-		this.getnexts.forEach(function(conn) {
-			conn.abort();
-		});
-		_this.getnexts.splice(0);
-	} else {
-		_this.getnexts = [];
-	}
+	superstar.kill_comets();
 
 	// Localization
 	_this.location=new vec3(0,0,0);
@@ -476,19 +467,30 @@ connection_t.command_property_list={
 
 // Persistently request this superstar path, sending
 //   the resulting JSON object to this function.
-connection_t.prototype.network_getnext=function(path,on_success) {
+connection_t.prototype.network_getnext=function(path,on_success)
+{
 	var _this=this;
-	var state=superstar_getnext(_this.robot,path,
-		function(json) {
-			if (_this.connected()) {
-				_this.status_message("	Updated "+path+"="+JSON.stringify(json,null,'	'));
 
-				on_success(json);
-			} // else we're done
-		}
-	);
+	superstar.get(path,function(data)
+	{
+		if(on_success)
+			on_success(data);
+	});
 
-	_this.getnexts.push(state);
+	var func=function()
+	{
+		superstar.get_next(path,function(data)
+		{
+			if(_this.connected)
+			{
+				if(on_success)
+					on_success(data);
+				func();
+			}
+		});
+	};
+
+	func();
 }
 
 
@@ -499,19 +501,19 @@ connection_t.prototype.arduino_setup_complete=function()
 	_this.status_message("  arduino setup complete... sending command packet");
 	_this.arduino_send_packet();
 
-	// Set up network comms:
-	_this.network_getnext("pilot",function(pilot) {
-		for (var field in pilot.power) {
+	//Set up network comms:
+	_this.network_getnext(robot_to_starpath(this.robot)+"pilot",function(pilot)
+	{
+		for (var field in pilot.power)
 			_this.power[field]=pilot.power[field];
-		}
 	}
 	);
 
-	_this.network_getnext("config",function(config) {
-		if (config.counter!=_this.last_config.counter)
-		{ // need to reconfigure Arduino
+	_this.network_getnext(robot_to_starpath(this.robot)+"config",function(config)
+	{
+		//need to reconfigure Arduino
+		if(config.counter!=_this.last_config.counter)
 			_this.reconnect();
-		}
 	}
 	);
 }

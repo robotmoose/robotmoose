@@ -56,7 +56,7 @@ name_t.prototype.destroy=function()
 
 name_t.prototype.get_robot=function()
 {
-	var robot={superstar:"robotmoose.com",school:null,name:null,year:null};
+	var robot={superstar:"127.0.0.1:8081",school:null,name:null,year:null};
 
 	if(this.year_select.selected_index()>0&&
 		this.school_select.selected_index()>0&&
@@ -77,7 +77,7 @@ name_t.prototype.load=function(robot)
 	if(!this.onloaded_robot)
 		this.onloaded_robot={};
 	if(!this.onloaded_robot.superstar)
-		this.onloaded_robot.superstar="robotmoose.com";
+		this.onloaded_robot.superstar="127.0.0.1:8081";
 	this.update_superstars_m();
 }
 
@@ -98,11 +98,11 @@ name_t.prototype.update_superstars_m=function()
 {
 	var superstar_options=
 	[
-		"robotmoose.com",
+		"127.0.0.1:8081",
 		"test.robotmoose.com",
 		"androidantelope.com",
 		"cyborgcaribou.com",
-		"127.0.0.1:8081"
+		"robotmoose.com"
 	];
 
 	this.build_superstars_m(superstar_options);

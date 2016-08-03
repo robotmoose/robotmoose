@@ -169,7 +169,6 @@ doorway_manager_t.prototype.onmousedown=function(event,doorway)
 		this.dragging.doorway=doorway;
 		var offset_left=-parseInt(this.dragging.doorway.panel.offsetLeft);
 		var offset_top=-parseInt(this.dragging.doorway.panel.offsetTop);
-		console.log(this.div.scrollTop);
 
 		if(!offset_left)
 			offset_left=0;

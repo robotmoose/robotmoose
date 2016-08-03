@@ -169,11 +169,6 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 		}
 		else if(method=="set")
 		{
-			if(opts["value"]==Json::nullValue)
-			{
-				bad_params=true;
-				goto error_label;
-			}
 			response["result"]=true;
 			superstar.set(path,opts["value"]);
 			comet_mgr.update_path(path,superstar);
@@ -184,11 +179,6 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 		}
 		else if(method=="push")
 		{
-			if(opts["value"]==Json::nullValue)
-			{
-				bad_params=true;
-				goto error_label;
-			}
 			//Length is either null or an integer...optional field...
 			if(!opts["length"].isUInt()&&!opts["length"].isNull())
 			{
