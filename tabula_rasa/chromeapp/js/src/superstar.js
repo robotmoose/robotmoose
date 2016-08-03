@@ -383,7 +383,6 @@ function robot_set_superstar(url)
 	{
 		superstar.destroy();
 		superstar=new superstar_t(url);
-		console.log("SETTING SUPERSTAR TO: "+JSON.stringify(url));
 	}
 }
 
