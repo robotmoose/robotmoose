@@ -401,7 +401,25 @@ robot_ui_t.prototype.request_uuid=function()
 			if(xmlhttp.status==200)
 			{
 				_this.uuid=xmlhttp.responseText;
-				_this.widgets.video.uuid=_this.uuid;
+				try
+				{
+					_this.widgets.video.uuid=_this.uuid;
+				}
+				catch(error)
+				{
+					var set_uuid=function()
+					{
+						try
+						{
+							_this.widgets.video.uuid=_this.uuid;
+						}
+						catch(error)
+						{
+							setTimeout(set_uuid,100);
+						}
+					};
+					set_uuid();
+				}
 			}
 			else
 				setTimeout(function(){_this.request_uuid();},100);
