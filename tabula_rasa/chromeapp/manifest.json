@@ -30,6 +30,7 @@
 		{
 			"scripts":
 			[
+				"js/cryptojs/hmac-sha256.js",
 				"js/src/background.js",
 				"js/src/checkmark.js",
 				"js/src/connection.js",
@@ -46,8 +47,8 @@
 				"js/src/uri.js",
 				"js/src/vector.js",
 				"js/src/window.js",
-                "js/include/jquery.min.js",
-                "js/include/w2ui-1.4.3.min.js"
+				"js/include/jquery.min.js",
+				"js/include/w2ui-1.4.3.min.js"
 			]
 		}
 	},

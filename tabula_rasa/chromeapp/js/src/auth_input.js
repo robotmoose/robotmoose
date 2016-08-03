@@ -18,7 +18,6 @@ function auth_input_t(div, on_change)
 	{
 		var value=this.value;
 		on_change(value);
-		console.log(value);
 		this.value="";
 		for(var ii=0;ii<value.length;++ii)
 			this.value+=" ";

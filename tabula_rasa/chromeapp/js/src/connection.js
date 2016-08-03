@@ -268,20 +268,25 @@ connection_t.prototype.arduino_send_options=function()
 	var _this=this;
 	_this.status_message(" Sending option list to superstar...");
 	superstar_set(_this.robot,"options",_this.arduino_options,
-		function() {
+		function()
+		{
 			_this.status_message(" Sent option list to superstar");
 			_this.arduino_setup_devices();
 		},
-	function(err) {
-	  if (err.includes("(status 401)")) {
-		var err="Authentication error connecting to Superstar!\nMake sure your password is correct.";
-		_this.status_message(err);
-		_this.gui_disconnect();
-		if(_this.on_auth_error)
-			_this.on_auth_error(err);
-	  } else {
-		_this.status_message("Error connecting to Superstar: " + err);
-	  }
+	function(err)
+	{
+		if(err.code==-32000)
+		{
+			var err="Authentication error connecting to Superstar!\nMake sure your password is correct.";
+			_this.status_message(err);
+			_this.gui_disconnect();
+			if(_this.on_auth_error)
+				_this.on_auth_error(err);
+		}
+		else
+		{
+			_this.status_message("Error connecting to Superstar: " + err);
+		}
 	}
 	);
 }

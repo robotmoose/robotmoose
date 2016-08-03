@@ -75,7 +75,7 @@ robot_network_t.prototype.set_robot=function(robot)
 	this.robot=robot;
 	var _this=this;
 
-	robot_set_superstar(robot);
+	robot_set_superstar(robot.superstar);
 	superstar_get(_this.robot,"sensors",function(data)
 	{
 		_this.sensors=data;

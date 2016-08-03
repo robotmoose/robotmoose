@@ -87,29 +87,24 @@ function modal_connect_t(div)
 		localStorage.previous_robot = robot.name;
 
 		// Check connection validity
-		superstar_set(robot, 'authtest', 'authtest', function() {
+		superstar_set(robot, 'authtest', 'authtest', function()
+		{
 			if(_this.onconnect) _this.onconnect(robot);
 			_this.hide();
-		}, function(err) {
-			// window.alert("GOSH!");
-			if (err.message.includes("auth"))
+		},
+		function(err)
+		{
+			if(err.code==-32000)
 			{
 				_this.robot_auth_group.className="form-group has-feedback has-error";
 				_this.robot_auth_span.style.visibility="visible";
 				_this.robot_auth.focus();
-				/*$.notify({
-						message: _this.auth_error_str}, {
-						type: 'danger',
-						z_index: 1050
-					});*/
-			} else {
-				$.notify({
-					message: "Superstar error("+err.code+") - "+err.message
-				}, {
-					type: 'danger',
-					z_index: 1050
-				});
-      }
+			}
+			else
+			{
+				$.notify({message:"Superstar error("+err.code+") - "+err.message},
+					{type:'danger',z_index:1050});
+			}
 		})
 	};
 	this.modal.get_footer().appendChild(this.connect_button);
