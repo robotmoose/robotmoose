@@ -46,12 +46,19 @@ function robot_ui_t(gui_div,menu_div,modal_div)
 		// good robot:
 		function(robot)
 		{
-			//console.log("Connecting to URL robot "+JSON.stringify(robot));
 			_this.connect_menu.onconnect(robot);
 		},
 		// bad robot:
-		function()
+		function(robot)
 		{
+			if(robot)
+			{
+				localStorage.previous_year=robot.year;
+				localStorage.previous_school=robot.school;
+				localStorage.previous_robot=robot.name;
+				_this.connect_menu.show_auth_error();
+			}
+
 			_this.connect_menu.show();
 		});
 	this.pilot_heartbeat = new pilot_status_t(this);

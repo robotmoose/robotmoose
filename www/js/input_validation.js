@@ -158,45 +158,58 @@ function skip_whitespace(str,col,line)
 }
 
 function validate_robot_name(robot_name,on_ok,on_notok)
-{	
-	if(robot_name)
+{
+	if(!robot_name)
 	{
-		var split=robot_name.split("/");
-
-		if(split.length==3)
-		{
-			var year=split[0];
-			var school=split[1];
-			var name=split[2];
-
-			var name_in_path=function(path, name, foundit) {
-				superstar_sub(null,path, 
-					function(list) {
-						if (array_find(list,name)>=0) foundit();
-						else {
-							if(on_notok)
-								on_notok();
-						}
-					}
-				);
-			}
-			
-			name_in_path("",year, function() {
-				name_in_path(year,school, function() {
-					// don't check robot name--lets you make new robots via &robot=2016/oldschool/newname trick
-					if(on_ok) {
-						var robot={};
-						robot.year=year;
-						robot.school=school;
-						robot.name=name;
-						on_ok(robot);
-					}
-				})
-			});
-		}
-	}
-	else {
 		if(on_notok)
 			on_notok();
+		return;
 	}
+
+	var split=robot_name.split("/");
+	if(split.length!=3)
+	{
+		if(on_notok)
+			on_notok();
+		return;
+	}
+
+	var year=split[0];
+	var school=split[1];
+	var name=split[2];
+	var name_in_path=function(path,name,foundit)
+	{
+		superstar.sub("/robots/"+path,function(list)
+		{
+			if(array_find(list,name)>=0)
+				foundit();
+			else if(on_notok)
+				on_notok();
+		});
+		superstar.flush();
+	}
+
+	name_in_path("",year,function()
+	{
+		name_in_path(year,school,function()
+		{
+			name_in_path(year+"/"+school,name,function()
+			{
+				var robot={};
+				robot.year=year;
+				robot.school=school;
+				robot.name=name;
+				superstar.set("/robots/"+year+"/"+school+"/"+name+"/authtest/","authtest","",function()
+				{
+					if(on_ok)
+						on_ok(robot);
+				},
+				function()
+				{
+					if(on_notok)
+						on_notok(robot);
+				});
+			})
+		})
+	});
 }

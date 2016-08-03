@@ -96,9 +96,7 @@ function modal_connect_t(div)
 		{
 			if(err.code==-32000)
 			{
-				_this.robot_auth_group.className="form-group has-feedback has-error";
-				_this.robot_auth_span.style.visibility="visible";
-				_this.robot_auth.focus();
+				_this.show_auth_error();
 			}
 			else
 			{
@@ -271,4 +269,11 @@ modal_connect_t.prototype.update_disables_m=function()
 	this.school_select.disabled=(this.year_select.selectedIndex==0);
 	this.robot_select.disabled=(this.year_select.selectedIndex==0||this.school_select.selectedIndex==0);
 	this.connect_button.disabled=(this.year_select.selectedIndex==0||this.school_select.selectedIndex==0||this.robot_select.selectedIndex==0);
+}
+
+modal_connect_t.prototype.show_auth_error=function()
+{
+	this.robot_auth_group.className="form-group has-feedback has-error";
+	this.robot_auth_span.style.visibility="visible";
+	this.robot_auth.focus();
 }
