@@ -76,9 +76,15 @@ robot_ui_t.prototype.create_menus=function()
 	{
 		if(robot)
 		{
-			_this.robot=JSON.parse(JSON.stringify(robot));
-			if(!robot.sim)
+			if (robot.sim)
+				_this.robot = robot;
+			else
+			{
+				_this.robot=JSON.parse(JSON.stringify(robot));
 				robot_network.sim="";
+			}
+			
+				
 			clearInterval(_this.gui.interval);
 			_this.gui.interval=null;
 			_this.menu.get_status_area().innerHTML="Connected<br/>"+

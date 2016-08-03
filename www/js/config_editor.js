@@ -94,12 +94,19 @@ config_editor_t.prototype.download=function(robot)
 		return;
 
 	var myself=this;
-
-	superstar_get(robot,"options",function(options)
-	{
-		myself.get_options_m(options);
-		myself.download_m(robot);
-	});
+	
+	if (!robot.sim)
+		superstar_get(robot,"options",function(options)
+		{
+			myself.get_options_m(options);
+			myself.download_m(robot);
+		});
+	else
+		sim_get(robot,"options",function(options)
+		{
+			myself.get_options_m(options);
+			myself.download_m(robot);
+		});
 }
 
 config_editor_t.prototype.upload=function(robot)
