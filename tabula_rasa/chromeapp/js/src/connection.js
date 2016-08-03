@@ -1145,7 +1145,7 @@ connection_t.prototype.load=function()
 			if(!data.superstar)
 				data.superstar="robotmoose.com";
 
-			if(_this.on_name_set&&data&&data.superstar&&data.robot&&data.robot.school&&data.robot.name)
+			if(_this.on_name_set&&valid_robot(data.robot))
 				_this.on_name_set(data.robot);
 			else
 				_this.on_name_set();

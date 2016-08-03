@@ -1,4 +1,4 @@
-function dropdown_t(div,enable_callback,onchange)
+function dropdown_t(div,enable_callback,onchange,default_value)
 {
 	if(!div)
 		return null;
@@ -29,6 +29,12 @@ function dropdown_t(div,enable_callback,onchange)
 		window.focus();
 	});
 	this.disabled=false;
+	if(default_value)
+	{
+		var option=document.createElement("option");
+		option.text=option.value=default_value;
+		this.select.appendChild(option);
+	}
 }
 
 dropdown_t.prototype.destroy=function()
