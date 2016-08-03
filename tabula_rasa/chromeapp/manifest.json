@@ -1,8 +1,8 @@
 {
-	"name":"RobotMoose",
-	"short_name":"RobotMoose",
-	"description":"Robotics backend software.",
-	"version":"2016.6.25.0",
+	"name":"RobotMoose test",
+	"short_name":"RobotMoose test",
+	"description":"Robotics backend software (test version from git).",
+	"version":"2016.8.2.0",
 	"manifest_version":2,
 	"permissions":
 	[
