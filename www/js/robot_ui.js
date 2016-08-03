@@ -425,6 +425,6 @@ robot_ui_t.prototype.request_uuid=function()
 				setTimeout(function(){_this.request_uuid();},100);
 		}
 	};
-	xmlhttp.open("GET","?uuid=true&rand="+Date.now(),true);
+	xmlhttp.open("GET","/superstar/?uuid=true&rand="+Date.now(),true);
 	xmlhttp.send(null);
 }
