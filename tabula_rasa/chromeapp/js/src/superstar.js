@@ -107,8 +107,8 @@ superstar_t.prototype.get_next=function(path,success_cb,error_cb)
 				xmlhttp.already_dead=true;
 				_this.cleanup_comets();
 
-				//try
-				//{
+				try
+				{
 					//Parse response, call responses.
 					var response=JSON.parse(xmlhttp.responseText);
 
@@ -127,18 +127,18 @@ superstar_t.prototype.get_next=function(path,success_cb,error_cb)
 					//Server error...
 					else
 						handle_error(response.error);
-				//}
-                //
-				////Handle bad parse or throw...
-				//catch(error)
-				//{
-				//	var error_obj=
-				//	{
-				//		code:0,
-				//		message:error
-				//	};
-				//	handle_error(error_obj);
-				//}
+				}
+
+				//Handle bad parse or throw...
+				catch(error)
+				{
+					var error_obj=
+					{
+						code:0,
+						message:error
+					};
+					handle_error(error_obj);
+				}
 			}
 
 			//Handle bad connection...
@@ -290,8 +290,8 @@ superstar_t.prototype.flush=function()
 		{
 			if(xmlhttp.status==200)
 			{
-				//try
-				//{
+				try
+				{
 					//Parse response, call responses.
 					var response=JSON.parse(xmlhttp.responseText);
 
@@ -320,19 +320,19 @@ superstar_t.prototype.flush=function()
 					else
 						for(var key in old_queue)
 							handle_error(old_queue[key],response.error);
-				//}
-                //
-				////Handle bad parse or throw...
-				//catch(error)
-				//{
-				//	var error_obj=
-				//	{
-				//		code:0,
-				//		message:error
-				//	};
-				//	for(var key in old_queue)
-				//		handle_error(old_queue[key],error_obj);
-				//}
+				}
+
+				//Handle bad parse or throw...
+				catch(error)
+				{
+					var error_obj=
+					{
+						code:0,
+						message:error
+					};
+					for(var key in old_queue)
+						handle_error(old_queue[key],error_obj);
+				}
 			}
 
 			//Handle bad connection...
