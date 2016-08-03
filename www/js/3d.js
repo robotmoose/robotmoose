@@ -403,6 +403,10 @@ function renderer_t(div,setup_func,loop_func)
 
 		var line_geometry=new THREE.Geometry();
 		var line_material=new THREE.LineBasicMaterial({color:0x0488c8,linewidth:1.5});
+		
+		var axis_geometry=new THREE.Geometry();
+		var axis_material=new THREE.LineBasicMaterial({color:0x0488c8,linewidth:30});
+		
 
 		for(var xx=0;xx<=width;++xx)
 		{
@@ -417,17 +421,19 @@ function renderer_t(div,setup_func,loop_func)
 			line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0,-size*height/2+yy*size,0));
 			line_geometry.vertices.push(new THREE.Vector3(size*width/2.0,-size*height/2+yy*size,0));
 		}
-		if (showOrigin) { // add extra lines around origin
-		  for (var del=-showOrigin;del<=showOrigin;del+=showOrigin/32) {
-			line_geometry.vertices.push(new THREE.Vector3(del,-size*height/2,0));
-			line_geometry.vertices.push(new THREE.Vector3(del,+size*height/2,0));
-			line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0,del,0));
-			line_geometry.vertices.push(new THREE.Vector3(+size*width/2.0,del,0));
-		  }
+		if (showOrigin) { // add thick line around origin
+
+		 	axis_geometry.vertices.push(new THREE.Vector3(0,-size*height/2,0));
+			axis_geometry.vertices.push(new THREE.Vector3(0,+size*height/2,0));
+			axis_geometry.vertices.push(new THREE.Vector3(-size*width/2.0,0,0));
+			axis_geometry.vertices.push(new THREE.Vector3(+size*width/2.0,0,0));
+		 
 		}
 
 		var line=new THREE.Line(line_geometry,line_material,THREE.LinePieces);
+		var axis_line = new THREE.Line(axis_geometry,axis_material,THREE.LinePieces);
 		plane.add(line);
+		plane.add(axis_line);
 
 
 
