@@ -120,31 +120,32 @@ function gui_t(div)
 			}
 	},1000);
 
-	this.is_fullscreen=false;
 	this.fullscreen_button=document.createElement("input");
 	this.serial_selector.el.appendChild(this.fullscreen_button);
 	this.fullscreen_button.type="button";
-	this.fullscreen_button.value="Enter Fullscreen";
+	var fullscreen_text="Fullscreen";
+	var not_fullscreen_text="Exit Fullscreen";
+	this.fullscreen_button.value=fullscreen_text;
 	this.fullscreen_button.style.width="50%";
 	this.fullscreen_button.onclick=function()
 	{
-		_this.is_fullscreen=!_this.is_fullscreen;
-
-		if(_this.is_fullscreen)
-		{
-			document.body.webkitRequestFullscreen();
-			this.value="Exit Fullscreen Mode";
-		}
-		else
-		{
+		if(document.webkitIsFullScreen)
 			document.webkitExitFullscreen();
-			this.value="Enter Fullscreen Mode";
-		}
+		else
+			document.body.webkitRequestFullscreen();
 	}
 	this.fullscreen_button.addEventListener("permissionrequest",function(evt)
 	{
 		if(evt.permission==="fullscreen")
 			evt.request.allow();
+	});
+
+	document.addEventListener("webkitfullscreenchange",function()
+	{
+		if(document.webkitIsFullScreen)
+			_this.fullscreen_button.value=not_fullscreen_text;
+		else
+			_this.fullscreen_button.value=fullscreen_text;
 	});
 
 	this.sound_player=new sound_player_t(this.name);
