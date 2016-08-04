@@ -79,6 +79,7 @@ function gui_t(div)
 		}
 	);
 
+	this.media_selector=new media_selector_t(this.main_div, this.gruveo);
 	this.connection.on_name_set=function(robot)
 	{
 		_this.name.load(robot);
