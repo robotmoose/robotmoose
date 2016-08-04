@@ -16,11 +16,7 @@ function auth_input_t(div, on_change)
 	this.input.type="password";
 	this.input.onchange=function()
 	{
-		var value=this.value;
-		on_change(value);
-		this.value="";
-		for(var ii=0;ii<value.length;++ii)
-			this.value+=" ";
+		on_change(this.value);
 	};
 	div.appendChild(this.input);
 }

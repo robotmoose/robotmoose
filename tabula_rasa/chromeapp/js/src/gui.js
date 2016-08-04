@@ -57,10 +57,11 @@ function gui_t(div)
 
 	);
 
-	this.auth_input = new auth_input_t(
-			this.main_div,
-			function(auth) { _this.connection.gui_auth(auth) }
-			);
+	this.auth_input=new auth_input_t(this.main_div,function(auth)
+	{
+		_this.connection.gui_auth(auth);
+		_this.load_gruveo(_this.connection.robot,_this.pilot_status.current_pilot);
+	});
 
 	this.serial_selector=new serial_selector_t
 	(
@@ -79,7 +80,7 @@ function gui_t(div)
 		}
 	);
 
-	this.media_selector=new media_selector_t(this.main_div, this.gruveo);
+	//this.media_selector=new media_selector_t(this.main_div, this.gruveo);
 	this.connection.on_name_set=function(robot)
 	{
 		_this.name.load(robot);
@@ -177,11 +178,21 @@ gui_t.prototype.destroy=function()
 
 gui_t.prototype.load_gruveo=function(robot,uuid)
 {
-	this.last_uuid=uuid;
+	if(uuid)
+		this.last_uuid=uuid;
+	else
+		uuid=this.last_uuid;
+	if(!uuid)
+		uuid="";
 	var url="https://gruveo.com/";
 	var robot_url="";
+	if(!robot.auth)
+		robot.auth="";
 	if(valid_robot(robot)&&uuid)
+	{
 		robot_url=uuid+superstar.superstar+robot.year+robot.school+robot.name;
+		robot_url=CryptoJS.HmacSHA256(robot_url,robot.auth).toString(CryptoJS.enc.Hex);
+	}
 	url+=encodeURIComponent(robot_url.replace(/[^A-Za-z0-9\s!?]/g,''));
 	this.gruveo.src=url;
 }
