@@ -13,52 +13,41 @@ The typical usage model puts the front end on the robot pilot's web browser, sup
 
 ## Installation and Setup
 
-First, you need the version control system git to get this code.  For Mac, use [GitHub for Mac](https://desktop.github.com/).  For Windows, use [Git for Windows](https://msysgit.github.io/).  For Ubuntu, use:
-```
-sudo apt-get install git make g++ freeglut3-dev arduino
-```
-
-Now clone our software repository:
-```
-git clone https://github.com/robotmoose/robotmoose
-```
-
-The easy way to get started is to connect a **simulated** robot backend to our robotmoose.com superstar server:
-```
-cd ~/robotmoose/tabula_rasa
-make
-./backend --robot 2016/test/yourbot --sim
-```
-
-You should immediately be able to pilot the simulated robot by choosing your robot at http://robotmoose.com/robots/
-
+To get started with a simulated robot, just visit [robotmoose.com/robots/](https://robotmoose.com/robots/), and click the "Simulate a Robot" button. This will let you get a general sense of how the website works.
 
 ### Firmware Installation and Physical Backend
-To use a real physical Arduino with real robot components, you first need to make sure you have permission to access the USB serial port where the Arduino connects.  On Ubuntu, you need to be a member of the "dialout" group:
-```
-sudo usermod -a -G dialout $USER
-```
+
+You need Google Chrome to run the backend, the version control system git to get this code, and the Arduino IDE to flash the Arduino firmware.
+
+Windows:
+* [Google Chrome](https://www.google.com/chrome/browser/desktop/index.html)
+* [Git for Windows](https://msysgit.github.io/)
+* [Arduino IDE](https://www.arduino.cc/en/Main/Software)
+
+macOS:
+* [Google Chrome](https://www.google.com/chrome/browser/desktop/index.html)
+* [GitHub for Mac](https://desktop.github.com/)
+* [Arduino IDE](https://www.arduino.cc/en/Main/Software)
+
+Ubuntu:
+* [Google Chrome](https://www.google.com/chrome/browser/desktop/index.html)
+* Terminal command: `sudo apt-get install git arduino`
+
+Now open Terminal (macOS/Ubuntu) or Command Prompt (Windows), and run this command to download the code:
+
+    git clone https://github.com/robotmoose/robotmoose
+
+On Ubuntu, you'll need to run this command to give yourself access to serial devices:
+
+    sudo usermod -a -G dialout $USER
+
 You'll need to log out and log back in to be in the new group.
 
-Now plug in the Arduino and flash the firmware at robotmoose/tabula_rasa/arduino, using either the Arduino IDE or the Makefile there:
-```
-cd ~/robotmoose/tabula_rasa/arduino
-make mega
-```
-or, if using an UNO:
-```
-cd ~/robotmoose/tabula_rasa/arduino
-make uno
-```
-You can doublecheck the installation by opening the Arduino as a serial port at 57600 baud, and you should get a welcome message.
+Now plug in the Arduino and open the Arduino IDE. Open the project at `robotmoose/arduino/arduino.ino`, and click the upload button.
 
+You can double check the installation by opening the Arduino as a serial port at 57600 baud. You should get a welcome message.
 
-Now run the backend again, but leave off the "--sim" argument, and the backend will connect to the Arduino and configure it:
-```
-cd ~/robotmoose/tabula_rasa
-make
-./backend --robot 2016/test/yourbot
-```
+Open Chrome, and [install the backend app](https://chrome.google.com/webstore/detail/robotmoose/ecadjbcmgjcekpogchpochjieaimpegf?hl=en). Open the backend app, enter your year/school/robot info, and click connect.
 
 You can now use the web interface to configure and pilot your robot!
 
@@ -77,30 +66,23 @@ There are many options for robot driving hardware (tabula_rasa/arduino/motor_con
 
 There are also several robot peripherals supported:
 * "pwm" is a pulse width modulated (PWM) pin, which can be used to smoothly vary the brightness of an LED.  For example, pin 13 is the standard Arduino LED, so you can control it by adding a pwm device on pin 13, and dragging the brightness slider around.  This is a good first project to try!
-* "servo" is an RC servo, like with a model plane.  You can hook the servo's white control wire to any Arduino pin, and power the red from 5v and black to ground.  In the "Drive" tab, you set the servo position in degrees, from 0 to 180 degrees. 
+* "servo" is an RC servo, like with a model plane.  You can hook the servo's white control wire to any Arduino pin, and power the red from 5v and black to ground.  In the "Drive" tab, you set the servo position in degrees, from 0 to 180 degrees.
 * "analog" reads an Arduino analog pin, like A3.  The read value will show up in the Sensors tab.
 * "neato" is a Neato XV-11 laser distance sensor, which uses a laser to measure distance in a 360 degree plane around the robot.  You give a serial port to read the neato's serial data distance reports, and a pin to control the neato's motor power via a transistor.
 * "latency" measures the Arduino firmware's control loop latency, in milliseconds.  It should normally read 1 millisecond.
 * "heartbeat" is incremented every 10ms by Arduino firmware.  If you can see this number changing in the "Sensors" tab, you have connectivity between the web front end, superstar, backend, and Arduino.  If this number stops changing, something has been disconnected.
 
-
-
-### Making a Superstar 
-For most tasks, it's best to use UAF's main superstar server (http://robotmoose.com/superstar/).  But if you don't have reliable internet access, or want to change our web user interface code, you need your own local superstar server.
+### Making a Superstar
+For most tasks, it's best to use UAF's main superstar server (http://robotmoose.com/superstar/).  But if you don't have reliable internet access, or want to change our web user interface code, you need your own local superstar server. These instructions assume you're running macOS or Ubuntu, with basic dev tools installed.
 
 To make and run your own local copy of superstar:
 ```
-cd ~/robotmoose/superstar
+cd ~/robotmoose/superstarv2
 make
 ./superstar > log &
 ```
 
-Connect a robot backend to this local interface using:
-```
-cd ~/robotmoose/tabula_rasa
-make
-./backend --robot 2016/test/yourbot --superstar http://localhost:8081/
-```
+Connect a robot backend to this local interface by setting the first dropdown to "127.0.0.1:8081".
 
 You should now be able to point your web browser to [http://localhost:8081/robots/](http://localhost:8081/robots/) and see your local copy of the web user interface.  Edit the files in ~/robotmoose/www/js and hit reload to modify the interface.  You can also manually examine the entries in [http://localhost:8081/superstar/](http://localhost:8081/superstar/) to see how the robot configuration, sensor, and pilot information is exchanged, using superstar get and set operations.
 
@@ -128,7 +110,7 @@ ioctl("TIOCMGET"): Invalid argument
 Even if you manage to flash the Arduino, if you have a permission problem the backend will hang when connecting to the Arduino:
 ```
 Uploading new config to arduino!
-Arduino startup: 
+Arduino startup:
 ```
 
 A temporary fix is to force the Arduino device to be readable and writeable, but this will need to be repeated every time you unplug the Arduino:
@@ -166,7 +148,7 @@ If you get an error similar to this when you try to `make` Superstar:
 	make: "/usr/home/christopher/Code/robotmoose/superstar/Makefile" line 9: Need an operator
 	make: Fatal errors encountered -- cannot continue
 	make: stopped in /usr/home/christopher/Code/robotmoose/superstar
-	
+
 The problem is that Superstar's `Makefile` uses GNU make-specific features. To solve the problem, install `gmake` on your system (if it's not installed already), then run `gmake` instead of `make`.
 
 
@@ -175,17 +157,7 @@ The problem is that Superstar's `Makefile` uses GNU make-specific features. To s
 This is an NSF-funded ITEST research project, with full name:
 Collaborative Research: ITEST-Strategies: Human-Centered Robotics Experiences for Exploring Engineering, Computer Science, and Society
 
-Seta Bogosyan <sbogosyan@alaska.edu>, PI
-Orion Lawlor <lawlor@alaska.edu>, Co-PI
-Cindy Hmelo-Silver <chmelosi@gmail.com>, Co-PI
-Selma Sabanovic <selmas@indiana.edu>, Co-PI
-
-
-
-To get all the backend scripts on an Ubuntu linux machine, including Raspbian:
-	sudo apt-get install freeglut3-dev cheese mpg321 imagemagick
-
-You'll also need a video conferencing (WebRTC) capable browser:
-	sudo apt-get install iceweasel
-
-
+* Seta Bogosyan <sbogosyan@alaska.edu>, PI
+* Orion Lawlor <lawlor@alaska.edu>, Co-PI
+* Cindy Hmelo-Silver <chmelosi@gmail.com>, Co-PI
+* Selma Sabanovic <selmas@indiana.edu>, Co-PI
