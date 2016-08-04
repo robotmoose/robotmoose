@@ -3,7 +3,7 @@
 //callback onchange(count) - Gives number of pilots when DOWNLOADED or TIMEDOUT.
 //callback onvideohangup(pilot_uuid) - Called when main pilot hangs up (uuid maybe null if no pilot is connected).
 //callback onvideocall(pilot_uuid) - Called when main pilot calls in.
-
+var blarg=30;
 function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 {
 	if(!name||!pilot_checkmark)
@@ -19,9 +19,12 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 	this.current_pilot=null;
 
 	var _this=this;
-	this.timeout_time=2500;
+	this.timeout_time=3500;
 	this.timeout=null;
 	this.video_timer=null;
+	this.videohungup=false;
+	this.can_call_again=true;
+	this.called=false;
 
 	var handle_get=function(data)
 	{
@@ -42,25 +45,70 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 				function(error)
 				{
 					console.log(error);
-					setTimeout(handle_get,1000);
+					setTimeout(handle_get,100);
 				});
 		else
 		{
-			setTimeout(handle_get,1000);
+			setTimeout(handle_get,100);
 		}
 	};
 	handle_get();
 
 	this.video_interval=setInterval(function()
 	{
-		var time=Date.now();
-		if(_this.current_pilot&&(time-_this.video_timer)>_this.timeout_time)
-		{
-			_this.current_pilot=null;
-			if(_this.onvideohangup)
-				_this.onvideohangup();
-		}
-	},1000);
+		//Get webview number of video elements.
+		var webview=document.querySelector("webview");
+		webview.executeScript
+		(
+			{code:"chrome.storage.local.set({robotmoose_pilot_status:document.getElementsByTagName('video').length});"},
+			function(results)
+			{
+				if(!chrome.runtime.lastError)
+				{
+					chrome.storage.local.get("robotmoose_pilot_status",function(result)
+					{
+						var time=Date.now();
+
+						//No heartbeats in a while, hangup.
+						if(_this.current_pilot&&(time-_this.video_timer)>_this.timeout_time&&!_this.videohungup&&!_this.called)
+						{
+							_this.video_timer=time+_this.timeout_time;
+							_this.current_pilot=null;
+							_this.videohungup=true;
+							_this.called=false;
+							if(_this.onvideohangup)
+								_this.onvideohangup(_this.current_pilot);
+						}
+
+						//Heartbeats and hungup, call.
+						if(_this.current_pilot&&_this.videohungup)
+						{
+							_this.videohungup=false;
+							_this.called=true;
+							if(_this.onvideocall)
+								_this.onvideocall(_this.current_pilot,null);
+						}
+
+						//User hangups on their side.
+						if(result.robotmoose_pilot_status<=0&&!_this.videohungup&&_this.can_call_again)
+						{
+							//Call
+							if(_this.onvideocall)
+								_this.onvideocall(_this.current_pilot,null);
+
+							//Put repeating calls in a timeout to prevent infinite calling.
+							_this.can_call_again=false;
+							setTimeout(function()
+							{
+								if(!_this.can_call_again)
+									_this.can_call_again=true;
+							},_this.timeout_time);
+						}
+					})
+				}
+			}
+		);
+	},500);
 }
 
 pilot_status_t.prototype.destroy=function()
@@ -115,6 +163,7 @@ pilot_status_t.prototype.update=function(new_pilots)
 	{
 		//Go through pilots that are online, check them against our pilots.
 		for(var ii in new_pilots)
+		{
 			if(ii in this.pilots)
 			{
 				//New heartbeats, add pilots and set timeout.
@@ -145,6 +194,11 @@ pilot_status_t.prototype.update=function(new_pilots)
 						this.video_timer=time;
 				}
 			}
+			else
+			{
+				active_pilots[ii]=new_pilots[ii];
+			}
+		}
 
 		//Keep old pilots.
 		old_pilots=JSON.parse(JSON.stringify(this.pilots));
@@ -158,8 +212,6 @@ pilot_status_t.prototype.update=function(new_pilots)
 	{
 		this.current_pilot=elderest_pilot;
 		this.video_timer=time;
-		if(this.onvideocall)
-			this.onvideocall(this.current_pilot);
 	}
 
 	//Go through robots we already have, check to see if they are disconnected
@@ -167,19 +219,19 @@ pilot_status_t.prototype.update=function(new_pilots)
 	//  This also resets the pilot.
 	var robot=this.name.get_robot();
 	for(var ii in old_pilots)
-		if(!(ii in active_pilots))
+		if(!(ii in active_pilots)&&(this.pilot_timers[ii]||(time-this.pilot_timers[ii])>this.timeout_time))
 		{
 			superstar.set(robot_to_starpath(robot)+"frontend_status/"+ii,null);
 			if(ii==this.current_pilot)
 				this.current_pilot=null;
 		}
 
-	//Clear up out local timers (probably not needed...but it makes me sleep better...).
-	var new_pilot_timers={};
-	for(var ii in this.pilot_timers)
-		if((time-this.pilot_timers[ii])<this.timeout_time*2)
-			new_pilot_timers[ii]=this.pilot_timers[ii];
-	this.pilot_timers=new_pilot_timers;
+	////Clear up out local timers (probably not needed...but it makes me sleep better...).
+	//var new_pilot_timers={};
+	//for(var ii in this.pilot_timers)
+	//	if((time-this.pilot_timers[ii])<this.timeout_time*2)
+	//		new_pilot_timers[ii]=this.pilot_timers[ii];
+	//this.pilot_timers=new_pilot_timers;
 
 	//Update checkmark and such.
 	var old_pilot_connected=this.pilot_connected;
