@@ -71,7 +71,7 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 						//No heartbeats in a while, hangup.
 						if(_this.current_pilot&&(time-_this.video_timer)>_this.timeout_time&&!_this.videohungup)
 						{
-							_this.video_timer=time+_this.timeout_time*1.5;
+							_this.video_timer=time+_this.timeout_time*2;
 							_this.current_pilot=null;
 							_this.videohungup=true;
 							if(_this.onvideohangup)
@@ -99,7 +99,7 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 							{
 								if(!_this.can_call_again)
 									_this.can_call_again=true;
-							},_this.timeout_time*1.5);
+							},_this.timeout_time*2);
 						}
 					})
 				}
