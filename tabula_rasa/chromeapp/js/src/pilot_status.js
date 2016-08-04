@@ -19,11 +19,12 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 	this.current_pilot=null;
 
 	var _this=this;
-	this.timeout_time=3000;
+	this.timeout_time=3500;
 	this.timeout=null;
 	this.video_timer=null;
 	this.videohungup=false;
 	this.can_call_again=true;
+	this.called=false;
 
 	var handle_get=function(data)
 	{
@@ -69,11 +70,12 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 						var time=Date.now();
 
 						//No heartbeats in a while, hangup.
-						if(_this.current_pilot&&(time-_this.video_timer)>_this.timeout_time&&!_this.videohungup)
+						if(_this.current_pilot&&(time-_this.video_timer)>_this.timeout_time&&!_this.videohungup&&!_this.called)
 						{
-							_this.video_timer=time+_this.timeout_time*2;
+							_this.video_timer=time+_this.timeout_time;
 							_this.current_pilot=null;
 							_this.videohungup=true;
+							_this.called=false;
 							if(_this.onvideohangup)
 								_this.onvideohangup(_this.current_pilot);
 						}
@@ -82,6 +84,7 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 						if(_this.current_pilot&&_this.videohungup)
 						{
 							_this.videohungup=false;
+							_this.called=true;
 							if(_this.onvideocall)
 								_this.onvideocall(_this.current_pilot,null);
 						}
@@ -99,13 +102,13 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 							{
 								if(!_this.can_call_again)
 									_this.can_call_again=true;
-							},_this.timeout_time*2);
+							},_this.timeout_time);
 						}
 					})
 				}
 			}
 		);
-	},1000);
+	},500);
 }
 
 pilot_status_t.prototype.destroy=function()
