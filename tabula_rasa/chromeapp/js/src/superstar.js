@@ -162,6 +162,13 @@ superstar_t.prototype.get_next=function(path,success_cb,error_cb)
 	for(var ii=0;ii<this.comets.length-5;++ii)
 		this.comets[ii].needs_to_die=true;
 	this.cleanup_comets();
+
+	//Return connection (so user can abort).
+	xmlhttp.destroy=function()
+	{
+		xmlhttp.needs_to_die=true;
+	}
+	return xmlhttp;
 }
 
 //Changes auth for the given path and auth to the given value.

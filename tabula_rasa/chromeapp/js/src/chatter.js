@@ -1,10 +1,10 @@
-function chatter_t(div,robot,maxlines,handle)
+function chatter_t(div,maxlines,handle)
 {
-	if(!div||!robot)
+	if(!div)
 		return null;
 
 	this.div=div;
-	this.robot=robot;
+	this.robot=null;
 	this.maxlines=maxlines;
 	this.handle=handle;
 	var _this=this;
@@ -49,15 +49,16 @@ function chatter_t(div,robot,maxlines,handle)
 	};
 
 	this.prev_data="";
-
-	this.create_interval();
+	this.comet=null;
 }
 
 chatter_t.prototype.destroy=function()
 {
-	if(this.chat_interval)
-		clearInterval(this.chat_interval);
-	this.chat_interval=null;
+	if(this.comet)
+	{
+		this.comet.destroy();
+		this.comet=null;
+	}
 	try
 	{
 		this.div.removeChild(this.el);
@@ -65,11 +66,6 @@ chatter_t.prototype.destroy=function()
 	catch(error)
 	{}
 	this.div=this.robot=null;
-}
-
-chatter_t.prototype.load=function(robot)
-{
-	this.robot=robot;
 }
 
 chatter_t.prototype.chat=function(msg)
@@ -87,37 +83,55 @@ chatter_t.prototype.chat=function(msg)
 	}
 }
 
-chatter_t.prototype.create_interval=function()
+chatter_t.prototype.set_robot=function(robot)
 {
-	var _this=this;
-
-	if(this.chat_interval)
-		clearInterval(this.chat_interval);
-	this.chat_interval=setInterval(function()
+	if(JSON.stringify(robot)!=JSON.stringify(this.robot))
 	{
-		if(valid_robot(_this.robot))
-			superstar.get("chat",function(data)
+		this.robot=robot;
+		var _this=this;
+
+		if(this.comet)
+		{
+			this.comet.destroy();
+			this.comet=null;
+		}
+
+		var service=function(data)
+		{
+			var chat="";
+			for(var key in data)
 			{
-				//if(_this.history!=JSON.stringify(data))
-				 {
-				 	var chat="";
-					for(var key in data)
-						{
-							try
-							{
-								var obj=data[key];
-								if(obj.handle&&obj.message&&obj.time)
-								{
-									var time=moment(obj.time).fromNow();
-									chat+=obj.handle+" ("+time+"):\t"+obj.message+"\n";
-								}
-							}
-							catch(error)
-							{}
-						}
-					_this.history.value=chat;
-					_this.history.scrollTop=_this.history.scrollHeight;
+				try
+				{
+					var obj=data[key];
+					if(obj.handle&&obj.message&&obj.time)
+					{
+						var time=moment(obj.time).fromNow();
+						chat+=obj.handle+" ("+time+"):\t"+obj.message+"\n";
+					}
 				}
+				catch(error)
+				{}
+			}
+			_this.history.value=chat;
+			_this.history.scrollTop=_this.history.scrollHeight;
+			request();
+		};
+
+		var request=function()
+		{
+			_this.comet=superstar.get_next(robot_to_starpath(_this.robot)+"chat",function(data)
+			{
+				service(data);
 			});
-	},500);
+		};
+
+		if(valid_robot(this.robot))
+		{
+			superstar.get(robot_to_starpath(this.robot)+"chat",function(data)
+			{
+				service(data);
+			});
+		}
+	}
 }

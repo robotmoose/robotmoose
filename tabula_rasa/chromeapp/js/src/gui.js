@@ -52,7 +52,7 @@ function gui_t(div)
 		{
 			_this.connection.gui_robot(robot);
 			_this.load_gruveo(robot,_this.pilot_status.current_pilot);
-			_this.chat.load(robot);
+			_this.chat.set_robot(robot);
 		}
 
 	);
@@ -158,14 +158,14 @@ function gui_t(div)
 	}
 	this.pilot_status.onvideohangup=function(uuid)
 	{
-		_this.load_gruveo(_this.name.get_robot(),uuid);
+		_this.load_gruveo(_this.connection.robot,uuid);
 	}
 	this.pilot_status.onvideocall=function(uuid)
 	{
-		_this.load_gruveo(_this.name.get_robot(),uuid);
+		_this.load_gruveo(_this.connection.robot,uuid);
 	}
 
-	this.chat=new chatter_t(this.chat_div,this.name.get_robot(),20,"Caretaker");
+	this.chat=new chatter_t(this.chat_div,20,"Caretaker");
 }
 
 gui_t.prototype.destroy=function()
