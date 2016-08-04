@@ -51,7 +51,7 @@ function gui_t(div)
 		function(robot)
 		{
 			_this.connection.gui_robot(robot);
-			_this.load_gruveo(robot,this.last_uuid);
+			_this.load_gruveo(robot,_this.pilot_status.current_pilot);
 			_this.chat.load(robot);
 		}
 
