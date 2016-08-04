@@ -331,9 +331,13 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	rotate(this.images.wheel,0);
 	rotate(this.images.needle,-77.5);
 
-	var downfunc=function()
+	var downfunc=function(evt)
 	{
-		_this.dragging=true;
+		if(!_this.dragging)
+		{
+			_this.dragging=true;
+			rotatefunc(evt);
+		}
 	};
 
 	var upfunc=function()
