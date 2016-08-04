@@ -120,6 +120,7 @@ function gui_t(div)
 	this.fullscreen_button.style.width="50%";
 	this.fullscreen_button.onclick=function()
 	{
+		window.open("https://google.com/");
 		if(document.webkitIsFullScreen)
 			document.webkitExitFullscreen();
 		else
@@ -175,14 +176,11 @@ gui_t.prototype.destroy=function()
 
 gui_t.prototype.load_gruveo=function(robot,uuid)
 {
-	if(uuid!=this.last_uuid)
-	{
-		this.last_uuid=uuid;
-		var url="https://gruveo.com/";
-		var robot_url="";
-		if(valid_robot(robot)&&uuid)
-			robot_url=uuid+superstar.superstar+robot.year+robot.school+robot.name;
-		url+=encodeURIComponent(robot_url.replace(/[^A-Za-z0-9\s!?]/g,''));
-		this.gruveo.src=url;
-	}
+	this.last_uuid=uuid;
+	var url="https://gruveo.com/";
+	var robot_url="";
+	if(valid_robot(robot)&&uuid)
+		robot_url=uuid+superstar.superstar+robot.year+robot.school+robot.name;
+	url+=encodeURIComponent(robot_url.replace(/[^A-Za-z0-9\s!?]/g,''));
+	this.gruveo.src=url;
 }

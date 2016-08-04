@@ -91,7 +91,6 @@ video_widget_t.prototype.download=function(robot,option)
 			this.frame.style.pointerEvents="none";
 		if(this.pilot)
 			this.update_videobeats_interval=setInterval(function(){myself.pilot.update_videobeats();},1000);
-
 	}
 
 	if(this.pilot&& option&&!option.video_link)
