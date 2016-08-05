@@ -42,6 +42,7 @@
 #include <fstream>
 #include <string>
 #include "superstar/superstar.hpp"
+#include "robot.hpp"
 
 // Libraries needed for DSP
 #include <deque>
@@ -78,23 +79,14 @@ static simple_filter simple_filters[4];
 
 // ********** // 
 
-typedef struct {
-	std::string superstar = "127.0.0.1:8081";
-	std::string name = "";
-	std::string auth = "";
-} robotmoose_config;
-
-robotmoose_config robot;
+robot_t Robot;
 
 static const bool KINECT_1473 = true; // Need to upload special firmware if using Kinect Model #1473
+static const bool KINECT_UPSIDE_DOWN = false; // If Kinect is mounted upside down, flip angles.
 
 const GLuint WIDTH = 800, HEIGHT = 600;
 
 // ******************** // 
-
-void success(Json::Value obj) {
-	// Do nothing
-}
 
 // Function Prototypes
 void parse_config_string(std::string line);
@@ -133,7 +125,7 @@ int main(int argc, char* argv[]) {
 			parse_config_string(argv[i]);
 		}
 	}
-	if(robot.name == "") {
+	if(Robot.name == "") {
 		std::cout << "Error: No robot name entered\n";
 		return 1;
 	}
@@ -289,9 +281,9 @@ void parse_config_string(std::string str) {
 		else if(!key_fin) key += str[idx++];
 		else value += str[idx++];
 	}
-	if(key == "robot") robot.name = value;
-	else if(key == "superstar") robot.superstar = value;
-	else if(key == "auth") robot.auth = value;
+	if(key == "robot") Robot.name = value;
+	else if(key == "superstar") Robot.superstar = value;
+	else if(key == "auth") Robot.auth = value;
 	else std::cout << "Unrecognized Input\n";
 	std::cout << "Key: " << key << std:: endl;
 	std::cout << "Value: " << value << std::endl;
@@ -412,6 +404,7 @@ void in_callback(freenect_device* dev, int num_samples,
 					for(int i=0; i<2; ++i)
 						angle_avg += angles[i];
 					angle = angle_avg/2;
+					angle = KINECT_UPSIDE_DOWN ? -angle : angle;
 				 }
 				angle_counter = 0;
 			}
