@@ -5,7 +5,7 @@
 #ifndef JSON_UTIL_HPP
 #define JSON_UTIL_HPP
 
-#include <jsoncpp/json.h>
+#include "jsoncpp/json.h"
 #include <string>
 
 //Converts json to string (pretty prints with formatting...helpful for debugging...).

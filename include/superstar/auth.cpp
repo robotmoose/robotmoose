@@ -1,6 +1,6 @@
 #include "auth.hpp"
 
-#include <picosha2.h>
+#include "picosha2.h"
 #include <vector>
 
 static const size_t SHA256_HASH_SIZE=32;

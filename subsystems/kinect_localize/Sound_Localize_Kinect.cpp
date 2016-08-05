@@ -41,7 +41,7 @@
 // Libraries needed for robotmoose integration
 #include <fstream>
 #include <string>
-#include "superstar.hpp"
+#include "superstar/superstar.hpp"
 
 // Libraries needed for DSP
 #include <deque>
