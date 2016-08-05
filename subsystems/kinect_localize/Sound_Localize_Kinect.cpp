@@ -79,7 +79,7 @@ static simple_filter simple_filters[4];
 // ********** // 
 
 typedef struct {
-	std::string superstar = "https://www.robotmoose.com";
+	std::string superstar = "127.0.0.1:8081";
 	std::string name = "";
 	std::string auth = "";
 } robotmoose_config;
@@ -92,6 +92,10 @@ const GLuint WIDTH = 800, HEIGHT = 600;
 
 // ******************** // 
 
+void success(Json::Value obj) {
+	// Do nothing
+}
+
 // Function Prototypes
 void parse_config_string(std::string line);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -102,7 +106,6 @@ void in_callback(freenect_device* dev, int num_samples,
 void* freenect_threadfunc(void* arg);
 
 int main(int argc, char* argv[]) {
-
 	if (freenect_init(&f_ctx, NULL) < 0) {
 		printf("freenect_init() failed\n");
 		return 1;

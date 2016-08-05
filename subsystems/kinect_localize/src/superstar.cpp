@@ -1,28 +1,31 @@
 #include "superstar.hpp"
 #include "string_util.hpp"
 #include "jsoncpp/json.h"
-#include "json_util.hpp"
 #include "auth.hpp"
 #include "mongoose/mongoose.h"
+#include "wget.hpp"
 #include <string>
-#include <algorithm>
+#include "json_util.hpp"
+#include <iostream>
+#include <sstream>
+#include <iomanip>
 
 superstar_t::superstar_t(std::string url) : superstar(url) {}
 
 // Gets the value of the path.
-//     Calls successcb on sucess with server response.
-//     Calls errorcb on error with the server error object (as per spec).
-void superstar_t::get(std::string path, void(*successcb)(Json::Value), void(*errorcb)(Json::Value)) {
+//     Calls success_cb on sucess with server response.
+//     Calls error_cb on error with the server error object (as per spec).
+void superstar_t::get(std::string path, void(*success_cb)(Json::Value), void(*error_cb)(Json::Value)) {
 	path = pathify(path);
 	Json::Value request = build_skeleton_request("get", path);
-	add_request(request, successcb, errorcb);
+	add_request(request, success_cb, error_cb);
 }
 
 // Sets path to the value using the given auth.
 //     Calls success_cb on success with the server response.
 //     Calls error_cb on error with the server error object (as per spec).
 void superstar_t::set(std::string path, Json::Value value, std::string auth, 
-	void(*successcb)(Json::Value), void(*errorcb)(Json::Value)) {
+	void(*success_cb)(Json::Value), void(*error_cb)(Json::Value)) {
 	path = pathify(path);
 
 	Json::Value temp;
@@ -30,17 +33,17 @@ void superstar_t::set(std::string path, Json::Value value, std::string auth,
 	std::string opts = JSON_serialize(temp);
 	Json::Value request = build_skeleton_request("set", path, opts);
 	request["params"]["auth"]=auth;
-	add_request(request, successcb, errorcb);
+	add_request(request, success_cb, error_cb);
 
 }
 
 // Gets sub keys of the given path.
 //     Calls success_cb on success with the server response.
 //     Calls error_cb on error with the server error object (as per spec).
-void superstar_t::sub(std::string path, void(*successcb)(Json::Value), void(*errorcb)(Json::Value)) {
+void superstar_t::sub(std::string path, void(*success_cb)(Json::Value), void(*error_cb)(Json::Value)) {
 	path = pathify(path);
 	Json::Value request = build_skeleton_request("sub", path);
-	add_request(request, successcb, errorcb);
+	add_request(request, success_cb, error_cb);
 }
 
 // Pushes the given value onto path using the given auth.
@@ -48,7 +51,7 @@ void superstar_t::sub(std::string path, void(*successcb)(Json::Value), void(*err
 //     Calls error_cb on error with the server error object (as per spec).
 //     Note, if the path is not an array, it will be after self.
 void superstar_t::push(std::string path, Json::Value value, int length, std::string auth, 
-	void(*successcb)(Json::Value), void(*errorcb)(Json::Value)) {
+	void(*success_cb)(Json::Value), void(*error_cb)(Json::Value)) {
 	path = pathify(path);
 	Json::Value temp;
 	temp["value"] = value;
@@ -56,34 +59,65 @@ void superstar_t::push(std::string path, Json::Value value, int length, std::str
 	std::string opts = JSON_serialize(temp);
 	Json::Value request = build_skeleton_request("push", path, opts);
 	request["params"]["auth"]=auth;
-	add_request(request, successcb, errorcb);
+	add_request(request, success_cb, error_cb);
 }
 
 
-void superstar_t::get_next(std::string path, void(*successcb)(Json::Value), void(*errorcb)(Json::Value)) {
+// Gets the value of path when it changes.
+	// Calls success_cb on success with the server response.
+	// Calls error_cb on error with the server error object (as per spec).
+	// Note, this version is BLOCKING.
+void superstar_t::get_next(std::string path, void(*success_cb)(Json::Value), void(*error_cb)(Json::Value)) {
 	path = pathify(path);
 	Json::Value request = build_skeleton_request("get_next", path);
 	request["id"] = 0;
 	Json::Value request_error_handler;
-	request_error_handler["error_cb"] = errorcb;
+	if(error_cb != NULL) {
+		request_error_handler["error_cb"] = pointer_to_string(error_cb);
+		callbacks[JSON_serialize(request_error_handler["error_cb"])] = error_cb;
+	}
 
-	// try{
+	try {
+		// Make the request
+		std::string data = JSON_serialize(request);
+		Json::Value server_response = JSON_deserialize(wget("http://" + superstar + "/superstar/", data));
 
-	// }
+		// Got an array, must be batch data
+		if(server_response.type() == Json::objectValue) {
+			// Error Callback
+			if( server_response.isMember("error") ) {
+				handle_error(request_error_handler, server_response["error"]);
+			}
+			// Success Callback
+			else if(server_response.isMember("result")) {
+				if(success_cb != NULL)
+					success_cb(server_response["result"]);
+			}
+		}
+		// Server Error
+		else
+			handle_error(request_error_handler, server_response["error"]);
+	}
+	catch(std::exception & e) {
+		Json::Value error_obj;
+		error_obj["code"] = 0;
+		error_obj["message"] = e.what();
+		handle_error(request_error_handler, error_obj);
+	}
 }
 
 // Changes auth for the given path and auth to the given value.
 //     Calls success_cb on success with the server response.
 //     Calls error_cb on error with the server error object (as per spec).
 void superstar_t::change_auth(std::string path, Json::Value value, std::string auth, 
-			void(*successcb)(Json::Value), void(*errorcb)(Json::Value)) {
+			void(*success_cb)(Json::Value), void(*error_cb)(Json::Value)) {
 	path = pathify(path);
 	Json::Value temp;
 	temp["value"] = value;
 	std::string opts = JSON_serialize(temp);
 	Json::Value request = build_skeleton_request("change_auth", path, opts);
 	request["params"]["auth"]=auth;
-	add_request(request, successcb, errorcb);
+	add_request(request, success_cb, error_cb);
 }
 
 // Builds a basic jsonrpc request with given method.
@@ -100,17 +134,24 @@ Json::Value superstar_t::build_skeleton_request(std::string method, std::string 
 	request["params"] = params;
 	request["id"] = Json::nullValue;
 	request["params"]["opts"] = opts;
-
 	return request;
 }
 
 // Adds a build request into the batch queue.
 //     Note, won't be sent until .flush() is called.
-void superstar_t::add_request(Json::Value & request, void(*successcb)(Json::Value), void(*errorcb)(Json::Value)) {
+void superstar_t::add_request(Json::Value & request, void(*success_cb)(Json::Value), void(*error_cb)(Json::Value)) {
 	Json::Value full_request;
 	full_request["request"] = request;
-	full_request["success_cb"] = successcb;
-	full_request["error_cb"] = errorcb;
+
+	if(success_cb != NULL) {
+		full_request["success_cb"] = pointer_to_string(success_cb);
+		callbacks[JSON_serialize(full_request["success_cb"])] = success_cb;
+	}
+	if(error_cb != NULL) {
+		full_request["error_cb"] = pointer_to_string(error_cb);
+		callbacks[JSON_serialize(full_request["error_cb"])] = error_cb;
+	}
+
 	queue.push_back(full_request);
 }
 
@@ -130,6 +171,8 @@ std::string superstar_t::pathify(std::string path) {
 	return path;
 }
 
+
+
 // Builds the batch request object and clears out the current queue.
 void superstar_t::flush() {
 	// No requests, return.
@@ -139,90 +182,70 @@ void superstar_t::flush() {
 	// Build batch of current requests.
 	std::vector<Json::Value> batch;
 	for(int i=0; i<queue.size(); ++i) {
-		Json::Value request = queue[i]["request"];
-		std::string path = request["params"]["path"];
-		std::string opts = request["params"]["opts"];
-		request["id"] = i;
-		if(request["params"].isMember("auth")) {
-			std::string auth = to_hex_string(request["params"]["auth"]);
+		std::string path = JSON_serialize(queue[i]["request"]["params"]["path"]);
+		std::string opts = JSON_serialize(queue[i]["request"]["params"]["opts"], true);
+		queue[i]["request"]["id"] = i;
+		if(queue[i]["request"]["params"].isMember("auth")) {
+			std::string auth = to_hex_string(JSON_serialize(queue[i]["request"]["params"]["auth"]));
 			std::string data = to_hex_string(path+opts);
-			request["params"]["auth"] =  hmac_sha256(auth, data);
+			queue[i]["request"]["params"]["auth"] =  hmac_sha256(auth, data);
 		}
 		batch.push_back(queue[i]["request"]);
 	}
 	old_queue=queue;
 	queue.clear();
-}
 
+	try {
+		// Make the request
+		std::string data = "[";
+		for(std::vector<Json::Value>::iterator iter = batch.begin(); iter != batch.end(); ++iter) {
+			data += JSON_serialize(*iter);
+			if(iter != batch.end() - 1) data += ',';
+		}
+		data += "]";
+		Json::Value server_response = JSON_deserialize(wget("http://" + superstar + "/superstar/", data));
 
+		// Got an array, must be batch data
+		if(server_response.type() == Json::arrayValue) {
+			for(Json::ValueIterator iter = server_response.begin(); iter != server_response.end(); ++iter) {
+				if( !((*iter).isMember("id")) )
+					continue;
 
+				// Error Callback
+				if( (*iter).isMember("error") ) {
+					Json::Value response_obj = (*iter)["error"];
+					handle_error(old_queue[strtol(JSON_serialize((*iter)["id"]).c_str(), NULL, 10)], response_obj);
+					continue;
+				}
 
-
-
-
-
-
-
-
-struct wget_t
-{
-	std::string data;
-	std::string error;
-	bool done;
-};
-
-
-
-static inline void wget_ev_handler(mg_connection* connection,int ev,void* ev_data)
-{
-	wget_t& responder=*(wget_t*)(connection->mgr->user_data);
-
-	if(ev==MG_EV_CONNECT)
-	{
-		int status=*(int*)ev_data;
-
-		if(status!=0)
-		{
-			responder.error=strerror(status);
-			responder.done=true;
-			return;
+				// Success Callback
+				if( (*iter).isMember("result") ) {
+					Json::Value response_obj = (*iter)["result"];
+					if( old_queue[strtol(JSON_serialize((*iter)["id"]).c_str(), NULL, 10)]["success_cb"] != Json::nullValue ) {
+						callbacks[JSON_serialize(old_queue[strtol(JSON_serialize((*iter)["id"]).c_str(), NULL, 10)]["success_cb"])](response_obj);
+					}
+				}
+			}
+		}
+		// Server error ...
+		else {
+			for(std::vector<Json::Value>::iterator iter = old_queue.begin(); iter != old_queue.end(); ++iter)
+				handle_error(*iter, server_response["error"]);
 		}
 	}
-	else if(ev==MG_EV_HTTP_REPLY)
-	{
-		connection->flags|=MG_F_CLOSE_IMMEDIATELY;
-		http_message* hm=(http_message*)ev_data;
-
-		if(hm->resp_code!=200)
-		{
-			responder.error="Connection error: "+std::to_string(hm->resp_code)+".";
-			responder.done=true;
-			return;
-		}
-
-		responder.data=std::string(hm->body.p,hm->body.len);
-		responder.done=true;
+	catch(std::exception & e) {
+		Json::Value error_obj;
+		error_obj["code"] = 0;
+		error_obj["message"] = e.what();
+		
+		for(std::vector<Json::Value>::iterator iter = old_queue.begin(); iter != old_queue.end(); ++iter)
+			handle_error(*iter, error_obj);
 	}
 }
 
-static inline std::string wget(const std::string& address,const std::string& post_data)
-{
-	wget_t responder;
-	responder.data="";
-	responder.error="";
-	responder.done=false;
-
-	mg_mgr mgr;
-	mg_mgr_init(&mgr,&responder);
-	mg_connect_http(&mgr,wget_ev_handler,address.c_str(),nullptr,post_data.c_str());
-
-	while(mgr.active_connections!=nullptr)
-		mg_mgr_poll(&mgr,1000);
-
-	mg_mgr_free(&mgr);
-
-	if(responder.error.size()>0)
-		throw std::runtime_error(responder.error);
-
-	return responder.data;
+void superstar_t::handle_error(Json::Value request, Json::Value error) {
+	if(request.isMember("error_cb"))
+		callbacks[JSON_serialize(request["error_cb"])](error);
+	else
+		std::cout << "Superstar error (" << error["code"] << ") - " << error["message"] << std::endl;
 }

@@ -7,6 +7,8 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
+#include <iomanip>
 
 //Returns whether str starts with prefix.
 bool starts_with(const std::string& str,const std::string& prefix);
@@ -36,4 +38,13 @@ std::vector<std::string> split(const std::string& str,const std::string& delim);
 //Converts bytes of str into a hex string.
 std::string to_hex_string(const std::string& str);
 
+// Convert pointer to hex string.
+template<typename T>
+std::string pointer_to_string(T* ptr) {
+	std::stringstream ss;
+	for (int i=0; i<sizeof(ptr); ++i) {
+		ss << std::hex << std::setfill('0') << std::setw(2) << (int)((unsigned char *)&ptr)[i];
+    }
+	return ss.str();
+}
 #endif

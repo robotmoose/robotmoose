@@ -24,22 +24,26 @@ set(dsp_SRCS src/xcor_td.cpp src/Kinect_DOA.cpp)
 add_library(dsp ${dsp_SRCS})
 
 # Add sources for JSON
-set(json_SRCS include/jsoncpp/json_reader.cpp include/jsoncpp/json_value.cpp include/jsoncpp/json_writer.cpp src/json_util.cpp)
+set(json_SRCS include/jsoncpp/json_value.cpp include/jsoncpp/json_reader.cpp include/jsoncpp/json_writer.cpp)
 add_library(json ${json_SRCS})
 
-# Add mongoose
-set(mongoose_SRCS include/mongoose/mongoose.c)
-add_library(mongoose ${mongoose_SRCS})
+# Add utils
+set(utils_SRCS include/mongoose/mongoose.c src/string_util.cpp src/auth.cpp src/json_util.cpp src/wget.cpp)
+add_library(utils ${utils_SRCS})
 
 # Add superstar
-set(superstar_SRCS src/superstar.cpp src/string_util.cpp src/auth.cpp)
+set(superstar_SRCS src/superstar.cpp) # src/string_util.cpp src/auth.cpp src/json_util.cpp src/wget.cpp)
 add_library(superstar ${superstar_SRCS})
 
 # Libraries needed for graphics
 set(graphics_SRCS GLEW glfw3 glut Xrandr Xrender Xinerama Xcursor Xi GL m dl drm Xdamage X11-xcb xcb-glx xcb-dri2 xcb-dri3 xcb-present xcb-sync xshmfence Xxf86vm Xfixes Xext X11 pthread xcb Xau Xdmcp)
 
+# Need to link these before-hand or it will not work.
+target_link_libraries(utils json)
+target_link_libraries(superstar utils)
+
 # Build the executable
 add_executable(Sound_Localize_Kinect Sound_Localize_Kinect.cpp)
 # Link against required libraries
-target_link_libraries(Sound_Localize_Kinect freenect freenect_fix dsp json mongoose superstar ${graphics_SRCS})
+target_link_libraries(Sound_Localize_Kinect freenect freenect_fix dsp json utils superstar ${graphics_SRCS})
 
