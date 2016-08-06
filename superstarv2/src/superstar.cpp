@@ -376,6 +376,7 @@ bool superstar_t::auth_check(std::string path,const std::string& opts,
 	//Open auth file and parse passwords in line based format "PATH PASSWORD" (without quotes).
 	bool authorized=false;
 	std::string line;
+	bool found_path=false;
 	while(std::getline(ifstr,line))
 	{
 		std::istringstream istr(line);
@@ -390,13 +391,19 @@ bool superstar_t::auth_check(std::string path,const std::string& opts,
 		if(!(istr>>pass))
 			pass="";
 
+		//Check to see if we found a parent path (means there's a auth code)
+		if(path.find(challenge_path)==0||challenge_path.size()==0)
+			found_path=true;
+
 		//Check auth...
 		if(path.find(challenge_path)==0&&
 			(to_hex_string(hmac_sha256(pass,path+opts))==auth_str||pass.size()==0))
 			authorized=true;
 	}
 	ifstr.close();
-	return authorized;
+
+	//If authorized or none of our parents where in the auth file.
+	return (authorized||!found_path);
 }
 
 //Loads from either an old style binary file (superstar v1).
