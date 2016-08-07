@@ -13,7 +13,7 @@ if __name__=="__main__":
 		parser=argparse.ArgumentParser(description="Lists superstar paths.")
 		parser.add_argument("-s","--superstar",
 			dest="superstar",
-			default="https://robotmoose.com",
+			default="robotmoose.com",
 			help="Superstar to query (default: robotmoose.com).")
 		parser.add_argument("-l","--local",
 			action='store_true',
@@ -30,7 +30,7 @@ if __name__=="__main__":
 		#Figure out superstar...
 		superstar_url=args.superstar
 		if args.dev:
-			superstar_url="https://test.robotmoose.com"
+			superstar_url="test.robotmoose.com"
 		if args.local:
 			superstar_url="127.0.0.1:8081"
 		ss=superstar.superstar_t(superstar_url)
@@ -49,5 +49,6 @@ if __name__=="__main__":
 		ss.sub(args.path,onsuccess,onerror)
 		ss.flush()
 
-	except:
+	except Exception as error:
+		print(error)
 		pass

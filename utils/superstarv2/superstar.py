@@ -13,6 +13,11 @@ import urllib.request
 class superstar_t:
 	def __init__(self,superstar):
 		self.superstar=superstar
+		if superstar[0:7]!="http://" and superstar[:8]!="https://":
+			if superstar[0:9]=="127.0.0.1" or superstar[0:9]=="localhost":
+				self.superstar="http://"+self.superstar
+			else:
+				self.superstar="https://"+self.superstar
 		self.queue=[]
 
 	#Gets the value of path.
@@ -165,7 +170,7 @@ class superstar_t:
 		try:
 			#Make the request.
 			data=bytes(json.dumps(batch),"utf-8")
-			server_response=urllib.request.urlopen("http://"+self.superstar+"/superstar/", data)
+			server_response=urllib.request.urlopen(self.superstar+"/superstar/", data)
 
 			#Parse response, call responses.
 			response=json.loads(server_response.read().decode('utf-8'))
