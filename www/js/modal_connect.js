@@ -18,6 +18,11 @@ function modal_connect_t(div)
 	this.connect_button=document.createElement("input");
 	this.cancel_button=document.createElement("input");
 	this.sim_button=document.createElement("input");
+	this.change_auth_button=document.createElement("input");
+
+
+
+
 
 	if(!this.modal)
 	{
@@ -126,6 +131,31 @@ function modal_connect_t(div)
 		_this.hide();
 	};
 	this.modal.get_footer().appendChild(this.sim_button);
+	
+	
+	this.change_auth_button.className="btn btn-primary";
+	this.change_auth_button.type="button";
+	this.change_auth_button.value="Change Authentication";
+	this.change_auth_button.style.float="right";
+	
+	//this.change_auth_button.overflow="hidden";
+	this.change_auth_button.onclick=function()
+	{
+		console.log("change authentication button pressed")
+		var robot={};
+		robot.superstar=null; // <- means "same server as this page"
+		robot.year=get_select_value(_this.year_select);
+		robot.school=get_select_value(_this.school_select);
+		robot.name=get_select_value(_this.robot_select);
+		
+		_this.modal_change_auth = new modal_change_auth_t(div, robot, function(){_this.show()})
+		_this.modal_change_auth.show();
+		_this.hide();
+		_this.modal_change_auth.modal.close_button.addEventListener("click", function(){_this.show()})
+	};
+	
+	this.robot_auth_group.style["margin-bottom"]="40px";
+	this.robot_auth_group.appendChild(this.change_auth_button);
 }
 
 modal_connect_t.prototype.show=function()
@@ -269,6 +299,7 @@ modal_connect_t.prototype.update_disables_m=function()
 	this.school_select.disabled=(this.year_select.selectedIndex==0);
 	this.robot_select.disabled=(this.year_select.selectedIndex==0||this.school_select.selectedIndex==0);
 	this.connect_button.disabled=(this.year_select.selectedIndex==0||this.school_select.selectedIndex==0||this.robot_select.selectedIndex==0);
+	this.change_auth_button.disabled=(this.year_select.selectedIndex==0||this.school_select.selectedIndex==0||this.robot_select.selectedIndex==0);
 }
 
 modal_connect_t.prototype.show_auth_error=function()
