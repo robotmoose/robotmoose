@@ -50,7 +50,7 @@ class superstar_t
 		//  Note, relies on HTTPS for secure transport.
 		//  Note, traverses auth until a matching code is found for a path.
 		//        This is NOT create new auth codes, only changes existing ones.
-		bool change_auth(std::string path,const Json::Value& value);
+		bool change_auth(std::string path,const Json::Value& value,bool& was_immutable);
 
 		//Authenticates path with opts with the passed auth object.
 		//  Note, expects a string or null in the auth object.
