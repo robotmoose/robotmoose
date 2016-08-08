@@ -398,7 +398,7 @@ bool superstar_t::auth_check(std::string path,const std::string& opts,
 
 		//Check auth...
 		if(path.find(challenge_path)==0&&
-			(to_hex_string(hmac_sha256(pass,path+opts))==auth_str||pass.size()==0))
+			(to_hex_string(hmac_sha256(pass,path+opts))==auth_str||pass.size()==0||pass=="!"))
 			authorized=true;
 	}
 	ifstr.close();
