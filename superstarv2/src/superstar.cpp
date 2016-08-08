@@ -282,7 +282,7 @@ void superstar_t::push(const std::string& path,const Json::Value& val,
 //  Note, relies on HTTPS for secure transport.
 //  Note, traverses auth until a matching code is found for a path.
 //        This is NOT create new auth codes, only changes existing ones.
-bool superstar_t::change_auth(std::string path,const Json::Value& value)
+bool superstar_t::change_auth(std::string path,const Json::Value& value,bool& was_immutable)
 {
 	//Check auth length.
 	std::string new_auth_str="";
@@ -331,19 +331,20 @@ bool superstar_t::change_auth(std::string path,const Json::Value& value)
 	for(size_t ii=0;ii<auths.size();++ii)
 	{
 		ofstr<<auths[ii].first;
-		if(auths[ii].second.size()>0)
+
+		//If path for auth change and current path are the same, change.
+		std::string cur_path=remove_double_slashes(strip(auths[ii].first,"/"));
+		if(cur_path==path&&auths[ii].second!="!")
 		{
-			//If path for auth change and current path are the same, change.
-			std::string cur_path=remove_double_slashes(strip(auths[ii].first,"/"));
-			if(cur_path==path)
-			{
-				ofstr<<" "<<new_auth_str;
-				replaced=true;
-			}
-			else
-			{
-				ofstr<<" "<<auths[ii].second;
-			}
+			ofstr<<" "<<new_auth_str;
+			replaced=true;
+			was_immutable=false;
+		}
+		else
+		{
+			ofstr<<" "<<auths[ii].second;
+			if(auths[ii].second=="!")
+				was_immutable=true;
 		}
 		ofstr<<std::endl;
 	}
@@ -397,7 +398,7 @@ bool superstar_t::auth_check(std::string path,const std::string& opts,
 
 		//Check auth...
 		if(path.find(challenge_path)==0&&
-			(to_hex_string(hmac_sha256(pass,path+opts))==auth_str||pass.size()==0))
+			(to_hex_string(hmac_sha256(pass,path+opts))==auth_str||pass.size()==0||pass=="!"))
 			authorized=true;
 	}
 	ifstr.close();

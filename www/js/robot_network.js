@@ -11,7 +11,6 @@ function robot_network_t()
 			{
 				if(!_this.sim&&valid_robot(_this.robot))
 				{
-					superstar_set(_this.robot,"pilot",_this.pilot);
 					superstar_get(_this.robot,"active_experiment",function(data)
 					{
 						_this.active_experiment=data;
@@ -68,6 +67,15 @@ robot_network_t.prototype.destroy=function()
 		}
 		catch(error)
 		{}
+}
+
+robot_network_t.prototype.update_pilot=function(pilot)
+{
+	if(valid_robot(this.robot))
+	{
+		this.pilot=pilot;
+		superstar_set(this.robot,"pilot",this.pilot);
+	}
 }
 
 robot_network_t.prototype.set_robot=function(robot)
