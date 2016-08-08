@@ -503,7 +503,7 @@ pilot_interface_t.prototype.download=function(robot)
 
 pilot_interface_t.prototype.upload=function(robot)
 {
-	robot_network.pilot=this.pilot;
+	robot_network.update_pilot(this.pilot);
 	if(robot.sim)
 		robot.update_pilot(this.pilot);
 }

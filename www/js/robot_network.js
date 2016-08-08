@@ -3,7 +3,6 @@ function robot_network_t()
 	var _this=this;
 	this.robot=null;
 	this.pilot={};
-	this.old_pilot={};
 	this.intervals=
 	[
 		{
@@ -12,11 +11,6 @@ function robot_network_t()
 			{
 				if(valid_robot(_this.robot))
 				{
-					if(JSON.stringify(_this.pilot)!=JSON.stringify(_this.old_pilot))
-					{
-						superstar_set(_this.robot,"pilot",_this.pilot);
-						_this.old_pilot=JSON.parse(JSON.stringify(_this.pilot));
-					}
 					superstar_get(_this.robot,"active_experiment",function(data)
 					{
 						_this.active_experiment=data;
@@ -73,6 +67,15 @@ robot_network_t.prototype.destroy=function()
 		}
 		catch(error)
 		{}
+}
+
+robot_network_t.prototype.update_pilot=function(pilot)
+{
+	if(valid_robot(this.robot))
+	{
+		this.pilot=pilot;
+		superstar_set(this.robot,"pilot",this.pilot);
+	}
 }
 
 robot_network_t.prototype.set_robot=function(robot)
