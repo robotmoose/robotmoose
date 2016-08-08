@@ -146,7 +146,10 @@ config_editor_t.prototype.upload=function(robot)
 		}
 	}
 
-	superstar_set(robot,"config",data);
+	if (!robot.sim)
+		superstar_set(robot,"config",data);
+	else
+		sim_set(robot, "config", data);
 }
 
 config_editor_t.prototype.get_entries=function()

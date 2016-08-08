@@ -72,6 +72,10 @@ chatter_t.prototype.load=function(robot)
 
 chatter_t.prototype.chat=function(msg)
 {
+
+	if(this.robot.sim)
+		return;
+		
 	if(valid_robot(this.robot))
 	{
 		var _this=this;

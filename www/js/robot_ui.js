@@ -206,45 +206,87 @@ robot_ui_t.prototype.download_gui=function()
 			div.removeChild(div.firstChild);
 	}
 
-	superstar_get(this.robot,"gui",function(json)
-	{
-		_this.doorways=
+	if(!this.robot.sim)
+		superstar_get(this.robot,"gui",function(json)
 		{
-			config:_this.create_doorway("Configure","Set up robot hardware",help_text_config),
-			pilot:_this.create_doorway("Drive","Manually drive the robot",help_text_pilot),
-			sensors:_this.create_doorway("Sensors","Examine sensor data from robot",help_text_sensors),
-			charts:_this.create_doorway("Charts", "Chart sensor data received from robot",null),
-			states:_this.create_doorway("Code","Automatically drive the robot",help_text_states),
-			map:_this.create_doorway("Map","See where the robot thinks it is",help_text_map),
-			video:_this.create_doorway("Video","Show the robot's video camera",null),
-			UI:_this.create_doorway("UI","Customized robot user interface",help_text_ui),
-			sound:_this.create_doorway("Sound","Play sounds on the backend to get attention",null),
-			chat:_this.create_doorway("Chat","Chat with the caretaker of the robot.",null)
-		};
+			_this.doorways=
+			{
+				config:_this.create_doorway("Configure","Set up robot hardware",help_text_config),
+				pilot:_this.create_doorway("Drive","Manually drive the robot",help_text_pilot),
+				sensors:_this.create_doorway("Sensors","Examine sensor data from robot",help_text_sensors),
+				charts:_this.create_doorway("Charts", "Chart sensor data received from robot",null),
+				states:_this.create_doorway("Code","Automatically drive the robot",help_text_states),
+				map:_this.create_doorway("Map","See where the robot thinks it is",help_text_map),
+				video:_this.create_doorway("Video","Show the robot's video camera",null),
+				UI:_this.create_doorway("UI","Customized robot user interface",help_text_ui),
+				sound:_this.create_doorway("Sound","Play sounds on the backend to get attention",null),
+				chat:_this.create_doorway("Chat","Chat with the caretaker of the robot.",null)
+			};
 
-		clear_out(_this.doorways.config.content);
-		clear_out(_this.doorways.pilot.content);
-		clear_out(_this.doorways.sensors.content);
-		clear_out(_this.doorways.charts.content);
-		clear_out(_this.doorways.states.content);
-		clear_out(_this.doorways.map.content);
-		clear_out(_this.doorways.video.content);
-		clear_out(_this.doorways.UI.content);
-		clear_out(_this.doorways.sound.content);
-		clear_out(_this.doorways.chat.content);
+			clear_out(_this.doorways.config.content);
+			clear_out(_this.doorways.pilot.content);
+			clear_out(_this.doorways.sensors.content);
+			clear_out(_this.doorways.charts.content);
+			clear_out(_this.doorways.states.content);
+			clear_out(_this.doorways.map.content);
+			clear_out(_this.doorways.video.content);
+			clear_out(_this.doorways.UI.content);
+			clear_out(_this.doorways.sound.content);
+			clear_out(_this.doorways.chat.content);
 
-		_this.doorway_manager.hide_all();
-		_this.doorways.config.set_minimized(false);
+			_this.doorway_manager.hide_all();
+			_this.doorways.config.set_minimized(false);
 
-		_this.doorway_manager.load(json);
-		_this.create_widgets();
+			_this.doorway_manager.load(json);
+			_this.create_widgets();
 
-		for(var key in _this.widgets)
-			if(_this.widgets[key].download)
-				_this.widgets[key].download(_this.robot);
+			for(var key in _this.widgets)
+				if(_this.widgets[key].download)
+					_this.widgets[key].download(_this.robot);
 
-		_this.gui.interval=setInterval(function(){_this.run_interval();},100);
-	});
+			_this.gui.interval=setInterval(function(){_this.run_interval();},100);
+		});
+	else
+		sim_get(this.robot,"gui",function(json)
+		{
+			_this.doorways=
+			{
+				config:_this.create_doorway("Configure","Set up robot hardware",help_text_config),
+				pilot:_this.create_doorway("Drive","Manually drive the robot",help_text_pilot),
+				sensors:_this.create_doorway("Sensors","Examine sensor data from robot",help_text_sensors),
+				charts:_this.create_doorway("Charts", "Chart sensor data received from robot",null),
+				states:_this.create_doorway("Code","Automatically drive the robot",help_text_states),
+				map:_this.create_doorway("Map","See where the robot thinks it is",help_text_map),
+				video:_this.create_doorway("Video","Show the robot's video camera",null),
+				UI:_this.create_doorway("UI","Customized robot user interface",help_text_ui),
+				sound:_this.create_doorway("Sound","Play sounds on the backend to get attention",null),
+				chat:_this.create_doorway("Chat","Chat with the caretaker of the robot.",null)
+			};
+
+			clear_out(_this.doorways.config.content);
+			clear_out(_this.doorways.pilot.content);
+			clear_out(_this.doorways.sensors.content);
+			clear_out(_this.doorways.charts.content);
+			clear_out(_this.doorways.states.content);
+			clear_out(_this.doorways.map.content);
+			clear_out(_this.doorways.video.content);
+			clear_out(_this.doorways.UI.content);
+			clear_out(_this.doorways.sound.content);
+			clear_out(_this.doorways.chat.content);
+
+			_this.doorway_manager.hide_all();
+			_this.doorways.config.set_minimized(false);
+
+			_this.doorway_manager.load(json);
+			_this.create_widgets();
+
+			for(var key in _this.widgets)
+				if(_this.widgets[key].download)
+					_this.widgets[key].download(_this.robot);
+
+			_this.gui.interval=setInterval(function(){_this.run_interval();},100);
+		});
+		
 }
 
 robot_ui_t.prototype.run_interval=function() {
@@ -304,7 +346,10 @@ robot_ui_t.prototype.upload_gui=function()
 
 	if(valid_robot(this.robot)&&this.gui.old!=stringified)
 	{
-		superstar_set(this.robot,"gui",save);
+		if(!this.robot.sim)
+			superstar_set(this.robot,"gui",save);
+		else
+			sim_set(this.robot,"gui",save);
 		this.gui.old=stringified;
 	}
 }

@@ -341,8 +341,9 @@ state_table_t.prototype.get_states=function()
 
 state_table_t.prototype.upload_active_experiment=function(experiment)
 {
-	//console.log("State table - Experiment: " + experiment)
-	if(valid_robot(this.robot))
+	if(this.robot.sim)
+		sim_set(this.robot,"active_experiment",experiment);
+	else if(valid_robot(this.robot))
 		superstar_set(this.robot,"active_experiment",experiment);
 }
 

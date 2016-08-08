@@ -74,6 +74,7 @@ function robot_sim_t()
 }
 	
 
+// ****Not currently used
 // Move robot to location
 robot_sim_t.prototype.change_location=function(x_cord, y_cord, z_cord, angle)
 {
@@ -90,7 +91,7 @@ robot_sim_t.prototype.change_location=function(x_cord, y_cord, z_cord, angle)
 	w_1_x = x_cord + 0.5*this.wheelbase*Math.sin(angle_rad);
 	w_1_y = y_cord - 0.5*this.wheelbase*Math.cos(angle_rad);
 	
-	console.log("angle_rad: " + angle_rad);
+	// console.log("angle_rad: " + angle_rad);
 	
 
 	this.wheel[0]=new vec3(w_0_x, w_0_y, z_cord);
@@ -357,7 +358,7 @@ function sim_set(robot, path, json, on_success)
 		robot.setup_sensors();
 
 	}
-	else if (path === "frontendStatus")
+	else if (path === "frontend_status")
 	{
 		robot.pilot_status = json[0];
 		robot.heartbeats = robot.pilot_status["heartbeats"];
