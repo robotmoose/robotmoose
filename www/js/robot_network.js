@@ -3,6 +3,7 @@ function robot_network_t()
 	var _this=this;
 	this.robot=null;
 	this.pilot={};
+	this.old_pilot={};
 	this.intervals=
 	[
 		{
@@ -11,7 +12,11 @@ function robot_network_t()
 			{
 				if(valid_robot(_this.robot))
 				{
-					superstar_set(_this.robot,"pilot",_this.pilot);
+					if(JSON.stringify(_this.pilot)!=JSON.stringify(_this.old_pilot))
+					{
+						superstar_set(_this.robot,"pilot",_this.pilot);
+						_this.old_pilot=JSON.parse(JSON.stringify(_this.pilot));
+					}
 					superstar_get(_this.robot,"active_experiment",function(data)
 					{
 						_this.active_experiment=data;
