@@ -212,7 +212,7 @@ void superstar_t::flush() {
 			if(iter != batch.end() - 1) data += ',';
 		}
 		data += "]";
-		Json::Value server_response = JSON_deserialize(wget("http://" + superstar + "/superstar/", data));
+		Json::Value server_response = JSON_deserialize(wget(superstar + "/superstar/", data));
 
 		// Got an array, must be batch data
 		if(server_response.type() == Json::arrayValue) {

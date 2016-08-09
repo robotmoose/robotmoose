@@ -113,8 +113,8 @@ void robot_config_t::validate()
 	if(to_bool(keys_m["dev"]))
 		keys_m["superstar"]="http://test.robotmoose.com";
 
-	if(keys_m["superstar"].size()>0&&keys_m["superstar"][keys_m["superstar"].size()-1]!='/')
-		keys_m["superstar"]+='/';
+	// if(keys_m["superstar"].size()>0&&keys_m["superstar"][keys_m["superstar"].size()-1]!='/')
+	// 	keys_m["superstar"]+='/';
 
 	size_t slashes=0;
 

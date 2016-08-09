@@ -34,7 +34,7 @@
 // Libraries needed for robotmoose integration
 #include <string>
 #include "superstar/superstar.hpp"
-#include "robot.hpp"
+//#include "robot.hpp"
 #include "robot_config.h"
 
 // Libraries needed for DSP
@@ -67,7 +67,7 @@ static float angle = 0;
 
 // ********** // 
 
-robot_t Robot;
+//robot_t Robot;
 
 static const bool KINECT_1473 = true; // Need to upload special firmware if using Kinect Model #1473
 static const bool KINECT_UPSIDE_DOWN = true; // If Kinect is mounted upside down, flip angles.
@@ -135,14 +135,15 @@ int main(int argc, char* argv[]) {
 		robot_config.from_file("robot.ini");
 	}
 
-
-	superstar_t superstar("127.0.0.1:8081");
-	std::string starpath = robot_config.get("robot") + "/kinect";
+	superstar_t superstar(robot_config.get("superstar"));
+	std::string starpath = "robots/" + robot_config.get("robot") + "/kinect";
+	std::cout << "Superstar is: " << robot_config.get("superstar") << std::endl;
+	std::cout << "Robot is " << robot_config.get("robot") << std::endl;
 	Json::Value kinect;
 
 	printf("This is the Kinect localization subsystem. Press Ctrl-C to exit.\n");
 
-	while(true) {
+	while(!die) {
 		pthread_cond_wait(&batch_cond, &batch_mutex);
 		if(!kinect_DOA.isNoise()) {	
 			angles[angle_counter] = kinect_DOA.findAngle();
@@ -154,13 +155,13 @@ int main(int argc, char* argv[]) {
 						angle_avg += angles[i];
 					angle = angle_avg/2;
 					angle = KINECT_UPSIDE_DOWN ? -angle : angle;
+					printf("The estimated angle to the source is %f degrees\n", angle);
 					kinect["angle"] = angle;
 					superstar.set(starpath, kinect);
 					superstar.flush();
 				 }
 				angle_counter = 0;
 			}
-			printf("The estimated angle to the source is %f degrees\n", angle);
 		}
 	}
 	return 0;
@@ -269,5 +270,8 @@ void* freenect_threadfunc(void* arg) {
 	freenect_stop_audio(f_dev);
 	freenect_close_device(f_dev);
 	freenect_shutdown(f_ctx);
+
+
+
 	return NULL;
 }
