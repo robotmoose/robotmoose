@@ -408,6 +408,20 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		var ret=VM.UI.element(name,"slider",opts);
 		return parseFloat(ret.dom.value); // returns value of slider
 	};
+	VM.spinner=function(name, num_v){
+		var ret = VM.UI.element(name, "spinner");
+		if (num_v)
+		{
+			var s_arr = num_v.split(".");
+			var v_str;
+			if (s_arr[0] === "store") v_str = s_arr[1];
+			{
+				VM.store[v_str] = ret.dom.value;
+
+			}
+		}
+		return ret.dom.value;
+	};
 	VM.label=function(name,opts) {
 		var ret=VM.UI.element(name,"label",opts);
 	};
