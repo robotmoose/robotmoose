@@ -1,5 +1,7 @@
 #include "Kinect_DOA.h"
 
+#include <cstdlib> //for abs
+
 Kinect_DOA::Kinect_DOA() {
 	for(int i=0; i<4; ++i)
 		xcor_data[i] = new int32_t[NUMSAMPLES_XCOR];
@@ -40,17 +42,17 @@ double Kinect_DOA::findAngle() {
 
 	// Determine the lags between the microphone pairs.
 	// Ideally, this would be done in a loop.
-	lags_and_x.push_back(std::make_pair(xcor_td(xcor_data[0], xcor_data[1], NUMSAMPLES_XCOR, XCOR_WIDTH).second, 
+	lags_and_x.push_back(std::make_pair(xcor_td(xcor_data[0], xcor_data[1], NUMSAMPLES_XCOR, XCOR_WIDTH).second,
 		fabs(MIC_POSITIONS[0]-MIC_POSITIONS[1])));
-	lags_and_x.push_back(std::make_pair(xcor_td(xcor_data[0], xcor_data[2], NUMSAMPLES_XCOR, XCOR_WIDTH).second, 
+	lags_and_x.push_back(std::make_pair(xcor_td(xcor_data[0], xcor_data[2], NUMSAMPLES_XCOR, XCOR_WIDTH).second,
 		fabs(MIC_POSITIONS[0]-MIC_POSITIONS[2])));
-	lags_and_x.push_back(std::make_pair(xcor_td(xcor_data[0], xcor_data[3], NUMSAMPLES_XCOR, XCOR_WIDTH).second, 
+	lags_and_x.push_back(std::make_pair(xcor_td(xcor_data[0], xcor_data[3], NUMSAMPLES_XCOR, XCOR_WIDTH).second,
 		fabs(MIC_POSITIONS[0]-MIC_POSITIONS[3])));
-	lags_and_x.push_back(std::make_pair(xcor_td(xcor_data[1], xcor_data[2], NUMSAMPLES_XCOR, XCOR_WIDTH).second, 
+	lags_and_x.push_back(std::make_pair(xcor_td(xcor_data[1], xcor_data[2], NUMSAMPLES_XCOR, XCOR_WIDTH).second,
 		fabs(MIC_POSITIONS[1]-MIC_POSITIONS[2])));
-	lags_and_x.push_back(std::make_pair(xcor_td(xcor_data[1], xcor_data[3], NUMSAMPLES_XCOR, XCOR_WIDTH).second, 
+	lags_and_x.push_back(std::make_pair(xcor_td(xcor_data[1], xcor_data[3], NUMSAMPLES_XCOR, XCOR_WIDTH).second,
 		fabs(MIC_POSITIONS[1]-MIC_POSITIONS[3])));
-	lags_and_x.push_back(std::make_pair(xcor_td(xcor_data[2], xcor_data[3], NUMSAMPLES_XCOR, XCOR_WIDTH).second, 
+	lags_and_x.push_back(std::make_pair(xcor_td(xcor_data[2], xcor_data[3], NUMSAMPLES_XCOR, XCOR_WIDTH).second,
 		fabs(MIC_POSITIONS[2]-MIC_POSITIONS[3])));
 
 	std::vector<double> angles;
@@ -72,7 +74,7 @@ double Kinect_DOA::findAngle() {
 	// }
 
 /*	// Determine the median lag
-	std::sort(lags_and_x.begin(), lags_and_x.end(), 
+	std::sort(lags_and_x.begin(), lags_and_x.end(),
 		[](const std::pair<int32_t,double> &a, const std::pair<int32_t, double> & b) {
 			return b.first < a.first;
 	});

@@ -10,7 +10,16 @@
 // #include <sstream>
 // #include <iomanip>
 
-superstar_t::superstar_t(std::string url) : superstar(url) {}
+superstar_t::superstar_t(std::string url) : superstar(url)
+{
+	if(superstar.substr(0,7)!="http://"&&superstar.substr(0,8)!="https://")
+	{
+		if(superstar.substr(0,9)=="127.0.0.1"||superstar.substr(0,9)=="localhost")
+			superstar="http://"+superstar;
+		else
+			superstar="https://"+superstar;
+	}
+}
 
 // Gets the value of the path.
 //     Calls success_cb on sucess with server response.
@@ -24,7 +33,7 @@ void superstar_t::get(std::string path, void(*success_cb)(Json::Value), void(*er
 // Sets path to the value using the given auth.
 //     Calls success_cb on success with the server response.
 //     Calls error_cb on error with the server error object (as per spec).
-void superstar_t::set(std::string path, Json::Value value, std::string auth, 
+void superstar_t::set(std::string path, Json::Value value, std::string auth,
 	void(*success_cb)(Json::Value), void(*error_cb)(Json::Value)) {
 	path = pathify(path);
 
@@ -50,7 +59,7 @@ void superstar_t::sub(std::string path, void(*success_cb)(Json::Value), void(*er
 //     Calls success_cb on success with the server response.
 //     Calls error_cb on error with the server error object (as per spec).
 //     Note, if the path is not an array, it will be after self.
-void superstar_t::push(std::string path, Json::Value value, int length, std::string auth, 
+void superstar_t::push(std::string path, Json::Value value, int length, std::string auth,
 	void(*success_cb)(Json::Value), void(*error_cb)(Json::Value)) {
 	path = pathify(path);
 	Json::Value temp;
@@ -109,7 +118,7 @@ void superstar_t::get_next(std::string path, void(*success_cb)(Json::Value), voi
 // Changes auth for the given path and auth to the given value.
 //     Calls success_cb on success with the server response.
 //     Calls error_cb on error with the server error object (as per spec).
-void superstar_t::change_auth(std::string path, Json::Value value, std::string auth, 
+void superstar_t::change_auth(std::string path, Json::Value value, std::string auth,
 			void(*success_cb)(Json::Value), void(*error_cb)(Json::Value)) {
 	path = pathify(path);
 	Json::Value temp;
@@ -237,7 +246,7 @@ void superstar_t::flush() {
 		Json::Value error_obj;
 		error_obj["code"] = 0;
 		error_obj["message"] = e.what();
-		
+
 		for(std::vector<Json::Value>::iterator iter = old_queue.begin(); iter != old_queue.end(); ++iter)
 			handle_error(*iter, error_obj);
 	}
