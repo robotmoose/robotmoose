@@ -282,11 +282,18 @@ modal_change_auth_t.prototype.onconfirm=function()
 	var _this = this;
 
 	// clear modal content
-	while(this.modal.get_content().lastChild)
-		this.modal.get_content().removeChild(_this.modal.get_content().lastChild);
+	try
+	{
+		while(this.modal.get_content().lastChild)
+			this.modal.get_content().removeChild(this.modal.get_content().lastChild);
 
-	this.modal.get_footer().removeChild(_this.confirm_button);
-	this.modal.get_footer().removeChild(_this.cancel_button);
+		this.modal.get_footer().removeChild(this.confirm_button);
+		this.modal.get_footer().removeChild(this.cancel_button);
+	}
+	catch(error)
+	{
+		//Ignoring errors here...
+	}
 
 
 	// display confirmation message

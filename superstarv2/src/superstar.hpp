@@ -50,13 +50,16 @@ class superstar_t
 		//  Note, relies on HTTPS for secure transport.
 		//  Note, traverses auth until a matching code is found for a path.
 		//        This is NOT create new auth codes, only changes existing ones.
-		bool change_auth(std::string path,const Json::Value& value,bool& was_immutable);
+		//  Note, RELIES ON AUTH_CHECK TO HANDLE IMMUTABLE ENTRIES.
+		bool change_auth(std::string path,const Json::Value& value);
 
 		//Authenticates path with opts with the passed auth object.
+		//  Variable was_immutable indicates whether or not the auth was immutable or not.
 		//  Note, expects a string or null in the auth object.
 		//  Note, PATH IS STRIPPED OF ALL PRECEEDING /'s and ENDING /'s,
 		//        AND MULTIPLE /'s ARE CHANGED TO A SINGLE /.
-		bool auth_check(std::string path,const std::string& opts,const Json::Value& auth);
+		bool auth_check(std::string path,const std::string& opts,
+			const Json::Value& auth,bool& was_immutable);
 
 		//Loads from either an old style binary file (superstar v1).
 		//Or from a JSON file (superstar v2).

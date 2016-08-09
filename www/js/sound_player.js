@@ -64,7 +64,7 @@ sound_player_t.prototype.get_sounds=function(json)
 }
 sound_player_t.prototype.download=function()
 {
-	if (!this.robot.sim)
+	if (this.robot.sim)
 		return;
 	
 	var _this=this;

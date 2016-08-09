@@ -175,7 +175,7 @@ modal_connect_t.prototype.show=function()
 		},
 		function(error)
 		{
-			throw error;
+			throw "Superstar error ("+error.code+") "+error.message;
 		});
 }
 
