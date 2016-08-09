@@ -503,9 +503,10 @@ pilot_interface_t.prototype.download=function(robot)
 
 pilot_interface_t.prototype.upload=function(robot)
 {
-	robot_network.update_pilot(this.pilot);
 	if(robot.sim)
 		robot.update_pilot(this.pilot);
+	else
+		robot_network.update_pilot(this.pilot);
 }
 
 // This is a simple placeholder, to get things working for now:

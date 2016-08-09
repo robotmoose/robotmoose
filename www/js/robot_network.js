@@ -9,7 +9,7 @@ function robot_network_t()
 			int:null,
 			func:function()
 			{
-				if(valid_robot(_this.robot))
+				if(!_this.sim&&valid_robot(_this.robot))
 				{
 					superstar_get(_this.robot,"active_experiment",function(data)
 					{
@@ -31,7 +31,7 @@ function robot_network_t()
 			int:null,
 			func:function()
 			{
-				if(valid_robot(_this.robot))
+				if(!_this.sim&&valid_robot(_this.robot))
 				{
 					superstar_sub(_this.robot,"experiments",function(json)
 					{
@@ -82,12 +82,18 @@ robot_network_t.prototype.set_robot=function(robot)
 {
 	this.robot=robot;
 	var _this=this;
-
-	robot_set_superstar(robot.superstar);
-	superstar_get(_this.robot,"sensors",function(data)
+	
+	if(robot.sim) 
+		this.sim = true;
+	else
 	{
-		_this.sensors=data;
-	});
+		this.sim = "";
+		robot_set_superstar(robot.superstar);
+		superstar_get(_this.robot,"sensors",function(data)
+		{
+			_this.sensors=data;
+		});
+	}
 
 	var func=function()
 	{
@@ -101,5 +107,7 @@ robot_network_t.prototype.set_robot=function(robot)
 			func();
 		});
 	}
-	func();
+	
+	if (!robot.sim) 
+		func();
 }

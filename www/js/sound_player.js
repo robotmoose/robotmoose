@@ -64,6 +64,9 @@ sound_player_t.prototype.get_sounds=function(json)
 }
 sound_player_t.prototype.download=function()
 {
+	if (this.robot.sim)
+		return;
+	
 	var _this=this;
 
 	superstar_get(this.robot,this.path,function(json){_this.get_sounds(json);});
@@ -83,6 +86,9 @@ sound_player_t.prototype.build_sound_list=function()
 
 sound_player_t.prototype.request_sound=function()
 {
+	if (!this.robot.sim)
+		return;
+		
 	if(this.sound_requested!=="") //Do not execute when no sound selected
 	{
 		this.play_sound=!this.play_sound;
@@ -94,6 +100,9 @@ sound_player_t.prototype.request_sound=function()
 
 sound_player_t.prototype.stop_sound=function()
 {
+	if (!this.robot.sim)
+		return;
+		
 	this.play_sound=!this.play_sound;
 	superstar_set(this.robot,this.path,{"options":this.sounds,"sound":this.sound_requested,"play":this.play_sound});
 	this.play_sound_button.disabled=false;
