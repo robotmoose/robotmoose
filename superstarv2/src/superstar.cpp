@@ -290,7 +290,7 @@ bool superstar_t::change_auth(std::string path,const Json::Value& value)
 	std::string new_auth_str="";
 	if(!value.isNull())
 		new_auth_str=value.asString();
-	if(new_auth_str.size()<8)
+	if(new_auth_str.size()<8&&new_auth_str!="!")
 		return false;
 
 	//Check for invalid characters.
