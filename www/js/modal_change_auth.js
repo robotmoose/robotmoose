@@ -201,9 +201,12 @@ function modal_change_auth_t(div, robot, onclose)
 
 		var robot = _this.robot;
 
-		robot.auth=_this.robot_auth.value;
-		newauth_val = _this.robot_newauth.value;
-		repeatauth_val = _this.robot_repeatauth.value;
+		robot.auth=CryptoJS.SHA256(_this.robot_auth.value).
+			toString(CryptoJS.enc.Hex);
+		newauth_val=CryptoJS.SHA256(_this.robot_newauth.value).
+			toString(CryptoJS.enc.Hex);
+		repeatauth_val=CryptoJS.SHA256(_this.robot_repeatauth.value).
+			toString(CryptoJS.enc.Hex);
 
 
 		// remove error messages and warning/success labels

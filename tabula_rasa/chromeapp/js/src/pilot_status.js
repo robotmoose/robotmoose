@@ -44,7 +44,6 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 				},
 				function(error)
 				{
-					console.log(error);
 					setTimeout(handle_get,100);
 				});
 		else

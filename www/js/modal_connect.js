@@ -83,7 +83,8 @@ function modal_connect_t(div)
 		robot.year=get_select_value(_this.year_select);
 		robot.school=get_select_value(_this.school_select);
 		robot.name=get_select_value(_this.robot_select);
-		robot.auth=_this.robot_auth.value;
+		robot.auth=CryptoJS.SHA256(_this.robot_auth.value).
+			toString(CryptoJS.enc.Hex);
 		_this.robot_auth.value="";
 
 		// Remember selections for later using localStorage API
@@ -94,7 +95,8 @@ function modal_connect_t(div)
 		// Check connection validity
 		superstar_set(robot, 'authtest', 'authtest', function()
 		{
-			if(_this.onconnect) _this.onconnect(robot);
+			if(_this.onconnect)
+				_this.onconnect(robot);
 			_this.hide();
 		},
 		function(err)
