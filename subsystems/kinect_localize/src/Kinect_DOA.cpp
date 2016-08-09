@@ -10,6 +10,30 @@ Kinect_DOA::~Kinect_DOA() {
 		delete [] xcor_data[i];
 }
 
+// Simple white noise filter. The higher the white noise ratio is, the easier it will be for audio to be
+//     identified as non-noise.
+// Source: http://stackoverflow.com/questions/3881256/can-you-programmatically-detect-white-noise
+bool Kinect_DOA::isNoise(double white_noise_ratio) {
+
+	uint64_t sumd0[4] = {0};
+	uint64_t sumd1[4] = {0};
+
+	for(int i=0; i<NUMSAMPLES_XCOR; ++i) {
+		if(i>0) {
+			for(int j=0; j<4; ++j) {
+				sumd0[j] += abs(xcor_data[j][i]);
+				sumd1[j] += abs(xcor_data[j][i]-xcor_data[j][i-1]);
+			}
+		}
+	}
+
+	for(int i=0; i<4; ++i) {
+		if(((double)sumd1[i])/((double)sumd0[i]) < white_noise_ratio)
+			return false;
+	}
+	return true;
+}
+
 double Kinect_DOA::findAngle() {
 	std::vector<std::pair<int32_t,double>> lags_and_x;
 	lags_and_x.reserve(8);
@@ -60,5 +84,7 @@ double Kinect_DOA::findAngle() {
 	else if(sin_angle < -1) return -90.0;
 	else return asin(sin_angle)*180/M_PI;*/
 }
+
+
 
 // Linear Prediction Filter

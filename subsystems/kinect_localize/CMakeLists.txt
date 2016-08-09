@@ -28,15 +28,12 @@ set(json_SRCS include/superstar/jsoncpp/json_value.cpp include/superstar/jsoncpp
 add_library(json ${json_SRCS})
 
 # Add utils
-set(utils_SRCS include/superstar/mongoose/mongoose.c include/superstar/string_util.cpp include/superstar/auth.cpp include/superstar/json_util.cpp include/superstar/wget.cpp)
+set(utils_SRCS include/superstar/mongoose/mongoose.c include/superstar/string_util.cpp include/superstar/auth.cpp include/superstar/json_util.cpp include/superstar/wget.cpp src/robot_config.cpp src/ini.cpp src/string_util.cpp)
 add_library(utils ${utils_SRCS})
 
 # Add superstar
 set(superstar_SRCS include/superstar/superstar.cpp)
 add_library(superstar ${superstar_SRCS})
-
-# Libraries needed for graphics
-set(graphics_SRCS GLEW glfw3 glut Xrandr Xrender Xinerama Xcursor Xi GL m dl drm Xdamage X11-xcb xcb-glx xcb-dri2 xcb-dri3 xcb-present xcb-sync xshmfence Xxf86vm Xfixes Xext X11 pthread xcb Xau Xdmcp)
 
 # Need to link these before-hand or it will not work.
 target_link_libraries(utils json)
@@ -45,5 +42,5 @@ target_link_libraries(superstar utils)
 # Build the executable
 add_executable(Sound_Localize_Kinect Sound_Localize_Kinect.cpp)
 # Link against required libraries
-target_link_libraries(Sound_Localize_Kinect freenect freenect_fix dsp json utils superstar ${graphics_SRCS})
+target_link_libraries(Sound_Localize_Kinect freenect freenect_fix dsp json utils superstar pthread)
 

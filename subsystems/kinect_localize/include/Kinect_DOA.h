@@ -22,10 +22,11 @@ class Kinect_DOA {
 		const int XCOR_WIDTH = 2*MAX_LAG;
 
 	public:
-		const int NUMSAMPLES_XCOR = 256*16;//16; // Width of the sliding window.
+		const int NUMSAMPLES_XCOR = 256*16; // Width of the sliding window.
 		int32_t * xcor_data[4];
 		Kinect_DOA();
 		~Kinect_DOA();
+		bool isNoise(double white_noise_ratio=0.7);
 		double findAngle();
 
 };

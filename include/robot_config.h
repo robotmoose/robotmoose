@@ -2,6 +2,7 @@
 #define ROBOT_CONFIG_H
 
 #include <string>
+#include <map>
 
 class robot_config_t
 {
