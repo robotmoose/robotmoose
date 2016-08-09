@@ -100,7 +100,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 		std::string opts_str;
 		Json::Value opts;
 		bool auth=true;
-		bool immutable_auth=false;
+		bool was_immutable=false;
 
 		//We only use objects as params...for now...
 		if(!params.isObject())
@@ -157,7 +157,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 
 		//Write based operations - check auth.
 		if((method=="set"||method=="push"||method=="change_auth")&&
-			!superstar.auth_check(path,opts_str,params["auth"]))
+			!superstar.auth_check(path,opts_str,params["auth"],was_immutable))
 		{
 			auth=false;
 			goto error_label;
@@ -171,6 +171,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 		else if(method=="set")
 		{
 			response["result"]=true;
+			was_immutable=false;
 			superstar.set(path,opts["value"]);
 			comet_mgr.update_path(path,superstar);
 		}
@@ -189,18 +190,19 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 			}
 
 			response["result"]=true;
+			was_immutable=false;
 			superstar.push(path,opts["value"],opts["length"]);
 			comet_mgr.update_path(path,superstar);
 		}
 		else if(method=="change_auth")
 		{
-			response["result"]=superstar.change_auth(path,opts["value"],immutable_auth);
-
-			if(immutable_auth)
+			if(was_immutable)
 			{
 				error_message="Authorization for this robot is immutable.";
 				goto error_label;
 			}
+
+			response["result"]=superstar.change_auth(path,opts["value"]);
 
 		}
 		else if(method=="get_next")
@@ -216,7 +218,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 				response["error"]=jsonrpc_error(-32602,"Invalid params",error_message);
 			if(!auth)
 				response["error"]=jsonrpc_error(-32000,"Not authorized","");
-			if(immutable_auth)
+			if(was_immutable)
 				response["error"]=jsonrpc_error(-32001,"Immutable auth",error_message);
 	}
 
