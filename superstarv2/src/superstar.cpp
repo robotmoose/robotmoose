@@ -317,7 +317,8 @@ bool superstar_t::change_auth(std::string path,const Json::Value& value)
 
 		//Parse path from line...
 		std::string path;
-		istr>>path;
+		if(!(istr>>path))
+			continue;
 
 		//Parse auth from line...
 		std::string auth;
@@ -391,7 +392,8 @@ bool superstar_t::auth_check(std::string path,const std::string& opts,
 
 		//Parse path from line...
 		std::string path;
-		istr>>path;
+		if(!(istr>>path))
+			continue;
 		path=remove_double_slashes(strip(path,"/"));
 
 		//Parse auth from line...

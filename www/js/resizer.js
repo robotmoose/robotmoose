@@ -33,7 +33,7 @@ function resizer_t(div,containing_div,options)
 	this.handle.style.backgroundColor="red";
 	this.handle.style.opacity=0;
 	this.handle.style.zIndex=999999;
-	this.handle.onmousedown=function(event){return myself.onmousedown(event);}
+	this.handle.addEventListener("mousedown",function(event){return myself.onmousedown(event);});
 	this.div.appendChild(this.handle);
 
 	this.mousemove_listener=function(event){return myself.onmousemove(event);};
