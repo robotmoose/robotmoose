@@ -103,7 +103,7 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 									_this.can_call_again=true;
 							},_this.timeout_time);
 						}
-					})
+					});
 				}
 			}
 		);

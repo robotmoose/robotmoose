@@ -507,10 +507,11 @@ connection_t.prototype.arduino_setup_complete=function()
 	_this.arduino_send_packet();
 
 	//Set up network comms:
-	_this.network_getnext(robot_to_starpath(this.robot)+"pilot",function(pilot)
+	_this.network_getnext(robot_to_starpath(this.robot)+"pilot/power",function(power)
 	{
-		for (var field in pilot.power)
-			_this.power[field]=pilot.power[field];
+		for (var field in power)
+			_this.power[field]=power[field];
+		console.log("power: "+JSON.stringify(power));
 	});
 
 	_this.network_getnext(robot_to_starpath(this.robot)+"config",function(config)

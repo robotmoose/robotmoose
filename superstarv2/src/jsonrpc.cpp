@@ -34,15 +34,25 @@ void jsonrpc(superstar_t& superstar,comet_mgr_t& comet_mgr,
 			}
 
 			//Handle each invidual request.
+			std::map<std::string,bool> changed_paths;
 			for(size_t ii=0;ii<requests.size();++ii)
 				responses.append(jsonrpc_handle(superstar,comet_mgr,
-					requests[(Json::ArrayIndex)ii]));
+					requests[(Json::ArrayIndex)ii],changed_paths));
+
+			//Check for updated comet paths.
+			for(std::map<std::string,bool>::iterator ii=changed_paths.begin();ii!=changed_paths.end();++ii)
+				comet_mgr.update_path(ii->first,superstar);
 		}
 
 		//Single request...
 		else
 		{
-			Json::Value response(jsonrpc_handle(superstar,comet_mgr,requests));
+			std::map<std::string,bool> changed_paths;
+			Json::Value response(jsonrpc_handle(superstar,comet_mgr,requests,changed_paths));
+
+			//Check for updated comet paths.
+			for(std::map<std::string,bool>::iterator ii=changed_paths.begin();ii!=changed_paths.end();++ii)
+				comet_mgr.update_path(ii->first,superstar);
 
 			//Comet requests...
 			if(response.isMember("comet")&&response["comet"].asBool())
@@ -76,7 +86,7 @@ void jsonrpc(superstar_t& superstar,comet_mgr_t& comet_mgr,
 
 //Handles individual jsonrpc request via the passed superstar/comet_mgr objects.
 Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
-	const Json::Value request)
+	const Json::Value request,std::map<std::string,bool>& changed_paths)
 {
 	Json::Value response=jsonrpc_skeleton();
 
@@ -173,7 +183,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 			response["result"]=true;
 			was_immutable=false;
 			superstar.set(path,opts["value"]);
-			comet_mgr.update_path(path,superstar);
+			changed_paths[path]=true;
 		}
 		else if(method=="sub")
 		{
@@ -192,7 +202,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 			response["result"]=true;
 			was_immutable=false;
 			superstar.push(path,opts["value"],opts["length"]);
-			comet_mgr.update_path(path,superstar);
+			changed_paths[path]=true;
 		}
 		else if(method=="change_auth")
 		{

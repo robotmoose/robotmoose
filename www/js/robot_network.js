@@ -79,7 +79,10 @@ robot_network_t.prototype.update_pilot=function(pilot)
 		{
 			if(_this.sensors.power.L!=_this.pilot.power.L||
 				_this.sensors.power.R!=_this.pilot.power.R)
-					_this.update_pilot(_this.pilot);
+					setTimeout(function()
+					{
+						_this.update_pilot(_this.pilot);
+					},300);
 		});
 	}
 }

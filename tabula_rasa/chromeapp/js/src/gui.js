@@ -186,6 +186,8 @@ gui_t.prototype.load_gruveo=function(robot,uuid)
 		uuid="";
 	var url="https://gruveo.com/";
 	var robot_url="";
+	if(!robot)
+		robot={};
 	if(!robot.auth)
 		robot.auth="";
 	if(valid_robot(robot)&&uuid)

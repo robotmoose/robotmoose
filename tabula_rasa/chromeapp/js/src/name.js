@@ -195,7 +195,7 @@ name_t.prototype.download_years_m=function()
 			},
 			function(error)
 			{
-				_this.on_error_m("Year download error("+error+").");
+				_this.on_error_m("Year download error("+error.code+") "+error.message);
 				_this.superstar_ok=false;
 			}
 		);
@@ -227,7 +227,7 @@ name_t.prototype.download_schools_m=function()
 			},
 			function(error)
 			{
-				_this.on_error_m("School download error ("+error+").");
+				_this.on_error_m("School download error("+error.code+") "+error.message);
 				_this.superstar_ok=false;
 			}
 		);
@@ -260,7 +260,7 @@ name_t.prototype.download_robots_m=function()
 			},
 			function(error)
 			{
-				_this.on_error_m("School download error ("+error+").");
+				_this.on_error_m("Robot download error("+error.code+") "+error.message);
 				_this.superstar_ok=false;
 			}
 		);

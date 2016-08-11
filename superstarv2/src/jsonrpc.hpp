@@ -8,6 +8,7 @@
 
 #include "comet.hpp"
 #include <jsoncpp/json.h>
+#include <map>
 #include <mongoose/mongoose.h>
 #include <string>
 #include "superstar.hpp"
@@ -20,7 +21,7 @@ void jsonrpc(superstar_t& superstar,comet_mgr_t& comet_mgr,
 
 //Handles individual jsonrpc request via the passed superstar/comet_mgr objects.
 Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
-	const Json::Value request);
+	const Json::Value request,std::map<std::string,bool>& changed_paths);
 
 //Builds a jsonrpc error object with given code, message, and data (data is optional).
 Json::Value jsonrpc_error(int code,const std::string& message,const std::string& data="");
