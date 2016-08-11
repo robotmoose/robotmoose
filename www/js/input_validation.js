@@ -60,6 +60,11 @@ function is_count(arg)
 	return (arg.length>0&&is_int(arg)&&arg>0);
 }
 
+function is_value(arg)
+{
+	return (typeof(arg)!=="undefined"&&arg!==null);
+}
+
 function is_pin(arg)
 {
 	if(!arg)
