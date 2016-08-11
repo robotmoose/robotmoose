@@ -834,12 +834,21 @@ connection_t.prototype.arduino_recv_packet=function(p)
 	for(var key in _this.sensors)
 		superstar_set(_this.robot,"sensors/"+key,_this.sensors[key]);
 
+	// Clear out old sensors.
 	for(var key in connection_t.sensor_property_list)
 		if(!(key in _this.sensors))
 			superstar_set(_this.robot,"sensors/"+key,null);
 
-	if(!("battery" in _this.sensors))
-		superstar_set(_this.robot,"sensors/battery",null);
+	// Clear out old roomba sensors (and bts...because that's under battery...)
+	for(var key in connection_t.sensor_property_list.create2)
+	{
+		var entry=connection_t.sensor_property_list.create2[key];
+		entry=entry.replace(/<.*>/,'').replace(/\[.*\]/,'').replace(/<|>|\[|\]/,'').split('.')[0];
+		if(!(entry in _this.sensors))
+			superstar_set(_this.robot,"sensors/"+entry,null);
+	}
+
+	console.log(_this.location);
 /*
 	// Send sensor data to superstar, and grab pilot commands with set & mget:
 	var robotName=_this.robot.school+"/"+_this.robot.name;
