@@ -77,12 +77,9 @@ robot_network_t.prototype.update_pilot=function(pilot)
 		this.pilot=pilot;
 		superstar_set(this.robot,"pilot",this.pilot,function()
 		{
-			if(_this.sensors.power.L!=_this.pilot.L||
-				_this.sensors.power.R!=_this.pilot.R)
-					setTimeout(function()
-					{
-						_this.update_pilot(pilot);
-					},200);
+			if(_this.sensors.power.L!=_this.pilot.power.L||
+				_this.sensors.power.R!=_this.pilot.power.R)
+					_this.update_pilot(_this.pilot);
 		});
 	}
 }
