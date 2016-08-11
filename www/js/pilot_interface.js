@@ -204,7 +204,6 @@ pilot_interface_t.prototype.make_slider=function(config_entry,name,number, minva
 	var set_power=function()
 	{
 		pilotpower[name][number]=parseInt(slider.value);
-		_this.pilot_send();
 		label_value.nodeValue=""+(0xffFFffFF&pilotpower[name][number]);
 	};
 
@@ -291,7 +290,6 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	this.images.wheel.style.width = this.images.wheel.style.height = "100%";
 	this.images.wheel.style.pointerEvents = "none";
 	this.arrowDiv.appendChild(this.images.wheel);
-	this.pilot_send();
 
     // Add needlewell image -- static
 	this.images.gradient = document.createElement("img");
@@ -317,7 +315,6 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	this.images.needle.style.webkitTransformOrigin = "83% 83%";
 	this.images.needle.style.pointerEvents = "none";
 	this.arrowDiv.appendChild(this.images.needle);
-	this.pilot_send();
 
     // Add gauge image -- static
 	this.images.shell = document.createElement("img");
@@ -347,7 +344,7 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 		rotate(_this.images.needle,-77.5);
 		_this.pilot.power.L=0;
 		_this.pilot.power.R=0;
-		_this.pilot_send();
+		robot_network.update_pilot(_this.pilot);
 	};
 
 	var rotatefunc=function(evt)
@@ -391,7 +388,7 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 				-max_power,max_power));
 			_this.pilot.power.R=parseInt(""+clamp(-forward-turn,
 				-max_power,max_power));
-			_this.pilot_send();
+			robot_network.update_pilot(_this.pilot);
 		}
 	};
 	this.arrowDiv.addEventListener('mousedown', downfunc,true);
@@ -403,7 +400,7 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	{
 		_this.pilot.power.L=0;
 		_this.pilot.power.R=0;
-		_this.pilot_send();
+		robot_network.update_pilot(_this.pilot);
 	});
 }
 
@@ -493,7 +490,7 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 
 	this.pilot.power.L=100.0*clamp(maxPower*(forward+turn),-maxPower,+maxPower);
 	this.pilot.power.R=100.0*clamp(maxPower*(forward-turn),-maxPower,+maxPower);
-	this.pilot_send();
+	robot_network.update_pilot(this.pilot);
 }
 
 
@@ -538,7 +535,7 @@ pilot_interface_t.prototype.handle_gamepad_input=function()
 	}
 	this.pilot.power.L*=50;
 	this.pilot.power.R*=50;
-	this.pilot_send();
+	robot_network.update_pilot(this.pilot);
 }
 
 

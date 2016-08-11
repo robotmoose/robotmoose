@@ -73,8 +73,17 @@ robot_network_t.prototype.update_pilot=function(pilot)
 {
 	if(valid_robot(this.robot))
 	{
+		var _this=this;
 		this.pilot=pilot;
-		superstar_set(this.robot,"pilot",this.pilot);
+		superstar_set(this.robot,"pilot",this.pilot,function()
+		{
+			if(_this.sensors.power.L!=_this.pilot.L||
+				_this.sensors.power.R!=_this.pilot.R)
+					setTimeout(function()
+					{
+						_this.update_pilot(pilot);
+					},200);
+		});
 	}
 }
 
@@ -82,8 +91,8 @@ robot_network_t.prototype.set_robot=function(robot)
 {
 	this.robot=robot;
 	var _this=this;
-	
-	if(robot.sim) 
+
+	if(robot.sim)
 		this.sim = true;
 	else
 	{
@@ -107,7 +116,7 @@ robot_network_t.prototype.set_robot=function(robot)
 			func();
 		});
 	}
-	
-	if (!robot.sim) 
+
+	if (!robot.sim)
 		func();
 }

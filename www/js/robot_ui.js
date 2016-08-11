@@ -286,7 +286,7 @@ robot_ui_t.prototype.download_gui=function()
 
 			_this.gui.interval=setInterval(function(){_this.run_interval();},100);
 		});
-		
+
 }
 
 robot_ui_t.prototype.run_interval=function() {
@@ -409,7 +409,7 @@ robot_ui_t.prototype.create_widgets=function()
 			_this.state_runner.stop(_this.widgets.states);
 		_this.widgets.UI.stop();
 	}
-	this.widgets.pilot.onpilot=_this.state_runner.onpilot=function(power)
+	this.state_runner.onpilot=function(power)
 	{
 		if(_this.robot.name)
 			_this.widgets.pilot.upload(_this.robot);
