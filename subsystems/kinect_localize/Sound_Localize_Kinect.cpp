@@ -78,9 +78,9 @@ static const bool KINECT_UPSIDE_DOWN = true; // If Kinect is mounted upside down
 struct sigaction sig_init();
 void handle_signal(int signal);
 void in_callback(freenect_device* dev, int num_samples,
-                 int32_t* mic1, int32_t* mic2,
-                 int32_t* mic3, int32_t* mic4,
-                 int16_t* cancelled, void *unknown);
+				 int32_t* mic1, int32_t* mic2,
+				 int32_t* mic3, int32_t* mic4,
+				 int16_t* cancelled, void *unknown);
 void* freenect_threadfunc(void* arg);
 
 int main(int argc, char* argv[]) {
@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	superstar_t superstar(robot_config.get("superstar"));
-	std::string starpath = "robots/" + robot_config.get("robot") + "/sensors/kinect";
+	std::string starpath = "robots/" + robot_config.get("robot") + "/kinect";
 	std::cout << "Superstar is: " << robot_config.get("superstar") << std::endl;
 	std::cout << "Robot is " << robot_config.get("robot") << std::endl;
 	Json::Value kinect;
@@ -172,33 +172,35 @@ struct sigaction sig_init() {
 	//     Code from https://gist.github.com/aspyct/3462238
 	struct sigaction sa;
 
-    // Setup the sighub handler
-    sa.sa_handler = &handle_signal;
+	// Setup the sighub handler
+	sa.sa_handler = &handle_signal;
 
-    // Restart the system call, if at all possible
-    sa.sa_flags = SA_RESTART;
+	// Restart the system call, if at all possible
+	sa.sa_flags = SA_RESTART;
 
-    // Block every signal during the handler
-    sigfillset(&sa.sa_mask);
+	// Block every signal during the handler
+	sigfillset(&sa.sa_mask);
 
-    // Intercept SIGHUP and SIGINT
-    if (sigaction(SIGHUP, &sa, NULL) == -1) {
-        perror("Error: cannot handle SIGHUP"); // Should not happen
-    }
+	// Intercept SIGHUP and SIGINT
+	if (sigaction(SIGHUP, &sa, NULL) == -1) {
+		perror("Error: cannot handle SIGHUP"); // Should not happen
+	}
 
-    if (sigaction(SIGUSR1, &sa, NULL) == -1) {
-        perror("Error: cannot handle SIGUSR1"); // Should not happen
-    }
+	if (sigaction(SIGUSR1, &sa, NULL) == -1) {
+		perror("Error: cannot handle SIGUSR1"); // Should not happen
+	}
 
-    // Will always fail, SIGKILL is intended to force kill your process
-    if (sigaction(SIGKILL, &sa, NULL) == -1) {
-        //perror("Cannot handle SIGKILL"); // Will always happen
-        //printf("You can never handle SIGKILL anyway...\n");
-    }
+	// Will always fail, SIGKILL is intended to force kill your process
+	if (sigaction(SIGKILL, &sa, NULL) == -1) {
+		//perror("Cannot handle SIGKILL"); // Will always happen
+		//printf("You can never handle SIGKILL anyway...\n");
+	}
 
-    if (sigaction(SIGINT, &sa, NULL) == -1) {
-        perror("Error: cannot handle SIGINT"); // Should not happen
-    }
+	if (sigaction(SIGINT, &sa, NULL) == -1) {
+		perror("Error: cannot handle SIGINT"); // Should not happen
+	}
+
+	return sa;
 }
 
 void handle_signal(int signal) {
@@ -215,9 +217,9 @@ void handle_signal(int signal) {
 }
 
 void in_callback(freenect_device* dev, int num_samples,
-                 int32_t* mic1, int32_t* mic2,
-                 int32_t* mic3, int32_t* mic4,
-                 int16_t* cancelled, void *unknown) {
+				 int32_t* mic1, int32_t* mic2,
+				 int32_t* mic3, int32_t* mic4,
+				 int16_t* cancelled, void *unknown) {
 
 	static int xcor_counter = 0; // Counts up to NUMSAMPLES_XCOR/2 to trigger xcor.
 	static std::deque<int32_t> mic1_d, mic2_d, mic3_d, mic4_d; // Store microphone data streams

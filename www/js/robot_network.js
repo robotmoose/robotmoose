@@ -108,21 +108,43 @@ robot_network_t.prototype.set_robot=function(robot)
 		{
 			_this.sensors=data;
 		});
+		superstar_get(_this.robot,"kinect",function(data)
+		{
+			_this.kinect=data;
+		});
 	}
 
-	var func=function()
+	var getnext_sensors=function()
 	{
 		superstar.get_next(robot_to_starpath(_this.robot)+"sensors",function(json)
 		{
 			_this.sensors=json;
-			func();
+			if(_this.kinect)
+				_this.sensors.kinect=_this.kinect;
+			getnext_sensors();
 		},
 		function()
 		{
-			func();
+			getnext_sensors();
+		});
+	}
+
+	var getnext_kinect=function()
+	{
+		superstar.get_next(robot_to_starpath(_this.robot)+"kinect",function(json)
+		{
+			_this.kinect=json;
+			getnext_kinect();
+		},
+		function()
+		{
+			getnext_kinect();
 		});
 	}
 
 	if (!robot.sim)
-		func();
+	{
+		getnext_sensors();
+		getnext_kinect();
+	}
 }
