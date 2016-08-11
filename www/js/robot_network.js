@@ -73,8 +73,14 @@ robot_network_t.prototype.update_pilot=function(pilot)
 {
 	if(valid_robot(this.robot))
 	{
-		var _this=this;
 		this.pilot=pilot;
+		if(this.robot.sim)
+		{
+			this.robot.update_pilot(this.pilot);
+			return;
+		}
+
+		var _this=this;
 		superstar_set(this.robot,"pilot",this.pilot,function()
 		{
 			if(_this.sensors.power.L!=_this.pilot.power.L||
