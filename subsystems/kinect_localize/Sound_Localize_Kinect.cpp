@@ -9,8 +9,8 @@
 // This program uses the microphone array on the Kinect v1 to estimate the direction to the dominant sound source
 //     in a 180 degree FOV in front of the Kinect. This program sends this data to the specified RobotMoose Superstar
 //     where it can be viewed.
-// The micview example provided with libfreenect was used as a guide to interfacing with the Kinect's microphone 
-//     array using libfreenect. 
+// The micview example provided with libfreenect was used as a guide to interfacing with the Kinect's microphone
+//     array using libfreenect.
 
 // ***** License ***** //
 // This code is licensed to you under the terms of the Apache License, version
@@ -55,24 +55,24 @@ pthread_cond_t batch_cond = PTHREAD_COND_INITIALIZER;
 
 static freenect_context* f_ctx;
 static freenect_device* f_dev;
-// ********** // 
+// ********** //
 
-// ***** Constants and Variables needed for DOA Estimation ***** // 
+// ***** Constants and Variables needed for DOA Estimation ***** //
 Kinect_DOA kinect_DOA;
-// int xcor_counter = 0; // Counts up to NUMSAMPLES_XCOR/2 to trigger xcor. 
+// int xcor_counter = 0; // Counts up to NUMSAMPLES_XCOR/2 to trigger xcor.
 // std::deque<int32_t> mic1_d, mic2_d, mic3_d, mic4_d; // Store microphone data streams
 static float angles[5];
 static int angle_counter = 0;
 static float angle = 0;
 
-// ********** // 
+// ********** //
 
 //robot_t Robot;
 
 static const bool KINECT_1473 = true; // Need to upload special firmware if using Kinect Model #1473
 static const bool KINECT_UPSIDE_DOWN = true; // If Kinect is mounted upside down, flip angles.
 
-// ******************** // 
+// ******************** //
 
 // Function Prototypes
 struct sigaction sig_init();
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
 	if(KINECT_1473) {
 		// Need to upload audio firmware for Kinect model #1473
 		freenect_set_fw_address_nui(f_ctx, ofxKinectExtras::getFWData1473(), ofxKinectExtras::getFWSize1473());
-		freenect_set_fw_address_k4w(f_ctx, ofxKinectExtras::getFWDatak4w(), ofxKinectExtras::getFWSizek4w());	
+		freenect_set_fw_address_k4w(f_ctx, ofxKinectExtras::getFWDatak4w(), ofxKinectExtras::getFWSizek4w());
 	}
 
 	freenect_set_log_level(f_ctx, FREENECT_LOG_INFO);
@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	superstar_t superstar(robot_config.get("superstar"));
-	std::string starpath = "robots/" + robot_config.get("robot") + "/kinect";
+	std::string starpath = "robots/" + robot_config.get("robot") + "/sensors/kinect";
 	std::cout << "Superstar is: " << robot_config.get("superstar") << std::endl;
 	std::cout << "Robot is " << robot_config.get("robot") << std::endl;
 	Json::Value kinect;
@@ -145,7 +145,7 @@ int main(int argc, char* argv[]) {
 
 	while(!die) {
 		pthread_cond_wait(&batch_cond, &batch_mutex);
-		if(!kinect_DOA.isNoise()) {	
+		if(!kinect_DOA.isNoise()) {
 			angles[angle_counter] = kinect_DOA.findAngle();
 
 			if((++angle_counter >= 2)) {
@@ -211,7 +211,7 @@ void handle_signal(int signal) {
 		default:
 			printf("Caught wrong signal: %d\n", signal);
 			return;
-	}	
+	}
 }
 
 void in_callback(freenect_device* dev, int num_samples,
@@ -219,7 +219,7 @@ void in_callback(freenect_device* dev, int num_samples,
                  int32_t* mic3, int32_t* mic4,
                  int16_t* cancelled, void *unknown) {
 
-	static int xcor_counter = 0; // Counts up to NUMSAMPLES_XCOR/2 to trigger xcor. 
+	static int xcor_counter = 0; // Counts up to NUMSAMPLES_XCOR/2 to trigger xcor.
 	static std::deque<int32_t> mic1_d, mic2_d, mic3_d, mic4_d; // Store microphone data streams
 
 	if(mic1_d.size() < kinect_DOA.NUMSAMPLES_XCOR) { // Still filling up buffers.

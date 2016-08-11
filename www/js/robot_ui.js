@@ -318,12 +318,6 @@ robot_ui_t.prototype.run_interval=function() {
 				}
 				else
 				{
-					if(doesExist(_this.robot["kinect"])) { // If there is kinect data,
-						if(!doesExist(_this.robot.sensors["kinect"])) 
-							_this.robot.sensors["kinect"] = {};
-						if(doesExist(_this.robot["kinect"]["angle"]))
-							_this.robot.sensors["kinect"]["angle"] = _this.robot["kinect"]["angle"];
-					}
 					if (!_this.doorways.sensors.minimized)
 					{	var sensors_json = JSON.parse(JSON.stringify(_this.robot.sensors));
 						//console.log("refreshing sensors from simulation: " + JSON.stringify(_this.robot.sensors));

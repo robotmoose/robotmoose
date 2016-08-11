@@ -831,7 +831,8 @@ connection_t.prototype.arduino_recv_packet=function(p)
 
 
 	// Upload new sensor data to network:
-	superstar_set(_this.robot,"sensors",_this.sensors);
+	for(var key in _this.sensors)
+		superstar_set(_this.robot,"sensors/"+key,_this.sensors[key]);
 
 /*
 	// Send sensor data to superstar, and grab pilot commands with set & mget:
