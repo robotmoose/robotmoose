@@ -64,7 +64,7 @@ chart_interface_t.prototype.refresh=function(json) {
 					if(subprop == "servo" || subprop == "pwm") {
 						for(i=0; i < json[prop][subprop].length; ++i) {
 							sensor_list.push(subprop + "_" + i);
-							if(this.doesExist(this.charts.data_points[subprop + "_" + i])) {
+							if(doesExist(this.charts.data_points[subprop + "_" + i])) {
 								this.charts.data_points[subprop + "_" + i].datasets[0].data.push(json[prop][subprop][i]);
 								this.charts.data_points[subprop + "_" + i].labels.push(0);
 								if(this.charts.data_points[subprop + "_" + i].datasets[0].data.length > 60) {
@@ -83,7 +83,7 @@ chart_interface_t.prototype.refresh=function(json) {
 			case "heartbeats":
 			case "latency":
 				sensor_list.push(prop);
-				if(this.doesExist(this.charts.data_points[prop])) {
+				if(doesExist(this.charts.data_points[prop])) {
 					this.charts.data_points[prop].datasets[0].data.push(json[prop]);
 					this.charts.data_points[prop].labels.push(0);
 					if(this.charts.data_points[prop].datasets[0].data.length > 30) {
@@ -97,13 +97,13 @@ chart_interface_t.prototype.refresh=function(json) {
 
 			case "kinect":
 				sensor_list.push(prop);
-				if(this.doesExist(this.charts.data_points["kinect"])) {
+				if(doesExist(this.charts.data_points["kinect"])) {
 					for(var subprop in json[prop]) {
 						if(!json[prop].hasOwnProperty(subprop)) {
 							continue;
 						}
 						if(subprop == "angle") {
-							if(this.doesExist(this.charts.data_points["kinect"]["angle"])) {
+							if(doesExist(this.charts.data_points["kinect"]["angle"])) {
 								var ctx = this.charts.canvas["kinect"]["angle"].getContext("2d");
 								ctx.clearRect(0, 0, this.charts.canvas["kinect"]["angle"].width, this.charts.canvas["kinect"]["angle"].height);
 								ctx.save()
@@ -138,7 +138,7 @@ chart_interface_t.prototype.refresh=function(json) {
 			case "ultrasonic":
 				for(i=0; i < json[prop].length; ++i) {
 					sensor_list.push(prop + "_" + i);
-					if(this.doesExist(this.charts.data_points[prop + "_" + i])) {
+					if(doesExist(this.charts.data_points[prop + "_" + i])) {
 						this.charts.data_points[prop + "_" + i].datasets[0].data.push(json[prop][i]);
 						this.charts.data_points[prop + "_" + i].labels.push(0);
 						if(this.charts.data_points[prop + "_" + i].datasets[0].data.length > 30) {
@@ -153,7 +153,7 @@ chart_interface_t.prototype.refresh=function(json) {
 			// Create 2 Sensors
 			case "light":
 				sensor_list.push(prop);
-				if(this.doesExist(this.charts.data_points[prop])) {
+				if(doesExist(this.charts.data_points[prop])) {
 					for(i=0; i<6; ++i) {
 						this.charts.data_points[prop].datasets[0].data[i]=json[prop][i];
 					}
@@ -163,7 +163,7 @@ chart_interface_t.prototype.refresh=function(json) {
 				break;
 			case "floor":
 				sensor_list.push(prop);
-				if(this.doesExist(this.charts.data_points[prop])) {
+				if(doesExist(this.charts.data_points[prop])) {
 					for(i=0; i<4; ++i) {
 						this.charts.data_points[prop].datasets[0].data[i]=json[prop][i]
 					}
@@ -177,7 +177,7 @@ chart_interface_t.prototype.refresh=function(json) {
 	this.chart_drop.build(sensor_list);
 }
 
-chart_interface_t.prototype.doesExist=function(variable) {
+var doesExist=function(variable) {
 	if(typeof variable === "undefined" || variable === null)
 		return false;
 	return true;
@@ -187,13 +187,13 @@ chart_interface_t.prototype.add_chart=function() {
 	var _this = this;
 	switch(_this.chart_drop.value) {
 		case "kinect":
-			if(!_this.doesExist(_this.charts.data_points["kinect"])) {
+			if(!doesExist(_this.charts.data_points["kinect"])) {
 				_this.charts.data_points["kinect"] = {};
 				_this.charts.canvas["kinect"] = {};
 				_this.charts.header["kinect"] = {};
 				_this.charts.chart["kinect"] = {};
 			}
-			if(!_this.doesExist(_this.charts.data_points["kinect"]["angle"])) {
+			if(!doesExist(_this.charts.data_points["kinect"]["angle"])) {
 			 	_this.charts.canvas["kinect"]["angle"] = document.createElement("canvas");
 			 	_this.charts.header["kinect"]["angle"] = document.createElement("h4");
 			 	_this.charts.header["kinect"]["angle"].innerHTML = _this.chart_drop.value;
@@ -245,7 +245,7 @@ chart_interface_t.prototype.add_chart=function() {
 			break;
 
 		default:
-			if(!_this.doesExist(_this.charts.data_points[_this.chart_drop.value])) {
+			if(!doesExist(_this.charts.data_points[_this.chart_drop.value])) {
 				_this.charts.canvas[_this.chart_drop.value] = document.createElement("canvas");
 		 		_this.charts.header[_this.chart_drop.value] = document.createElement("h4");
 		 		_this.charts.header[_this.chart_drop.value].innerHTML = _this.chart_drop.value;
@@ -378,11 +378,11 @@ chart_interface_t.prototype.add_chart=function() {
 			break;
 	}
 }
-	// if(!_this.doesExist(_this.charts.data_points[_this.chart_drop.value])) {
+	// if(!doesExist(_this.charts.data_points[_this.chart_drop.value])) {
 	// 	switch(_this.chart_drop.value) {
 	// 		case "kinect":
 
-	// 			if(!_this.doesExist(_this.charts.data_points["kinect"]["angle"])) {
+	// 			if(!doesExist(_this.charts.data_points["kinect"]["angle"])) {
 	// 			 	_this.charts.canvas["kinect"]["angle"] = document.createElement("canvas");
 	// 			 	_this.charts.header["kinect"]["angle"] = document.createElement("h4");
 	// 			 	_this.charts.header["kinect"]["angle"].innerHTML = _this.chart_drop.value;
@@ -569,7 +569,7 @@ chart_interface_t.prototype.add_chart=function() {
 
 chart_interface_t.prototype.remove_chart=function() {
 	var _this = this;
-	if(_this.doesExist(_this.charts.data_points[_this.chart_drop.value])) {
+	if(doesExist(_this.charts.data_points[_this.chart_drop.value])) {
 		switch(_this.chart_drop.value) {
 			case "kinect":
 				// Clean up

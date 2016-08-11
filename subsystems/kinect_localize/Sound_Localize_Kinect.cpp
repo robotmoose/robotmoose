@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	superstar_t superstar(robot_config.get("superstar"));
-	std::string starpath = "robots/" + robot_config.get("robot") + "/sensors/kinect";
+	std::string starpath = "robots/" + robot_config.get("robot") + "/kinect";
 	std::cout << "Superstar is: " << robot_config.get("superstar") << std::endl;
 	std::cout << "Robot is " << robot_config.get("robot") << std::endl;
 	Json::Value kinect;
