@@ -104,6 +104,7 @@ chart_interface_t.prototype.refresh=function(json) {
 						}
 						if(subprop == "angle") {
 							if(is_value(this.charts.data_points["kinect"]["angle"])) {
+								console.log("Updating");
 								var ctx = this.charts.canvas["kinect"]["angle"].getContext("2d");
 								ctx.clearRect(0, 0, this.charts.canvas["kinect"]["angle"].width, this.charts.canvas["kinect"]["angle"].height);
 								ctx.save()

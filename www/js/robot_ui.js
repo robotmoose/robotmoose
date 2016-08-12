@@ -34,7 +34,6 @@ function robot_ui_t(gui_div,menu_div,modal_div)
 		interval:null,
 		old:""
 	};
-	this.sensor_data_count=0;
 	this.doorways={};
 	this.widgets={};
 
@@ -293,47 +292,19 @@ robot_ui_t.prototype.run_interval=function() {
 	// Update sensor data
 	var _this=this;
 
-	if (_this.sensor_data_count<2)
-	{ // request more sensor data
-		this.sensor_data_count++;
-		//superstar_get(this.robot,"sensors",
-			//function(sensors) // sensor data has arrived:
-			//{
-				_this.sensor_data_count--;
-				if(!_this.robot.sim)
-				{
-					if (!_this.doorways.sensors.minimized)
-						{
-						//console.log("refreshing sensors from robot network: " + JSON.stringify(robot_network.sensors));
-						_this.widgets.sensors.refresh(robot_network.sensors);
-						}
+	if(!_this.robot.sim)
+		_this.robot.sensors = robot_network.sensors;
 
-					if (!_this.doorways.map.minimized)
-						_this.widgets.map.refresh(robot_network.sensors);
+	if (!_this.doorways.sensors.minimized)
+		_this.widgets.sensors.refresh(JSON.parse(JSON.stringify(_this.robot.sensors)));
 
-					if(!_this.doorways.charts.minimized)
-						_this.widgets.charts.refresh(robot_network.sensors);
+	if (!_this.doorways.map.minimized)
+		_this.widgets.map.refresh(_this.robot.sensors);
 
-					_this.state_runner.VM_sensors=robot_network.sensors;
-				}
-				else
-				{
-					if (!_this.doorways.sensors.minimized)
-					{	var sensors_json = JSON.parse(JSON.stringify(_this.robot.sensors));
-						//console.log("refreshing sensors from simulation: " + JSON.stringify(_this.robot.sensors));
-						_this.widgets.sensors.refresh(sensors_json);
-					}
+	if(!_this.doorways.charts.minimized)
+		_this.widgets.charts.refresh(_this.robot.sensors);
 
-					if (!_this.doorways.map.minimized)
-						_this.widgets.map.refresh(_this.robot.sensors);
-
-					if(!_this.doorways.charts.minimized)
-						_this.widgets.charts.refresh(_this.robot.sensors);
-
-					_this.state_runner.VM_sensors=_this.robot.sensors;
-				}
-			//});
-	}
+	_this.state_runner.VM_sensors=_this.robot.sensors;
 
 	this.upload_gui();
 }

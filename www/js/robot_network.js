@@ -134,6 +134,7 @@ robot_network_t.prototype.set_robot=function(robot)
 		superstar.get_next(robot_to_starpath(_this.robot)+"kinect",function(json)
 		{
 			_this.kinect=json;
+			_this.sensors.kinect=_this.kinect;
 			getnext_kinect();
 		},
 		function()
