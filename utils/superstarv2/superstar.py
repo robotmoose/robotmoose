@@ -69,7 +69,7 @@ class superstar_t:
 		try:
 			#Make the request.
 			data=bytes(json.dumps(request),"utf-8")
-			server_response=urllib.request.urlopen("http://"+self.superstar+"/superstar/", data)
+			server_response=urllib.request.urlopen("http://"+self.superstar+"/superstar/",data)
 
 			#Parse response, call responses.
 			response=json.loads(server_response.read().decode('utf-8'))
@@ -159,7 +159,7 @@ class superstar_t:
 			opts=request["params"]["opts"]
 			request["id"]=ii
 			if "auth" in request["params"]:
-				auth=bytearray(request["params"]["auth"],"utf-8")
+				auth=bytearray(hashlib.sha256(bytearray(request["params"]["auth"],"utf-8")).hexdigest(),"utf-8")
 				data=bytearray(path+opts,"utf-8")
 				request["params"]["auth"]=hmac.new(auth,data,digestmod=hashlib.sha256).hexdigest()
 			batch.append(self.queue[ii]["request"])
@@ -170,7 +170,7 @@ class superstar_t:
 		try:
 			#Make the request.
 			data=bytes(json.dumps(batch),"utf-8")
-			server_response=urllib.request.urlopen(self.superstar+"/superstar/", data)
+			server_response=urllib.request.urlopen(self.superstar+"/superstar/",data)
 
 			#Parse response, call responses.
 			response=json.loads(server_response.read().decode('utf-8'))
