@@ -7,8 +7,6 @@
 #include <string>
 #include "json_util.hpp"
 #include <iostream>
-// #include <sstream>
-// #include <iomanip>
 
 superstar_t::superstar_t(std::string url) : superstar(url)
 {
@@ -191,13 +189,13 @@ void superstar_t::flush() {
 	// Build batch of current requests.
 	std::vector<Json::Value> batch;
 	for(int i=0; i<queue.size(); ++i) {
-		std::string path = JSON_serialize(queue[i]["request"]["params"]["path"]);
-		std::string opts = JSON_serialize(queue[i]["request"]["params"]["opts"], true);
+		std::string path = queue[i]["request"]["params"]["path"].asString();
+		std::string opts = queue[i]["request"]["params"]["opts"].asString();
 		queue[i]["request"]["id"] = i;
 		if(queue[i]["request"]["params"].isMember("auth")) {
-			std::string auth = to_hex_string(JSON_serialize(queue[i]["request"]["params"]["auth"]));
-			std::string data = to_hex_string(path+opts);
-			queue[i]["request"]["params"]["auth"] =  hmac_sha256(auth, data);
+			std::string auth = queue[i]["request"]["params"]["auth"].asString();
+			std::string data = path+opts;
+			queue[i]["request"]["params"]["auth"] =  to_hex_string(hmac_sha256(to_hex_string(hash_sha256(auth)), data));
 		}
 		batch.push_back(queue[i]["request"]);
 	}

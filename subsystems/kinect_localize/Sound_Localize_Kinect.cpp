@@ -137,6 +137,7 @@ int main(int argc, char* argv[]) {
 
 	superstar_t superstar(robot_config.get("superstar"));
 	std::string starpath = "robots/" + robot_config.get("robot") + "/kinect";
+	std::string auth = robot_config.get("auth");
 	std::cout << "Superstar is: " << robot_config.get("superstar") << std::endl;
 	std::cout << "Robot is " << robot_config.get("robot") << std::endl;
 	Json::Value kinect;
@@ -157,7 +158,7 @@ int main(int argc, char* argv[]) {
 					angle = KINECT_UPSIDE_DOWN ? -angle : angle;
 					printf("The estimated angle to the source is %f degrees\n", angle);
 					kinect["angle"] = angle;
-					superstar.set(starpath, kinect);
+					superstar.set(starpath, kinect, auth);
 					superstar.flush();
 				 }
 				angle_counter = 0;
@@ -206,7 +207,7 @@ struct sigaction sig_init() {
 void handle_signal(int signal) {
 	switch(signal) {
 		case SIGINT:
-			printf("Cleaning Up\n");
+			printf("\nCleaning Up\n");
 			die = 1;
 			pthread_exit(NULL);
 			break;
