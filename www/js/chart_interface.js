@@ -124,7 +124,7 @@ chart_interface_t.prototype.refresh=function(json) {
 								ctx.strokeStyle="blue";
 								ctx.stroke();
 								ctx.restore();
-								this.charts.header["kinect"]["angle"].innerHTML = "Direction of Arrival: " + json["kinect"]["angle"] + "\xB0";
+								this.charts.header["kinect"]["angle"].innerHTML = "Direction of Arrival: " + json["kinect"]["angle"].toFixed(2) + "\xB0";
 							}
 						}
 					}

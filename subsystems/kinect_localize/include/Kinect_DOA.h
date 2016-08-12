@@ -26,7 +26,7 @@ class Kinect_DOA {
 		int32_t * xcor_data[4];
 		Kinect_DOA();
 		~Kinect_DOA();
-		bool isNoise(double white_noise_ratio=0.7);
+		bool isNoise(double white_noise_ratio=0.65);
 		double findAngle();
 
 };
