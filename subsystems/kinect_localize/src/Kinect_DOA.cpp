@@ -60,7 +60,7 @@ double Kinect_DOA::findAngle() {
 		double sin_angle = lags_and_x[i].first*SOUND_SPEED/(SAMPLE_FREQUENCY*lags_and_x[i].second);
 		if(sin_angle > 1) angles.push_back(90.0);
 		else if(sin_angle < -1) angles.push_back(-90.0);
-		else angles.push_back(asin(sin_angle)*180.0/M_PI);
+		else angles.push_back(-asin(sin_angle)*180.0/M_PI);
 	}
 
 	double angle_avg = 0;
