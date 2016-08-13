@@ -23,7 +23,7 @@
 // General libraries
 #include <cstdio> // for printf
 #include <iostream>
-#include <csignal>
+#include <csignal> // for capturig Ctrl-C
 
 // Libraries for libfreenect
 #include <libfreenect/libfreenect.h>
@@ -47,9 +47,6 @@
 pthread_t freenect_thread;
 volatile int die = 0;
 
-//pthread_mutex_t audiobuf_mutex = PTHREAD_MUTEX_INITIALIZER;
-//pthread_cond_t audiobuf_cond = PTHREAD_COND_INITIALIZER;
-
 pthread_mutex_t batch_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t batch_cond = PTHREAD_COND_INITIALIZER;
 
@@ -59,16 +56,6 @@ static freenect_device* f_dev;
 
 // ***** Constants and Variables needed for DOA Estimation ***** //
 Kinect_DOA kinect_DOA;
-// int xcor_counter = 0; // Counts up to NUMSAMPLES_XCOR/2 to trigger xcor.
-// std::deque<int32_t> mic1_d, mic2_d, mic3_d, mic4_d; // Store microphone data streams
-static float angles[5];
-static int angle_counter = 0;
-static float angle = 0;
-
-// ********** //
-
-//robot_t Robot;
-
 static const bool KINECT_1473 = true; // Need to upload special firmware if using Kinect Model #1473
 static const bool KINECT_UPSIDE_DOWN = true; // If Kinect is mounted upside down, flip angles.
 
@@ -128,12 +115,10 @@ int main(int argc, char* argv[]) {
 	}
 
 	robot_config_t robot_config;
-	if(argc > 1) {
+	if(argc > 1) 
 		robot_config.from_cli(argc, argv);
-	}
-	else {
+	else 
 		robot_config.from_file("robot.ini");
-	}
 
 	superstar_t superstar(robot_config.get("superstar"));
 	std::string starpath = "robots/" + robot_config.get("robot") + "/kinect";
@@ -141,35 +126,26 @@ int main(int argc, char* argv[]) {
 	std::cout << "Superstar is: " << robot_config.get("superstar") << std::endl;
 	std::cout << "Robot is " << robot_config.get("robot") << std::endl;
 	Json::Value kinect;
+	double angle = 0;
 
 	printf("This is the Kinect localization subsystem. Press Ctrl-C to exit.\n");
 
 	while(!die) {
 		pthread_cond_wait(&batch_cond, &batch_mutex);
 		if(!kinect_DOA.isNoise()) {
-			angles[angle_counter] = kinect_DOA.findAngle();
-
-			if((++angle_counter >= 2)) {
-				 if(!(fabs(angles[0]-angles[1]) > 20.0)) {
-					float angle_avg = 0;
-					for(int i=0; i<2; ++i)
-						angle_avg += angles[i];
-					angle = angle_avg/2;
-					angle = KINECT_UPSIDE_DOWN ? -angle : angle;
-					printf("The estimated angle to the source is %f degrees\n", angle);
-					kinect["angle"] = angle;
-					superstar.set(starpath, kinect, auth);
-					superstar.flush();
-				 }
-				angle_counter = 0;
-			}
+			angle = kinect_DOA.findAngle();
+			angle = KINECT_UPSIDE_DOWN ? -angle : angle;
+			printf("The estimated angle to the source is %f degrees\n", angle);
+			kinect["angle"] = angle;
+			superstar.set(starpath, kinect, auth);
+			superstar.flush();
 		}
 	}
 	return 0;
 }
 
 struct sigaction sig_init() {
-	// Setup handlers to catch ctrl-C. This enforces cleanup before the program exits.
+	// Setup handler to catch ctrl-C. This enforces cleanup before the program exits.
 	//     Code from https://gist.github.com/aspyct/3462238
 	struct sigaction sa;
 
@@ -181,21 +157,6 @@ struct sigaction sig_init() {
 
 	// Block every signal during the handler
 	sigfillset(&sa.sa_mask);
-
-	// Intercept SIGHUP and SIGINT
-	if (sigaction(SIGHUP, &sa, NULL) == -1) {
-		perror("Error: cannot handle SIGHUP"); // Should not happen
-	}
-
-	if (sigaction(SIGUSR1, &sa, NULL) == -1) {
-		perror("Error: cannot handle SIGUSR1"); // Should not happen
-	}
-
-	// Will always fail, SIGKILL is intended to force kill your process
-	if (sigaction(SIGKILL, &sa, NULL) == -1) {
-		//perror("Cannot handle SIGKILL"); // Will always happen
-		//printf("You can never handle SIGKILL anyway...\n");
-	}
 
 	if (sigaction(SIGINT, &sa, NULL) == -1) {
 		perror("Error: cannot handle SIGINT"); // Should not happen
