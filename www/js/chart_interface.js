@@ -113,14 +113,16 @@ chart_interface_t.prototype.refresh=function(json) {
 								ctx.clearRect(0, 0, this.charts.canvas["kinect"]["angle"].width, this.charts.canvas["kinect"]["angle"].height);
 								ctx.drawImage(this.images.kinect,0,0, this.charts.canvas["kinect"]["angle"].width, this.charts.canvas["kinect"]["angle"].height);
 								ctx.save()
-								ctx.translate(this.charts.canvas["kinect"]["angle"].width/2, this.charts.canvas["kinect"]["angle"].height)
+								var arrow_base_offset_x = 2;
+								var arrow_base_offset_y = -16;
+								ctx.translate(this.charts.canvas["kinect"]["angle"].width/2+arrow_base_offset_x, this.charts.canvas["kinect"]["angle"].height+arrow_base_offset_y);
 								ctx.beginPath();
-								ctx.moveTo(5,-15);
+								ctx.moveTo(0,0);
 								var arrow_length = this.charts.canvas["kinect"]["angle"].height*3/4;
 								var arrow_tip_y = Math.sin((json["kinect"]["angle"]-90)*Math.PI/180.0)*arrow_length;
 								var arrow_tip_x = Math.cos((json["kinect"]["angle"]-90)*Math.PI/180.0)*arrow_length;
 								ctx.lineTo(arrow_tip_x,arrow_tip_y);
-								ctx.lineWidth = 6;
+								ctx.lineWidth = 5;
 								ctx.strokeStyle="blue";
 								ctx.stroke();
 								ctx.restore();
@@ -333,7 +335,7 @@ chart_interface_t.prototype.add_chart=function() {
 
 chart_interface_t.prototype.remove_chart=function() {
 	var _this = this;
-	if(is_value(_this.charts.data_points[_this.chart_drop.value])) {
+	if(is_value(_this.charts.canvas[_this.chart_drop.value])) {
 		switch(_this.chart_drop.value) {
 			case "kinect":
 				// Clean up
