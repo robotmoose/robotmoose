@@ -829,9 +829,24 @@ connection_t.prototype.arduino_recv_packet=function(p)
 		_this.bad("Arduino sensor packet length mismatch: got "+p.length+
 			", expected "+idx+" (firmware/app mismatch?)");
 
+
+
+	// Merge backend laptop battery information with sensor packet
+	if(!(typeof navigator.getBattery() === 'undefined' ||  navigator.getBattery() === null)) {
+		navigator.getBattery().then(function(battery) {
+			// Have to add each individually
+			_this.sensors["backend_battery"] = {};
+			_this.sensors["backend_battery"]["charging"] = battery.charging;
+			_this.sensors["backend_battery"]["chargingTime"] = battery.chargingTime;
+			_this.sensors["backend_battery"]["dischargingTime"] = battery.dischargingTime;
+			_this.sensors["backend_battery"]["percent"] = (battery.level*100).toString()+"%";
+		});
+	}
+
 	// Upload new sensor data to network:
 	_this.status_message("\tsensors="+JSON.stringify(_this.sensors,null,'\t'));
 	superstar_set(_this.robot,"sensors",_this.sensors);
+
 
 /*
 	// Send sensor data to superstar, and grab pilot commands with set & mget:

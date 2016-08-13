@@ -14,7 +14,7 @@ class Kinect_DOA {
 		//     Source: http://giampierosalvi.blogspot.com/2013/12/ms-kinect-microphone-array-geometry.html
 		const double MIC_POSITIONS[4] = {0.113, -0.036, -.076, -0.113};
 
-		const double SOUND_SPEED = 343.0; // Sound speed in meters per second.
+		const double SOUND_SPEED = 338.4; // Sound speed in meters per second.
 		const double SAMPLE_FREQUENCY = 16000.0; // 16 kHz per channel.
 
 		// The microphones will be almost nearly in sync, so only need to compute the xcor for a short window.

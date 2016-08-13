@@ -234,8 +234,5 @@ void* freenect_threadfunc(void* arg) {
 	freenect_stop_audio(f_dev);
 	freenect_close_device(f_dev);
 	freenect_shutdown(f_ctx);
-
-
-
 	return NULL;
 }
