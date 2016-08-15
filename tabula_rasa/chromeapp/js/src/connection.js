@@ -753,7 +753,12 @@ connection_t.prototype.arduino_send_packet=function()
 	_this.walk_property_list(connection_t.command_property_list,
 	  function(device,property) {
 
-	  	if(device == "create2" && !_this.pilot_connected)
+	  	if(!_this.pilot_connected && (
+	  		device == "create2"
+	  		|| device == "bts"
+	  		|| device == "sabertooth1"
+	  		|| device == "sabertooth2"
+	  		))
 	  		_this.power = {L:0, R:0};
 
 		var value=_this.read_JSON_property(_this.power,property);
