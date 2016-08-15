@@ -847,9 +847,11 @@ connection_t.prototype.arduino_recv_packet=function(p)
 			// Have to add each individually
 			_this.sensors["backend_battery"] = {};
 			_this.sensors["backend_battery"]["charging"] = battery.charging;
-			_this.sensors["backend_battery"]["chargingTime"] = battery.chargingTime;
-			_this.sensors["backend_battery"]["dischargingTime"] = battery.dischargingTime;
-			_this.sensors["backend_battery"]["percent"] = (battery.level*100).toString()+"%";
+			if(battery.chargingTime !== Number.POSITIVE_INFINITY)
+				_this.sensors["backend_battery"]["chargingTime"] = ((battery.chargingTime/60.0).toFixed(2)).toString()+" minutes";
+			else if(battery.dischargingTime !== Number.POSITIVE_INFINITY)
+				_this.sensors["backend_battery"]["dischargingTime"] = ((battery.dischargingTime/60.0).toFixed(2)).toString()+" minutes";
+			_this.sensors["backend_battery"]["percent"] = ((battery.level*100).toFixed(2)).toString()+"%";
 		});
 	}
 
