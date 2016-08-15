@@ -53,6 +53,7 @@ function gui_t(div)
 			_this.connection.gui_robot(robot);
 			_this.load_gruveo(robot,_this.pilot_status.current_pilot);
 			_this.chat.set_robot(robot);
+			
 		}
 
 	);
@@ -151,7 +152,14 @@ function gui_t(div)
 	this.pilot_status_text.innerHTML="Pilots connected (0)";
 	this.main_div.appendChild(document.createElement("br"));
 
-	this.pilot_status=new pilot_status_t(this.name,this.pilot_checkmark);
+	this.pilot_status=new pilot_status_t(this.name,this.pilot_checkmark, 
+		function() {
+			_this.connection.pilot_connected=true;
+		}, 
+		function() {
+			_this.connection.pilot_connected=false;
+		}
+	);
 	this.pilot_status.onchange=function(num)
 	{
 		_this.pilot_status_text.innerHTML="Pilots connected ("+num+")";

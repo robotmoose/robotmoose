@@ -23,6 +23,7 @@ function connection_t(on_message,on_disconnect,on_connect,on_name_set,on_auth_er
 	_this.robot=null;
 	_this.auth="";
 	_this.serial_delay_ms=50; // milliseconds to wait between sensors and commands (saves CPU, costs some latency though)
+	_this.pilot_connected=false; // If pilot is not connected, write 0 power.
 
 	// Are there other serial JS apis?  maybe node.js?
 	_this.serial_api=serial_api;
@@ -739,7 +740,6 @@ connection_t.prototype.arduino_send_packet=function()
 		_this.status_message("  skipping send_packet due to outstanding data");
 		return;
 	}
-
 	// How big is the command packet?
 	var cmd_bytes=0;
 	_this.walk_property_list(connection_t.command_property_list,function(device,property) {
@@ -752,7 +752,12 @@ connection_t.prototype.arduino_send_packet=function()
 	var idx=0; // current output index
 	_this.walk_property_list(connection_t.command_property_list,
 	  function(device,property) {
+
+	  	if(device == "create2" && !_this.pilot_connected)
+	  		_this.power = {L:0, R:0};
+
 		var value=_this.read_JSON_property(_this.power,property);
+		
 		_this.write_JSON_property(_this.sensors.power,property,value);
 		//console.log("|"+device+"|"+value+"|");
 

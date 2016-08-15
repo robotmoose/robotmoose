@@ -1,18 +1,18 @@
 <html lang="en">
 	<head>
 		<!--#include virtual="/sources.html"-->
-		<title>RobotMoose - KT - Troubleshooting & FAQ</title>
+		<title>RobotMoose - Quizbot - Troubleshooting & FAQ</title>
 	</head>
 	<body role="document">
 		<!--#include virtual="/navbar.html"-->
 		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
 			<div class="page-header">
-				<h1>KT Troubleshooting & FAQ</h1>
+				<h1>Quizbot Troubleshooting & FAQ</h1>
 			</div>
 			<center>
 			<h3>Troubleshooting Guide</h3>
 			<div class="well" style="overflow-x:auto">
-				<!-- <table class="table" style="font-size: 14; overflow-x:auto">
+				<table class="table" style="font-size: 14; overflow-x:auto">
 					<thead>
 						<tr>
 							<th>Issue</th>
@@ -21,10 +21,20 @@
 						</tr>
 					</thead>
 					<tbody>
+
 						<tr>
-							<td rowspan="7">Attempting to move Quizbot on RobotMoose, but Quizbot is not moving.</td>
+							<td rowspan="6">Attempting to move KT on RobotMoose, but KT is not moving.</td>
+							<td>Drive tab is not selected.</td>
+							<td>KT will not move unless the drive tab is the active tab. Click on the drive tab, and the top bar of the tab should turn blue, indicating that it is the active tab.<td>
+						</tr>
+						<tr>
+							<td>KT is not turned on.</td>
+							<td>Ensure that you've plugged in KT's USB cable into the Backend computer, then start up the backend. KT should start up automatically, indicated by a big red light. If no light comes on, KT most likely needs to be recharged.</td>
+						</tr>
+						<tr>
 							<td>Backend is not running.</td>
 							<td>Go to the robot computer and ensure that the Backend Chrome app is open and connected to your robot.</td>
+
 						</tr>
 						<tr>
 							<td>Pilot is not connected or is connected to the wrong robot.</td>
@@ -38,27 +48,19 @@
 							<td>Web browser is causing unpredictable behavior.</td>
 							<td>Make sure you are using Google Chrome to ensure that all elements of the interface work properly.</td>
 						</tr>
+
 						<tr>
-							<td>Servos are not plugged in or are wired incorrectly.</td>
-							<td>Inspect the servo wiring to ensure that it matches the Quizbot wiring guide on robotmoose.com. Make sure that power, ground, and signal wires are plugged into the appropriate spots on the Arduino. Also make sure that the pins configured for the servo on the Frontend match the pins that the signal wires are plugged in to.</td>
-						</tr>
-						<tr>
-							<td>Servo(s) are broken.</td>
-							<td>Replace the non-functioning servo(s) and try again. Avoid moving the servo gears by hand, as doing such can break them.</td>
-						</tr>
-						<tr>
-							<td>Arduino pins are malfunctioning.</td>
-							<td>In the same row that the signal wires are plugged into, unplug the servo signal wires and plug them into different numbered slots on the Arduino Uno. Make note of those numbers and update your servo configuration on the Frontend with these numbers.</td>
+							<td>When trying to start the Backend, the big green light on KT turns on, then the Backend disconnects.</td>
+							<td>KT is incorrectly configured.</td>
+							<td>On the KT's Arduino, there are slots labeled TX3, TX2, and TX1. These are serial ports for communicating with KT, and one should have a wire plugged into it. On the <a href="/robots/">robot control page</a>, select the configure tab, and make sure a create2 device is configured with the serial port that KT is plugged in to.</td>
 						</tr>
 
 						<tr>
-							<td>Quizbot rams into its body when the servos are moved.</td>
-							<td>Servos were not at the right angle when the body was assembled.</td>
-							<td>Disconnect the Quizbot body parts from the servo gears, use the servo sliders on the Frontend to set both servos to 90 degrees, then reassemble the Quizbot so that it is facing forward and looking straight up.</td>
-						</tr>
-
+							<td>Programmed KT to move, now it won't stop.</td>
+							<td>KT is stuck in a programming loop.</td>
+							<td>When you run your code, RobotMoose will keep running the code in the current state unless it is told to go to a different state. For example, if you are in a state that does "forward(10)" and nothing else, KT will continually go forward 10 cm. If you don't want it to do this, then go to a stop state after driving forward 10, or use variables and control flow statements (more info on code API <a href="/code/api/">here</a>).</td>
 						<tr>
-							<td rowspan="2">There is considerable lag between sending commands to the Quizbot and those commands happening.</td>
+							<td rowspan="2">There is considerable lag between sending commands to KT and those commands happening.</td>
 							<td>Backend is being throttled.</td>
 							<td>On the Backend computer, the Backend window must be visible at all times, otherwise the app may be throttled. Ensure that the window is visible (not minimized, covered up by other windows, etc.).</td>
 						</tr>
@@ -66,7 +68,7 @@
 							<td>Network connection is too slow.</td>
 							<td>You may have to start your own Superstar server (more info on our GitHub, for advanced users only).</td>
 					</tbody>
-				</table> -->
+				</table>
 			</div>
 	</body>
 </html>
