@@ -3,14 +3,13 @@
 // UAF ITEST
 
 // Date Created: July 26, 2016
-// Last Modified: August 3, 2016
+// Last Modified: August 15, 2016
 
 // ***** Overview ***** //
 // This program uses the microphone array on the Kinect v1 to estimate the direction to the dominant sound source
 //     in a 180 degree FOV in front of the Kinect. This program sends this data to the specified RobotMoose Superstar
 //     where it can be viewed.
-// The micview example provided with libfreenect was used as a guide to interfacing with the Kinect's microphone
-//     array using libfreenect.
+// The micview and glview examples provided with libfreenect were used as a guide for interfacing with the Kinect.
 
 // ***** License ***** //
 // This code is licensed to you under the terms of the Apache License, version
@@ -47,11 +46,13 @@
 pthread_t freenect_thread;
 volatile int die = 0;
 
-pthread_mutex_t batch_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t batch_cond = PTHREAD_COND_INITIALIZER;
-
 static freenect_context* f_ctx;
 static freenect_device* f_dev;
+
+
+static const bool ENABLE_DEPTH = false;
+uint16_t t_gamma[2048];
+uint8_t depth_buffer[640*480*3];
 // ********** //
 
 // ***** Constants and Variables needed for DOA Estimation ***** //
@@ -59,20 +60,35 @@ Kinect_DOA kinect_DOA;
 static const bool KINECT_1473 = true; // Need to upload special firmware if using Kinect Model #1473
 static const bool KINECT_UPSIDE_DOWN = true; // If Kinect is mounted upside down, flip angles.
 
+// Used to signal main thread that data is ready for processing.
+pthread_mutex_t batch_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t batch_cond = PTHREAD_COND_INITIALIZER;
+
 // ******************** //
 
 // Function Prototypes
 struct sigaction sig_init();
 void handle_signal(int signal);
-void in_callback(freenect_device* dev, int num_samples,
+void audio_in_callback(freenect_device* dev, int num_samples,
 				 int32_t* mic1, int32_t* mic2,
 				 int32_t* mic3, int32_t* mic4,
 				 int16_t* cancelled, void *unknown);
+void depth_in_callback(freenect_device* dev, void *v_depth, uint32_t timestamp);
 void* freenect_threadfunc(void* arg);
 
 int main(int argc, char* argv[]) {
 
 	struct sigaction sa = sig_init(); // Catch Ctrl-C
+
+	// ***** Begin Libfreenect Setup ***** //
+	// Initialize gamma correction
+	if(ENABLE_DEPTH) {
+		for (int i=0; i<2048; i++) {
+			float v = i/2048.0;
+			v = powf(v, 3)* 6;
+			t_gamma[i] = v*6*256;
+		}
+	}
 
 	if (freenect_init(&f_ctx, NULL) < 0) {
 		printf("freenect_init() failed\n");
@@ -86,7 +102,14 @@ int main(int argc, char* argv[]) {
 	}
 
 	freenect_set_log_level(f_ctx, FREENECT_LOG_INFO);
-	freenect_select_subdevices(f_ctx, FREENECT_DEVICE_AUDIO);
+	if(ENABLE_DEPTH) {
+		freenect_select_subdevices(f_ctx, (freenect_device_flags)(FREENECT_DEVICE_AUDIO | FREENECT_DEVICE_CAMERA));
+		printf("Depth camera is enabled\n");
+	}
+	else {
+		freenect_select_subdevices(f_ctx, (freenect_device_flags)(FREENECT_DEVICE_AUDIO));
+		printf("Depth camera is disabled\n");
+	}
 
 	int nr_devices = freenect_num_devices (f_ctx);
 	printf ("Number of devices found: %d\n", nr_devices);
@@ -102,11 +125,6 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	freenect_set_user(f_dev, &freenect_thread);
-
-	freenect_set_audio_in_callback(f_dev, in_callback);
-	freenect_start_audio(f_dev);
-
 	int res = pthread_create(&freenect_thread, NULL, freenect_threadfunc, NULL);
 	if (res) {
 		printf("pthread_create failed\n");
@@ -114,6 +132,8 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
+
+	// ***** Begin RobotMoose Integration Setup ***** //
 	robot_config_t robot_config;
 	if(argc > 1) 
 		robot_config.from_cli(argc, argv);
@@ -130,6 +150,7 @@ int main(int argc, char* argv[]) {
 
 	printf("This is the Kinect localization subsystem. Press Ctrl-C to exit.\n");
 
+	// Main loop: wait for data collection, calculate DOA, then send to Superstar
 	while(!die) {
 		pthread_cond_wait(&batch_cond, &batch_mutex);
 		if(!kinect_DOA.isNoise()) {
@@ -178,12 +199,12 @@ void handle_signal(int signal) {
 	}
 }
 
-void in_callback(freenect_device* dev, int num_samples,
+void audio_in_callback(freenect_device* dev, int num_samples,
 				 int32_t* mic1, int32_t* mic2,
 				 int32_t* mic3, int32_t* mic4,
 				 int16_t* cancelled, void *unknown) {
 
-	static int xcor_counter = 0; // Counts up to NUMSAMPLES_XCOR/2 to trigger xcor.
+	static int xcor_counter = 0; // Counts up to NUMSAMPLES_XCOR/2 to trigger DOA estimate.
 	static std::deque<int32_t> mic1_d, mic2_d, mic3_d, mic4_d; // Store microphone data streams
 
 	if(mic1_d.size() < kinect_DOA.NUMSAMPLES_XCOR) { // Still filling up buffers.
@@ -227,11 +248,68 @@ void in_callback(freenect_device* dev, int num_samples,
 	}
 }
 
+void depth_in_callback(freenect_device* dev, void *v_depth, uint32_t timestamp) {
+
+	uint16_t *depth = (uint16_t*)v_depth;
+
+	for (int i=0; i<640*480; ++i) {
+		int pval = t_gamma[depth[i]];
+		int lb = pval & 0xff;
+		switch (pval>>8) {
+			case 0:
+				depth_buffer[3*i+0] = 255;
+				depth_buffer[3*i+1] = 255-lb;
+				depth_buffer[3*i+2] = 255-lb;
+				break;
+			case 1:
+				depth_buffer[3*i+0] = 255;
+				depth_buffer[3*i+1] = lb;
+				depth_buffer[3*i+2] = 0;
+				break;
+			case 2:
+				depth_buffer[3*i+0] = 255-lb;
+				depth_buffer[3*i+1] = 255;
+				depth_buffer[3*i+2] = 0;
+				break;
+			case 3:
+				depth_buffer[3*i+0] = 0;
+				depth_buffer[3*i+1] = 255;
+				depth_buffer[3*i+2] = lb;
+				break;
+			case 4:
+				depth_buffer[3*i+0] = 0;
+				depth_buffer[3*i+1] = 255-lb;
+				depth_buffer[3*i+2] = 255;
+				break;
+			case 5:
+				depth_buffer[3*i+0] = 0;
+				depth_buffer[3*i+1] = 0;
+				depth_buffer[3*i+2] = 255-lb;
+				break;
+			default:
+				depth_buffer[3*i+0] = 0;
+				depth_buffer[3*i+1] = 0;
+				depth_buffer[3*i+2] = 0;
+				break;
+		}
+	}
+}
+
 void* freenect_threadfunc(void* arg) {
+	freenect_set_audio_in_callback(f_dev, audio_in_callback);
+	freenect_start_audio(f_dev);
+	if(ENABLE_DEPTH) {
+		freenect_set_depth_callback(f_dev, depth_in_callback);
+		freenect_set_depth_mode(f_dev, freenect_find_depth_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_DEPTH_11BIT));
+		freenect_start_depth(f_dev);
+	}
+
 	while(!die && freenect_process_events(f_ctx) >= 0) {
 		// If we did anything else in the freenect thread, it might go here.
 	}
 	freenect_stop_audio(f_dev);
+	if(ENABLE_DEPTH)
+		freenect_stop_depth(f_dev);
 	freenect_close_device(f_dev);
 	freenect_shutdown(f_ctx);
 	return NULL;
