@@ -16,21 +16,13 @@ Kinect_DOA::~Kinect_DOA() {
 //     identified as non-noise.
 // Source: http://stackoverflow.com/questions/3881256/can-you-programmatically-detect-white-noise
 bool Kinect_DOA::isNoise(double white_noise_ratio) {
-
-	uint64_t sumd0[4] = {0};
-	uint64_t sumd1[4] = {0};
-
-	for(int i=0; i<NUMSAMPLES_XCOR; ++i) {
-		if(i>0) {
-			for(int j=0; j<4; ++j) {
-				sumd0[j] += abs(xcor_data[j][i]);
-				sumd1[j] += abs(xcor_data[j][i]-xcor_data[j][i-1]);
-			}
-		}
-	}
-
 	for(int i=0; i<4; ++i) {
-		if(((double)sumd1[i])/((double)sumd0[i]) < white_noise_ratio)
+		uint64_t sumd0 = 0, sumd1 = 0;
+		for(int j=1; j<NUMSAMPLES_XCOR; ++j) {
+			sumd0 += abs(xcor_data[i][j]);
+			sumd1 += abs(xcor_data[i][j]-xcor_data[i][j-1]);
+		}
+		if(((double)sumd1)/((double)sumd0) < white_noise_ratio)
 			return false;
 	}
 	return true;

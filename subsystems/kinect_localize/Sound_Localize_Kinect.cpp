@@ -3,7 +3,7 @@
 // UAF ITEST
 
 // Date Created: July 26, 2016
-// Last Modified: August 15, 2016
+// Last Modified: August 16, 2016
 
 // ***** Overview ***** //
 // This program uses the microphone array on the Kinect v1 to estimate the direction to the dominant sound source
@@ -33,12 +33,14 @@
 // Libraries needed for robotmoose integration
 #include <string>
 #include "superstar/superstar.hpp"
-//#include "robot.hpp"
 #include "robot_config.h"
 
 // Libraries needed for DSP
 #include <deque>
+#include <vector>
 #include "Kinect_DOA.h"
+
+#include <chrono>
 
 // ********** Constants and Variables ********** //
 
@@ -50,7 +52,7 @@ static freenect_context* f_ctx;
 static freenect_device* f_dev;
 
 
-static const bool ENABLE_DEPTH = false;
+static const bool ENABLE_DEPTH = true;
 uint16_t t_gamma[2048];
 uint8_t depth_buffer[640*480*3];
 // ********** //
@@ -59,6 +61,7 @@ uint8_t depth_buffer[640*480*3];
 Kinect_DOA kinect_DOA;
 static const bool KINECT_1473 = true; // Need to upload special firmware if using Kinect Model #1473
 static const bool KINECT_UPSIDE_DOWN = true; // If Kinect is mounted upside down, flip angles.
+std::vector<std::deque<int32_t>> sound_buffers;
 
 // Used to signal main thread that data is ready for processing.
 pthread_mutex_t batch_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -79,6 +82,9 @@ void* freenect_threadfunc(void* arg);
 int main(int argc, char* argv[]) {
 
 	struct sigaction sa = sig_init(); // Catch Ctrl-C
+
+	for(int i=0; i<4; ++i)
+		sound_buffers.push_back(std::deque<int32_t>());
 
 	// ***** Begin Libfreenect Setup ***** //
 	// Initialize gamma correction
@@ -103,7 +109,7 @@ int main(int argc, char* argv[]) {
 
 	freenect_set_log_level(f_ctx, FREENECT_LOG_INFO);
 	if(ENABLE_DEPTH) {
-		freenect_select_subdevices(f_ctx, (freenect_device_flags)(FREENECT_DEVICE_AUDIO | FREENECT_DEVICE_CAMERA));
+		freenect_select_subdevices(f_ctx, (freenect_device_flags)(FREENECT_DEVICE_AUDIO | FREENECT_DEVICE_CAMERA | FREENECT_DEVICE_MOTOR));
 		printf("Depth camera is enabled\n");
 	}
 	else {
@@ -148,19 +154,34 @@ int main(int argc, char* argv[]) {
 	Json::Value kinect;
 	double angle = 0;
 
+	// kinect["depth"] = Json::Value(Json::arrayValue);
+	// for(int i=0; i<640*480; ++i) {
+	// 	kinect["depth"][i] = Json::Value(Json::arrayValue);
+	// 	for(int j=0; j<3; ++j)
+	// 		kinect["depth"][i][j] = 0;
+	// }
+	//std::cout << JSON_serialize(kinect["depth"], true) << std::endl;
+
 	printf("This is the Kinect localization subsystem. Press Ctrl-C to exit.\n");
 
+	// std::chrono::time_point<std::chrono::system_clock> start,end;
 	// Main loop: wait for data collection, calculate DOA, then send to Superstar
 	while(!die) {
 		pthread_cond_wait(&batch_cond, &batch_mutex);
-		if(!kinect_DOA.isNoise()) {
+		if(!kinect_DOA.isNoise(0.7)) {
 			angle = kinect_DOA.findAngle();
 			angle = KINECT_UPSIDE_DOWN ? -angle : angle;
+			// start = std::chrono::system_clock::now();
 			printf("The estimated angle to the source is %f degrees\n", angle);
+			// end = std::chrono::system_clock::now();
 			kinect["angle"] = angle;
 			superstar.set(starpath, kinect, auth);
 			superstar.flush();
+
+		// std::chrono::duration<double> elapsed_seconds = end-start;
+		// std::cout << "Printf took " << elapsed_seconds.count() << " seconds." << std::endl;
 		}
+
 	}
 	return 0;
 }
@@ -169,20 +190,13 @@ struct sigaction sig_init() {
 	// Setup handler to catch ctrl-C. This enforces cleanup before the program exits.
 	//     Code from https://gist.github.com/aspyct/3462238
 	struct sigaction sa;
-
-	// Setup the sighub handler
-	sa.sa_handler = &handle_signal;
-
-	// Restart the system call, if at all possible
-	sa.sa_flags = SA_RESTART;
-
-	// Block every signal during the handler
-	sigfillset(&sa.sa_mask);
+	sa.sa_handler = &handle_signal; // Setup the sighub handler
+	sa.sa_flags = SA_RESTART; // Restart the system call, if at all possible
+	sigfillset(&sa.sa_mask); // Block every signal during the handler
 
 	if (sigaction(SIGINT, &sa, NULL) == -1) {
 		perror("Error: cannot handle SIGINT"); // Should not happen
 	}
-
 	return sa;
 }
 
@@ -204,42 +218,35 @@ void audio_in_callback(freenect_device* dev, int num_samples,
 				 int32_t* mic3, int32_t* mic4,
 				 int16_t* cancelled, void *unknown) {
 
+	int32_t * sound_packet[4] = {mic1, mic2, mic3, mic4};
 	static int xcor_counter = 0; // Counts up to NUMSAMPLES_XCOR/2 to trigger DOA estimate.
-	static std::deque<int32_t> mic1_d, mic2_d, mic3_d, mic4_d; // Store microphone data streams
 
-	if(mic1_d.size() < kinect_DOA.NUMSAMPLES_XCOR) { // Still filling up buffers.
-		for(int i=0; i<num_samples; ++i) {
-			mic1_d.push_back(mic1[i]);
-			mic2_d.push_back(mic2[i]);
-			mic3_d.push_back(mic3[i]);
-			mic4_d.push_back(mic4[i]);
+	if(sound_buffers[0].size() < kinect_DOA.NUMSAMPLES_XCOR) {
+		for(int i=0; i<4; ++i) {
+			for(int j=0; j<num_samples; ++j) {
+				sound_buffers[i].push_back(sound_packet[i][j]);
+			}
 		}
 	}
-	else { // buffers full.
-		for(int i=0; i<num_samples; ++i) {
-			mic1_d.pop_front();
-			mic1_d.push_back(mic1[i]);
-			mic2_d.pop_front();
-			mic2_d.push_back(mic2[i]);
-			mic3_d.pop_front();
-			mic3_d.push_back(mic3[i]);
-			mic4_d.pop_front();
-			mic4_d.push_back(mic4[i]);
+	else { // buffers full
+		for(int i=0; i<4; ++i) {
+			for(int j=0; j<num_samples; ++j) {
+				sound_buffers[i].pop_front();
+				sound_buffers[i].push_back(sound_packet[i][j]);
+			}
 		}
 	}
 	xcor_counter += num_samples;
 	// Perform the DOA analysis if we have collected the appropriate number of samples.
-	if( (xcor_counter >= kinect_DOA.NUMSAMPLES_XCOR/2) && (mic1_d.size() >= kinect_DOA.NUMSAMPLES_XCOR) ) { // xcors overlap by 50%.
+	if( (xcor_counter >= kinect_DOA.NUMSAMPLES_XCOR/2) && 
+		(sound_buffers[0].size() >= kinect_DOA.NUMSAMPLES_XCOR) ) { // xcors overlap by 50%.
+
 		pthread_mutex_lock(&batch_mutex);
 
-		uint64_t sumd0[4] = {0};
-		uint64_t sumd1[4] = {0};
-
-		for(int i=0; i<kinect_DOA.NUMSAMPLES_XCOR; ++i) {
-			kinect_DOA.xcor_data[0][i] = mic1_d[i];
-			kinect_DOA.xcor_data[1][i] = mic2_d[i];
-			kinect_DOA.xcor_data[2][i] = mic3_d[i];
-			kinect_DOA.xcor_data[3][i] = mic4_d[i];
+		for(int i=0; i<4; ++i) {
+			for(int j=0; j<kinect_DOA.NUMSAMPLES_XCOR; ++j) {
+				kinect_DOA.xcor_data[i][j] = sound_buffers[i][j];
+			}
 		}
 
 		xcor_counter=0;
@@ -248,10 +255,12 @@ void audio_in_callback(freenect_device* dev, int num_samples,
 	}
 }
 
+
 void depth_in_callback(freenect_device* dev, void *v_depth, uint32_t timestamp) {
 
 	uint16_t *depth = (uint16_t*)v_depth;
 
+	// Apply gamma correction to the received values
 	for (int i=0; i<640*480; ++i) {
 		int pval = t_gamma[depth[i]];
 		int lb = pval & 0xff;
@@ -302,14 +311,17 @@ void* freenect_threadfunc(void* arg) {
 		freenect_set_depth_callback(f_dev, depth_in_callback);
 		freenect_set_depth_mode(f_dev, freenect_find_depth_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_DEPTH_11BIT));
 		freenect_start_depth(f_dev);
+		freenect_set_led(f_dev,LED_RED);
 	}
-
+	
 	while(!die && freenect_process_events(f_ctx) >= 0) {
 		// If we did anything else in the freenect thread, it might go here.
 	}
 	freenect_stop_audio(f_dev);
-	if(ENABLE_DEPTH)
+	if(ENABLE_DEPTH) {
 		freenect_stop_depth(f_dev);
+		freenect_set_led(f_dev,LED_BLINK_GREEN);
+	}
 	freenect_close_device(f_dev);
 	freenect_shutdown(f_ctx);
 	return NULL;
