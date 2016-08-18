@@ -222,7 +222,6 @@ function renderer_t(div,setup_func,loop_func)
 			myself.scene.matrixAutoUpdate=true;
 
 			myself.camera=new THREE.PerspectiveCamera(45,myself.width/myself.height,1,20000);
-
 			myself.controls=new THREE.OrbitControls(myself.camera,myself.div);
 			myself.controls.movementSpeed=100;
 			myself.controls.lookSpeed=0.2;

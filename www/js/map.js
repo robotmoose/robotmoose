@@ -80,11 +80,12 @@ function robot_map_t(div, modal_div, robot)
 		//option3.value="maps/map3.jpg";
 		this.map_select.appendChild(option3);
 
-/* UNFINISHED: reset location button
+// UNFINISHED: reset location button
 
 	//Reset location button...
 	this.reset_location_button=document.createElement("input");
-	this.controls_div.appendChild(this.reset_location_button);
+
+		
 	this.reset_location_button.className="btn btn-primary";
 	this.reset_location_button.style.marginBottom="10px";
 	this.reset_location_button.style.width = "50%";
@@ -97,7 +98,7 @@ function robot_map_t(div, modal_div, robot)
 		myself.reset_location_button_pressed_m();
 	});
 	
-*/
+
 	
 	//Upload button...
 	this.upload_map_button=document.createElement("input");
@@ -115,7 +116,11 @@ function robot_map_t(div, modal_div, robot)
 	});
 
 
-
+	if (robot.sim)
+	{
+		this.upload_map_button.style.width = "50%";
+		this.controls_div.appendChild(this.reset_location_button);
+	}
 
 
 	this.map_display = document.createElement("div");
@@ -170,20 +175,7 @@ robot_map_t.prototype.setup=function(texture_file, width, height) {
 
 }
 
-robot_map_t.prototype.reset_location=function(x_cor, y_cor, angle)
-{
-	if (!x_cor) x_cor = 0;
-	if (!y_cor) y_cor = 0;
-	if (!angle) angle = 0;
-	
-	if (this.robot&&this.robot.sim) this.robot.change_location(x_cor, y_cor, 0, angle);
-	else
-	{
-		robot_network.sensors.location.x = x_cor;
-		robot_network.sensors.location.y = y_cor;
-		robot_network.sensors.angle = angle;
-	}
-}
+
 
 robot_map_t.prototype.resize_map=function()
 {
@@ -261,43 +253,28 @@ robot_map_t.prototype.load_button_pressed_m=function()
 
 }
 
-/* UNFINISHED: reset location button
+// UNFINISHED: reset location button
 
 robot_map_t.prototype.reset_location_button_pressed_m=function()
 {
 
 	var myself = this;
-	var new_x = 0;
-	var new_y = 0;
-	var new_angle = 0;
+	
 	
 
 	var map_json = JSON.parse(myself.map_select.value);
-	if (map_json.path)
-	{
+
 	
-	
-	this.modal_location = new modal_t(div)
-	this.modal_location.set_title("Reset Location");
-	this.minimap_img = document.createElement("img");
-	
-	console.log("showing image")
-	this.minimap_img.src =map_json.path;
-	this.minimap_img.style.width="100%";
-	//this.minimap_img.style["max-width"]=myself.modal_location.get_content().offsetWidth - 30;
-	
-	this.modal_location.get_content().appendChild(myself.minimap_img);
-		
+	this.modal_location = new modal_location_t(myself.modal_div, myself.robot, map_json, function(){myself.reset_tracks=true})
 	
 	this.modal_location.show();
 	
-	}
-	
-	this.reset_location(new_x, new_y, new_angle);
-	this.reset_tracks = true;
-	
 }
-*/
+
+
+
+
+
 robot_map_t.prototype.upload_map_button_pressed_m=function()
 {
 	var myself = this;

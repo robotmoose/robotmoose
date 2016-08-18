@@ -83,22 +83,22 @@ robot_sim_t.prototype.change_location=function(x_cord, y_cord, z_cord, angle)
 	if (!z_cord) z_cord = 0;
 	if (!angle) angle = 0;
 	
+	//console.log("change location: x: " + x_cord + ", y: " + y_cord);
+	
 	var angle_rad = angle*Math.PI/180
 	
-	w_0_x = x_cord - 0.5*this.wheelbase*Math.sin(angle_rad);
-	w_0_y = y_cord + 0.5*this.wheelbase*Math.cos(angle_rad);
+	//console.log("offset y: " + y_cord);
+	var w_0_x = +x_cord - (0.5)*this.wheelbase*Math.sin(angle_rad);
+	var w_0_y = +y_cord + 0.5*this.wheelbase*Math.cos(angle_rad);
 	
-	w_1_x = x_cord + 0.5*this.wheelbase*Math.sin(angle_rad);
-	w_1_y = y_cord - 0.5*this.wheelbase*Math.cos(angle_rad);
+	var w_1_x = +x_cord + 0.5*this.wheelbase*Math.sin(angle_rad);
+	var w_1_y = +y_cord - 0.5*this.wheelbase*Math.cos(angle_rad);
 	
-	// console.log("angle_rad: " + angle_rad);
+	//console.log("w_0_x: " + w_0_x + " w_0_y: " + w_0_y + " angle_rad: " + angle_rad);
 	
 
 	this.wheel[0]=new vec3(w_0_x, w_0_y, z_cord);
 	this.wheel[1]=new vec3(w_1_x, w_1_y, z_cord);
-
-	//this.wheel[0]=new vec3(x_cord,y_cord+0.5*this.wheelbase,z_cord);
-	//this.wheel[1]=new vec3(x_cord,y_cord-0.5*this.wheelbase,z_cord);	
 	
 	this.drive_wheels(0.0,0.0);
 }
