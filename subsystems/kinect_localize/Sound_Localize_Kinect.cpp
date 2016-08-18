@@ -30,17 +30,21 @@
 #include "ofxKinectExtras.h"
 #include <pthread.h>
 
+// Libraries for skeleton tracking
+#include <skeltrack.h>
+#include "skeltrack_helper.h"
+#include <glib-object.h> // Unfortunately ... 
+
 // Libraries needed for robotmoose integration
 #include <string>
 #include "superstar/superstar.hpp"
 #include "robot_config.h"
+#include <chrono>
 
 // Libraries needed for DSP
 #include <deque>
 #include <vector>
 #include "Kinect_DOA.h"
-
-#include <chrono>
 
 // ********** Constants and Variables ********** //
 
@@ -50,7 +54,6 @@ volatile int die = 0;
 
 static freenect_context* f_ctx;
 static freenect_device* f_dev;
-
 
 static const bool ENABLE_DEPTH = true;
 uint16_t t_gamma[2048];
@@ -62,6 +65,16 @@ Kinect_DOA kinect_DOA;
 static const bool KINECT_1473 = true; // Need to upload special firmware if using Kinect Model #1473
 static const bool KINECT_UPSIDE_DOWN = true; // If Kinect is mounted upside down, flip angles.
 std::vector<std::deque<int32_t>> sound_buffers;
+
+// ***** Skeltrack Variables ***** //
+static SkeltrackSkeleton *skeleton = NULL;
+static SkeltrackJointList list = NULL;
+
+// ***** Constants and Variables for RobotMoose Integration ***** //
+static superstar_t * superstar;
+static std::string starpath;
+static std::string auth;
+static Json::Value kinect;
 
 // Used to signal main thread that data is ready for processing.
 pthread_mutex_t batch_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -96,15 +109,40 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+	// Need to upload special firmware for Kinect #1473
+	// For some reason, if we try to upload this when the camera and motor subdevices are selected, the upload will
+	//     not work and the program can't open the audio. So the solution is to open just the audio device, upload,
+	//     the firmware, then close it. 
+	if(KINECT_1473) {
+		printf("Uploading firmware to Kinect #1473\n");
+		if (freenect_init(&f_ctx, NULL) < 0) {
+			printf("freenect_init() failed\n");
+			return 1;
+		}
+		freenect_set_fw_address_nui(f_ctx, ofxKinectExtras::getFWData1473(), ofxKinectExtras::getFWSize1473());
+		freenect_set_fw_address_k4w(f_ctx, ofxKinectExtras::getFWDatak4w(), ofxKinectExtras::getFWSizek4w());
+		freenect_select_subdevices(f_ctx, (freenect_device_flags)(FREENECT_DEVICE_AUDIO));
+
+		int nr_devices = freenect_num_devices (f_ctx);
+		if (nr_devices < 1) {
+			freenect_shutdown(f_ctx);
+			return 1;
+		}
+
+		int user_device_number = 0;
+		if (freenect_open_device(f_ctx, &f_dev, user_device_number) < 0) {
+			printf("Could not open device\n");
+			freenect_shutdown(f_ctx);
+			return 1;
+		}
+
+		freenect_close_device(f_dev);
+		freenect_shutdown(f_ctx);
+	}	
+
 	if (freenect_init(&f_ctx, NULL) < 0) {
 		printf("freenect_init() failed\n");
 		return 1;
-	}
-
-	if(KINECT_1473) {
-		// Need to upload audio firmware for Kinect model #1473
-		freenect_set_fw_address_nui(f_ctx, ofxKinectExtras::getFWData1473(), ofxKinectExtras::getFWSize1473());
-		freenect_set_fw_address_k4w(f_ctx, ofxKinectExtras::getFWDatak4w(), ofxKinectExtras::getFWSizek4w());
 	}
 
 	freenect_set_log_level(f_ctx, FREENECT_LOG_INFO);
@@ -146,40 +184,33 @@ int main(int argc, char* argv[]) {
 	else 
 		robot_config.from_file("robot.ini");
 
-	superstar_t superstar(robot_config.get("superstar"));
-	std::string starpath = "robots/" + robot_config.get("robot") + "/kinect";
-	std::string auth = robot_config.get("auth");
+	//superstar_t superstar(robot_config.get("superstar"));
+	superstar = new superstar_t(robot_config.get("superstar"));
+	starpath = "robots/" + robot_config.get("robot") + "/kinect";
+	auth = robot_config.get("auth");
 	std::cout << "Superstar is: " << robot_config.get("superstar") << std::endl;
 	std::cout << "Robot is " << robot_config.get("robot") << std::endl;
-	Json::Value kinect;
 	double angle = 0;
 
-	// kinect["depth"] = Json::Value(Json::arrayValue);
-	// for(int i=0; i<640*480; ++i) {
-	// 	kinect["depth"][i] = Json::Value(Json::arrayValue);
-	// 	for(int j=0; j<3; ++j)
-	// 		kinect["depth"][i][j] = 0;
-	// }
-	//std::cout << JSON_serialize(kinect["depth"], true) << std::endl;
+	kinect["joints"] = {};
+	kinect["joints"]["head"] = {};
+	kinect["joints"]["left_hand"] = {};
+	kinect["joints"]["right_hand"] = {};
+	kinect["joints"]["left_shoulder"] = {};
+	kinect["joints"]["right_shoulder"] = {};
+	kinect["joints"]["left_elbow"] = {};
+	kinect["joints"]["right_elbow"] = {};
 
 	printf("This is the Kinect localization subsystem. Press Ctrl-C to exit.\n");
 
-	// std::chrono::time_point<std::chrono::system_clock> start,end;
 	// Main loop: wait for data collection, calculate DOA, then send to Superstar
 	while(!die) {
 		pthread_cond_wait(&batch_cond, &batch_mutex);
 		if(!kinect_DOA.isNoise(0.7)) {
 			angle = kinect_DOA.findAngle();
 			angle = KINECT_UPSIDE_DOWN ? -angle : angle;
-			// start = std::chrono::system_clock::now();
 			printf("The estimated angle to the source is %f degrees\n", angle);
-			// end = std::chrono::system_clock::now();
 			kinect["angle"] = angle;
-			superstar.set(starpath, kinect, auth);
-			superstar.flush();
-
-		// std::chrono::duration<double> elapsed_seconds = end-start;
-		// std::cout << "Printf took " << elapsed_seconds.count() << " seconds." << std::endl;
 		}
 
 	}
@@ -260,48 +291,97 @@ void depth_in_callback(freenect_device* dev, void *v_depth, uint32_t timestamp) 
 
 	uint16_t *depth = (uint16_t*)v_depth;
 
-	// Apply gamma correction to the received values
-	for (int i=0; i<640*480; ++i) {
-		int pval = t_gamma[depth[i]];
-		int lb = pval & 0xff;
-		switch (pval>>8) {
-			case 0:
-				depth_buffer[3*i+0] = 255;
-				depth_buffer[3*i+1] = 255-lb;
-				depth_buffer[3*i+2] = 255-lb;
-				break;
-			case 1:
-				depth_buffer[3*i+0] = 255;
-				depth_buffer[3*i+1] = lb;
-				depth_buffer[3*i+2] = 0;
-				break;
-			case 2:
-				depth_buffer[3*i+0] = 255-lb;
-				depth_buffer[3*i+1] = 255;
-				depth_buffer[3*i+2] = 0;
-				break;
-			case 3:
-				depth_buffer[3*i+0] = 0;
-				depth_buffer[3*i+1] = 255;
-				depth_buffer[3*i+2] = lb;
-				break;
-			case 4:
-				depth_buffer[3*i+0] = 0;
-				depth_buffer[3*i+1] = 255-lb;
-				depth_buffer[3*i+2] = 255;
-				break;
-			case 5:
-				depth_buffer[3*i+0] = 0;
-				depth_buffer[3*i+1] = 0;
-				depth_buffer[3*i+2] = 255-lb;
-				break;
-			default:
-				depth_buffer[3*i+0] = 0;
-				depth_buffer[3*i+1] = 0;
-				depth_buffer[3*i+2] = 0;
-				break;
+	// // Apply gamma correction to the received values
+	// for (int i=0; i<640*480; ++i) {
+	// 	int pval = t_gamma[depth[i]];
+	// 	int lb = pval & 0xff;
+	// 	switch (pval>>8) {
+	// 		case 0:
+	// 			depth_buffer[3*i+0] = 255;
+	// 			depth_buffer[3*i+1] = 255-lb;
+	// 			depth_buffer[3*i+2] = 255-lb;
+	// 			break;
+	// 		case 1:
+	// 			depth_buffer[3*i+0] = 255;
+	// 			depth_buffer[3*i+1] = lb;
+	// 			depth_buffer[3*i+2] = 0;
+	// 			break;
+	// 		case 2:
+	// 			depth_buffer[3*i+0] = 255-lb;
+	// 			depth_buffer[3*i+1] = 255;
+	// 			depth_buffer[3*i+2] = 0;
+	// 			break;
+	// 		case 3:
+	// 			depth_buffer[3*i+0] = 0;
+	// 			depth_buffer[3*i+1] = 255;
+	// 			depth_buffer[3*i+2] = lb;
+	// 			break;
+	// 		case 4:
+	// 			depth_buffer[3*i+0] = 0;
+	// 			depth_buffer[3*i+1] = 255-lb;
+	// 			depth_buffer[3*i+2] = 255;
+	// 			break;
+	// 		case 5:
+	// 			depth_buffer[3*i+0] = 0;
+	// 			depth_buffer[3*i+1] = 0;
+	// 			depth_buffer[3*i+2] = 255-lb;
+	// 			break;
+	// 		default:
+	// 			depth_buffer[3*i+0] = 0;
+	// 			depth_buffer[3*i+1] = 0;
+	// 			depth_buffer[3*i+2] = 0;
+	// 			break;
+	// 	}
+	// }
+	BufferInfo *buffer_info;
+	uint16_t width=640, height=480;
+
+	uint16_t dimension_factor = 16;
+
+	buffer_info = process_buffer(
+		depth,
+		width,
+		height,
+		dimension_factor,
+		THRESHOLD_BEGIN,
+		THRESHOLD_END
+	);
+
+	list = skeltrack_skeleton_track_joints_sync(
+		skeleton,
+		buffer_info->reduced_buffer,
+		buffer_info->reduced_width,
+		buffer_info->reduced_height,
+		NULL,
+		NULL
+	);
+
+	// Get the joint data and store it in JSON format
+	SkeltrackJoint * joint_ptrs[7];
+	std::string joint_names[7] = {
+		"head", "left_hand", "right_hand", "left_shoulder",
+		"right_shoulder", "left_elbow", "right_elbow"
+	};
+
+	if(list != NULL) {
+		joint_ptrs[0] = skeltrack_joint_list_get_joint (list, SKELTRACK_JOINT_ID_HEAD);
+  		joint_ptrs[1] = skeltrack_joint_list_get_joint (list, SKELTRACK_JOINT_ID_LEFT_HAND);
+  		joint_ptrs[2] = skeltrack_joint_list_get_joint (list, SKELTRACK_JOINT_ID_RIGHT_HAND);
+  		joint_ptrs[3] = skeltrack_joint_list_get_joint (list, SKELTRACK_JOINT_ID_LEFT_SHOULDER);
+  		joint_ptrs[4] = skeltrack_joint_list_get_joint (list, SKELTRACK_JOINT_ID_RIGHT_SHOULDER);
+  		joint_ptrs[5]= skeltrack_joint_list_get_joint (list, SKELTRACK_JOINT_ID_LEFT_ELBOW);
+  		joint_ptrs[6] = skeltrack_joint_list_get_joint (list, SKELTRACK_JOINT_ID_RIGHT_ELBOW);
+	}
+	for(int i=0; i<7; ++i) {
+		if(joint_ptrs[i] != NULL) {
+			kinect["joints"][joint_names[i]]["x"] = joint_ptrs[i] -> x;
+			kinect["joints"][joint_names[i]]["y"] = joint_ptrs[i] -> y;
+			kinect["joints"][joint_names[i]]["z"] = joint_ptrs[i] -> z;
+			kinect["joints"][joint_names[i]]["screen_x"] = joint_ptrs[i] -> screen_x;
+			kinect["joints"][joint_names[i]]["screen_y"] = joint_ptrs[i] -> screen_y;
 		}
 	}
+	delete buffer_info;
 }
 
 void* freenect_threadfunc(void* arg) {
@@ -312,10 +392,21 @@ void* freenect_threadfunc(void* arg) {
 		freenect_set_depth_mode(f_dev, freenect_find_depth_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_DEPTH_11BIT));
 		freenect_start_depth(f_dev);
 		freenect_set_led(f_dev,LED_RED);
+		skeleton = skeltrack_skeleton_new();
+		g_object_set (skeleton, "enable-smoothing", true, NULL);
+		g_object_set (skeleton, "smoothing-factor", 0.5, NULL);
 	}
 	
+	static std::chrono::time_point<std::chrono::system_clock> time_curr, time_last_tx;
 	while(!die && freenect_process_events(f_ctx) >= 0) {
-		// If we did anything else in the freenect thread, it might go here.
+		time_curr = std::chrono::system_clock::now();
+		std::chrono::duration<double> elapsed_seconds = time_curr - time_last_tx;
+
+		if(elapsed_seconds.count() >= 0.1250) {
+			superstar -> set(starpath, kinect, auth);
+			superstar -> flush();
+			time_last_tx = std::chrono::system_clock::now();
+		}
 	}
 	freenect_stop_audio(f_dev);
 	if(ENABLE_DEPTH) {
@@ -324,5 +415,5 @@ void* freenect_threadfunc(void* arg) {
 	}
 	freenect_close_device(f_dev);
 	freenect_shutdown(f_ctx);
-	return NULL;
+	exit(0);
 }

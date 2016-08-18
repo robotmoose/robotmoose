@@ -14,6 +14,8 @@ else()
 endif()
 
 include_directories(include)
+include_directories(/usr/include/glib-2.0)
+include_directories(/usr/lib/x86_64-linux-gnu/glib-2.0/include)
 
 # Add freenect libraries and required fix for Kinect Model #1473
 set(freenect_fix_SRCS src/ofxKinectExtras.cpp)
@@ -42,5 +44,5 @@ target_link_libraries(superstar utils)
 # Build the executable
 add_executable(Sound_Localize_Kinect Sound_Localize_Kinect.cpp)
 # Link against required libraries
-target_link_libraries(Sound_Localize_Kinect freenect freenect_fix dsp json utils superstar pthread)
+target_link_libraries(Sound_Localize_Kinect freenect freenect_fix dsp json utils superstar pthread glib-2.0 gobject-2.0 skeltrack-0.1)
 

@@ -6,9 +6,7 @@ function chart_interface_t(div) {
 	// Stores chart data and related elements. Indexed by sensor name.
 	this.charts = {
 		canvas: {},
-		//smoothie: {},
 		chart: {},
-		//data: {},
 		data_points: {},
 		header: {},
 		image: {}
@@ -33,7 +31,9 @@ function chart_interface_t(div) {
 	this.add_button.value="Add";
 	this.add_button.title_add="Click here to add a chart for the selected sensor.";
 	this.add_button.title=this.add_button.title_add;
-	this.add_button.onclick=function() {_this.add_chart()};
+	this.add_button.addEventListener("click", function() {
+		_this.add_chart();
+	});
 
 	this.remove_button=document.createElement("input");
 	this.remove_button.type="button";
@@ -43,14 +43,31 @@ function chart_interface_t(div) {
 	this.remove_button.value="Remove";
 	this.remove_button.title_remove="Click here to remove the chart for the selected sensor.";
 	this.remove_button.title=this.remove_button.title_remove;
-	this.remove_button.onclick=function() {_this.remove_chart()};
-
+	this.remove_button.addEventListener("click", function() {
+		_this.remove_chart();
+	});
+	
 	// Add created UI elements to tab.
 	this.controls_div.appendChild(this.add_button);
 	this.controls_div.appendChild(this.remove_button);
 	this.div.appendChild(this.controls_div);
 	this.div.appendChild(document.createElement("br"));
 	this.div.appendChild(this.chart_div);
+}
+
+chart_interface_t.prototype.connect_joints = function(ctx, joint1, joint2, offset) {
+	if(joint1 == null || joint2 == null) return;
+
+	ctx.beginPath();
+	ctx.moveTo(joint1.screen_x - offset.x, joint1.screen_y - offset.y);
+	ctx.lineTo(joint2.screen_x - offset.x, joint2.screen_y - offset.y);
+	ctx.lineWidth = 4;
+	ctx.strokeStyle="blue";
+	ctx.stroke();
+}
+
+chart_interface_t.prototype.Vec2 = function(x_value, y_value) {
+	return {x: x_value, y: y_value};
 }
 
 chart_interface_t.prototype.refresh=function(json) {
@@ -108,25 +125,111 @@ chart_interface_t.prototype.refresh=function(json) {
 							continue;
 						}
 						if(subprop == "angle") {
-							if(is_value(this.charts.canvas["kinect"]["angle"])) {
+							if(is_value(this.charts.canvas["kinect"]["angle"])) { // Draw the background and the angled line
 								var ctx = this.charts.canvas["kinect"]["angle"].getContext("2d");
 								ctx.clearRect(0, 0, this.charts.canvas["kinect"]["angle"].width, this.charts.canvas["kinect"]["angle"].height);
 								ctx.drawImage(this.images.kinect,0,0, this.charts.canvas["kinect"]["angle"].width, this.charts.canvas["kinect"]["angle"].height);
 								ctx.save()
-								var arrow_base_offset_x = 2;
-								var arrow_base_offset_y = -16;
-								ctx.translate(this.charts.canvas["kinect"]["angle"].width/2+arrow_base_offset_x, this.charts.canvas["kinect"]["angle"].height+arrow_base_offset_y);
+								var arrow_base_offset = this.Vec2(2, -16);
+								ctx.translate(this.charts.canvas["kinect"]["angle"].width/2+arrow_base_offset.x, this.charts.canvas["kinect"]["angle"].height+arrow_base_offset.y);
 								ctx.beginPath();
 								ctx.moveTo(0,0);
 								var arrow_length = this.charts.canvas["kinect"]["angle"].height*3/4;
-								var arrow_tip_y = Math.sin((json["kinect"]["angle"]-90)*Math.PI/180.0)*arrow_length;
-								var arrow_tip_x = Math.cos((json["kinect"]["angle"]-90)*Math.PI/180.0)*arrow_length;
-								ctx.lineTo(arrow_tip_x,arrow_tip_y);
+								var arrow_tip = this.Vec2(
+									Math.cos((json["kinect"]["angle"]-90)*Math.PI/180.0)*arrow_length,
+									Math.sin((json["kinect"]["angle"]-90)*Math.PI/180.0)*arrow_length
+								);
+								
+								;
+								ctx.lineTo(arrow_tip.x,arrow_tip.y);
 								ctx.lineWidth = 5;
 								ctx.strokeStyle="blue";
 								ctx.stroke();
 								ctx.restore();
 								this.charts.header["kinect"]["angle"].innerHTML = "Direction of Arrival: " + json["kinect"]["angle"] + "\xB0";
+							}
+						}
+						if(subprop == "joints") {
+							if(json["kinect"]["joints"]["left_shoulder"] !== null && json["kinect"]["joints"]["right_shoulder"] !== null) {
+								var ctx = this.charts.canvas["kinect"]["joints"].getContext("2d");
+								ctx.fillStyle="grey";
+								ctx.fillRect(0, 0, this.charts.canvas["kinect"]["joints"].width, this.charts.canvas["kinect"]["joints"].height);
+								ctx.save();
+								var origin = this.Vec2(
+									this.charts.canvas["kinect"]["joints"].width/4,
+									this.charts.canvas["kinect"]["joints"].height/4
+								);
+								ctx.translate(origin.x, origin.y);
+								var shoulder_center = this.Vec2(
+									(json["kinect"]["joints"]["left_shoulder"].screen_x + json["kinect"]["joints"]["right_shoulder"].screen_x)/2,
+								 	(json["kinect"]["joints"]["left_shoulder"].screen_y + json["kinect"]["joints"]["right_shoulder"].screen_y)/2
+								);
+
+								ctx.fillStyle="black";
+								ctx.fillRect(origin.x-5, origin.y-5, 10, 10);
+
+								var offset = this.Vec2(shoulder_center.x - origin.x, shoulder_center.y - origin.y);
+
+								ctx.fillStyle="yellow";
+								ctx.fillRect(shoulder_center.x-offset.x-5, shoulder_center.y-offset.y-5, 10, 10);							
+
+								// Connect joints with lines
+								this.connect_joints(
+									ctx, 
+									json["kinect"]["joints"]["left_shoulder"],
+									json["kinect"]["joints"]["right_shoulder"],
+									offset
+								);
+								this.connect_joints(
+									ctx, 
+									json["kinect"]["joints"]["left_shoulder"],
+									json["kinect"]["joints"]["left_elbow"],
+									offset
+								);
+								this.connect_joints(
+									ctx, 
+									json["kinect"]["joints"]["left_elbow"],
+									json["kinect"]["joints"]["left_hand"],
+									offset
+								);
+								this.connect_joints(
+									ctx, 
+									json["kinect"]["joints"]["right_shoulder"],
+									json["kinect"]["joints"]["right_elbow"],
+									offset
+								);
+								this.connect_joints(
+									ctx, 
+									json["kinect"]["joints"]["right_elbow"],
+									json["kinect"]["joints"]["right_hand"],
+									offset
+								);
+								if(json["kinect"]["joints"]["head"] !== null
+								){
+									ctx.beginPath();
+									ctx.moveTo(json["kinect"]["joints"]["head"].screen_x - offset.x, json["kinect"]["joints"]["head"].screen_y - offset.y);
+									ctx.lineTo(shoulder_center.x - offset.x, shoulder_center.y - offset.y);
+									ctx.lineWidth = 4;
+									ctx.strokeStyle="blue";
+									ctx.stroke();
+								}
+								// Draw points for joints
+								for(var subsubprop in json["kinect"]["joints"]) {
+									if(!json["kinect"]["joints"].hasOwnProperty(subsubprop))
+										continue;
+
+									if(json["kinect"]["joints"][subsubprop] != null) {
+										ctx.fillStyle="black";
+										ctx.fillRect(
+											json["kinect"]["joints"][subsubprop].screen_x-7.5-offset.x,
+											json["kinect"]["joints"][subsubprop].screen_y-7.5-offset.y,
+											15,
+											15
+										);
+									}
+								}
+
+								ctx.restore();
 							}
 						}
 					}
@@ -180,6 +283,7 @@ chart_interface_t.prototype.refresh=function(json) {
 
 chart_interface_t.prototype.add_chart=function() {
 	var _this = this;
+
 	switch(_this.chart_drop.value) {
 		case "kinect":
 			if(!is_value(_this.charts.canvas["kinect"])) {
@@ -196,6 +300,17 @@ chart_interface_t.prototype.add_chart=function() {
 			 	_this.charts.canvas["kinect"]["angle"].width = 800;
 			 	_this.charts.canvas["kinect"]["angle"].height = 400;
 			 	_this.charts.canvas["kinect"]["angle"].style.width="100%";
+			}
+			if(!is_value(_this.charts.canvas["kinect"]["joints"])) {
+				_this.charts.canvas["kinect"]["joints"] = document.createElement("canvas");
+				_this.charts.header["kinect"]["joints"] = document.createElement("h4");
+				_this.chart_div.appendChild(_this.charts.header["kinect"]["joints"]);
+			 	_this.chart_div.appendChild(_this.charts.canvas["kinect"]["joints"]);
+
+			 	_this.charts.header["kinect"]["joints"].innerHTML = "Kinect Skeleton Tracker";
+			 	_this.charts.canvas["kinect"]["joints"].width = 1280;
+			 	_this.charts.canvas["kinect"]["joints"].height = 800;
+			 	_this.charts.canvas["kinect"]["joints"].style.width="100%";
 			}
 			break;
 
@@ -343,6 +458,11 @@ chart_interface_t.prototype.remove_chart=function() {
 				_this.chart_div.removeChild(_this.charts.header["kinect"]["angle"]);
 				_this.charts.canvas["kinect"]["angle"] = null;
 				_this.charts.header["kinect"]["angle"] = null;
+
+				_this.chart_div.removeChild(_this.charts.canvas["kinect"]["joints"]);
+				_this.chart_div.removeChild(_this.charts.header["kinect"]["joints"]);
+				_this.charts.canvas["kinect"]["joints"] = null;
+				_this.charts.header["kinect"]["joints"] = null;
 
 				_this.charts.canvas["kinect"] = null;
 				_this.charts.header["kinect"] = null;
