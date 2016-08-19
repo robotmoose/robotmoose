@@ -58,27 +58,43 @@ function modal_location_t(div, robot, map_json, onreset){
 	this.pos_row=document.createElement("div");
 	this.pos_row.className="row";
 	this.pos_colX = document.createElement("div");
-	this.pos_colX.className="col-md-4"
+	this.pos_colX.className="col-md-2"
 	this.pos_colY = document.createElement("div");
-	this.pos_colY.className="col-md-4 col-md-offset-2"
+	this.pos_colY.className="col-md-2 col-md-offset-2"
+	this.pos_angle=document.createElement("div");
+	this.pos_angle.className="col-md-2 col-md-offset-2"
+	
+	var input_width = 75;
 	
 	this.posX_input = document.createElement("input");
 	this.posX_input.type="number";
 	this.posX_input.value=0;
 	this.posX_input.id="posX_input";
+	this.posX_input.style.width=input_width;
 	this.posX_input.onchange=function(){ myself.pos_input_onchange()};
 	this.posX_label=document.createElement("label");
 	this.posX_label.for="posX_input";
-	this.posX_label.innerHTML="X coordinate";
+	this.posX_label.innerHTML="X";
 	
 	this.posY_input=document.createElement("input");
 	this.posY_input.type="number";
 	this.posY_input.value=0;
 	this.posY_input.id="posY_input"
+	this.posY_input.style.width=input_width;
 	this.posY_input.onchange=function(){ myself.pos_input_onchange()};
 	this.posY_label=document.createElement("label");
 	this.posY_label.for="posY_input";
-	this.posY_label.innerHTML="Y coordinate";
+	this.posY_label.innerHTML="Y";
+	
+	this.angle_input=document.createElement("input");
+	this.angle_input.type="number";
+	this.angle_input.value=0;
+	this.angle_input.id="angle_input"
+	this.angle_input.style.width=input_width;
+	this.angle_input.onchange=function(){ myself.pos_input_onchange()};
+	this.angle_label=document.createElement("label");
+	this.angle_label.for="angle_input";
+	this.angle_label.innerHTML="angle";
 	
 	
 	this.set_loc_button=document.createElement("input");
@@ -98,8 +114,11 @@ function modal_location_t(div, robot, map_json, onreset){
 	this.pos_colX.appendChild(this.posX_label);
 	this.pos_colY.appendChild(this.posY_input);
 	this.pos_colY.appendChild(this.posY_label);
+	this.pos_angle.appendChild(this.angle_input);
+	this.pos_angle.appendChild(this.angle_label);
 	this.pos_row.appendChild(this.pos_colX);
 	this.pos_row.appendChild(this.pos_colY);
+	this.pos_row.appendChild(this.pos_angle);
 	this.modal_ui_col.appendChild(this.pos_text_el);
 	this.modal_ui_col.appendChild(document.createElement("br"));
 	this.modal_ui_col.appendChild(document.createElement("br"));
@@ -111,16 +130,21 @@ function modal_location_t(div, robot, map_json, onreset){
 	this.modal_img_col.addEventListener("mousemove", function(event){myself.get_coords(event)});
 	
 	
+	
+	
 	window.setTimeout(function(){myself.set_minimap_roomba();}, 1);
 	
 }
 
-modal_location_t.prototype.set_minimap_roomba=function(posX, posY)
+modal_location_t.prototype.set_minimap_roomba=function(posX, posY, angle)
 {
 	var myself = this;
 	
 	if(!myself.minimap_roomba_scale)
 	{
+	
+	//myself.minimap_roomba.style["-webkit-transform"]="rotate(90deg)";
+	myself.minimap_roomba.style["transform"]="rotate(90deg)";
 	
 	var roomba_width = 0.3;
 	var px_real_img_ratio = this.minimap_img.width/this.map_json.width;
@@ -156,8 +180,17 @@ modal_location_t.prototype.set_minimap_roomba=function(posX, posY)
 	var offset_left = myself.minimap_img.width/2- myself.minimap_roomba_width/2 + 15 + offset_posX;
 	var offset_top = myself.minimap_img.height/2 - myself.minimap_roomba_height/2 + offset_posY;
 	
+	
 	myself.minimap_roomba.style.left=offset_left;
 	myself.minimap_roomba.style.top=offset_top;
+	
+	if(!angle) 
+		angle = 0;
+		
+	myself.angle = angle;
+	var angle_adj = -angle + 90;
+	
+	myself.minimap_roomba.style["transform"]="rotate(" + angle_adj + "deg)"; 
 	
 	console.log("left: " + offset_left + " top: " + offset_top)
 
@@ -173,6 +206,7 @@ modal_location_t.prototype.pos_input_onchange=function()
 	// check range
 	var posX_temp = this.posX_input.value;
 	var posY_temp = this.posY_input.value;
+	var angle_temp = this.angle_input.value;
 	
 	if (opt.width/2 < posX_temp)
 	{
@@ -192,12 +226,18 @@ modal_location_t.prototype.pos_input_onchange=function()
 		this.posY_input.value=-opt.height/2;
 	}
 	
+	if (angle_temp > 180)
+		this.angle_input.value = 180;
+	else if (angle_temp < -180)
+		this.angle_input.value = -180;
+	
 	// set roomba position
 	this.posX_set=this.posX_input.value;
 	this.posY_set=this.posY_input.value;
+	this.angle_set=this.angle_input.value;
 	
 	// set minimap roomba image
-	this.set_minimap_roomba(myself.posX_set, myself.posY_set);
+	this.set_minimap_roomba(myself.posX_set, myself.posY_set, myself.angle_set);
 }
 
 modal_location_t.prototype.reset_location=function(x_cor, y_cor, angle)
@@ -220,7 +260,7 @@ modal_location_t.prototype.set_loc_button_pressed_m=function()
 	var myself = this;
 	var new_x = myself.posX_set;
 	var new_y = myself.posY_set;
-	var new_angle = 0;
+	var new_angle = myself.angle_set;
 	console.log("Resetting location - x: " + new_x + ", y: " + new_y);
 	myself.reset_location(new_x, new_y, new_angle);
 	if(myself.onreset) myself.onreset();
