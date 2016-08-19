@@ -221,7 +221,6 @@ robot_ui_t.prototype.download_gui=function()
 				UI:_this.create_doorway("UI","Customized robot user interface",help_text_ui),
 				sound:_this.create_doorway("Sound","Play sounds on the backend to get attention",null),
 				chat:_this.create_doorway("Chat","Chat with the caretaker of the robot.",null)
-                voice:_this.create_doorway("Voice","Control the robot using simple voice commands",null)
 			};
 
 			clear_out(_this.doorways.config.content);
@@ -274,7 +273,11 @@ robot_ui_t.prototype.download_gui=function()
 			clear_out(_this.doorways.UI.content);
 			clear_out(_this.doorways.sound.content);
 			clear_out(_this.doorways.chat.content);
-            clear_out(_this.doorways.voice.content);
+
+            if(typeof(webkitSpeechRecognition) !== 'undefined'){
+                _this.doorways.voice = _this.create_doorway("Voice","Control the robot using simple voice commands",null);
+                clear_out(_this.doorways.voice.content);
+            }
 
 			_this.doorway_manager.hide_all();
 			_this.doorways.config.set_minimized(false);
@@ -353,8 +356,10 @@ robot_ui_t.prototype.create_widgets=function()
 		UI:new UI_builder_t(this.doorways.UI.content),
 		sound:new sound_player_t(this.doorways.sound.content,_this.robot),
 		chat:new chatter_t(this.doorways.chat.content,_this.robot,20,"Pilot"),
-        voice: new voice_control_t(this.doorways.voice.content)
 	};
+    if(typeof(webkitSpeechRecognition) !=='undefined'){
+        this.widgets.voice = new voice_control_t(this.doorways.voice.content);
+    }
 	this.state_runner.set_UI(this.widgets.UI);
 
 	this.widgets.config.onchange=function() { // recreate pilot GUI when configuration changes
