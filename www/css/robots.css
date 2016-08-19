@@ -12,6 +12,7 @@ head,.robot.body
 	border:1px solid #000000;
 	height:auto;
 }
+
 .CodeMirror-scroll
 {
 	overflow:visible;
@@ -22,7 +23,7 @@ head,.robot.body
 .robots
 {
 	--top-menu-height:50px;
-	--side-menu-width:100px;
+	--side-menu-width:110px;
 }
 
 .robots.menu_div
@@ -63,6 +64,8 @@ head,.robot.body
 	color:#333;
 	text-align:left;
 	outline:none;
+	white-space:nowrap;
+	padding-right:5px;
 }
 
 .robot.menu.button:hover
@@ -75,4 +78,5 @@ head,.robot.body
 {
 	height:96px;
 	background-color:white;
+	padding-left:10px;
 }
