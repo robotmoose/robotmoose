@@ -53,7 +53,7 @@ function gui_t(div)
 			_this.connection.gui_robot(robot);
 			_this.load_gruveo(robot,_this.pilot_status.current_pilot);
 			_this.chat.set_robot(robot);
-			
+
 		}
 
 	);
@@ -152,10 +152,10 @@ function gui_t(div)
 	this.pilot_status_text.innerHTML="Pilots connected (0)";
 	this.main_div.appendChild(document.createElement("br"));
 
-	this.pilot_status=new pilot_status_t(this.name,this.pilot_checkmark, 
+	this.pilot_status=new pilot_status_t(this.name,this.pilot_checkmark,
 		function() {
 			_this.connection.pilot_connected=true;
-		}, 
+		},
 		function() {
 			_this.connection.pilot_connected=false;
 		}
@@ -184,23 +184,17 @@ gui_t.prototype.destroy=function()
 	this.div.removedChild(this.el);
 }
 
-gui_t.prototype.load_gruveo=function(robot,uuid)
+gui_t.prototype.load_gruveo=function(robot)
 {
-	if(uuid)
-		this.last_uuid=uuid;
-	else
-		uuid=this.last_uuid;
-	if(!uuid)
-		uuid="";
 	var url="https://gruveo.com/";
 	var robot_url="";
 	if(!robot)
 		robot={};
 	if(!robot.auth)
 		robot.auth="";
-	if(valid_robot(robot)&&uuid)
+	if(valid_robot(robot))
 	{
-		robot_url=uuid+superstar.superstar+robot.year+robot.school+robot.name;
+		robot_url=superstar.superstar+robot.year+robot.school+robot.name;
 		robot_url=CryptoJS.HmacSHA256(robot_url,robot.auth).toString(CryptoJS.enc.Hex);
 	}
 	url+=encodeURIComponent(robot_url.replace(/[^A-Za-z0-9\s!?]/g,''));
