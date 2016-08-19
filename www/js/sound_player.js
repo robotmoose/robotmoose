@@ -86,11 +86,13 @@ sound_player_t.prototype.build_sound_list=function()
 
 sound_player_t.prototype.request_sound=function()
 {
-	if (!this.robot.sim)
+	if (this.robot.sim)
 		return;
+
 		
 	if(this.sound_requested!=="") //Do not execute when no sound selected
 	{
+		console.log("Got to execute condition!");
 		this.play_sound=!this.play_sound;
 		this.play_sound_button.disabled=true;
 		this.stop_sound_button.disabled=false;
@@ -100,7 +102,7 @@ sound_player_t.prototype.request_sound=function()
 
 sound_player_t.prototype.stop_sound=function()
 {
-	if (!this.robot.sim)
+	if (this.robot.sim)
 		return;
 		
 	this.play_sound=!this.play_sound;
