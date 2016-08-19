@@ -21,18 +21,22 @@ robot_menu_t.prototype.destroy=function()
 	this.div=this.el=null;
 }
 
-robot_menu_t.prototype.create=function(title,onclick,tooltip)
+robot_menu_t.prototype.create=function(title,onclick,tooltip,icon)
 {
 	var button=document.createElement("button");
 	this.el.appendChild(button);
-	button.innerHTML=title;
 	button.className="robot menu button";
+	if (icon)
+		button.innerHTML = `<span class="glyphicon glyphicon-${icon}"></span>&nbsp;&nbsp;${title}`;
+	else button.innerHTML=title;
+
 	button.addEventListener("click",function(event)
 	{
 		if(onclick)
 			onclick(event);
 	});
 	button.title=tooltip;
+	button.style.whiteSpace = 'nowrap';
 	this.buttons.push(button);
 }
 

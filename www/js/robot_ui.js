@@ -77,7 +77,8 @@ robot_ui_t.prototype.create_menus=function()
 	(
 		"Connect",
 		function(){_this.connect_menu.show();},
-		"Connect to a new robot over the network"
+		"Connect to a new robot over the network",
+		'transfer'
 	);
 
 	this.connect_menu.onconnect=function(robot)
@@ -250,16 +251,16 @@ robot_ui_t.prototype.download_gui=function()
 		{
 			_this.doorways=
 			{
-				config:_this.create_doorway("Configure","Set up robot hardware",help_text_config),
-				pilot:_this.create_doorway("Drive","Manually drive the robot",help_text_pilot),
-				sensors:_this.create_doorway("Sensors","Examine sensor data from robot",help_text_sensors),
-				charts:_this.create_doorway("Charts", "Chart sensor data received from robot",null),
-				states:_this.create_doorway("Code","Automatically drive the robot",help_text_states),
-				map:_this.create_doorway("Map","See where the robot thinks it is",help_text_map),
-				video:_this.create_doorway("Video","Show the robot's video camera",null),
-				UI:_this.create_doorway("UI","Customized robot user interface",help_text_ui),
-				sound:_this.create_doorway("Sound","Play sounds on the backend to get attention",null),
-				chat:_this.create_doorway("Chat","Chat with the caretaker of the robot.",null)
+				config:_this.create_doorway("Configure","Set up robot hardware",help_text_config, 'wrench'),
+				pilot:_this.create_doorway("Drive","Manually drive the robot",help_text_pilot, 'dashboard'),
+				sensors:_this.create_doorway("Sensors","Examine sensor data from robot",help_text_sensors, 'scale'),
+				charts:_this.create_doorway("Charts", "Chart sensor data received from robot",null, 'stats'),
+				states:_this.create_doorway("Code","Automatically drive the robot",help_text_states, 'list-alt'),
+				map:_this.create_doorway("Map","See where the robot thinks it is",help_text_map, 'globe'),
+				video:_this.create_doorway("Video","Show the robot's video camera",null, 'facetime-video'),
+				UI:_this.create_doorway("UI","Customized robot user interface",help_text_ui, 'object-align-top'),
+				sound:_this.create_doorway("Sound","Play sounds on the backend to get attention",null, 'volume-up'),
+				chat:_this.create_doorway("Chat","Chat with the caretaker of the robot.",null, 'comment')
 			};
 
 			clear_out(_this.doorways.config.content);
@@ -392,7 +393,7 @@ robot_ui_t.prototype.create_widgets=function()
 	}
 }
 
-robot_ui_t.prototype.create_doorway=function(title,tooltip,help_text)
+robot_ui_t.prototype.create_doorway=function(title,tooltip,help_text,icon)
 {
 	var doorway=this.doorway_manager.get_by_title(title);
 
@@ -402,7 +403,7 @@ robot_ui_t.prototype.create_doorway=function(title,tooltip,help_text)
 	if(doorway)
 		return doorway;
 	else
-		return this.doorway_manager.create(title,undefined,tooltip,help_text);
+		return this.doorway_manager.create(title,undefined,tooltip,help_text,icon);
 }
 
 robot_ui_t.prototype.request_uuid=function()
