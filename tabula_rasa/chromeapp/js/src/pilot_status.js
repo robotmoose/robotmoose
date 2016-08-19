@@ -68,16 +68,16 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 						var time=Date.now();
 
 						//No heartbeats in a while, hangup.
-						if((time-_this.video_timer)>_this.timeout_time&&!_this.videohungup)
-						{
-							_this.video_timer=time+_this.timeout_time;
-							_this.videohungup=true;
-							_this.called=false;
-							if(_this.onvideohangup)
-								_this.onvideohangup();
-						}
+						//if((time-_this.video_timer)>_this.timeout_time&&!_this.videohungup)
+						//{
+						//	_this.video_timer=time+_this.timeout_time;
+						//	_this.videohungup=true;
+						//	_this.called=false;
+						//	if(_this.onvideohangup)
+						//		_this.onvideohangup();
+						//}
 
-						//Heartbeats and hungup, call.
+						//hungup, call.
 						if(_this.videohungup)
 						{
 							_this.videohungup=false;
