@@ -15,6 +15,9 @@ function chart_interface_t(div) {
 		kinect: new Image()
 	}
 	this.images.kinect.src = "/images/Half_Circle_Angles.jpg";
+	this.kinect = {};
+	this.kinect.flap_counter = 0;
+	this.kinect.flap_sound_playing = false;
 
 	// ***** Create UI ***** //
 	this.div=div;
@@ -140,7 +143,7 @@ chart_interface_t.prototype.refresh=function(json) {
 									Math.sin((json["kinect"]["angle"]-90)*Math.PI/180.0)*arrow_length
 								);
 								
-								;
+								
 								ctx.lineTo(arrow_tip.x,arrow_tip.y);
 								ctx.lineWidth = 5;
 								ctx.strokeStyle="blue";
@@ -149,11 +152,35 @@ chart_interface_t.prototype.refresh=function(json) {
 								this.charts.header["kinect"]["angle"].innerHTML = "Direction of Arrival: " + json["kinect"]["angle"] + "\xB0";
 							}
 						}
+						if(subprop == "flapping") {
+							if(json["kinect"]["flapping"]) {
+								if(this.kinect.flap_counter < 50)
+									this.kinect.flap_counter++;
+								if(this.kinect.flap_counter >= 10) {
+									if(!(robot_ui.widgets.sound.play_sound_button.disabled || this.flap_sound_playing)) {
+										robot_ui.widgets.sound.request_sound();
+										this.flap_sound_playing = true;
+									}
+								}
+							}
+							else {
+								if(this.kinect.flap_counter > 0) {
+									this.kinect.flap_counter--;
+								}
+								if(this.kinect.flap_counter < 10) {
+									if(robot_ui.widgets.sound.play_sound_button.disabled && this.flap_sound_playing) {
+										robot_ui.widgets.sound.stop_sound();
+									}
+									this.flap_sound_playing = false;
+								}
+							}
+							this.charts.header["kinect"]["joints"].innerHTML = "Kinect Skeleton Tracker (Flap Count: " + this.kinect.flap_counter + "/50)";
+						}
 						if(subprop == "joints") {
+							var ctx = this.charts.canvas["kinect"]["joints"].getContext("2d");
+							ctx.fillStyle="grey";
+							ctx.fillRect(0, 0, this.charts.canvas["kinect"]["joints"].width, this.charts.canvas["kinect"]["joints"].height);
 							if(json["kinect"]["joints"]["left_shoulder"] !== null && json["kinect"]["joints"]["right_shoulder"] !== null) {
-								var ctx = this.charts.canvas["kinect"]["joints"].getContext("2d");
-								ctx.fillStyle="grey";
-								ctx.fillRect(0, 0, this.charts.canvas["kinect"]["joints"].width, this.charts.canvas["kinect"]["joints"].height);
 								ctx.save();
 								var origin = this.Vec2(
 									this.charts.canvas["kinect"]["joints"].width/4,
@@ -165,10 +192,7 @@ chart_interface_t.prototype.refresh=function(json) {
 								 	(json["kinect"]["joints"]["left_shoulder"].screen_y + json["kinect"]["joints"]["right_shoulder"].screen_y)/2
 								);
 
-								ctx.fillStyle="black";
-								ctx.fillRect(origin.x-5, origin.y-5, 10, 10);
-
-								var offset = this.Vec2(shoulder_center.x - origin.x, shoulder_center.y - origin.y);
+								var offset = this.Vec2(0,0);//(shoulder_center.x - origin.x, shoulder_center.y - origin.y);
 
 								ctx.fillStyle="yellow";
 								ctx.fillRect(shoulder_center.x-offset.x-5, shoulder_center.y-offset.y-5, 10, 10);							
@@ -300,6 +324,8 @@ chart_interface_t.prototype.add_chart=function() {
 			 	_this.charts.canvas["kinect"]["angle"].width = 800;
 			 	_this.charts.canvas["kinect"]["angle"].height = 400;
 			 	_this.charts.canvas["kinect"]["angle"].style.width="100%";
+			 	var ctx = this.charts.canvas["kinect"]["angle"].getContext("2d");
+			 	ctx.drawImage(this.images.kinect,0,0, this.charts.canvas["kinect"]["angle"].width, this.charts.canvas["kinect"]["angle"].height);
 			}
 			if(!is_value(_this.charts.canvas["kinect"]["joints"])) {
 				_this.charts.canvas["kinect"]["joints"] = document.createElement("canvas");

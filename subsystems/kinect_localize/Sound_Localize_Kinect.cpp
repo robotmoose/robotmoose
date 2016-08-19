@@ -80,6 +80,8 @@ static Json::Value kinect;
 pthread_mutex_t batch_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t batch_cond = PTHREAD_COND_INITIALIZER;
 
+pthread_mutex_t kinect_json_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 // ******************** //
 
 // Function Prototypes
@@ -125,6 +127,7 @@ int main(int argc, char* argv[]) {
 
 		int nr_devices = freenect_num_devices (f_ctx);
 		if (nr_devices < 1) {
+			printf ("Number of devices found: %d\n", nr_devices);
 			freenect_shutdown(f_ctx);
 			return 1;
 		}
@@ -210,7 +213,9 @@ int main(int argc, char* argv[]) {
 			angle = kinect_DOA.findAngle();
 			angle = KINECT_UPSIDE_DOWN ? -angle : angle;
 			printf("The estimated angle to the source is %f degrees\n", angle);
+			pthread_mutex_lock(&kinect_json_mutex);
 			kinect["angle"] = angle;
+			pthread_mutex_unlock(&kinect_json_mutex);
 		}
 
 	}
@@ -286,53 +291,53 @@ void audio_in_callback(freenect_device* dev, int num_samples,
 	}
 }
 
-
+std::deque<int16_t> left_elbow_buffer, right_elbow_buffer;
 void depth_in_callback(freenect_device* dev, void *v_depth, uint32_t timestamp) {
 
 	uint16_t *depth = (uint16_t*)v_depth;
 
-	// // Apply gamma correction to the received values
-	// for (int i=0; i<640*480; ++i) {
-	// 	int pval = t_gamma[depth[i]];
-	// 	int lb = pval & 0xff;
-	// 	switch (pval>>8) {
-	// 		case 0:
-	// 			depth_buffer[3*i+0] = 255;
-	// 			depth_buffer[3*i+1] = 255-lb;
-	// 			depth_buffer[3*i+2] = 255-lb;
-	// 			break;
-	// 		case 1:
-	// 			depth_buffer[3*i+0] = 255;
-	// 			depth_buffer[3*i+1] = lb;
-	// 			depth_buffer[3*i+2] = 0;
-	// 			break;
-	// 		case 2:
-	// 			depth_buffer[3*i+0] = 255-lb;
-	// 			depth_buffer[3*i+1] = 255;
-	// 			depth_buffer[3*i+2] = 0;
-	// 			break;
-	// 		case 3:
-	// 			depth_buffer[3*i+0] = 0;
-	// 			depth_buffer[3*i+1] = 255;
-	// 			depth_buffer[3*i+2] = lb;
-	// 			break;
-	// 		case 4:
-	// 			depth_buffer[3*i+0] = 0;
-	// 			depth_buffer[3*i+1] = 255-lb;
-	// 			depth_buffer[3*i+2] = 255;
-	// 			break;
-	// 		case 5:
-	// 			depth_buffer[3*i+0] = 0;
-	// 			depth_buffer[3*i+1] = 0;
-	// 			depth_buffer[3*i+2] = 255-lb;
-	// 			break;
-	// 		default:
-	// 			depth_buffer[3*i+0] = 0;
-	// 			depth_buffer[3*i+1] = 0;
-	// 			depth_buffer[3*i+2] = 0;
-	// 			break;
-	// 	}
-	// }
+	// // // Apply gamma correction to the received values
+	// // for (int i=0; i<640*480; ++i) {
+	// // 	int pval = t_gamma[depth[i]];
+	// // 	int lb = pval & 0xff;
+	// // 	switch (pval>>8) {
+	// // 		case 0:
+	// // 			depth_buffer[3*i+0] = 255;
+	// // 			depth_buffer[3*i+1] = 255-lb;
+	// // 			depth_buffer[3*i+2] = 255-lb;
+	// // 			break;
+	// // 		case 1:
+	// // 			depth_buffer[3*i+0] = 255;
+	// // 			depth_buffer[3*i+1] = lb;
+	// // 			depth_buffer[3*i+2] = 0;
+	// // 			break;
+	// // 		case 2:
+	// // 			depth_buffer[3*i+0] = 255-lb;
+	// // 			depth_buffer[3*i+1] = 255;
+	// // 			depth_buffer[3*i+2] = 0;
+	// // 			break;
+	// // 		case 3:
+	// // 			depth_buffer[3*i+0] = 0;
+	// // 			depth_buffer[3*i+1] = 255;
+	// // 			depth_buffer[3*i+2] = lb;
+	// // 			break;
+	// // 		case 4:
+	// // 			depth_buffer[3*i+0] = 0;
+	// // 			depth_buffer[3*i+1] = 255-lb;
+	// // 			depth_buffer[3*i+2] = 255;
+	// // 			break;
+	// // 		case 5:
+	// // 			depth_buffer[3*i+0] = 0;
+	// // 			depth_buffer[3*i+1] = 0;
+	// // 			depth_buffer[3*i+2] = 255-lb;
+	// // 			break;
+	// // 		default:
+	// // 			depth_buffer[3*i+0] = 0;
+	// // 			depth_buffer[3*i+1] = 0;
+	// // 			depth_buffer[3*i+2] = 0;
+	// // 			break;
+	// // 	}
+	// // }
 	BufferInfo *buffer_info;
 	uint16_t width=640, height=480;
 
@@ -358,12 +363,12 @@ void depth_in_callback(freenect_device* dev, void *v_depth, uint32_t timestamp) 
 
 	// Get the joint data and store it in JSON format
 	SkeltrackJoint * joint_ptrs[7];
-	std::string joint_names[7] = {
+	static const std::string joint_names[7] = {
 		"head", "left_hand", "right_hand", "left_shoulder",
 		"right_shoulder", "left_elbow", "right_elbow"
 	};
 
-	if(list != NULL) {
+	if(list) {
 		joint_ptrs[0] = skeltrack_joint_list_get_joint (list, SKELTRACK_JOINT_ID_HEAD);
   		joint_ptrs[1] = skeltrack_joint_list_get_joint (list, SKELTRACK_JOINT_ID_LEFT_HAND);
   		joint_ptrs[2] = skeltrack_joint_list_get_joint (list, SKELTRACK_JOINT_ID_RIGHT_HAND);
@@ -372,15 +377,70 @@ void depth_in_callback(freenect_device* dev, void *v_depth, uint32_t timestamp) 
   		joint_ptrs[5]= skeltrack_joint_list_get_joint (list, SKELTRACK_JOINT_ID_LEFT_ELBOW);
   		joint_ptrs[6] = skeltrack_joint_list_get_joint (list, SKELTRACK_JOINT_ID_RIGHT_ELBOW);
 	}
+	else {
+		for(int i=0; i<7; ++i) {
+			joint_ptrs[i] = NULL;
+		}
+	}
+	
+	pthread_mutex_lock(&kinect_json_mutex);
 	for(int i=0; i<7; ++i) {
-		if(joint_ptrs[i] != NULL) {
+		if(joint_ptrs[i]) {
 			kinect["joints"][joint_names[i]]["x"] = joint_ptrs[i] -> x;
 			kinect["joints"][joint_names[i]]["y"] = joint_ptrs[i] -> y;
 			kinect["joints"][joint_names[i]]["z"] = joint_ptrs[i] -> z;
 			kinect["joints"][joint_names[i]]["screen_x"] = joint_ptrs[i] -> screen_x;
 			kinect["joints"][joint_names[i]]["screen_y"] = joint_ptrs[i] -> screen_y;
 		}
+		else
+			kinect["joints"][joint_names[i]] = Json::nullValue;
 	}
+	pthread_mutex_unlock(&kinect_json_mutex);
+
+	static std::chrono::time_point<std::chrono::system_clock> time_curr, time_last_detect;
+	// Gesture recognition: Flapping arms
+	if(joint_ptrs[1] && joint_ptrs[2]) { // Check elbows because hands aren't always recognized
+		static const int buff_size = 30; // Store 1 second's worth of values
+
+		time_last_detect = std::chrono::system_clock::now();
+		// For flapping arms we really only care about the change in y
+		left_elbow_buffer.push_back(joint_ptrs[1] -> y);
+		right_elbow_buffer.push_back(joint_ptrs[2] -> y);
+
+		if(left_elbow_buffer.size() > buff_size)
+			left_elbow_buffer.pop_front();
+		if(right_elbow_buffer.size() > buff_size)
+			right_elbow_buffer.pop_front();
+
+		// Copy buffers for sorting
+		std::deque<int16_t> temp_left = left_elbow_buffer, temp_right = right_elbow_buffer;
+		std::sort(temp_left.begin(), temp_left.end());
+		std::sort(temp_right.begin(), temp_right.end());
+	
+		int16_t range_left = *(temp_left.end()-1) - *(temp_left.begin());
+		int16_t range_right = *(temp_right.end()-1) - *(temp_right.begin());
+
+		static int16_t threshold = 800; // From experimentation
+		pthread_mutex_lock(&kinect_json_mutex);
+		if(range_left > threshold && range_right > threshold) {
+			kinect["flapping"] = true;
+		}
+		else
+			kinect["flapping"] = false;
+		pthread_mutex_unlock(&kinect_json_mutex);
+	}
+	else
+		kinect["flapping"] = false; // set to false if we can't see hands
+
+	time_curr = std::chrono::system_clock::now();
+	std::chrono::duration<double> elapsed_seconds = time_curr - time_last_detect;
+
+	if(elapsed_seconds.count() >= .25) { // throw out stale data
+		left_elbow_buffer.clear();
+		right_elbow_buffer.clear();
+	}
+
+	
 	delete buffer_info;
 }
 
@@ -389,7 +449,7 @@ void* freenect_threadfunc(void* arg) {
 	freenect_start_audio(f_dev);
 	if(ENABLE_DEPTH) {
 		freenect_set_depth_callback(f_dev, depth_in_callback);
-		freenect_set_depth_mode(f_dev, freenect_find_depth_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_DEPTH_11BIT));
+		freenect_set_depth_mode(f_dev, freenect_find_depth_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_DEPTH_MM));
 		freenect_start_depth(f_dev);
 		freenect_set_led(f_dev,LED_RED);
 		skeleton = skeltrack_skeleton_new();
@@ -403,7 +463,9 @@ void* freenect_threadfunc(void* arg) {
 		std::chrono::duration<double> elapsed_seconds = time_curr - time_last_tx;
 
 		if(elapsed_seconds.count() >= 0.1250) {
+			pthread_mutex_lock(&kinect_json_mutex);
 			superstar -> set(starpath, kinect, auth);
+			pthread_mutex_unlock(&kinect_json_mutex);
 			superstar -> flush();
 			time_last_tx = std::chrono::system_clock::now();
 		}
