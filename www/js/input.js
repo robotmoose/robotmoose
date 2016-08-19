@@ -9,7 +9,6 @@ var kb_down=40;
 */
 function input_t(event, DOM)
 {
-	this.interval=null;
 	this.keys_down=[]; // currently down
 	this.keys_pressed=[]; // has been pressed
 	this.keys_released=[]; // currently released
@@ -22,10 +21,19 @@ function input_t(event, DOM)
 		this.keys_released[ii]=false;
 	}
 
-	var myself=this;
-	if (!DOM) DOM=window;
-	DOM.addEventListener("keydown",function(evt){myself.keydown(evt);},true);
-	DOM.addEventListener("keyup",function(evt){myself.keyup(evt);},true);
+	var _this=this;
+	if(!DOM)
+		DOM=window;
+	DOM.addEventListener("keydown",function(evt){_this.keydown(evt);},true);
+	DOM.addEventListener("keyup",function(evt){_this.keyup(evt);},true);
+
+	window.addEventListener("blur",function()
+	{
+		for(var ii=0;ii<255;++ii)
+			_this.keys_down[ii]=false;
+		_this.clear();
+		_this.user_event();
+	});
 }
 
 input_t.prototype.keydown=function(evt)

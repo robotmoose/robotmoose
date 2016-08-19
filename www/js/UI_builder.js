@@ -108,6 +108,13 @@ UI_builder_t.prototype.create_element=function(name,type,opts) {
 		div.style.marginTop=-10;
 		this.div.appendChild(div);
 		break;
+	case "spinner":
+		e.dom=document.createElement("input");
+		e.dom.type="number";
+		e.dom.value="0.0";
+		e.dom.style.width=100;
+		e.label=document.createTextNode(" " + name);
+		break;
 
 	case "label":
 		e.dom=document.createElement("div");

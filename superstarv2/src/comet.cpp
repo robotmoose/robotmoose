@@ -66,11 +66,18 @@ void comet_mgr_t::update_path(const std::string& path,superstar_t& superstar)
 	std::vector<comet_client_t> remaining;
 	for(size_t ii=0;ii<clients_m.size();++ii)
 	{
-		//Check for an update.
-		std::string our_path(clients_m[ii].response["path"].asString());
-		if(path.find(our_path)==0)
+		//Expired, cancel.
+		if(clients_m[ii].expiration<=millis())
+		{
+			cancel(clients_m[ii]);
+		}
+
+
+		//Note expired, check for an update.
+		else
 		{
 			//Get old/new value.
+			std::string our_path(clients_m[ii].response["path"].asString());
 			std::string old_value(JSON_serialize(clients_m[ii].response["result"]));
 			Json::Value current_value(superstar.get(our_path));
 
@@ -81,18 +88,6 @@ void comet_mgr_t::update_path(const std::string& path,superstar_t& superstar)
 			//Still waiting...
 			else
 				remaining.push_back(clients_m[ii]);
-		}
-
-		//Experied, cancel.
-		else if(clients_m[ii].expiration<=millis())
-		{
-			cancel(clients_m[ii]);
-		}
-
-		//Still waiting...
-		else
-		{
-			remaining.push_back(clients_m[ii]);
 		}
 	}
 	clients_m=remaining;

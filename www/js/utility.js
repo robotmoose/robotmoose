@@ -34,10 +34,34 @@ function get_time()
 
 function get_select_value(select)
 {
-	return select.options[select.selectedIndex].text
+	if(!select||!select.options||select.options.length<=0)
+		return "";
+	if(select.selectedIndex>select.options.length)
+		select.selectedIndex=0;
+	if(!select.options[select.selectedIndex])
+		return "";
+	return select.options[select.selectedIndex].text;
 }
 
 function valid_robot(robot)
 {
 	return (robot&&robot.year&&robot.school&&robot.name);
 }
+
+//Returns the global offset for an element via iterative looping of parents...
+//  http://stackoverflow.com/questions/442404/retrieve-the-position-x-y-of-an-html-element
+function get_absolute_offset(el)
+{
+	var offset=
+	{
+		x:0,
+		y:0
+	};
+	while(el)
+	{
+		offset.x+=parseInt(el.offsetLeft)-parseInt(el.scrollLeft);
+		offset.y+=parseInt(el.offsetTop)-parseInt(el.scrollTop);
+		el=el.offsetParent;
+	}
+	return offset;
+};

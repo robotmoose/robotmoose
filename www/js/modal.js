@@ -27,6 +27,7 @@ function modal_t(div)
 
 	this.content.className="modal-content";
 	this.dialog.appendChild(this.content);
+	this.content.style.zIndex="999999999";
 
 	this.header.className="modal-header";
 	this.content.appendChild(this.header);

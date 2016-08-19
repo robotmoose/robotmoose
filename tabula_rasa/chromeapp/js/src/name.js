@@ -30,13 +30,13 @@ function name_t(div,on_message,on_selected)
 	this.superstar_select.onchange=function(){_this.download_years_m();};
 
 	this.name_checkmark=new checkmark_t(this.el);
-	this.year_select=new dropdown_t(this.name_checkmark.getElement());
+	this.year_select=new dropdown_t(this.name_checkmark.getElement(),null,null,"Year");
 	this.year_select.set_width("34%");
 	this.year_select.onchange=function(){_this.download_schools_m();};
-	this.school_select=new dropdown_t(this.name_checkmark.getElement());
+	this.school_select=new dropdown_t(this.name_checkmark.getElement(),null,null,"School");
 	this.school_select.set_width("33%");
 	this.school_select.onchange=function(){_this.download_robots_m();};
-	this.robot_select=new dropdown_t(this.name_checkmark.getElement());
+	this.robot_select=new dropdown_t(this.name_checkmark.getElement(),null,null,"Robot");
 	this.robot_select.set_width("33%");
 	this.robot_select.onchange=function(){_this.on_selected_m();};
 
@@ -174,9 +174,7 @@ name_t.prototype.on_error_m=function(error)
 
 name_t.prototype.download_years_m=function()
 {
-	this.build_years_m();
-	this.build_schools_m();
-	this.build_robots_m();
+	robot_set_superstar(this.superstar_select.selected());
 
 	if(this.superstar_select.selected_index()>0)
 	{
@@ -197,10 +195,11 @@ name_t.prototype.download_years_m=function()
 			},
 			function(error)
 			{
-				_this.on_error_m("Year download error("+error+").");
+				_this.on_error_m("Year download error("+error.code+") "+error.message);
 				_this.superstar_ok=false;
 			}
 		);
+		superstar.flush();
 		return;
 	}
 	this.update_years_m();
@@ -208,9 +207,6 @@ name_t.prototype.download_years_m=function()
 
 name_t.prototype.download_schools_m=function()
 {
-	this.build_schools_m();
-	this.build_robots_m();
-
 	if(this.superstar_select.selected_index()>0&&
 		this.year_select.selected_index()>0)
 	{
@@ -231,10 +227,11 @@ name_t.prototype.download_schools_m=function()
 			},
 			function(error)
 			{
-				_this.on_error_m("School download error ("+error+").");
+				_this.on_error_m("School download error("+error.code+") "+error.message);
 				_this.superstar_ok=false;
 			}
 		);
+		superstar.flush();
 		return;
 	}
 	this.update_schools_m();
@@ -242,8 +239,6 @@ name_t.prototype.download_schools_m=function()
 
 name_t.prototype.download_robots_m=function()
 {
-	this.build_robots_m();
-
 	if(this.superstar_select.selected_index()>0&&
 		this.year_select.selected_index()>0&&
 		this.school_select.selected_index()>0)
@@ -265,10 +260,11 @@ name_t.prototype.download_robots_m=function()
 			},
 			function(error)
 			{
-				_this.on_error_m("School download error ("+error+").");
+				_this.on_error_m("Robot download error("+error.code+") "+error.message);
 				_this.superstar_ok=false;
 			}
 		);
+		superstar.flush();
 		return;
 	}
 	this.update_robots_m();

@@ -23,6 +23,7 @@ function connection_t(on_message,on_disconnect,on_connect,on_name_set,on_auth_er
 	_this.robot=null;
 	_this.auth="";
 	_this.serial_delay_ms=50; // milliseconds to wait between sensors and commands (saves CPU, costs some latency though)
+	_this.pilot_connected=false; // If pilot is not connected, write 0 power.
 
 	// Are there other serial JS apis?  maybe node.js?
 	_this.serial_api=serial_api;
@@ -52,16 +53,7 @@ connection_t.prototype.reset=function() {
 	_this.sensors={}; // Arduino-reported sensor values
 	_this.sensors.power={}; // Commanded values reflected back up to pilot
 
-	// Cancel all outstanding getnext calls
-	if ( _this.getnexts) {
-		//console.log("Cleaning " + _this.getnexts.length + " getnext sockets.")
-		this.getnexts.forEach(function(conn) {
-			conn.abort();
-		});
-		_this.getnexts.splice(0);
-	} else {
-		_this.getnexts = [];
-	}
+	superstar.kill_comets();
 
 	// Localization
 	_this.location=new vec3(0,0,0);
@@ -277,20 +269,25 @@ connection_t.prototype.arduino_send_options=function()
 	var _this=this;
 	_this.status_message(" Sending option list to superstar...");
 	superstar_set(_this.robot,"options",_this.arduino_options,
-		function() {
+		function()
+		{
 			_this.status_message(" Sent option list to superstar");
 			_this.arduino_setup_devices();
 		},
-	function(err) {
-	  if (err.includes("(status 401)")) {
-		var err="Authentication error connecting to Superstar!\nMake sure your password is correct.";
-		_this.status_message(err);
-		_this.gui_disconnect();
-		if(_this.on_auth_error)
-			_this.on_auth_error(err);
-	  } else {
-		_this.status_message("Error connecting to Superstar: " + err);
-	  }
+	function(err)
+	{
+		if(err.code==-32000)
+		{
+			var err="Authentication error connecting to Superstar!\nMake sure your password is correct.";
+			_this.status_message(err);
+			_this.gui_disconnect();
+			if(_this.on_auth_error)
+				_this.on_auth_error(err);
+		}
+		else
+		{
+			_this.status_message("Error connecting to Superstar: " + err);
+		}
 	}
 	);
 }
@@ -476,19 +473,30 @@ connection_t.command_property_list={
 
 // Persistently request this superstar path, sending
 //   the resulting JSON object to this function.
-connection_t.prototype.network_getnext=function(path,on_success) {
+connection_t.prototype.network_getnext=function(path,on_success)
+{
 	var _this=this;
-	var state=superstar_getnext(_this.robot,path,
-		function(json) {
-			if (_this.connected()) {
-				_this.status_message("	Updated "+path+"="+JSON.stringify(json,null,'	'));
 
-				on_success(json);
-			} // else we're done
-		}
-	);
+	superstar.get(path,function(data)
+	{
+		if(on_success)
+			on_success(data);
+	});
 
-	_this.getnexts.push(state);
+	var func=function()
+	{
+		superstar.get_next(path,function(data)
+		{
+			if(_this.connected)
+			{
+				if(on_success)
+					on_success(data);
+				func();
+			}
+		});
+	};
+
+	func();
 }
 
 
@@ -499,21 +507,20 @@ connection_t.prototype.arduino_setup_complete=function()
 	_this.status_message("  arduino setup complete... sending command packet");
 	_this.arduino_send_packet();
 
-	// Set up network comms:
-	_this.network_getnext("pilot",function(pilot) {
-		for (var field in pilot.power) {
-			_this.power[field]=pilot.power[field];
-		}
-	}
-	);
+	//Set up network comms:
+	_this.network_getnext(robot_to_starpath(this.robot)+"pilot/power",function(power)
+	{
+		for (var field in power)
+			_this.power[field]=power[field];
+		console.log("power: "+JSON.stringify(power));
+	});
 
-	_this.network_getnext("config",function(config) {
-		if (config.counter!=_this.last_config.counter)
-		{ // need to reconfigure Arduino
+	_this.network_getnext(robot_to_starpath(this.robot)+"config",function(config)
+	{
+		//need to reconfigure Arduino
+		if(config.counter!=_this.last_config.counter)
 			_this.reconnect();
-		}
-	}
-	);
+	});
 }
 
 // Look up all the properties for our currently configured set of devices,
@@ -733,7 +740,6 @@ connection_t.prototype.arduino_send_packet=function()
 		_this.status_message("  skipping send_packet due to outstanding data");
 		return;
 	}
-
 	// How big is the command packet?
 	var cmd_bytes=0;
 	_this.walk_property_list(connection_t.command_property_list,function(device,property) {
@@ -746,7 +752,17 @@ connection_t.prototype.arduino_send_packet=function()
 	var idx=0; // current output index
 	_this.walk_property_list(connection_t.command_property_list,
 	  function(device,property) {
+
+	  	if(!_this.pilot_connected && (
+	  		device == "create2"
+	  		|| device == "bts"
+	  		|| device == "sabertooth1"
+	  		|| device == "sabertooth2"
+	  		))
+	  		_this.power = {L:0, R:0};
+
 		var value=_this.read_JSON_property(_this.power,property);
+		
 		_this.write_JSON_property(_this.sensors.power,property,value);
 		//console.log("|"+device+"|"+value+"|");
 
@@ -819,13 +835,30 @@ connection_t.prototype.arduino_recv_packet=function(p)
 		_this.sensors.location.angle=_this.angle;
 	}
 
-	if (idx!=p.length) _this.bad("Arduino sensor packet length mismatch: got "+p.length+", expected "+idx+" (firmware/app mismatch?)");
+	if (idx!=p.length)
+		_this.bad("Arduino sensor packet length mismatch: got "+p.length+
+			", expected "+idx+" (firmware/app mismatch?)");
 
-	_this.status_message("	sensors="+JSON.stringify(_this.sensors,null,'	'));
 
+
+	// Merge backend laptop battery information with sensor packet
+	if(!(typeof navigator.getBattery() === 'undefined' ||  navigator.getBattery() === null)) {
+		navigator.getBattery().then(function(battery) {
+			// Have to add each individually
+			_this.sensors["backend_battery"] = {};
+			_this.sensors["backend_battery"]["charging"] = battery.charging;
+			if(battery.chargingTime !== Number.POSITIVE_INFINITY)
+				_this.sensors["backend_battery"]["chargingTime"] = ((battery.chargingTime/60.0).toFixed(2)).toString()+" minutes";
+			else if(battery.dischargingTime !== Number.POSITIVE_INFINITY)
+				_this.sensors["backend_battery"]["dischargingTime"] = ((battery.dischargingTime/60.0).toFixed(2)).toString()+" minutes";
+			_this.sensors["backend_battery"]["percent"] = ((battery.level*100).toFixed(2)).toString()+"%";
+		});
+	}
 
 	// Upload new sensor data to network:
+	_this.status_message("\tsensors="+JSON.stringify(_this.sensors,null,'\t'));
 	superstar_set(_this.robot,"sensors",_this.sensors);
+
 
 /*
 	// Send sensor data to superstar, and grab pilot commands with set & mget:
@@ -1140,7 +1173,7 @@ connection_t.prototype.load=function()
 			if(!data.superstar)
 				data.superstar="robotmoose.com";
 
-			if(_this.on_name_set&&data&&data.superstar&&data.robot&&data.robot.school&&data.robot.name)
+			if(_this.on_name_set&&valid_robot(data.robot))
 				_this.on_name_set(data.robot);
 			else
 				_this.on_name_set();

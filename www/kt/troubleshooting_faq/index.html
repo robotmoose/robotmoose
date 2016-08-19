@@ -1,0 +1,83 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - KT - Troubleshooting & FAQ</title>
+	</head>
+	<body role="document">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>KT Troubleshooting & FAQ</h1>
+			</div>
+			<center>
+			<h3>Troubleshooting Guide</h3>
+			<div class="well" style="overflow-x:auto">
+				<table class="table" style="font-size: 14; overflow-x:auto">
+					<thead>
+						<tr>
+							<th>Issue</th>
+							<th>Possible Causes</th>
+							<th>Recommended Course of Action</th>
+						</tr>
+					</thead>
+					<tbody>
+
+						<tr>
+							<td rowspan="7">Attempting to move KT on RobotMoose, but KT is not moving.</td>
+							<td>Drive tab is not selected.</td>
+							<td>KT will not move unless the drive tab is the active tab. Click on the drive tab, and the top bar of the tab should turn blue, indicating that it is the active tab.<td>
+						</tr>
+						<tr>
+							<td>KT is not turned on.</td>
+							<td>Ensure that you've plugged in KT's USB cable into the Backend computer, then start up the backend. KT should start up automatically, indicated by a big red light. If no light comes on, KT most likely needs to be recharged.</td>
+						</tr>
+						<tr>
+							<td>Wires have become unplugged.</td>
+							<td>Unplug the Arduino from the Backend computer, then find the long black cable that has four smaller wires inside it make sure that the black wire is plugged into the spot marked GND, the yellow wire is plugged into the spot marked 2, the red wire is plugged into the spot marked TX3, and the blue wire is plugged into the spot marked RX3 (<a href="/kt/troubleshooting_faq/images/KT_Wiring.jpg">Image</a>). Double check your wiring then plug the USB back in.
+						</tr>
+						<tr>
+							<td>Backend is not running.</td>
+							<td>Go to the robot computer and ensure that the Backend Chrome app is open and connected to your robot.</td>
+
+						</tr>
+						<tr>
+							<td>Pilot is not connected or is connected to the wrong robot.</td>
+							<td>Ensure that the robot year, school, and name that you selected on the Frontend match what was specified on the Backend.</td>
+						</tr>
+						<tr>
+							<td>The Frontend or Backend has lost its connection to the Superstar server.</td>
+							<td>Ensure that the Superstar selected from the dropdown menu on the Backend is robotmoose.com (or your local Superstar if you are running one). Also ensure that in your web browser you are connected to robotmoose.com (or the IP address of your local Superstar). Refresh your page to make sure robotmoose.com (or your local superstar) is still up and running.</td>
+						</tr>
+						<tr>
+							<td>Web browser is causing unpredictable behavior.</td>
+							<td>Make sure you are using Google Chrome to ensure that all elements of the interface work properly.</td>
+						</tr>
+
+						<tr>
+							<td>When trying to start the Backend, the big green light on KT turns on, then the Backend disconnects.</td>
+							<td>KT is incorrectly configured.</td>
+							<td>On the KT's Arduino, there are slots labeled TX3, TX2, and TX1. These are serial ports for communicating with KT, and one should have a wire plugged into it. On the <a href="/robots/">robot control page</a>, select the configure tab, and make sure a create2 device is configured with the serial port that KT is plugged in to.</td>
+						</tr>
+
+						<tr>
+							<td rowspan="2">Programmed KT to move, now it won't stop.</td>
+							<td>KT is stuck in a programming loop.</td>
+							<td>When you run your code, RobotMoose will keep running the code in the current state unless it is told to go to a different state. For example, if you are in a state that does "forward(10)" and nothing else, KT will continually go forward 10 cm. If you don't want it to do this, then go to a stop state after driving forward 10, or use variables and control flow statements (more info on code API <a href="/code/api/">here</a>).</td>
+						</tr>
+						<tr>
+							<td>KT Arduino has become unplugged</td>
+							<td>If the KT Arduino somehow becomes unplugged, KT will be stuck doing the last command that was sent to it. Plug the Arduino back in and restart the backend.
+						</tr>
+						<tr>
+							<td rowspan="2">There is considerable lag between sending commands to KT and those commands happening.</td>
+							<td>Backend is being throttled.</td>
+							<td>On the Backend computer, the Backend window must be visible at all times, otherwise the app may be throttled. Ensure that the window is visible (not minimized, covered up by other windows, etc.).</td>
+						</tr>
+						<tr>
+							<td>Network connection is too slow.</td>
+							<td>You may have to start your own Superstar server (more info on our GitHub, for advanced users only).</td>
+					</tbody>
+				</table>
+			</div>
+	</body>
+</html>

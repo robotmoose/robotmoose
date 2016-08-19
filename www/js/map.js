@@ -4,11 +4,20 @@
   Dr. Orion Lawlor, lawlor@alaska.edu, 2015-07-23 (Public Domain)
 */
 
-function robot_map_t(div)
+function robot_map_t(div, modal_div, robot)
 {
 	this.div=div;
 	this.div.title="Shows where the robot thinks it is in the world.  The grid lines are 1 meter apart.  The robot's right and left wheels leave red and purple tracks";
+	this.modal_div = modal_div;
+	
+	
+	if (robot) this.robot = robot;
+	
 	var myself=this;
+	
+	this.offset_x = 0;
+	this.offset_y = 0;
+	this.offset_angle = 0;
 
 	this.element=document.createElement("div");
 	this.div.appendChild(this.element);
@@ -71,11 +80,32 @@ function robot_map_t(div)
 		//option3.value="maps/map3.jpg";
 		this.map_select.appendChild(option3);
 
+// UNFINISHED: reset location button
+
+	//Reset location button...
+	this.reset_location_button=document.createElement("input");
+
+		
+	this.reset_location_button.className="btn btn-primary";
+	this.reset_location_button.style.marginBottom="10px";
+	this.reset_location_button.style.width = "50%";
+	this.reset_location_button.disabled=false;
+	this.reset_location_button.type="button";
+	this.reset_location_button.value="Reset Location";
+	this.reset_location_button.title="Click here to reset robot location";
+	this.reset_location_button.addEventListener("click",function(event)
+	{
+		myself.reset_location_button_pressed_m();
+	});
+	
+
+	
 	//Upload button...
 	this.upload_map_button=document.createElement("input");
 	this.controls_div.appendChild(this.upload_map_button);
-	this.upload_map_button.className="btn btn-primary form-control";
+	this.upload_map_button.className="btn btn-primary";
 	this.upload_map_button.style.marginBottom="10px";
+	this.upload_map_button.style.width = "100%";
 	this.upload_map_button.disabled=false;
 	this.upload_map_button.type="button";
 	this.upload_map_button.value="Upload Map Image";
@@ -86,6 +116,11 @@ function robot_map_t(div)
 	});
 
 
+	if (robot.sim)
+	{
+		this.upload_map_button.style.width = "50%";
+		this.controls_div.appendChild(this.reset_location_button);
+	}
 
 
 	this.map_display = document.createElement("div");
@@ -140,6 +175,8 @@ robot_map_t.prototype.setup=function(texture_file, width, height) {
 
 }
 
+
+
 robot_map_t.prototype.resize_map=function()
 {
 	var edge_offset = 20;
@@ -166,6 +203,7 @@ robot_map_t.prototype.loop=function() {
 	// Convert angle from degrees to radians
 	var angle_rad=sensors.location.angle*Math.PI/180.0;
 	// Convert position from meters to mm (rendering units)
+	
 	var P=new vec3(sensors.location.x,sensors.location.y,0.0).te(1000.0);
 
 	// Move onscreen robot there
@@ -210,219 +248,64 @@ robot_map_t.prototype.load_button_pressed_m=function()
 
 	var opt = JSON.parse(myself.last_map_select);
 
+	
 	this.make_new(opt.path, opt.width, opt.height);
 
 }
+
+// UNFINISHED: reset location button
+
+robot_map_t.prototype.reset_location_button_pressed_m=function()
+{
+
+	var myself = this;
+	
+	
+
+	var map_json = JSON.parse(myself.map_select.value);
+
+	
+	this.modal_location = new modal_location_t(myself.modal_div, myself.robot, map_json, function(){myself.reset_tracks=true})
+	
+	this.modal_location.show();
+	
+}
+
+
+
+
 
 robot_map_t.prototype.upload_map_button_pressed_m=function()
 {
 	var myself = this;
 
-	// new modal popup
-	this.modal=new modal_t(div);
-	this.modal.set_title("Upload Map Image");
-
-
-	// upload button
-	this.file_input=document.createElement("input");
-	this.file_input.type='file';
-	this.file_input.addEventListener("change",function(event)
-	{
-		if (myself.file_input.files[0].type.split('/')[0]=='image')
-		{
-
-				if (myself.upload_error_div&&myself.modal.get_content().contains(myself.upload_error_div))
-					myself.modal.get_content().removeChild(myself.upload_error_div); // remove error message
-
-				var reader = new FileReader();
-				reader.onload=function()
-				{
-					// create image object and set source to uploaded image
-					myself.uploaded_map=document.createElement("img");
-					myself.uploaded_map.src=reader.result;
-					myself.uploaded_map.style["max-width"]=myself.modal.get_content().offsetWidth - 30;
-
-
-					// preview image:
-					if (myself.upload_preview_div&&myself.modal.get_content().contains(myself.upload_preview_div))
-					{
-						myself.modal.get_content().removeChild(myself.upload_preview_div); // remove old preview
-					}
-
-
-					var dim_text = "Image Dimensions (in pixels): "  + myself.uploaded_map.width + ":" + myself.uploaded_map.height;
-					myself.dim_text_node = document.createTextNode(dim_text);
-
-					myself.upload_preview_div=document.createElement("div");
-
-
-					myself.upload_preview_div.appendChild(document.createElement("br"));
-					myself.upload_preview_div.appendChild(myself.uploaded_map);
-					myself.upload_preview_div.appendChild(document.createElement("br"));
-					myself.upload_preview_div.appendChild(myself.dim_text_node);
-
-
-					myself.modal.get_content().appendChild(myself.upload_opts_div);
-					myself.modal.get_content().appendChild(myself.upload_preview_div);
-
-				}
-				reader.readAsDataURL(myself.file_input.files[0]);
-
-		}
-		else
-		{
-			myself.file_input_form.reset();
-			myself.display_upload_message("Error: selected file is not an image. Please select an image and try again.");
-		}
-	});
-
-	this.display_upload_message=function(msg) // display error message to modal
-	{
-			if (myself.upload_error_div&&myself.modal.get_content().contains(myself.upload_error_div))
-				myself.modal.get_content().removeChild(myself.upload_error_div); // remove error message
-
-			if (myself.upload_opts_div&&myself.modal.get_content().contains(myself.upload_opts_div))
-				myself.modal.get_content().removeChild(myself.upload_opts_div); // remove height, width, and confirm button
-
-			if (myself.upload_preview_div&&myself.modal.get_content().contains(myself.upload_preview_div))
-				myself.modal.get_content().removeChild(myself.upload_preview_div); // remove preview image
-
-			myself.upload_error_div=document.createElement("div")
-			myself.upload_error=document.createTextNode(msg);
-
-			myself.upload_error_div.appendChild(document.createElement("br"));
-			myself.upload_error_div.appendChild(myself.upload_error);
-
-			myself.modal.get_content().appendChild(myself.upload_error_div);
-	}
-
-	this.file_input_form=document.createElement("form");
-	this.file_input_form.appendChild(this.file_input);
-
-
-
-	// create objects: title input, width input, height input, and confirm upload button
-
-	this.upload_opts_div=document.createElement("div");
-
-	// text prompt
-	var scale_prompt="A preview of your map image is shown below. Choose a width and height between 1 and 100 meters and click \"Load Map Image\" to confirm."
-	this.upload_text=document.createTextNode(scale_prompt)
-
-	// map title (optional)
-	this.upload_title=document.createElement("input");
-	this.upload_title.className="form-control";
-	this.upload_title.width="100%";
-	this.upload_title.placeholder="Map Title (optional)";
-
-	// map scale
-	this.scale_div=document.createElement("div"); // create row element to store height and width input boxes
-	this.scale_div.className="row";
-	this.scale_column_w=document.createElement("div"); // column element to store width
-	this.scale_column_w.className="col-xs-4";
-	this.scale_column_h=document.createElement("div"); // column element to store height
-	this.scale_column_h.className="col-xs-4";
-	this.scale_column_b=document.createElement("div"); // column element to store button
-	this.scale_column_b.className="col-xs-4";
-
-	this.upload_width=document.createElement("input"); // width input
-	this.upload_width.className="form-control";
-	this.upload_width.placeholder="width (in meters)";
-	this.upload_width.addEventListener("change",function(event)
-	{
-		myself.scale_onchange_m();
-	});
-
-	this.upload_height=document.createElement("input"); // height input
-	this.upload_height.className="form-control";
-	this.upload_height.placeholder="height (in meters)";
-	this.upload_height.addEventListener("change",function(event)
-	{
-		myself.scale_onchange_m();
-	});
-
-
-	// confirm upload button
-	this.confirm_upload_button=document.createElement("input");
-	this.confirm_upload_button.className="btn btn-primary";
-	this.confirm_upload_button.disabled=true;
-	this.confirm_upload_button.type="button";
-	this.confirm_upload_button.value="Load Map Image";
-	this.confirm_upload_button.title="Click Here to Load the Map Image";
-	this.confirm_upload_button.style.float="right";
-	this.confirm_upload_button.addEventListener("click",function(event)
-	{
-		myself.confirm_upload_button_pressed_m();
-	});
-
-
-	// add text prompt to div
-	this.upload_opts_div.appendChild(document.createElement("br"));
-	this.upload_opts_div.appendChild(this.upload_text);
-	this.upload_opts_div.appendChild(document.createElement("br"));
-	this.upload_opts_div.appendChild(document.createElement("br"));
-
-	//add title to div
-	this.upload_opts_div.appendChild(this.upload_title);
-	this.upload_opts_div.appendChild(document.createElement("br"));
-
-
-	// add objects to columns
-	this.scale_column_w.appendChild(this.upload_width);
-	this.scale_column_h.appendChild(this.upload_height);
-	this.scale_column_b.appendChild(this.confirm_upload_button);
-
-	// add columns to row
-	this.scale_div.appendChild(this.scale_column_w);
-	this.scale_div.appendChild(this.scale_column_h);
-	this.scale_div.appendChild(this.scale_column_b);
-
-	// add row to div
-	this.upload_opts_div.appendChild(this.scale_div);
-
-
-	// append divs to modal
-	this.modal.get_content().appendChild(document.createElement("br"));
-	this.modal.get_content().appendChild(this.file_input_form);
+	this.modal = new modal_uploadmap_t(myself.modal_div, function(src, width, height, title){myself.onupload(src, width, height, title)});
 	this.modal.show();
 
 }
 
-robot_map_t.prototype.scale_onchange_m=function() // when height or width are changed
-{
-	var myself = this;
-	if (myself.upload_width && myself.upload_height)
-	{
-		console.log("scales exist!")
-		if (myself.upload_width.value >= 1 && myself.upload_width.value <= 100 && myself.upload_height.value >= 1 && myself.upload_height.value <= 100)
-			myself.confirm_upload_button.disabled=false;
-		else
-			myself.confirm_upload_button.disabled=true;
-	}
-}
 
 
-robot_map_t.prototype.confirm_upload_button_pressed_m=function()
+
+robot_map_t.prototype.onupload=function(src, width, height, title)
 {
 	var myself = this;
-	if (myself.uploaded_map)
-	{
 		// add image to map options
 
 		myself.uploaded_option=document.createElement("option");
-		if (myself.upload_title.value) myself.uploaded_option.text=myself.upload_title.value;
+		if (title) myself.uploaded_option.text=title;
 		else myself.uploaded_option.text="Uploaded Map";
 		var opt = {};
-		opt.path=myself.uploaded_map.src; // image path
-		opt.width=myself.upload_width.value; // width
-		opt.height=myself.upload_height.value; // height
+		opt.path=src; // image path
+		opt.width=width; // width
+		opt.height=height; // height
 		myself.uploaded_option.value=JSON.stringify(opt);
 		myself.map_select.appendChild(myself.uploaded_option);
+		
 		myself.modal.hide();
 
 		myself.map_select.selectedIndex=myself.map_select.length - 1;
 		myself.change_map_image();
-	}
 
 }
 
@@ -451,7 +334,7 @@ robot_map_t.prototype.clean_up=function()
 robot_map_t.prototype.make_new=function(filename, width, height)
 {
 	var myself = this;
-
+	
 	this.clean_up();
 
 	this.map_display = document.createElement("div");

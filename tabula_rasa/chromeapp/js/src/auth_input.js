@@ -16,12 +16,8 @@ function auth_input_t(div, on_change)
 	this.input.type="password";
 	this.input.onchange=function()
 	{
-		var value=this.value;
-		on_change(value);
-		console.log(value);
+		on_change(CryptoJS.SHA256(this.value).toString(CryptoJS.enc.Hex));
 		this.value="";
-		for(var ii=0;ii<value.length;++ii)
-			this.value+=" ";
 	};
 	div.appendChild(this.input);
 }

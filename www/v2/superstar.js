@@ -1,12 +1,29 @@
 //Mike Moss
-//07/21/2016
+//08/02/2016
 //Contains client code to get requests from a superstar server.
 
 //Superstar object.
 //  Variable this.queue to store requests in until .flush is called.
-function superstar_t()
+function superstar_t(superstar)
 {
+	if(!this.superstar)
+		this.superstar=window.location.host;
+	if(this.superstar.substr(0,9)=="127.0.0.1"||
+		this.superstar.substr(0,9)=="localhost")
+			this.superstar="http://"+this.superstar;
+	else if(this.superstar.substr(0,7)!="http://"&&
+		this.superstar.substr(0,8)!="https://")
+		this.superstar="https://"+this.superstar;
 	this.queue=[];
+	this.comets=[];
+}
+
+//Cleans up connections.
+superstar_t.prototype.destroy=function()
+{
+	for(var ii in this.comets)
+		this.comets[ii].abort();
+	this.comets=[];
 }
 
 //Gets the value of path.
@@ -59,6 +76,7 @@ superstar_t.prototype.push=function(path,value,len,auth,success_cb,error_cb)
 //  Calls error_cb on error with the server error object (as per spec).
 superstar_t.prototype.get_next=function(path,success_cb,error_cb)
 {
+	//Build request.
 	path=this.pathify(path);
 	var request=this.build_skeleton_request("get_next",path);
 	request.id=0;
@@ -73,13 +91,19 @@ superstar_t.prototype.get_next=function(path,success_cb,error_cb)
 	}
 
 	//Make the request.
+	var _this=this;
 	var xmlhttp=new XMLHttpRequest();
+	this.comets.push(xmlhttp);
 	xmlhttp.onreadystatechange=function()
 	{
 		if(xmlhttp.readyState==4)
 		{
 			if(xmlhttp.status==200)
 			{
+				//Cleanup
+				xmlhttp.already_dead=true;
+				_this.cleanup_comets();
+
 				try
 				{
 					//Parse response, call responses.
@@ -126,8 +150,15 @@ superstar_t.prototype.get_next=function(path,success_cb,error_cb)
 			}
 		}
 	};
-	xmlhttp.open("POST","/superstar/",true);
+	xmlhttp.open("POST",this.superstar+"/superstar/",true);
 	xmlhttp.send(JSON.stringify(request));
+
+	//Limit to 5 comet connections...
+	//  Note, more is likely to stop outstanding comet connections
+	//        from getting serviced...
+	for(var ii=0;ii<this.comets.length-5;++ii)
+		this.comets[ii].needs_to_die=true;
+	this.cleanup_comets();
 }
 
 //Changes auth for the given path and auth to the given value.
@@ -196,7 +227,17 @@ superstar_t.prototype.add_request=function(request,success_cb,error_cb)
 	});
 }
 
-
+//Kills comet connections that need to die and removes them from comet array.
+superstar_t.prototype.cleanup_comets=function()
+{
+	var new_comets=[];
+	for(var ii in this.comets)
+		if(this.comets[ii].needs_to_die)
+			this.comets[ii].abort();
+		else if(!this.comets[ii].already_dead)
+			new_comets.push(this.comets[ii]);
+	this.comets=new_comets;
+}
 
 //Builds the batch request object and clears out the current queue.
 superstar_t.prototype.flush=function()
@@ -297,7 +338,7 @@ superstar_t.prototype.flush=function()
 			}
 		}
 	};
-	xmlhttp.open("POST","/superstar/",true);
+	xmlhttp.open("POST",this.superstar+"/superstar/",true);
 	xmlhttp.send(JSON.stringify(batch));
 }
 

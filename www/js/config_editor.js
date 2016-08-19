@@ -94,12 +94,19 @@ config_editor_t.prototype.download=function(robot)
 		return;
 
 	var myself=this;
-
-	superstar_get(robot,"options",function(options)
-	{
-		myself.get_options_m(options);
-		myself.download_m(robot);
-	});
+	
+	if (!robot.sim)
+		superstar_get(robot,"options",function(options)
+		{
+			myself.get_options_m(options);
+			myself.download_m(robot);
+		});
+	else
+		sim_get(robot,"options",function(options)
+		{
+			myself.get_options_m(options);
+			myself.download_m(robot);
+		});
 }
 
 config_editor_t.prototype.upload=function(robot)
@@ -139,7 +146,10 @@ config_editor_t.prototype.upload=function(robot)
 		}
 	}
 
-	superstar_set(robot,"config",data);
+	if (!robot.sim)
+		superstar_set(robot,"config",data);
+	else
+		sim_set(robot, "config", data);
 }
 
 config_editor_t.prototype.get_entries=function()
@@ -197,37 +207,70 @@ config_editor_t.prototype.download_m=function(robot)
 		this.remove_entry(this.entries[key]);
 
 	this.entries=[];
-
-	superstar_get(robot,"config",function(obj)
-	{
-		if(obj==null) { // backend not connected, make fake config object
-			obj={counter:0};
-		}
-		myself.counter=obj.counter+1;
-
-		var config_text="";
-
-		for(var key in obj.configs)
-			config_text+=obj.configs[key]+"\n";
-
-		var configs=myself.lex_m(config_text);
-
-		for(var key in configs)
+	
+	if(!robot.sim)
+		superstar_get(robot,"config",function(obj)
 		{
-			var lookup=myself.find_option_m(configs[key]);
+			if(obj==null) { // backend not connected, make fake config object
+				obj={counter:0};
+			}
+			myself.counter=obj.counter+1;
 
-			if(lookup)
-				myself.create_entry(configs[key].type,lookup.args,configs[key].args);
-			else
-				console.log("Invalid tabula config: "+configs[key].type+"("+configs[key].args+");");
-		}
+			var config_text="";
 
-		// Finally finished downloading--fire onchange
-		if(myself.onchange)
-			myself.onchange(myself);
+			for(var key in obj.configs)
+				config_text+=obj.configs[key]+"\n";
 
-		myself.refresh_m();
-	});
+			var configs=myself.lex_m(config_text);
+
+			for(var key in configs)
+			{
+				var lookup=myself.find_option_m(configs[key]);
+
+				if(lookup)
+					myself.create_entry(configs[key].type,lookup.args,configs[key].args);
+				else
+					console.log("Invalid tabula config: "+configs[key].type+"("+configs[key].args+");");
+			}
+
+			// Finally finished downloading--fire onchange
+			if(myself.onchange)
+				myself.onchange(myself);
+
+			myself.refresh_m();
+		});
+	else
+			sim_get(robot,"config",function(obj)
+		{
+			if(obj==null) { // backend not connected, make fake config object
+				obj={counter:0};
+			}
+			myself.counter=obj.counter+1;
+
+			var config_text="";
+
+			for(var key in obj.configs)
+				config_text+=obj.configs[key]+"\n";
+
+			var configs=myself.lex_m(config_text);
+
+			for(var key in configs)
+			{
+				var lookup=myself.find_option_m(configs[key]);
+
+				if(lookup)
+					myself.create_entry(configs[key].type,lookup.args,configs[key].args);
+				else
+					console.log("Invalid tabula config: "+configs[key].type+"("+configs[key].args+");");
+			}
+
+			// Finally finished downloading--fire onchange
+			if(myself.onchange)
+				myself.onchange(myself);
+
+			myself.refresh_m();
+		});
+		
 }
 
 config_editor_t.prototype.create_entry_m=function(entry,type,arg_types,arg_values)
@@ -661,7 +704,6 @@ config_editor_t.prototype.refresh_m=function()
 				break;
 		}
 	}
-
 	this.configure_button.disabled=!configureable;
 
 	if(this.onrefresh)

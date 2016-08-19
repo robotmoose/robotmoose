@@ -9,21 +9,20 @@ function robot_network_t()
 			int:null,
 			func:function()
 			{
-				if(valid_robot(_this.robot))
+				if(!_this.sim&&valid_robot(_this.robot))
 				{
-					superstar_set_and_get_multiple
-					(
-						_this.robot,
-						"pilot",
-						_this.pilot,
-						["active_experiment","config","frontendStatus"],
-						function(json)
-						{
-							_this.active_experiment=json[0];
-							_this.config=json[1];
-							_this.frontendStatus=json[2];
-						}
-					);
+					superstar_get(_this.robot,"active_experiment",function(data)
+					{
+						_this.active_experiment=data;
+					});
+					superstar_get(_this.robot,"config",function(data)
+					{
+						_this.config=data;
+					});
+					superstar_get(_this.robot,"frontendStatus",function(data)
+					{
+						_this.frontendStatus=data;
+					});
 				}
 			},
 			ms:300
@@ -32,7 +31,7 @@ function robot_network_t()
 			int:null,
 			func:function()
 			{
-				if(valid_robot(_this.robot))
+				if(!_this.sim&&valid_robot(_this.robot))
 				{
 					superstar_sub(_this.robot,"experiments",function(json)
 					{
@@ -40,9 +39,9 @@ function robot_network_t()
 
 					});
 
-					superstar_generic(_this.robot,"chat","?get",function(str)
+					superstar_get(_this.robot,"chat",function(data)
 					{
-						_this.chat=str;
+						_this.chat=data;
 					});
 				}
 			},
@@ -70,12 +69,86 @@ robot_network_t.prototype.destroy=function()
 		{}
 }
 
+robot_network_t.prototype.update_pilot=function(pilot)
+{
+	if(valid_robot(this.robot))
+	{
+		this.pilot=pilot;
+		if(this.robot.sim)
+		{
+			this.robot.update_pilot(this.pilot);
+			return;
+		}
+
+		var _this=this;
+		superstar_set(this.robot,"pilot",this.pilot,function()
+		{
+			if(_this.sensors.power.L!=_this.pilot.power.L||
+				_this.sensors.power.R!=_this.pilot.power.R)
+					setTimeout(function()
+					{
+						_this.update_pilot(_this.pilot);
+					},300);
+		});
+	}
+}
+
 robot_network_t.prototype.set_robot=function(robot)
 {
 	this.robot=robot;
 	var _this=this;
-	superstar_getnext(this.robot,"sensors",function(json)
+
+	if(robot.sim)
+		this.sim = true;
+	else
 	{
-		_this.sensors=json;
-	});
+		this.sim = "";
+		robot_set_superstar(robot.superstar);
+		superstar_get(_this.robot,"sensors",function(data)
+		{
+			_this.sensors=data;
+		});
+		superstar_get(_this.robot,"kinect",function(data)
+		{
+			_this.kinect=data;
+		});
+	}
+
+	var getnext_sensors=function()
+	{
+		superstar.get_next(robot_to_starpath(_this.robot)+"sensors",function(json)
+		{
+			_this.sensors=json;
+			if(_this.kinect) {
+				//_this.kinect.angle=_this.kinect.angle.toFixed(2);
+				_this.sensors.kinect=_this.kinect;
+			}
+			getnext_sensors();
+		},
+		function()
+		{
+			getnext_sensors();
+		});
+	}
+
+	var getnext_kinect=function()
+	{
+		superstar.get_next(robot_to_starpath(_this.robot)+"kinect",function(json)
+		{
+			_this.kinect=json;
+			//_this.kinect.angle=_this.kinect.angle.toFixed(2);
+			_this.sensors.kinect=_this.kinect;
+			getnext_kinect();
+		},
+		function()
+		{
+			getnext_kinect();
+		});
+	}
+
+	if (!robot.sim)
+	{
+		getnext_sensors();
+		getnext_kinect();
+	}
 }

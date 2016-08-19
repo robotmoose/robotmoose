@@ -19,6 +19,7 @@ function gui_t(div)
 		if(evt.permission==="media"||evt.permission==="fullscreen")
 			evt.request.allow();
 	});
+	this.last_uuid=null;
 
 	this.superstar_errored=false;
 
@@ -33,6 +34,7 @@ function gui_t(div)
 			_this.auth_input.enable();
 			_this.serial_selector.disconnect();
 			_this.sound_player.disconnect();
+			_this.pilot_status.reset();
 		},
 		function()
 		{
@@ -49,16 +51,18 @@ function gui_t(div)
 		function(robot)
 		{
 			_this.connection.gui_robot(robot);
-			_this.load_gruveo(robot);
-			_this.chat.load(robot);
+			_this.load_gruveo(robot,_this.pilot_status.current_pilot);
+			_this.chat.set_robot(robot);
+
 		}
 
 	);
 
-	this.auth_input = new auth_input_t(
-			this.main_div,
-			function(auth) { _this.connection.gui_auth(auth) }
-			);
+	this.auth_input=new auth_input_t(this.main_div,function(auth)
+	{
+		_this.connection.gui_auth(auth);
+		_this.load_gruveo(_this.connection.robot,_this.pilot_status.current_pilot);
+	});
 
 	this.serial_selector=new serial_selector_t
 	(
@@ -73,13 +77,11 @@ function gui_t(div)
 		},
 		function()
 		{
-			return (_this.name.get_robot().school!=null&&
-				_this.name.get_robot().name!=null&&
-				_this.name.get_robot().year!=null);
+			return valid_robot(_this.name.get_robot());
 		}
 	);
 
-	
+	//this.media_selector=new media_selector_t(this.main_div, this.gruveo);
 	this.connection.on_name_set=function(robot)
 	{
 		_this.name.load(robot);
@@ -112,34 +114,20 @@ function gui_t(div)
 		]
 	});
 
-	this.gruveo_check=setInterval(function(){
-
-		if(_this.pilot_status.last_video&&!_this.pilot_status.video_closed)
-			{
-				_this.load_gruveo(_this.name.get_robot());
-			}
-	},1000);
-
-	this.is_fullscreen=false;
 	this.fullscreen_button=document.createElement("input");
 	this.serial_selector.el.appendChild(this.fullscreen_button);
 	this.fullscreen_button.type="button";
-	this.fullscreen_button.value="Enter Fullscreen";
+	var fullscreen_text="Fullscreen";
+	var not_fullscreen_text="Exit Fullscreen";
+	this.fullscreen_button.value=fullscreen_text;
 	this.fullscreen_button.style.width="50%";
 	this.fullscreen_button.onclick=function()
 	{
-		_this.is_fullscreen=!_this.is_fullscreen;
-
-		if(_this.is_fullscreen)
-		{
-			document.body.webkitRequestFullscreen();
-			this.value="Exit Fullscreen Mode";
-		}
-		else
-		{
+		window.open("https://google.com/");
+		if(document.webkitIsFullScreen)
 			document.webkitExitFullscreen();
-			this.value="Enter Fullscreen Mode";
-		}
+		else
+			document.body.webkitRequestFullscreen();
 	}
 	this.fullscreen_button.addEventListener("permissionrequest",function(evt)
 	{
@@ -147,20 +135,45 @@ function gui_t(div)
 			evt.request.allow();
 	});
 
+	document.addEventListener("webkitfullscreenchange",function()
+	{
+		if(document.webkitIsFullScreen)
+			_this.fullscreen_button.value=not_fullscreen_text;
+		else
+			_this.fullscreen_button.value=fullscreen_text;
+	});
+
 	this.sound_player=new sound_player_t(this.name);
 
 	this.pilot_checkmark=new checkmark_t(this.main_div);
 	this.pilot_status_text=this.pilot_checkmark.getElement();
 	this.pilot_status_text.align="center";
-	this.pilot_status_text.style.fontSize="x-large";
-	this.pilot_status_text.innerHTML="Pilot connected";
+	this.pilot_status_text.style.fontSize="large";
+	this.pilot_status_text.innerHTML="Pilots connected (0)";
 	this.main_div.appendChild(document.createElement("br"));
 
-	this.pilot_status=new pilot_status_t(this.name,this.pilot_checkmark,function()
+	this.pilot_status=new pilot_status_t(this.name,this.pilot_checkmark,
+		function() {
+			_this.connection.pilot_connected=true;
+		},
+		function() {
+			_this.connection.pilot_connected=false;
+		}
+	);
+	this.pilot_status.onchange=function(num)
 	{
-		_this.load_gruveo(_this.name.get_robot());
-	});
-	this.chat=new chatter_t(this.chat_div,this.name.get_robot(),20,"Caretaker");
+		_this.pilot_status_text.innerHTML="Pilots connected ("+num+")";
+	}
+	this.pilot_status.onvideohangup=function(uuid)
+	{
+		_this.load_gruveo(_this.connection.robot,uuid);
+	}
+	this.pilot_status.onvideocall=function(uuid)
+	{
+		_this.load_gruveo(_this.connection.robot,uuid);
+	}
+
+	this.chat=new chatter_t(this.chat_div,20,"Caretaker");
 }
 
 gui_t.prototype.destroy=function()
@@ -175,8 +188,15 @@ gui_t.prototype.load_gruveo=function(robot)
 {
 	var url="https://gruveo.com/";
 	var robot_url="";
-	if(robot&&robot.year&&robot.school&&robot.name)
-		robot_url=robot.year+robot.school+robot.name;
+	if(!robot)
+		robot={};
+	if(!robot.auth)
+		robot.auth="";
+	if(valid_robot(robot))
+	{
+		robot_url=superstar.superstar+robot.year+robot.school+robot.name;
+		robot_url=CryptoJS.HmacSHA256(robot_url,robot.auth).toString(CryptoJS.enc.Hex);
+	}
 	url+=encodeURIComponent(robot_url.replace(/[^A-Za-z0-9\s!?]/g,''));
 	this.gruveo.src=url;
 }

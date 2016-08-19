@@ -1,5 +1,4 @@
-#include "ini.h"
-
+#include "robot_config.h"
 #include <stdexcept>
 #include <stdlib.h>
 
@@ -8,8 +7,8 @@
 
 robot_config_t::robot_config_t()
 {
-	keys_m["robot"]="0/test/demo";                 // superstar robot name
-	keys_m["superstar"]="http://robotmoose.com"; // superstar server
+	keys_m["robot"]="2016/test/demo";            // superstar robot name
+	keys_m["superstar"]="robotmoose.com";        // superstar server
 	keys_m["baudrate"]="57600";                  // serial comms to Arduino
 	keys_m["motors"]="";                         // Arduino firmware device name
 	keys_m["marker"]="";                         // computer vision marker file
@@ -20,6 +19,7 @@ robot_config_t::robot_config_t()
 	keys_m["sim"]="false";                       // use without an arduino (for testing)
 	keys_m["local"]="false";                     // use local server shortcut
 	keys_m["dev"]="false";                       // use dev server shortcut
+	keys_m["auth"]="";							 
 
 	validate();
 }
@@ -114,8 +114,8 @@ void robot_config_t::validate()
 	if(to_bool(keys_m["dev"]))
 		keys_m["superstar"]="http://test.robotmoose.com";
 
-	if(keys_m["superstar"].size()>0&&keys_m["superstar"][keys_m["superstar"].size()-1]!='/')
-		keys_m["superstar"]+='/';
+	// if(keys_m["superstar"].size()>0&&keys_m["superstar"][keys_m["superstar"].size()-1]!='/')
+	// 	keys_m["superstar"]+='/';
 
 	size_t slashes=0;
 

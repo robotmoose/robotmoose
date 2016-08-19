@@ -9,8 +9,6 @@
 // 	1) Bicycle horn (https://www.freesound.org/people/AntumDeluge/sounds/188039/)
 // 		by AntumDeluge (https://www.freesound.org/people/AntumDeluge/)
 
-
-
 function sound_player_t(name)
 {
 	if(!name)
@@ -23,7 +21,8 @@ function sound_player_t(name)
 	this.sounds=
 	[
 		{name:"Squeak",audio:new Audio("sounds/DWY_SqueakHi.wav")},
-		{name:"bike horn",audio:new Audio("https://robotmoose.com/downloads/files/bike_horn.wav")}
+		{name:"eagle",audio:new Audio("sounds/eagle.mp3")},
+		{name:"bike horn",audio:new Audio("https://robotmoose.com/downloads/files/bike_horn.wav")},
 	];
 
 	this.sound_requested="";
@@ -46,8 +45,11 @@ sound_player_t.prototype.send_sounds=function()
 	if(this.connected)
 	{
 		var sound_list=[];
-		for(index in this.sounds)
+		console.log(this.sounds);
+		for(index in this.sounds) {
 			sound_list.push(this.sounds[index].name);
+			console.log(this.sounds[index].name)
+		}
 
 		if(this.robot&&this.robot.name&&this.robot.superstar&&this.robot.year&&this.robot.school)
 			superstar_set(this.robot,this.path,{"options":sound_list,"sound":this.sound_requested,"play":this.play});

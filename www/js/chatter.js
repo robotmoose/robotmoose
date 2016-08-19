@@ -72,6 +72,10 @@ chatter_t.prototype.load=function(robot)
 
 chatter_t.prototype.chat=function(msg)
 {
+
+	if(this.robot.sim)
+		return;
+		
 	if(valid_robot(this.robot))
 	{
 		var _this=this;
@@ -81,10 +85,7 @@ chatter_t.prototype.chat=function(msg)
 				message:msg,
 				time:(new Date()).getTime()
 			};
-		superstar_append(this.robot,"chat",obj,function()
-		{
-			superstar_trim(_this.robot,"chat",_this.maxlines);
-		});
+		superstar_append(this.robot,"chat",obj,_this.maxlines);
 	}
 }
 
@@ -100,13 +101,13 @@ chatter_t.prototype.create_interval=function()
 			//{
 				if(robot_network.chat&&_this.history.value!=robot_network.chat)
 				{
-					var data=robot_network.chat.split("\n");
+					var data=robot_network.chat;
 					var chat="";
 					for(var key in data)
 					{
 						try
 						{
-							var obj=JSON.parse(data[key]);
+							var obj=data[key];
 							if(obj.handle&&obj.message&&obj.time)
 							{
 								var time=moment(obj.time).fromNow();

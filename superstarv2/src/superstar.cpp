@@ -8,6 +8,7 @@
 #include <cmath>
 #include <fstream>
 #include "json_util.hpp"
+#include <map>
 #include <sstream>
 #include <stdexcept>
 #include <stdint.h>
@@ -282,13 +283,14 @@ void superstar_t::push(const std::string& path,const Json::Value& val,
 //  Note, relies on HTTPS for secure transport.
 //  Note, traverses auth until a matching code is found for a path.
 //        This is NOT create new auth codes, only changes existing ones.
+//  Note, RELIES ON AUTH_CHECK TO HANDLE IMMUTABLE ENTRIES.
 bool superstar_t::change_auth(std::string path,const Json::Value& value)
 {
 	//Check auth length.
 	std::string new_auth_str="";
 	if(!value.isNull())
 		new_auth_str=value.asString();
-	if(new_auth_str.size()<8)
+	if(new_auth_str.size()<8&&new_auth_str!="!")
 		return false;
 
 	//Check for invalid characters.
@@ -302,22 +304,28 @@ bool superstar_t::change_auth(std::string path,const Json::Value& value)
 	//Try to open auth file.
 	std::ifstream ifstr(auth_file_m.c_str());
 
-	//No auth file...can't change anything...
+	//No auth file...no authentication.
 	if(!ifstr.good())
-		return false;
+		return true;
 
 	//Open auth file and parse passwords in line based format "PATH PASSWORD" (without quotes).
-	std::vector<std::pair<std::string,std::string> > auths;
 	std::string line;
+	std::vector<std::pair<std::string,std::string> > auths;
 	while(std::getline(ifstr,line))
 	{
-		//Separate line into path and pass, push to auths array...
 		std::istringstream istr(line);
-		std::pair<std::string,std::string> path_and_auth;
-		istr>>path_and_auth.first;
-		if(!(istr>>path_and_auth.second))
-			path_and_auth.second="";
-		auths.push_back(path_and_auth);
+
+		//Parse path from line...
+		std::string path;
+		if(!(istr>>path))
+			continue;
+
+		//Parse auth from line...
+		std::string auth;
+		if(!(istr>>auth))
+			auth="";
+
+		auths.push_back(std::pair<std::string,std::string>(path,auth));
 	}
 	ifstr.close();
 
@@ -327,36 +335,38 @@ bool superstar_t::change_auth(std::string path,const Json::Value& value)
 		return false;
 
 	//Write all auths and replace the one with our path with the new auth code.
-	bool replaced=false;
+	bool found=false;
 	for(size_t ii=0;ii<auths.size();++ii)
 	{
 		ofstr<<auths[ii].first;
-		if(auths[ii].second.size()>0)
+
+		//If path for auth change and current path are the same, change.
+		std::string cur_path=remove_double_slashes(strip(auths[ii].first,"/"));
+		if(cur_path==path)
 		{
-			//If path for auth change and current path are the same, change.
-			std::string cur_path=remove_double_slashes(strip(auths[ii].first,"/"));
-			if(cur_path==path)
-			{
-				ofstr<<" "<<new_auth_str;
-				replaced=true;
-			}
-			else
-			{
-				ofstr<<" "<<auths[ii].second;
-			}
+			ofstr<<" "<<new_auth_str;
+			found=true;
+		}
+		else
+		{
+			ofstr<<" "<<auths[ii].second;
 		}
 		ofstr<<std::endl;
 	}
+
+	if(!found)
+		ofstr<<path<<" "<<new_auth_str<<std::endl;
 	ofstr.close();
-	return replaced;
+	return true;
 }
 
 //Authenticates path with opts with the passed auth object.
+//  Variable was_immutable indicates whether or not the auth was immutable or not.
 //  Note, expects a string or null in the auth object.
 //  Note, PATH IS STRIPPED OF ALL PRECEEDING /'s and ENDING /'s,
 //        AND MULTIPLE /'s ARE CHANGED TO A SINGLE /.
 bool superstar_t::auth_check(std::string path,const std::string& opts,
-	const Json::Value& auth)
+	const Json::Value& auth,bool& was_immutable)
 {
 	//Remove multiple,leading, and trailing slashes...
 	path=remove_double_slashes(strip(path,"/"));
@@ -374,29 +384,78 @@ bool superstar_t::auth_check(std::string path,const std::string& opts,
 		return true;
 
 	//Open auth file and parse passwords in line based format "PATH PASSWORD" (without quotes).
-	bool authorized=false;
 	std::string line;
+	std::map<std::string,std::string> table;
 	while(std::getline(ifstr,line))
 	{
 		std::istringstream istr(line);
 
 		//Parse path from line...
-		std::string challenge_path;
-		istr>>challenge_path;
-		challenge_path=remove_double_slashes(strip(challenge_path,"/"));
+		std::string path;
+		if(!(istr>>path))
+			continue;
+		path=remove_double_slashes(strip(path,"/"));
 
-		//Parse pass from line...
-		std::string pass;
-		if(!(istr>>pass))
-			pass="";
+		//Parse auth from line...
+		std::string auth;
+		if(!(istr>>auth))
+			auth="";
 
-		//Check auth...
-		if(path.find(challenge_path)==0&&
-			(to_hex_string(hmac_sha256(pass,path+opts))==auth_str||pass.size()==0))
-			authorized=true;
+		table[path]=auth;
 	}
 	ifstr.close();
-	return authorized;
+
+	//Iteratively go up through entire tree structure.
+	std::string parent_path(path);
+	was_immutable=false;
+	bool authenticated=false;
+	bool authenticated_with_bang=false;
+	while(true)
+	{
+		bool newly_authenticated=false;
+		bool not_bang=false;
+		bool in_file=false;
+
+		//if path in table.
+		if(table.count(parent_path)>0)
+		{
+			//In table then in file.
+			in_file=true;
+
+			//Immutable check.
+			not_bang=(table[parent_path]!="!");
+			if(!not_bang)
+				was_immutable=true;
+
+			//If empty auth or matching auth, authenticate.
+			if(table[parent_path].size()<=0||
+				to_hex_string(hmac_sha256(table[parent_path],path+opts))==auth_str)
+				newly_authenticated=true;
+
+			//If "!" auth, authenticate.
+			if(table[parent_path]=="!")
+				authenticated_with_bang=true;
+		}
+
+		//Transitioning from a level of immutable to not immutable.
+		if(newly_authenticated&&!authenticated&&in_file&&not_bang)
+			was_immutable=false;
+
+		//Got authenticated.
+		if(newly_authenticated)
+			authenticated=true;
+
+		//Hit end of tree structure, break.
+		if(parent_path.size()==0)
+			break;
+
+		//Strip off top level.
+		while(parent_path.size()>0&&parent_path[parent_path.size()-1]!='/')
+			parent_path=path.substr(0,parent_path.size()-1);
+		parent_path=strip_end(parent_path,"/");
+	}
+
+	return (authenticated||authenticated_with_bang);
 }
 
 //Loads from either an old style binary file (superstar v1).
