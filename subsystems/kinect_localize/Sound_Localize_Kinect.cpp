@@ -27,18 +27,18 @@
 // Libraries for libfreenect
 #include <libfreenect/libfreenect.h>
 #include <libfreenect/libfreenect_audio.h>
-#include "ofxKinectExtras.h"
+#include <ofxKinectExtras.h>
 #include <pthread.h>
 
 // Libraries for skeleton tracking
-#include <skeltrack.h>
-#include "skeltrack_helper.h"
-#include <glib-object.h> // Unfortunately ... 
+#include <skeltrack/skeltrack.h>
+#include <skeltrack_helper.h>
+#include <glib-object.h> // Unfortunately ...
 
 // Libraries needed for robotmoose integration
 #include <string>
-#include "superstar/superstar.hpp"
-#include "robot_config.h"
+#include <superstar/superstar.hpp>
+#include <robot_config.h>
 #include <chrono>
 
 // Libraries needed for DSP
@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
 	// Need to upload special firmware for Kinect #1473
 	// For some reason, if we try to upload this when the camera and motor subdevices are selected, the upload will
 	//     not work and the program can't open the audio. So the solution is to open just the audio device, upload,
-	//     the firmware, then close it. 
+	//     the firmware, then close it.
 	if(KINECT_1473) {
 		printf("Uploading firmware to Kinect #1473\n");
 		if (freenect_init(&f_ctx, NULL) < 0) {
@@ -141,7 +141,7 @@ int main(int argc, char* argv[]) {
 
 		freenect_close_device(f_dev);
 		freenect_shutdown(f_ctx);
-	}	
+	}
 
 	if (freenect_init(&f_ctx, NULL) < 0) {
 		printf("freenect_init() failed\n");
@@ -182,9 +182,9 @@ int main(int argc, char* argv[]) {
 
 	// ***** Begin RobotMoose Integration Setup ***** //
 	robot_config_t robot_config;
-	if(argc > 1) 
+	if(argc > 1)
 		robot_config.from_cli(argc, argv);
-	else 
+	else
 		robot_config.from_file("robot.ini");
 
 	//superstar_t superstar(robot_config.get("superstar"));
@@ -274,7 +274,7 @@ void audio_in_callback(freenect_device* dev, int num_samples,
 	}
 	xcor_counter += num_samples;
 	// Perform the DOA analysis if we have collected the appropriate number of samples.
-	if( (xcor_counter >= kinect_DOA.NUMSAMPLES_XCOR/2) && 
+	if( (xcor_counter >= kinect_DOA.NUMSAMPLES_XCOR/2) &&
 		(sound_buffers[0].size() >= kinect_DOA.NUMSAMPLES_XCOR) ) { // xcors overlap by 50%.
 
 		pthread_mutex_lock(&batch_mutex);
@@ -382,7 +382,7 @@ void depth_in_callback(freenect_device* dev, void *v_depth, uint32_t timestamp) 
 			joint_ptrs[i] = NULL;
 		}
 	}
-	
+
 	pthread_mutex_lock(&kinect_json_mutex);
 	for(int i=0; i<7; ++i) {
 		if(joint_ptrs[i]) {
@@ -416,7 +416,7 @@ void depth_in_callback(freenect_device* dev, void *v_depth, uint32_t timestamp) 
 		std::deque<int16_t> temp_left = left_elbow_buffer, temp_right = right_elbow_buffer;
 		std::sort(temp_left.begin(), temp_left.end());
 		std::sort(temp_right.begin(), temp_right.end());
-	
+
 		int16_t range_left = *(temp_left.end()-1) - *(temp_left.begin());
 		int16_t range_right = *(temp_right.end()-1) - *(temp_right.begin());
 
@@ -440,7 +440,7 @@ void depth_in_callback(freenect_device* dev, void *v_depth, uint32_t timestamp) 
 		right_elbow_buffer.clear();
 	}
 
-	
+
 	delete buffer_info;
 }
 
@@ -456,7 +456,7 @@ void* freenect_threadfunc(void* arg) {
 		g_object_set (skeleton, "enable-smoothing", true, NULL);
 		g_object_set (skeleton, "smoothing-factor", 0.5, NULL);
 	}
-	
+
 	static std::chrono::time_point<std::chrono::system_clock> time_curr, time_last_tx;
 	while(!die && freenect_process_events(f_ctx) >= 0) {
 		time_curr = std::chrono::system_clock::now();
