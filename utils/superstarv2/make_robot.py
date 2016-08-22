@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #Mike Moss
-#07/22/2016
+#08/22/2016
 #Copies a path.
 
 import argparse
@@ -67,7 +67,10 @@ if __name__=="__main__":
 				raise Exception('Auth codes do not match.')
 			robot={"authtest":"","config":{"configs":[],"counter":1},"experiments":{"HelloWorld":{"code":[{"code":"// JavaScript code","name":"start","time":""}]}},"options":["ultrasonic_sensor PP","wheel_encoder PPC","encoder P","neato SP","latency ","heartbeat ","bms ","analog P","pwm P","neopixel PC","servo P","create2 S","sabertooth2 S","sabertooth1 S","bts PPPP"],"sensors":{"heartbeats":0}}
 			ss.set("/robots/"+args.ROBOT,robot,auth,onsuccess,onerror)
-			ss.change_auth("/robots/"+args.ROBOT,robot_auth,auth,onauthsuccess,onerror)
+			if len(robot_auth)>0:
+				ss.change_auth("/robots/"+args.ROBOT,robot_auth,auth,onauthsuccess,onerror)
+			else:
+				print('Blank auth code.')
 			ss.flush()
 
 		#Get original...

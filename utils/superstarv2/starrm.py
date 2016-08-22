@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #Mike Moss
-#07/22/2016
+#08/22/2016
 #Removes a path.
 
 import argparse
@@ -47,15 +47,7 @@ if __name__=="__main__":
 			print("Success!")
 
 		#Remove
-		def remove(data):
-			if not data:
-				print("Path \""+args.PATH+"\" does not exist!")
-				exit(1)
-			ss.set(args.PATH,None,auth,onsuccess,onerror)
-			ss.flush()
-
-		#Get original...
-		ss.get(args.PATH,remove,onerror)
+		ss.set(args.PATH,None,auth,onsuccess,onerror)
 		ss.flush()
 
 	except Exception as error:
