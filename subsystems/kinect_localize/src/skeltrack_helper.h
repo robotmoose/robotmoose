@@ -25,7 +25,8 @@ static BufferInfo * process_buffer (
     uint16_t height,
   	uint16_t dimension_factor,
     uint16_t threshold_begin,
-    uint16_t threshold_end
+    uint16_t threshold_end,
+    bool camera_upside_down
 ){
  	g_return_val_if_fail (buffer != NULL, NULL);
   	uint16_t reduced_width = (width - width % dimension_factor) / dimension_factor;
@@ -36,7 +37,7 @@ static BufferInfo * process_buffer (
   	for (int i = 0; i < reduced_width; ++i) {
 	  	for (int j = 0; j < reduced_height; ++j) {
 	  		int index;
-	  		if(KINECT_UPSIDE_DOWN)
+	  		if(camera_upside_down)
 	  			index = (reduced_height-1-j) * width * dimension_factor - i * dimension_factor;
 	  		else 
 		    	index = j * width * dimension_factor + i * dimension_factor;
