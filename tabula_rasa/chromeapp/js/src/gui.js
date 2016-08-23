@@ -109,7 +109,7 @@ function gui_t(div)
 		[
 			{type:"left",resizable:true,content:this.gruveo_div,size:"60%"},
 			{type:"main",resizable:true,content:this.main_div},
-			{type:"preview",resizable:true,content:this.status_viewer.el,size:"55%"},
+			{type:"preview",resizable:true,content:this.status_viewer.el,size:"40%"},
 			{type:"bottom",resizable:true,content:this.chat_div,size:"20%"}
 		]
 	});
