@@ -75,7 +75,7 @@ video_widget_t.prototype.download=function(robot,option)
 	if(option && option.video_link)
 	{
 		var myself=this;
-		var robot_url=this.uuid+superstar.superstar+this.robot.year+this.robot.school+this.robot.name;
+		var robot_url=superstar.superstar+this.robot.year+this.robot.school+this.robot.name;
 		if(!this.robot.auth)
 			this.robot.auth="";
 		robot_url=CryptoJS.HmacSHA256(robot_url,this.robot.auth).toString(CryptoJS.enc.Hex);

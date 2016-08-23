@@ -36,7 +36,7 @@ www/latest.tar.gz
 a.out
 superstarv2/superstar
 superstarv2/auth
-
+subsystems/kinect_localize/Sound_Localize_Kinect
 # generic gotcha files/c++
 *.exe
 *.o

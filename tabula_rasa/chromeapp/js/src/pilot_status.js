@@ -1,9 +1,9 @@
 //callback onconnect() - Called when no pilot is connected and then at least one pilot is connected.
 //callback ondisconnect() - Called when at least one pilot is connected and then no pilot is connected.
 //callback onchange(count) - Gives number of pilots when DOWNLOADED or TIMEDOUT.
-//callback onvideohangup(pilot_uuid) - Called when main pilot hangs up (uuid maybe null if no pilot is connected).
-//callback onvideocall(pilot_uuid) - Called when main pilot calls in.
-var blarg=30;
+//callback onvideohangup() - Called when main pilot hangs up.
+//callback onvideocall() - Called when main pilot calls in.
+
 function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 {
 	if(!name||!pilot_checkmark)
@@ -16,7 +16,6 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 	this.pilots={};
 	this.pilot_timers={};
 	this.reset();
-	this.current_pilot=null;
 
 	var _this=this;
 	this.timeout_time=3500;
@@ -69,23 +68,22 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 						var time=Date.now();
 
 						//No heartbeats in a while, hangup.
-						if((time-_this.video_timer)>_this.timeout_time&&!_this.videohungup)
-						{
-							_this.video_timer=time+_this.timeout_time;
-							_this.current_pilot=null;
-							_this.videohungup=true;
-							_this.called=false;
-							if(_this.onvideohangup)
-								_this.onvideohangup(_this.current_pilot);
-						}
+						//if((time-_this.video_timer)>_this.timeout_time&&!_this.videohungup)
+						//{
+						//	_this.video_timer=time+_this.timeout_time;
+						//	_this.videohungup=true;
+						//	_this.called=false;
+						//	if(_this.onvideohangup)
+						//		_this.onvideohangup();
+						//}
 
-						//Heartbeats and hungup, call.
-						if(_this.current_pilot&&_this.videohungup)
+						//hungup, call.
+						if(_this.videohungup)
 						{
 							_this.videohungup=false;
 							_this.called=true;
 							if(_this.onvideocall)
-								_this.onvideocall(_this.current_pilot,null);
+								_this.onvideocall();
 						}
 
 						//User hangups on their side.
@@ -93,7 +91,7 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 						{
 							//Call
 							if(_this.onvideocall)
-								_this.onvideocall(_this.current_pilot,null);
+								_this.onvideocall();
 
 							//Put repeating calls in a timeout to prevent infinite calling.
 							_this.can_call_again=false;
@@ -181,16 +179,6 @@ pilot_status_t.prototype.update=function(new_pilots)
 				{
 					++num_pilots;
 					active_pilots[ii]=new_pilots[ii];
-				}
-
-				//New video heartbeats, update elderest pilot.
-				if(new_pilots[ii].videobeats!=this.pilots[ii].videobeats)
-				{
-					++num_video;
-					if(!elderest_pilot||ii<elderest_pilot)
-						elderest_pilot=ii;
-					if(ii==this.current_pilot)
-						this.video_timer=time;
 				}
 			}
 			else

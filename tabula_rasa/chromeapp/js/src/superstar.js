@@ -242,7 +242,7 @@ superstar_t.prototype.cleanup_comets=function()
 {
 	var new_comets=[];
 	for(var ii in this.comets)
-		if(this.comets[ii].needs_to_die)
+		if(this.comets[ii]&&this.comets[ii].needs_to_die)
 			this.comets[ii].abort();
 		else if(!this.comets[ii].already_dead)
 			new_comets.push(this.comets[ii]);

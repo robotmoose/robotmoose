@@ -95,7 +95,7 @@ doorway_manager_t.prototype.load=function(data)
 	}
 }
 
-doorway_manager_t.prototype.create=function(title,pos,tooltip,help_text)
+doorway_manager_t.prototype.create=function(title,pos,tooltip,help_text,icon)
 {
 	if(!help_text)
 		help_text="";
@@ -104,7 +104,7 @@ doorway_manager_t.prototype.create=function(title,pos,tooltip,help_text)
 	{
 		doorway.activate();
 	},
-	tooltip);
+	tooltip, icon);
 	this.doorways.push(doorway);
 	return doorway;
 }
