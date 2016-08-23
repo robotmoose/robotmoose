@@ -1,17 +1,17 @@
-#CMake Stuff
+#CMake Required...
 cmake_minimum_required (VERSION 2.8)
 
-#CFLAGS
+#Flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result -Wno-sign-compare -std=c++11")
 
-#INCLUDES
+#Include Directories
 set(root_inc ../../include)
 include_directories(${root_inc})
 
 set(skeltrack_inc ${root_inc}/skeltrack)
 include_directories(${skeltrack_inc})
 
-#Libs
+#Libraries
 find_package(PkgConfig)
 pkg_search_module(GLIB2 REQUIRED glib-2.0)
 include_directories(${GLIB2_INCLUDE_DIRS})
@@ -36,5 +36,5 @@ add_library(mongoose ${mongoose_src})
 
 add_executable(Sound_Localize_Kinect src/Sound_Localize_Kinect.cpp)
 
-#Actual Linking
+#Final Link
 target_link_libraries(Sound_Localize_Kinect ${GLIB2_LIBRARIES} kinect skeltrack utility jsoncpp mongoose freenect pthread gio-2.0 gobject-2.0 gthread-2.0 glib-2.0)
