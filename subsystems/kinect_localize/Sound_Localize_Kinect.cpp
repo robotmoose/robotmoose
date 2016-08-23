@@ -31,14 +31,14 @@
 #include <pthread.h>
 
 // Libraries for skeleton tracking
-#include <skeltrack.h>
-#include "skeltrack_helper.h"
+#include <skeltrack/skeltrack.h>
+#include <skeltrack_helper.h>
 #include <glib-object.h> // Unfortunately ... 
 
 // Libraries needed for robotmoose integration
 #include <string>
-#include "superstar/superstar.hpp"
-#include "robot_config.h"
+#include <superstar/superstar.hpp>
+#include <robot_config.h>
 #include <chrono>
 
 // Libraries needed for DSP
@@ -63,7 +63,7 @@ uint8_t depth_buffer[640*480*3];
 // ***** Constants and Variables needed for DOA Estimation ***** //
 Kinect_DOA kinect_DOA;
 static const bool KINECT_1473 = true; // Need to upload special firmware if using Kinect Model #1473
-static const bool KINECT_UPSIDE_DOWN = true; // If Kinect is mounted upside down, flip angles.
+//static const bool KINECT_UPSIDE_DOWN = false; // If Kinect is mounted upside down, flip angles.
 std::vector<std::deque<int32_t>> sound_buffers;
 
 // ***** Skeltrack Variables ***** //

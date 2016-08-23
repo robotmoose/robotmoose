@@ -4,11 +4,12 @@
 #define SKELTRACK_HELPER_H_INCLUDED
 
 #include <glib-object.h>
+static const bool KINECT_UPSIDE_DOWN = true; // If Kinect is mounted upside down, flip angles.
 
 static const uint16_t THRESHOLD_BEGIN = 500;
 /* Adjust this value to increase of decrease
    the threshold */
-static const uint16_t THRESHOLD_END = 1500;
+static const uint16_t THRESHOLD_END = 5000;
 
 typedef struct {
 	uint16_t * reduced_buffer;
@@ -34,7 +35,11 @@ static BufferInfo * process_buffer (
 
   	for (int i = 0; i < reduced_width; ++i) {
 	  	for (int j = 0; j < reduced_height; ++j) {
-		    int index = j * width * dimension_factor + i * dimension_factor;
+	  		int index;
+	  		if(KINECT_UPSIDE_DOWN)
+	  			index = (reduced_height-1-j) * width * dimension_factor - i * dimension_factor;
+	  		else 
+		    	index = j * width * dimension_factor + i * dimension_factor;
 		    uint16_t value = buffer[index];
 
 		    if (value < threshold_begin || value > threshold_end) {
@@ -44,9 +49,20 @@ static BufferInfo * process_buffer (
 		      	reduced_buffer[j * reduced_width + i] = value;
 		}
     }
-
-	BufferInfo *buffer_info = new BufferInfo;
-	buffer_info->reduced_buffer = reduced_buffer;
+    BufferInfo *buffer_info = new BufferInfo;
+    // if(KINECT_UPSIDE_DOWN) {
+	   //  uint16_t * flipped_buffer = new uint16_t [reduced_width * reduced_height];
+	   //  for(int i=0; i<reduced_width; ++i) {
+	   //  	for(int j=0; j < reduced_height; ++j) {
+	    // 		flipped_buffer[j*reduced_width + i] = reduced_buffer[(reduced_height-1-j)*reduced_width - i];
+	    // 	}
+	    // }
+	//     buffer_info->reduced_buffer = flipped_buffer;
+	//     delete[redu]
+	// }
+	// else {
+		buffer_info->reduced_buffer = reduced_buffer;
+	// }
 	buffer_info->reduced_width = reduced_width;
 	buffer_info->reduced_height = reduced_height;
 	buffer_info->width = width;
