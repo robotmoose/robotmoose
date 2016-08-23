@@ -2,7 +2,8 @@
 cmake_minimum_required (VERSION 2.8)
 
 #Flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result -Wno-sign-compare -std=c++11 -DMG_ENABLE_SSL")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result -Wno-sign-compare -std=c++11")
+add_definitions(-DMG_ENABLE_SSL)
 
 #Include Directories
 set(root_inc ../../include)
@@ -41,4 +42,4 @@ add_library(mongoose ${mongoose_src})
 add_executable(Sound_Localize_Kinect src/Sound_Localize_Kinect.cpp)
 
 #Final Link
-target_link_libraries(Sound_Localize_Kinect ${GLIB2_LIBRARIES} kinect skeltrack utility jsoncpp mongoose freenect pthread gio-2.0 gobject-2.0 gthread-2.0 glib-2.0)
+target_link_libraries(Sound_Localize_Kinect ${GLIB2_LIBRARIES} ${OPENSSL_LIBRARIES} kinect skeltrack utility jsoncpp mongoose freenect pthread gio-2.0 gobject-2.0 gthread-2.0 glib-2.0)

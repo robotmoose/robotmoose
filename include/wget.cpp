@@ -19,6 +19,7 @@ void wget_ev_handler(mg_connection* connection,int ev,void* ev_data)
 		if(status!=0)
 		{
 			responder.error=strerror(status);
+			responder.done=true;
 			return;
 		}
 	}
@@ -30,10 +31,12 @@ void wget_ev_handler(mg_connection* connection,int ev,void* ev_data)
 		if(hm->resp_code!=200)
 		{
 			responder.error="Connection error: "+std::to_string(hm->resp_code)+".";
+			responder.done=true;
 			return;
 		}
 
 		responder.data=std::string(hm->body.p,hm->body.len);
+		responder.done=true;
 	}
 	else
 	{
@@ -50,12 +53,19 @@ std::string wget(const std::string& address,const std::string& post_data)
 
 	mg_mgr mgr;
 	mg_mgr_init(&mgr,&responder);
-	mg_connect_http(&mgr,wget_ev_handler,address.c_str(),nullptr,post_data.c_str());
+	mg_connection* nc=mg_connect_http(&mgr,wget_ev_handler,address.c_str(),nullptr,post_data.c_str());
 
-	while(!responder.done)
-		mg_mgr_poll(&mgr,1000);
+	if(nc==nullptr)
+	{
+		responder.error="Could not open a socket!";
+	}
+	else
+	{
+		while(!responder.done)
+			mg_mgr_poll(&mgr,1000);
 
-	mg_mgr_free(&mgr);
+		mg_mgr_free(&mgr);
+	}
 
 	if(responder.error.size()>0)
 		throw std::runtime_error(responder.error);
