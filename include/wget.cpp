@@ -17,11 +17,7 @@ void wget_ev_handler(mg_connection* connection,int ev,void* ev_data)
 		int status=*(int*)ev_data;
 
 		if(status!=0)
-		{
 			responder.error=strerror(status);
-			responder.done=true;
-			return;
-		}
 	}
 	else if(ev==MG_EV_HTTP_REPLY)
 	{
@@ -29,16 +25,11 @@ void wget_ev_handler(mg_connection* connection,int ev,void* ev_data)
 		http_message* hm=(http_message*)ev_data;
 
 		if(hm->resp_code!=200)
-		{
 			responder.error="Connection error: "+std::to_string(hm->resp_code)+".";
-			responder.done=true;
-			return;
-		}
-
-		responder.data=std::string(hm->body.p,hm->body.len);
-		responder.done=true;
+		else
+			responder.data=std::string(hm->body.p,hm->body.len);
 	}
-	else
+	else if(ev==MG_EV_CLOSE)
 	{
 		responder.done=true;
 	}
