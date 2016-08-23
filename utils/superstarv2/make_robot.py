@@ -61,7 +61,12 @@ if __name__=="__main__":
 				exit(1)
 			global auth
 			global ss
-			robot_auth=getpass.getpass(prompt='Enter new auth:  ')
+			robot_auth=getpass.getpass(prompt='Enter new auth (at least 8 characters):  ')
+			if len(robot_auth)<8:
+				raise Exception('Auth code must be at least 8 characters.')
+			for ii in robot_auth:
+				if ord(ii)<33 or ord(ii)>126:
+					raise Exception('Auth code can only contain non-whitespace ascii characters.')
 			robot_auth_verify=getpass.getpass(prompt='Verify new auth:  ')
 			if robot_auth!=robot_auth_verify:
 				raise Exception('Auth codes do not match.')
