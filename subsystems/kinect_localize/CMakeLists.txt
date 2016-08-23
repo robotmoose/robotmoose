@@ -11,8 +11,10 @@ include_directories(${root_inc})
 set(skeltrack_inc ${root_inc}/skeltrack)
 include_directories(${skeltrack_inc})
 
-include_directories(/usr/include/glib-2.0)
-include_directories(/usr/lib/x86_64-linux-gnu/glib-2.0/include)
+#Libs
+find_package(PkgConfig)
+pkg_search_module(GLIB2 REQUIRED glib-2.0)
+include_directories(${GLIB2_INCLUDE_DIRS})
 
 #Sources
 set(kinect_src src/Kinect_DOA.cpp src/xcor_td.cpp src/ofxKinectExtras.cpp)
@@ -35,4 +37,4 @@ add_library(mongoose ${mongoose_src})
 add_executable(Sound_Localize_Kinect src/Sound_Localize_Kinect.cpp)
 
 #Actual Linking
-target_link_libraries(Sound_Localize_Kinect kinect skeltrack utility jsoncpp mongoose freenect pthread gio-2.0 gobject-2.0 gthread-2.0 glib-2.0)
+target_link_libraries(Sound_Localize_Kinect ${GLIB2_LIBRARIES} kinect skeltrack utility jsoncpp mongoose freenect pthread gio-2.0 gobject-2.0 gthread-2.0 glib-2.0)
