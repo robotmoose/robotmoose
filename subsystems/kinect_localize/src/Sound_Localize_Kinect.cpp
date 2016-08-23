@@ -27,17 +27,17 @@
 // Libraries for libfreenect
 #include <libfreenect/libfreenect.h>
 #include <libfreenect/libfreenect_audio.h>
-#include <ofxKinectExtras.h>
+#include "ofxKinectExtras.h"
 #include <pthread.h>
 
 // Libraries for skeleton tracking
 #include <skeltrack/skeltrack.h>
-#include <skeltrack_helper.h>
+#include "skeltrack_helper.h"
 #include <glib-object.h> // Unfortunately ...
 
 // Libraries needed for robotmoose integration
 #include <string>
-#include <superstar/superstar.hpp>
+#include <superstar.hpp>
 #include <robot_config.h>
 #include <chrono>
 
