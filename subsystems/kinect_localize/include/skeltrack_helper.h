@@ -9,7 +9,7 @@ static const bool KINECT_UPSIDE_DOWN = true; // If Kinect is mounted upside down
 static const uint16_t THRESHOLD_BEGIN = 500;
 /* Adjust this value to increase of decrease
    the threshold */
-static const uint16_t THRESHOLD_END = 5000;
+static const uint16_t THRESHOLD_END = 2000;
 
 typedef struct {
 	uint16_t * reduced_buffer;
@@ -50,19 +50,7 @@ static BufferInfo * process_buffer (
 		}
     }
     BufferInfo *buffer_info = new BufferInfo;
-    // if(KINECT_UPSIDE_DOWN) {
-	   //  uint16_t * flipped_buffer = new uint16_t [reduced_width * reduced_height];
-	   //  for(int i=0; i<reduced_width; ++i) {
-	   //  	for(int j=0; j < reduced_height; ++j) {
-	    // 		flipped_buffer[j*reduced_width + i] = reduced_buffer[(reduced_height-1-j)*reduced_width - i];
-	    // 	}
-	    // }
-	//     buffer_info->reduced_buffer = flipped_buffer;
-	//     delete[redu]
-	// }
-	// else {
-		buffer_info->reduced_buffer = reduced_buffer;
-	// }
+	buffer_info->reduced_buffer = reduced_buffer;
 	buffer_info->reduced_width = reduced_width;
 	buffer_info->reduced_height = reduced_height;
 	buffer_info->width = width;

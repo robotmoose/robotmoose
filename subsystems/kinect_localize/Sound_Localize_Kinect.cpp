@@ -33,11 +33,7 @@
 // Libraries for skeleton tracking
 #include <skeltrack/skeltrack.h>
 #include <skeltrack_helper.h>
-<<<<<<< HEAD
-#include <glib-object.h> // Unfortunately ... 
-=======
 #include <glib-object.h> // Unfortunately ...
->>>>>>> 85744f5d3e71c4769d526e854307bfc648d3014f
 
 // Libraries needed for robotmoose integration
 #include <string>
