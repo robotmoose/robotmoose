@@ -123,6 +123,10 @@ chatter_t.prototype.set_robot=function(robot)
 			_this.comet=superstar.get_next(robot_to_starpath(_this.robot)+"chat",function(data)
 			{
 				service(data);
+			},
+			function()
+			{
+				setTimeout(2000,function(){request();});
 			});
 		};
 
