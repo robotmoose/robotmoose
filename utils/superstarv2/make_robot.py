@@ -62,7 +62,7 @@ if __name__=="__main__":
 			global auth
 			global ss
 			robot_auth=getpass.getpass(prompt='Enter new auth (at least 8 characters):  ')
-			if len(robot_auth)<8:
+			if len(robot_auth)<8 and (robot_auth!='!' or len(robot_auth)==0):
 				raise Exception('Auth code must be at least 8 characters.')
 			for ii in robot_auth:
 				if ord(ii)<33 or ord(ii)>126:

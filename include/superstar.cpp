@@ -254,5 +254,5 @@ void superstar_t::handle_error(Json::Value request, Json::Value error) {
 	if(request.isMember("error_cb"))
 		callbacks[JSON_serialize(request["error_cb"])](error);
 	else
-		std::cout << "Superstar error (" << error["code"] << ") - " << error["message"] << std::endl;
+		std::cout << "Superstar error (" << error["code"] << ") - " << replace_all(error["message"].asString(),"\n","") << std::endl;
 }
