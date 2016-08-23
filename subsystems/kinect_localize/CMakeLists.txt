@@ -2,7 +2,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 #Flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result -Wno-sign-compare -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result -Wno-sign-compare -std=c++11 -DMG_ENABLE_SSL")
 
 #Include Directories
 set(root_inc ../../include)
@@ -13,8 +13,12 @@ include_directories(${skeltrack_inc})
 
 #Libraries
 find_package(PkgConfig)
+
 pkg_search_module(GLIB2 REQUIRED glib-2.0)
 include_directories(${GLIB2_INCLUDE_DIRS})
+
+pkg_search_module(OPENSSL REQUIRED openssl)
+include_directories(${OPENSSL_INCLUDE_DIR})
 
 #Sources
 set(kinect_src src/Kinect_DOA.cpp src/xcor_td.cpp src/ofxKinectExtras.cpp)
