@@ -9,6 +9,10 @@ CCFLAGS=-std=c++11 -O -Wno-unused-result $(INCLUDE_DIRS) -I$(SRC)
 CLIB=-pthread -lgio-2.0 -lgobject-2.0 -lgthread-2.0 -lglib-2.0
 LIB=-lfreenect $(CLIB)
 
+CCFLAGS += -DMG_ENABLE_SSL=1
+LIB += -lssl -lcrypto
+
+
 JSONCPP_SRC=$(SUPERSTAR_INC)/jsoncpp/json_reader.cpp $(SUPERSTAR_INC)/jsoncpp/json_value.cpp $(SUPERSTAR_INC)/jsoncpp/json_writer.cpp
 MONGOOSE_SRC=$(SUPERSTAR_INC)/mongoose/mongoose.c
 SKELTRACK_SRC=$(INC)/skeltrack/pqueue.c $(INC)/skeltrack/skeltrack-joint.c $(INC)/skeltrack/skeltrack-skeleton.c $(INC)/skeltrack/skeltrack-smooth.c $(INC)/skeltrack/skeltrack-util.c
