@@ -61,7 +61,10 @@ function gui_t(div)
 	this.auth_input=new auth_input_t(this.main_div,function(auth)
 	{
 		_this.connection.gui_auth(auth);
-		_this.load_gruveo(_this.connection.robot,_this.pilot_status.current_pilot);
+		var pilot=null;
+		if(_this.pilot_status)
+			pilot=_this.pilot_status.current_pilot;
+		_this.load_gruveo(_this.connection.robot,pilot);
 	});
 
 	this.serial_selector=new serial_selector_t
