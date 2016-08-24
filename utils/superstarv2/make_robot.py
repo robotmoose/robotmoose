@@ -81,7 +81,7 @@ if __name__=="__main__":
 				robot_auth=""
 				try:
 					robot_auth=getpass.getpass(prompt='Enter new auth (at least 8 characters):  ')
-					if len(robot_auth)<8 and robot_auth!='!' and len(robot_auth)!=0:
+					if len(robot_auth)<8 and robot_auth!='!' and robot_auth!='-' and len(robot_auth)!=0:
 						raise Exception('Auth code must be at least 8 characters.')
 					for ii in robot_auth:
 						if ord(ii)<33 or ord(ii)>126:
@@ -95,17 +95,19 @@ if __name__=="__main__":
 				except KeyboardInterrupt:
 					exit(1)
 
+			#Empty auth check
+			if len(robot_auth)==0:
+				robot_auth="-"
+
 			#Set robot
 			global ss
 			robot={"authtest":"","config":{"configs":[],"counter":1},"experiments":{"HelloWorld":{"code":[{"code":"// JavaScript code","name":"start","time":""}]}},
 				"options":["ultrasonic_sensor PP","wheel_encoder PPC","encoder P","neato SP","latency ","heartbeat ","bms ","analog P","pwm P","neopixel PC","servo P",
 				"create2 S","sabertooth2 S","sabertooth1 S","bts PPPP"],"sensors":{"heartbeats":0},"run":{"options":["Squeak","eagle","bike horn"],"play":False,"sound":"eagle"}}
 			ss.set("/robots/"+args.ROBOT,robot,auth,onsuccess,onerror)
-			if len(robot_auth)>0:
+			if len(robot_auth)>1:
 				robot_auth=hashlib.sha256(bytearray(robot_auth,"utf-8")).hexdigest()
-				ss.change_auth("/robots/"+args.ROBOT,robot_auth,auth,onauthsuccess,onerror)
-			else:
-				print('Blank auth code.')
+			ss.change_auth("/robots/"+args.ROBOT,robot_auth,auth,onauthsuccess,onerror)
 			ss.flush()
 
 		#Get original...
