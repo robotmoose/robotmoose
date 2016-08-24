@@ -155,7 +155,7 @@ function gui_t(div)
 	this.pilot_status_text.innerHTML="Pilots connected (0)";
 	this.main_div.appendChild(document.createElement("br"));
 
-	this.pilot_status=new pilot_status_t(this.name,this.pilot_checkmark,
+	this.pilot_status=new pilot_status_t(this.connection,this.pilot_checkmark,
 		function() {
 			_this.connection.pilot_connected=true;
 		},

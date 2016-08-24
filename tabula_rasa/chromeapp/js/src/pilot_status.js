@@ -4,11 +4,11 @@
 //callback onvideohangup() - Called when main pilot hangs up.
 //callback onvideocall() - Called when main pilot calls in.
 
-function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
+function pilot_status_t(connection,pilot_checkmark,onconnect,ondisconnect)
 {
-	if(!name||!pilot_checkmark)
+	if(!connection||!pilot_checkmark)
 		return null;
-	this.name=name;
+	this.connection=connection;
 	this.pilot_checkmark=pilot_checkmark;
 	this.onconnect=onconnect;
 	this.ondisconnect=ondisconnect;
@@ -25,9 +25,9 @@ function pilot_status_t(name,pilot_checkmark,onconnect,ondisconnect)
 	this.can_call_again=true;
 	this.called=false;
 
-	var handle_get=function(data)
+	var handle_get=function()
 	{
-		var robot=_this.name.get_robot();
+		var robot=_this.connection.robot;
 		if(valid_robot(robot))
 			superstar.get_next(robot_to_starpath(robot)+
 				"frontend_status",function(data)
@@ -131,7 +131,7 @@ pilot_status_t.prototype.disconnect=function()
 		this.ondisconnect();
 	if(this.onchange)
 		this.onchange(0);
-	var robot=this.name.get_robot();
+	var robot=this.connection.robot;
 	if(valid_robot(robot))
 		superstar.set(robot_to_starpath(robot)+"frontend_status",{});
 }
@@ -204,21 +204,21 @@ pilot_status_t.prototype.update=function(new_pilots)
 	//Go through robots we already have, check to see if they are disconnected
 	//  and remove them from online (keeps the online array from getting too big).
 	//  This also resets the pilot.
-	var robot=this.name.get_robot();
+	var robot=this.connection.robot;
 	for(var ii in old_pilots)
-		if(!(ii in active_pilots)&&(this.pilot_timers[ii]||(time-this.pilot_timers[ii])>this.timeout_time))
+		if(!(ii in active_pilots)&&(!this.pilot_timers[ii]||(time-this.pilot_timers[ii])>this.timeout_time))
 		{
-			superstar.set(robot_to_starpath(robot)+"frontend_status/"+ii,null);
+			superstar_set(robot,"frontend_status/"+ii,null);
 			if(ii==this.current_pilot)
 				this.current_pilot=null;
 		}
 
-	////Clear up out local timers (probably not needed...but it makes me sleep better...).
-	//var new_pilot_timers={};
-	//for(var ii in this.pilot_timers)
-	//	if((time-this.pilot_timers[ii])<this.timeout_time*2)
-	//		new_pilot_timers[ii]=this.pilot_timers[ii];
-	//this.pilot_timers=new_pilot_timers;
+	//Clear up out local timers (probably not needed...but it makes me sleep better...).
+	var new_pilot_timers={};
+	for(var ii in this.pilot_timers)
+		if((time-this.pilot_timers[ii])<this.timeout_time*2)
+			new_pilot_timers[ii]=this.pilot_timers[ii];
+	this.pilot_timers=new_pilot_timers;
 
 	//Update checkmark and such.
 	var old_pilot_connected=this.pilot_connected;
