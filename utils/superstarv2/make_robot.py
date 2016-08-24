@@ -16,6 +16,7 @@ if __name__=="__main__":
 		parser=argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
 			description=textwrap.dedent('''\
 			Makes a robot on superstar.
+			  You can clear a robot auth code by setting it to '-'.
 			  You can make a robot auth code not changeable by setting it '!'.
 			'''))
 		parser.add_argument("-s","--superstar",
