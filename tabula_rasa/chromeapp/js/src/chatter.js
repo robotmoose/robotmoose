@@ -113,6 +113,7 @@ chatter_t.prototype.set_robot=function(robot)
 				catch(error)
 				{}
 			}
+
 			_this.history.value=chat;
 			_this.history.scrollTop=_this.history.scrollHeight;
 			request();
@@ -130,16 +131,19 @@ chatter_t.prototype.set_robot=function(robot)
 			});
 		};
 
-		if(valid_robot(this.robot))
+		var get_once=function()
 		{
-			superstar.get(robot_to_starpath(this.robot)+"chat",function(data)
-			{
-				service(data);
-			},
-			function()
-			{
-				setTimeout(function(){request();},1000);
-			});
-		}
+			if(valid_robot(_this.robot))
+				superstar.get(robot_to_starpath(_this.robot)+"chat",function(data)
+				{
+					service(data);
+				},
+				function()
+				{
+					setTimeout(function(){get_once();},1000);
+				});
+		};
+
+		get_once();
 	}
 }

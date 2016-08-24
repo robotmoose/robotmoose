@@ -44,6 +44,11 @@ function gui_t(div)
 		}
 	);
 
+	this.chat_div=document.createElement("div");
+	maximize(this.chat_div);
+	this.chat_div.style.height="100%";
+	this.chat=new chatter_t(this.chat_div,20,"Caretaker");
+
 	this.name=new name_t
 	(
 		this.main_div,
@@ -53,9 +58,7 @@ function gui_t(div)
 			_this.connection.gui_robot(robot);
 			_this.load_gruveo(robot,_this.pilot_status.current_pilot);
 			_this.chat.set_robot(robot);
-
 		}
-
 	);
 
 	this.auth_input=new auth_input_t(this.main_div,function(auth)
@@ -65,6 +68,7 @@ function gui_t(div)
 		if(_this.pilot_status)
 			pilot=_this.pilot_status.current_pilot;
 		_this.load_gruveo(_this.connection.robot,pilot);
+		_this.chat.set_robot(_this.connection.robot);
 	});
 
 	this.serial_selector=new serial_selector_t
@@ -100,10 +104,6 @@ function gui_t(div)
 	this.status_viewer=new status_viewer_t(this.main_div);
 
 	this.state_side_bar=document.createElement("div");
-
-	this.chat_div=document.createElement("div");
-	maximize(this.chat_div);
-	this.chat_div.style.height="100%";
 
 	$("#content").w2layout
 	({
@@ -175,8 +175,6 @@ function gui_t(div)
 	{
 		_this.load_gruveo(_this.connection.robot,uuid);
 	}
-
-	this.chat=new chatter_t(this.chat_div,20,"Caretaker");
 }
 
 gui_t.prototype.destroy=function()
