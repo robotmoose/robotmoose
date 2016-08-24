@@ -343,16 +343,13 @@ bool superstar_t::change_auth(std::string path,const Json::Value& value)
 		if(cur_path==path)
 		{
 			if(new_auth_str!="-")
-			{
-				ofstr<<auths[ii].first<<" "<<new_auth_str;
-			}
+				ofstr<<auths[ii].first<<" "<<new_auth_str<<std::endl;
 			found=true;
 		}
 		else
 		{
-			ofstr<<auths[ii].first<<" "<<auths[ii].second;
+			ofstr<<auths[ii].first<<" "<<auths[ii].second<<std::endl;
 		}
-		ofstr<<std::endl;
 	}
 
 	//Wasn't found in file, make it.

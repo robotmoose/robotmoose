@@ -62,7 +62,7 @@ if __name__=="__main__":
 		while True:
 			robot_auth=""
 			try:
-				robot_auth=input(prompt='Enter new auth (at least 8 characters):  ')
+				robot_auth=input('Enter new auth (at least 8 characters):  ')
 				if len(robot_auth)<8 and robot_auth!='!' and robot_auth!='-' and len(robot_auth)!=0:
 					raise Exception('Auth code must be at least 8 characters.')
 				for ii in robot_auth:
@@ -76,6 +76,17 @@ if __name__=="__main__":
 				print(error)
 			except KeyboardInterrupt:
 				exit(1)
+
+		#Empty auth check
+		if len(robot_auth)==0:
+			answer=""
+			while True:
+				answer=input('Auth is blank, remove it instead of setting it to "" (y/n)?  ')
+				if answer=="y" or answer=="Y":
+					robot_auth="-"
+					break
+				if answer=="n" or answer=="N":
+					break
 		if robot_auth!="!" and robot_auth!="-":
 			robot_auth=hashlib.sha256(bytearray(robot_auth,"utf-8")).hexdigest()
 		ss.change_auth(args.path,robot_auth,auth,onsuccess,onerror)
