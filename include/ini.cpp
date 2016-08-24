@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "string_util.h"
+#include "string_util.hpp"
 
 ini_t read_ini(const std::string& filename)
 {

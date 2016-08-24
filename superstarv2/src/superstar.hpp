@@ -45,7 +45,8 @@ class superstar_t
 
 		//Changes auth code for a given path to the given value.
 		//  Returns whether new auth was set or not.
-		//  Note, min auth code length is 8 characters.
+		//  Note, min auth code length is 8 characters (SEE NOTE BELOW).
+		//  Note, "-" indicates to REMOVE auth code and "!" indicates to set path to IMMUTABLE.
 		//  Note, valid characters are ASCII 33-126 inclusive.
 		//  Note, relies on HTTPS for secure transport.
 		//  Note, traverses auth until a matching code is found for a path.

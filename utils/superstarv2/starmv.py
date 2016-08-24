@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #Mike Moss
-#07/22/2016
+#08/24/2016
 #Moves a path.
 
 import argparse
@@ -36,9 +36,6 @@ if __name__=="__main__":
 			superstar_url="127.0.0.1:8081"
 		ss=superstar.superstar_t(superstar_url)
 
-		#Get auth...
-		auth=getpass.getpass(prompt='Enter auth:  ')
-
 		#Print errors...
 		def onerror(error):
 			print(str("Error("+str(error["code"])+") - "+error["message"]))
@@ -48,29 +45,65 @@ if __name__=="__main__":
 		def onsuccess(result):
 			print("Success!")
 
+		#Globals...
+		auth=""
+		copy_data=None
+
+		#Check if to exists...
+		def do_check_to(data):
+			if not data:
+				print("Path \""+args.FROM+"\" does not exist!")
+				exit(1)
+
+			#Global copy data...
+			global copy_data
+			copy_data=data
+
+			#Get to...
+			ss.get(args.TO,do_copy,onerror)
+			ss.flush()
+
+		#Do copy...
+		def do_copy(data):
+			if data:
+				answer=""
+				while True:
+					answer=input("Path \""+args.TO+"\" exists, overwrite (y/n)?  ")
+					if answer=="y" or answer=="Y":
+						break
+					if answer=="n" or answer=="N":
+						exit(1)
+
+			#Get auth...
+			global auth
+			auth=getpass.getpass(prompt='Enter admin auth:  ')
+
+			#Copy
+			global ss
+			global copy_data
+			ss.set(args.TO,copy_data,auth,do_move,onerror)
+			ss.flush()
+
 		#Remove
-		def remove(result):
+		def do_move(result):
 			if result:
+				global auth
 				ss.set(args.FROM,None,auth,onsuccess,onerror)
 				ss.flush()
 			else:
 				print("Server returned non-true for set, aborting.")
 				exit(1)
 
-		#Do this copy...
-		def do_copy(data):
-			if not data:
-				print("Path \""+args.FROM+"\" does not exist!")
-				exit(1)
-			global auth
-			global ss
-			ss.set(args.TO,data,auth,remove,onerror)
-			ss.flush()
+		#Check from==to...
+		if ss.pathify(args.FROM)==ss.pathify(args.TO):
+			raise Exception("From and to are the same!")
 
 		#Get original...
-		ss.get(args.FROM,do_copy,onerror)
+		ss.get(args.FROM,do_check_to,onerror)
 		ss.flush()
 
 	except Exception as error:
 		print(error)
-		pass
+		exit(1)
+	except KeyboardInterrupt:
+		exit(1)

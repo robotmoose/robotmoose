@@ -14,11 +14,14 @@ function auth_input_t(div, on_change)
 	this.input.style.width="100%";
 	this.input.placeholder="Password";
 	this.input.type="password";
-	this.input.onchange=function()
+
+	var change=function()
 	{
 		on_change(CryptoJS.SHA256(this.value).toString(CryptoJS.enc.Hex));
 		this.value="";
 	};
+	this.input.addEventListener("change",change);
+	change();
 	div.appendChild(this.input);
 }
 

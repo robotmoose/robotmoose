@@ -45,11 +45,8 @@ sound_player_t.prototype.send_sounds=function()
 	if(this.connected)
 	{
 		var sound_list=[];
-		console.log(this.sounds);
-		for(index in this.sounds) {
+		for(index in this.sounds)
 			sound_list.push(this.sounds[index].name);
-			console.log(this.sounds[index].name)
-		}
 
 		if(this.robot&&this.robot.name&&this.robot.superstar&&this.robot.year&&this.robot.school)
 			superstar_set(this.robot,this.path,{"options":sound_list,"sound":this.sound_requested,"play":this.play});

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "ini.h"
-#include "string_util.h"
+#include "string_util.hpp"
 
 robot_config_t::robot_config_t()
 {
@@ -19,7 +19,7 @@ robot_config_t::robot_config_t()
 	keys_m["sim"]="false";                       // use without an arduino (for testing)
 	keys_m["local"]="false";                     // use local server shortcut
 	keys_m["dev"]="false";                       // use dev server shortcut
-	keys_m["auth"]="";							 
+	keys_m["auth"]="";
 
 	validate();
 }
