@@ -56,7 +56,6 @@ function gui_t(div)
 		function(robot)
 		{
 			_this.connection.gui_robot(robot);
-			_this.load_gruveo(robot,_this.pilot_status.current_pilot);
 			_this.chat.set_robot(robot);
 		}
 	);
@@ -65,9 +64,9 @@ function gui_t(div)
 	{
 		_this.connection.gui_auth(auth);
 		var pilot=null;
-		if(_this.pilot_status)
-			pilot=_this.pilot_status.current_pilot;
-		_this.load_gruveo(_this.connection.robot,pilot);
+		//if(_this.pilot_status)
+		//	pilot=_this.pilot_status.current_pilot;
+		//_this.load_gruveo(_this.connection.robot,pilot);
 		_this.chat.set_robot(_this.connection.robot);
 	});
 
@@ -167,13 +166,13 @@ function gui_t(div)
 	{
 		_this.pilot_status_text.innerHTML="Pilots connected ("+num+")";
 	}
-	this.pilot_status.onvideohangup=function(uuid)
+	this.pilot_status.onvideohangup=function()
 	{
-		_this.load_gruveo(_this.connection.robot,uuid);
+		_this.load_gruveo();
 	}
-	this.pilot_status.onvideocall=function(uuid)
+	this.pilot_status.onvideocall=function()
 	{
-		_this.load_gruveo(_this.connection.robot,uuid);
+		_this.load_gruveo(_this.connection.robot);
 	}
 }
 

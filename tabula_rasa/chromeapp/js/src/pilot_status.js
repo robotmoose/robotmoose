@@ -16,6 +16,7 @@ function pilot_status_t(connection,pilot_checkmark,onconnect,ondisconnect)
 	this.pilots={};
 	this.pilot_timers={};
 	this.reset();
+	this.num_pilots=0;
 
 	var _this=this;
 	this.timeout_time=3500;
@@ -23,7 +24,6 @@ function pilot_status_t(connection,pilot_checkmark,onconnect,ondisconnect)
 	this.video_timer=null;
 	this.videohungup=false;
 	this.can_call_again=true;
-	this.called=false;
 
 	var handle_get=function()
 	{
@@ -72,22 +72,21 @@ function pilot_status_t(connection,pilot_checkmark,onconnect,ondisconnect)
 						//{
 						//	_this.video_timer=time+_this.timeout_time;
 						//	_this.videohungup=true;
-						//	_this.called=false;
 						//	if(_this.onvideohangup)
 						//		_this.onvideohangup();
 						//}
 
-						//hungup, call.
-						if(_this.videohungup)
+						//We hungup, call.
+						if(_this.num_pilots>0&&_this.videohungup)
 						{
 							_this.videohungup=false;
-							_this.called=true;
 							if(_this.onvideocall)
 								_this.onvideocall();
 						}
 
 						//User hangups on their side.
-						if(result.robotmoose_pilot_status<=0&&!_this.videohungup&&_this.can_call_again)
+						if(_this.num_pilots>0&&result.robotmoose_pilot_status<=0&&
+							!_this.videohungup&&_this.can_call_again)
 						{
 							//Call
 							if(_this.onvideocall)
@@ -100,6 +99,14 @@ function pilot_status_t(connection,pilot_checkmark,onconnect,ondisconnect)
 								if(!_this.can_call_again)
 									_this.can_call_again=true;
 							},_this.timeout_time);
+						}
+
+						//Hangup if there are no pilots...
+						if(_this.num_pilots<=0&&result.robotmoose_pilot_status>0&&
+							!_this.videohungup&&_this.onvideohangup)
+						{
+							_this.videohungup=true;
+							_this.onvideohangup();
 						}
 					});
 				}
@@ -233,6 +240,7 @@ pilot_status_t.prototype.update=function(new_pilots)
 	//Change the number of pilots.
 	if(this.onchange)
 		this.onchange(num_pilots);
+	this.num_pilots=num_pilots;
 }
 
 
