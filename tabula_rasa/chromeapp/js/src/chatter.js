@@ -126,7 +126,7 @@ chatter_t.prototype.set_robot=function(robot)
 			},
 			function()
 			{
-				setTimeout(2000,function(){request();});
+				setTimeout(function(){request();},1000);
 			});
 		};
 
@@ -135,6 +135,10 @@ chatter_t.prototype.set_robot=function(robot)
 			superstar.get(robot_to_starpath(this.robot)+"chat",function(data)
 			{
 				service(data);
+			},
+			function()
+			{
+				setTimeout(function(){request();},1000);
 			});
 		}
 	}
