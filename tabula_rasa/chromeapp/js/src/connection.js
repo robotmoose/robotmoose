@@ -512,7 +512,6 @@ connection_t.prototype.arduino_setup_complete=function()
 	{
 		for (var field in power)
 			_this.power[field]=power[field];
-		console.log("power: "+JSON.stringify(power));
 	});
 
 	_this.network_getnext(robot_to_starpath(this.robot)+"config",function(config)
@@ -762,7 +761,7 @@ connection_t.prototype.arduino_send_packet=function()
 	  		_this.power = {L:0, R:0};
 
 		var value=_this.read_JSON_property(_this.power,property);
-		
+
 		_this.write_JSON_property(_this.sensors.power,property,value);
 		//console.log("|"+device+"|"+value+"|");
 

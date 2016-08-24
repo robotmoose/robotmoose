@@ -94,7 +94,7 @@ function modal_change_auth_t(div, robot, onclose)
 			_this.robot_newauth_span_text.innerHTML="Invalid character. Authentication may not contain spaces or non-printable characters.";
 			_this.confirm_button.disabled=true;
 		}
-		else if(_this.robot_newauth.value.length<8&&_this.robot_newauth.value!="!")
+		else if(_this.robot_newauth.value.length<8&&_this.robot_newauth.value!="!"&&_this.robot_newauth.value!="-")
 		{
 			_this.robot_newauth_group.className="form-group has-warning has-feedback";
 			_this.robot_newauth_span.className="glyphicon glyphicon-warning-sign form-control-feedback";
@@ -198,13 +198,11 @@ function modal_change_auth_t(div, robot, onclose)
 			toString(CryptoJS.enc.Hex);
 		newauth_val=CryptoJS.SHA256(_this.robot_newauth.value).
 			toString(CryptoJS.enc.Hex);
-		if(_this.robot_newauth.value=="!")
-			newauth_val="!";
-		repeatauth_val=CryptoJS.SHA256(_this.robot_repeatauth.value).
-			toString(CryptoJS.enc.Hex);
-		if(_this.robot_repeatauth.value=="!")
-			repeatauth_val="!";
-
+		if(_this.robot_newauth.value=="!"||_this.robot_newauth.value=="-")
+			newauth_val=_this.robot_newauth.value;
+		repeatauth_val=CryptoJS.SHA256(_this.robot_repeatauth.value).toString(CryptoJS.enc.Hex);
+		if(_this.robot_repeatauth.value=="!"||_this.robot_repeatauth.value=="-")
+			repeatauth_val=_this.robot_repeatauth.value;
 
 		// remove error messages and warning/success labels
 		_this.robot_auth_span.style.visibility="hidden";
