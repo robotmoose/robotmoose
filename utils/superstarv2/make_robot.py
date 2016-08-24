@@ -95,10 +95,6 @@ if __name__=="__main__":
 				except KeyboardInterrupt:
 					exit(1)
 
-			#Empty auth check
-			if len(robot_auth)==0:
-				robot_auth="-"
-
 			#Set robot
 			global ss
 			robot={"authtest":"","config":{"configs":[],"counter":1},"experiments":{"HelloWorld":{"code":[{"code":"// JavaScript code","name":"start","time":""}]}},
