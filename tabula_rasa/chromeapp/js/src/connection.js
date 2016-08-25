@@ -493,6 +493,10 @@ connection_t.prototype.network_getnext=function(path,on_success)
 					on_success(data);
 				func();
 			}
+		},
+		function()
+		{
+			setTimeout(func,2000);
 		});
 	};
 
