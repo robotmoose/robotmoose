@@ -62,7 +62,7 @@ if __name__=="__main__":
 		while True:
 			robot_auth=""
 			try:
-				robot_auth=input('Enter new auth (at least 8 characters):  ')
+				robot_auth=getpass.getpass(prompt='Enter new auth (at least 8 characters):  ')
 				if len(robot_auth)<8 and robot_auth!='!' and robot_auth!='-' and len(robot_auth)!=0:
 					raise Exception('Auth code must be at least 8 characters.')
 				for ii in robot_auth:
