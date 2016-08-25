@@ -22,7 +22,8 @@ superstar_t.prototype.fix_url=function(url)
 {
 	if(!url)
 		url=window.location.host;
-	if(url.substr(0,9)=="127.0.0.1"||url.substr(0,9)=="localhost")
+	if(url.substr(0,9)=="127.0.0.1"||url.substr(0,9)=="localhost" 
+		|| url.substr(0,3)=="10." || url.substr(0,4)=="192.")
 			url="http://"+url;
 	else if(url.substr(0,7)!="http://"&&url.substr(0,8)!="https://")
 		url="https://"+url;
