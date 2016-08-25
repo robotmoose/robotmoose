@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #Mike Moss
-#08/22/2016
+#08/24/2016
 #Removes a path.
 
 import argparse
@@ -35,7 +35,7 @@ if __name__=="__main__":
 		ss=superstar.superstar_t(superstar_url)
 
 		#Get auth...
-		auth=getpass.getpass(prompt='Enter auth:  ')
+		auth=getpass.getpass(prompt='Enter admin auth:  ')
 
 		#Print errors...
 		def onerror(error):
@@ -52,4 +52,6 @@ if __name__=="__main__":
 
 	except Exception as error:
 		print(error)
-		pass
+		exit(1)
+	except KeyboardInterrupt:
+		exit(1)

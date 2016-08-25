@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #Mike Moss
-#07/22/2016
+#08/24/2016
 #Shows values.
 
 import argparse
@@ -50,4 +50,6 @@ if __name__=="__main__":
 
 	except Exception as error:
 		print(error)
-		pass
+		exit(1)
+	except KeyboardInterrupt:
+		exit(1)

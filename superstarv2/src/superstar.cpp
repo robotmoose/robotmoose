@@ -278,7 +278,8 @@ void superstar_t::push(const std::string& path,const Json::Value& val,
 
 //Changes auth code for a given path to the given value.
 //  Returns whether new auth was set or not.
-//  Note, min auth code length is 8 characters.
+//  Note, min auth code length is 8 characters (SEE NOTE BELOW).
+//  Note, "-" indicates to REMOVE auth code and "!" indicates to set path to IMMUTABLE.
 //  Note, valid characters are ASCII 33-126 inclusive.
 //  Note, relies on HTTPS for secure transport.
 //  Note, traverses auth until a matching code is found for a path.
@@ -290,7 +291,7 @@ bool superstar_t::change_auth(std::string path,const Json::Value& value)
 	std::string new_auth_str="";
 	if(!value.isNull())
 		new_auth_str=value.asString();
-	if(new_auth_str.size()<8&&new_auth_str!="!")
+	if(new_auth_str.size()<8&&new_auth_str!="!"&&new_auth_str!="-"&&new_auth_str.size()>0)
 		return false;
 
 	//Check for invalid characters.
@@ -304,30 +305,29 @@ bool superstar_t::change_auth(std::string path,const Json::Value& value)
 	//Try to open auth file.
 	std::ifstream ifstr(auth_file_m.c_str());
 
-	//No auth file...no authentication.
-	if(!ifstr.good())
-		return true;
-
 	//Open auth file and parse passwords in line based format "PATH PASSWORD" (without quotes).
-	std::string line;
 	std::vector<std::pair<std::string,std::string> > auths;
-	while(std::getline(ifstr,line))
+	if(ifstr.good())
 	{
-		std::istringstream istr(line);
+		std::string line;
+		while(std::getline(ifstr,line))
+		{
+			std::istringstream istr(line);
 
-		//Parse path from line...
-		std::string path;
-		if(!(istr>>path))
-			continue;
+			//Parse path from line...
+			std::string path;
+			if(!(istr>>path))
+				continue;
 
-		//Parse auth from line...
-		std::string auth;
-		if(!(istr>>auth))
-			auth="";
+			//Parse auth from line...
+			std::string auth;
+			if(!(istr>>auth))
+				auth="";
 
-		auths.push_back(std::pair<std::string,std::string>(path,auth));
+			auths.push_back(std::pair<std::string,std::string>(path,auth));
+		}
+		ifstr.close();
 	}
-	ifstr.close();
 
 	//Open auth file in write mode.
 	std::ofstream ofstr(auth_file_m.c_str());
@@ -338,25 +338,25 @@ bool superstar_t::change_auth(std::string path,const Json::Value& value)
 	bool found=false;
 	for(size_t ii=0;ii<auths.size();++ii)
 	{
-		ofstr<<auths[ii].first;
-
 		//If path for auth change and current path are the same, change.
 		std::string cur_path=remove_double_slashes(strip(auths[ii].first,"/"));
 		if(cur_path==path)
 		{
-			ofstr<<" "<<new_auth_str;
+			if(new_auth_str!="-")
+				ofstr<<auths[ii].first<<" "<<new_auth_str<<std::endl;
 			found=true;
 		}
 		else
 		{
-			ofstr<<" "<<auths[ii].second;
+			ofstr<<auths[ii].first<<" "<<auths[ii].second<<std::endl;
 		}
-		ofstr<<std::endl;
 	}
 
-	if(!found)
+	//Wasn't found in file, make it.
+	if(!found&&new_auth_str!="-")
 		ofstr<<path<<" "<<new_auth_str<<std::endl;
 	ofstr.close();
+
 	return true;
 }
 

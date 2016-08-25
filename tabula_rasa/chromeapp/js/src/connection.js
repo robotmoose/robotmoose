@@ -10,6 +10,7 @@ function connection_t(on_message,on_disconnect,on_connect,on_name_set,on_auth_er
 	if(!serial_api)
 		serial_api=chrome.serial;
 	var _this=this;
+	this.comets={};
 	_this.config="";
 	_this.status_message=on_message;
 	_this.on_disconnect=on_disconnect;
@@ -485,7 +486,7 @@ connection_t.prototype.network_getnext=function(path,on_success)
 
 	var func=function()
 	{
-		superstar.get_next(path,function(data)
+		_this.comets[path]=superstar.get_next(path,function(data)
 		{
 			if(_this.connected)
 			{
@@ -493,6 +494,10 @@ connection_t.prototype.network_getnext=function(path,on_success)
 					on_success(data);
 				func();
 			}
+		},
+		function()
+		{
+			setTimeout(func,2000);
 		});
 	};
 
@@ -508,19 +513,23 @@ connection_t.prototype.arduino_setup_complete=function()
 	_this.arduino_send_packet();
 
 	//Set up network comms:
-	_this.network_getnext(robot_to_starpath(this.robot)+"pilot/power",function(power)
+	for(var key in this.comets)
+		this.comets[key].abort();
+	this.comets={};
+	console.log(this.comets);
+	this.network_getnext(robot_to_starpath(this.robot)+"pilot/power",function(power)
 	{
-		for (var field in power)
+		for(var field in power)
 			_this.power[field]=power[field];
-		console.log("power: "+JSON.stringify(power));
 	});
 
-	_this.network_getnext(robot_to_starpath(this.robot)+"config",function(config)
+	this.network_getnext(robot_to_starpath(this.robot)+"config",function(config)
 	{
 		//need to reconfigure Arduino
 		if(config.counter!=_this.last_config.counter)
 			_this.reconnect();
 	});
+	console.log(this.comets);
 }
 
 // Look up all the properties for our currently configured set of devices,
@@ -762,7 +771,7 @@ connection_t.prototype.arduino_send_packet=function()
 	  		_this.power = {L:0, R:0};
 
 		var value=_this.read_JSON_property(_this.power,property);
-		
+
 		_this.write_JSON_property(_this.sensors.power,property,value);
 		//console.log("|"+device+"|"+value+"|");
 

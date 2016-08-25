@@ -44,6 +44,11 @@ function gui_t(div)
 		}
 	);
 
+	this.chat_div=document.createElement("div");
+	maximize(this.chat_div);
+	this.chat_div.style.height="100%";
+	this.chat=new chatter_t(this.chat_div,20,"Caretaker");
+
 	this.name=new name_t
 	(
 		this.main_div,
@@ -51,20 +56,18 @@ function gui_t(div)
 		function(robot)
 		{
 			_this.connection.gui_robot(robot);
-			_this.load_gruveo(robot,_this.pilot_status.current_pilot);
 			_this.chat.set_robot(robot);
-
 		}
-
 	);
 
 	this.auth_input=new auth_input_t(this.main_div,function(auth)
 	{
 		_this.connection.gui_auth(auth);
 		var pilot=null;
-		if(_this.pilot_status)
-			pilot=_this.pilot_status.current_pilot;
-		_this.load_gruveo(_this.connection.robot,pilot);
+		//if(_this.pilot_status)
+		//	pilot=_this.pilot_status.current_pilot;
+		//_this.load_gruveo(_this.connection.robot,pilot);
+		_this.chat.set_robot(_this.connection.robot);
 	});
 
 	this.serial_selector=new serial_selector_t
@@ -100,10 +103,6 @@ function gui_t(div)
 	this.status_viewer=new status_viewer_t(this.main_div);
 
 	this.state_side_bar=document.createElement("div");
-
-	this.chat_div=document.createElement("div");
-	maximize(this.chat_div);
-	this.chat_div.style.height="100%";
 
 	$("#content").w2layout
 	({
@@ -155,7 +154,7 @@ function gui_t(div)
 	this.pilot_status_text.innerHTML="Pilots connected (0)";
 	this.main_div.appendChild(document.createElement("br"));
 
-	this.pilot_status=new pilot_status_t(this.name,this.pilot_checkmark,
+	this.pilot_status=new pilot_status_t(this.connection,this.pilot_checkmark,
 		function() {
 			_this.connection.pilot_connected=true;
 		},
@@ -167,16 +166,14 @@ function gui_t(div)
 	{
 		_this.pilot_status_text.innerHTML="Pilots connected ("+num+")";
 	}
-	this.pilot_status.onvideohangup=function(uuid)
+	this.pilot_status.onvideohangup=function()
 	{
-		_this.load_gruveo(_this.connection.robot,uuid);
+		_this.load_gruveo();
 	}
-	this.pilot_status.onvideocall=function(uuid)
+	this.pilot_status.onvideocall=function()
 	{
-		_this.load_gruveo(_this.connection.robot,uuid);
+		_this.load_gruveo(_this.connection.robot);
 	}
-
-	this.chat=new chatter_t(this.chat_div,20,"Caretaker");
 }
 
 gui_t.prototype.destroy=function()
