@@ -10,6 +10,7 @@ function connection_t(on_message,on_disconnect,on_connect,on_name_set,on_auth_er
 	if(!serial_api)
 		serial_api=chrome.serial;
 	var _this=this;
+	this.sent_getnexts=false;
 	_this.config="";
 	_this.status_message=on_message;
 	_this.on_disconnect=on_disconnect;
@@ -512,18 +513,22 @@ connection_t.prototype.arduino_setup_complete=function()
 	_this.arduino_send_packet();
 
 	//Set up network comms:
-	_this.network_getnext(robot_to_starpath(this.robot)+"pilot/power",function(power)
+	if(!this.sent_getnexts)
 	{
-		for (var field in power)
-			_this.power[field]=power[field];
-	});
+		_this.network_getnext(robot_to_starpath(this.robot)+"pilot/power",function(power)
+		{
+			for (var field in power)
+				_this.power[field]=power[field];
+		});
 
-	_this.network_getnext(robot_to_starpath(this.robot)+"config",function(config)
-	{
-		//need to reconfigure Arduino
-		if(config.counter!=_this.last_config.counter)
-			_this.reconnect();
-	});
+		_this.network_getnext(robot_to_starpath(this.robot)+"config",function(config)
+		{
+			//need to reconfigure Arduino
+			if(config.counter!=_this.last_config.counter)
+				_this.reconnect();
+		});
+		this.sent_getnexts=true;
+	}
 }
 
 // Look up all the properties for our currently configured set of devices,
