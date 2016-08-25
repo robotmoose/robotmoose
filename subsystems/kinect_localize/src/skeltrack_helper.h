@@ -4,7 +4,6 @@
 #define SKELTRACK_HELPER_H_INCLUDED
 
 #include <glib-object.h>
-static const bool KINECT_UPSIDE_DOWN = true; // If Kinect is mounted upside down, flip angles.
 
 static const uint16_t THRESHOLD_BEGIN = 500;
 /* Adjust this value to increase of decrease
@@ -39,7 +38,7 @@ static BufferInfo * process_buffer (
 	  		int index;
 	  		if(camera_upside_down)
 	  			index = (reduced_height-1-j) * width * dimension_factor - i * dimension_factor;
-	  		else 
+	  		else
 		    	index = j * width * dimension_factor + i * dimension_factor;
 		    uint16_t value = buffer[index];
 
