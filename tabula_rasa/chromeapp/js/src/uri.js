@@ -4,7 +4,7 @@ function parse_uri()
 	var query=window.location.search.substring(1);
 	var vars=query.split("&");
 
-	for(var ii=0;ii<vars.length;++ii)
+	for(let ii=0;ii<vars.length;++ii)
 	{
 		var pair=vars[ii].split("=");
 

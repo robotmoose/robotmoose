@@ -22,7 +22,7 @@ superstar_t.prototype.fix_url=function(url)
 {
 	if(!url)
 		url=window.location.host;
-	if(url.substr(0,9)=="127.0.0.1"||url.substr(0,9)=="localhost" 
+	if(url.substr(0,9)=="127.0.0.1"||url.substr(0,9)=="localhost"
 		|| url.substr(0,3)=="10." || url.substr(0,4)=="192.")
 			url="http://"+url;
 	else if(url.substr(0,7)!="http://"&&url.substr(0,8)!="https://")
@@ -160,7 +160,7 @@ superstar_t.prototype.get_next=function(path,success_cb,error_cb)
 	//Limit to 5 comet connections...
 	//  Note, more is likely to stop outstanding comet connections
 	//        from getting serviced...
-	for(var ii=0;ii<this.comets.length-5;++ii)
+	for(let ii=0;ii<this.comets.length-5;++ii)
 		this.comets[ii].needs_to_die=true;
 	this.cleanup_comets();
 
@@ -242,7 +242,7 @@ superstar_t.prototype.add_request=function(request,success_cb,error_cb)
 superstar_t.prototype.cleanup_comets=function()
 {
 	var new_comets=[];
-	for(var ii in this.comets)
+	for(let ii in this.comets)
 		if(this.comets[ii]&&this.comets[ii].needs_to_die)
 			this.comets[ii].abort();
 		else if(!this.comets[ii].already_dead)
@@ -252,7 +252,7 @@ superstar_t.prototype.cleanup_comets=function()
 
 superstar_t.prototype.kill_comets=function()
 {
-	for(var ii in this.comets)
+	for(let ii in this.comets)
 		this.comets[ii].abort();
 	this.comets=[];
 }
@@ -266,7 +266,7 @@ superstar_t.prototype.flush=function()
 
 	//Build batch of current requests.
 	var batch=[];
-	for(var ii=0;ii<this.queue.length;++ii)
+	for(let ii=0;ii<this.queue.length;++ii)
 	{
 		var request=this.queue[ii].request;
 		var path=request.params.path;
@@ -305,7 +305,7 @@ superstar_t.prototype.flush=function()
 
 					//Got an array, must be batch data...
 					if(response.constructor===Array)
-						for(var key in response)
+						for(let key in response)
 						{
 							if(response[key].id==null)
 								continue;
@@ -326,7 +326,7 @@ superstar_t.prototype.flush=function()
 
 					//Server error...
 					else
-						for(var key in old_queue)
+						for(let key in old_queue)
 							handle_error(old_queue[key],response.error);
 				}
 
@@ -338,7 +338,7 @@ superstar_t.prototype.flush=function()
 						code:0,
 						message:error
 					};
-					for(var key in old_queue)
+					for(let key in old_queue)
 						handle_error(old_queue[key],error_obj);
 				}
 			}
@@ -351,7 +351,7 @@ superstar_t.prototype.flush=function()
 					code:0,
 					message:"HTTP returned "+xmlhttp.status+"."
 				};
-				for(var key in old_queue)
+				for(let key in old_queue)
 					handle_error(old_queue[key],error_obj);
 			}
 		}

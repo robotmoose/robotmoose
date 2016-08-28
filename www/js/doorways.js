@@ -73,7 +73,7 @@ doorway_manager_t.prototype.save=function()
 {
 	var data=[];
 
-	for(var key in this.doorways)
+	for(let key in this.doorways)
 		data.push(this.doorways[key].save());
 
 	data.sort(function(lhs,rhs){return lhs.z-rhs.z;});
@@ -86,7 +86,7 @@ doorway_manager_t.prototype.load=function(data)
 	if(!data)
 		return;
 	data.sort(function(lhs,rhs){return lhs.z-rhs.z;});
-	for(var key in data)
+	for(let key in data)
 	{
 		var doorway=this.get_by_title(data[key].title);
 		if(!doorway)
@@ -111,7 +111,7 @@ doorway_manager_t.prototype.create=function(title,pos,tooltip,help_text,icon)
 
 doorway_manager_t.prototype.get_by_title=function(title)
 {
-	for(var key in this.doorways)
+	for(let key in this.doorways)
 		if(this.doorways[key].title==title)
 			return this.doorways[key];
 
@@ -121,7 +121,7 @@ doorway_manager_t.prototype.get_by_title=function(title)
 doorway_manager_t.prototype.remove=function(doorway)
 {
 	var new_doorways=[];
-	for(var key in this.doorways)
+	for(let key in this.doorways)
 		if(this.doorways[key]!=doorway)
 			new_doorways[key]=doorways;
 		else
@@ -131,20 +131,20 @@ doorway_manager_t.prototype.remove=function(doorway)
 
 doorway_manager_t.prototype.remove_all=function()
 {
-	for(var key in this.doorways)
+	for(let key in this.doorways)
 		this.remove(this.doorways[key]);
 	this.doorways.length=0;
 }
 
 doorway_manager_t.prototype.hide_all=function()
 {
-	for(var key in this.doorways)
+	for(let key in this.doorways)
 		this.doorways[key].set_minimized(true);
 }
 
 doorway_manager_t.prototype.show_all=function()
 {
-	for(var key in this.doorways)
+	for(let key in this.doorways)
 	{
 		var temp_old_active=this.doorways[key].old_active;
 		this.doorways[key].set_minimized(this.doorways[key].old_minimized);
@@ -157,7 +157,7 @@ doorway_manager_t.prototype.show_all=function()
 
 doorway_manager_t.prototype.deactivate_all=function()
 {
-	for(var key in this.doorways)
+	for(let key in this.doorways)
 		this.doorways[key].deactivate();
 }
 
@@ -226,7 +226,7 @@ doorway_manager_t.prototype.onblur=function(event)
 
 doorway_manager_t.prototype.onresize=function(event)
 {
-	for(var key in this.doorways)
+	for(let key in this.doorways)
 		this.doorways[key].move();
 }
 
@@ -279,7 +279,7 @@ doorway_manager_t.prototype.update_zindicies=function()
 		return rhs_value-lhs_value;
 	});
 
-	for(var ii=0;ii<this.doorways.length;++ii)
+	for(let ii=0;ii<this.doorways.length;++ii)
 		if(this.doorways[ii])
 			this.doorways[ii].panel.style.zIndex=this.doorways.length-ii;
 }

@@ -513,13 +513,13 @@ connection_t.prototype.arduino_setup_complete=function()
 	_this.arduino_send_packet();
 
 	//Set up network comms:
-	for(var key in this.comets)
+	for(let key in this.comets)
 		this.comets[key].abort();
 	this.comets={};
 	console.log(this.comets);
 	this.network_getnext(robot_to_starpath(this.robot)+"pilot/power",function(power)
 	{
-		for(var field in power)
+		for(let field in power)
 			_this.power[field]=power[field];
 	});
 

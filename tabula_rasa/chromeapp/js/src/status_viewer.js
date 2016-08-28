@@ -48,7 +48,7 @@ status_viewer_t.prototype.rebuild_textarea_m=function()
 
 	var lines=""; // buffer up lines to prevent repeated innerHTML updates
 
-	for(var ii=0;ii<this.lines.length;++ii)
+	for(let ii=0;ii<this.lines.length;++ii)
 		lines+=this.lines[ii]+"\n";
 
 	if(lines!=old_lines)

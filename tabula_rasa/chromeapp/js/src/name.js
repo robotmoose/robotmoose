@@ -86,7 +86,7 @@ name_t.prototype.build_select_m=function(select,json,heading,on_loaded_value,sor
 	select.length=0;
 	var list=[];
 	list.push(heading);
-	for(var key in json)
+	for(let key in json)
 		list.push(json[key]);
 	if(sort_func)
 		list.sort(sort_func);

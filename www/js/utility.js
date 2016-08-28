@@ -16,12 +16,12 @@ function remove_duplicates(arr)
 {
 	u_arr=[];
 
-	for(var key in arr)
+	for(let key in arr)
 		u_arr[arr[key]]=true;
 
 	arr.length=0;
 
-	for(var key in u_arr)
+	for(let key in u_arr)
 		arr.push(key);
 
 	return arr;

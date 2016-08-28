@@ -8,7 +8,7 @@ function str2ab(str)
 	var buffer=new ArrayBuffer(str.length);
 	var buffer_viewer=new Uint8Array(buffer);
 
-	for(var ii=0;ii<str.length;++ii)
+	for(let ii=0;ii<str.length;++ii)
 		buffer_viewer[ii]=str.charCodeAt(ii);
 
 	return buffer;
@@ -45,7 +45,7 @@ parser_t.prototype.parse=function(buffer)
 {
 	var buffer_viewer=new Uint8Array(buffer);
 
-	for(var ii=0;ii<buffer_viewer.length;++ii)
+	for(let ii=0;ii<buffer_viewer.length;++ii)
 	{
 		if(this.state==0&&buffer_viewer[ii]==0x5f)
 		{
@@ -72,7 +72,7 @@ parser_t.prototype.parse=function(buffer)
 		{
 			crc=0x00;
 
-			for(var jj=0;jj<this.str.length;++jj)
+			for(let jj=0;jj<this.str.length;++jj)
 				crc^=this.str.charCodeAt(jj);
 
 			if(crc==buffer_viewer[ii]&&this.on_receive)

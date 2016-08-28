@@ -383,7 +383,7 @@ function arduino_emulator_t()
 	myself.pin_analogs=new Array();
 	myself.pin_servos=new Array();
 
-	for(var ii=0;ii<myself.pin_count;++ii)
+	for(let ii=0;ii<myself.pin_count;++ii)
 	{
 		myself.pin_directions[ii]=1;
 		myself.pin_outputs[ii]=false;

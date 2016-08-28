@@ -21,7 +21,7 @@ function is_ident(value)
 	if(!isalpha(value[0])&&value[0]!='_')
 		return false;
 
-	for(var ii=1;ii<value.length;++ii)
+	for(let ii=1;ii<value.length;++ii)
 		if(!isalnum(value[ii])&&value[ii]!='_')
 			return false;
 
@@ -36,7 +36,7 @@ function is_time(value)
 	if(!is_int(value[0])||parseInt(value[0],10)<=0)
 		return false;
 
-	for(var ii=1;ii<value.length;++ii)
+	for(let ii=1;ii<value.length;++ii)
 		if(!is_int(value[ii]))
 			return false;
 
@@ -45,7 +45,7 @@ function is_time(value)
 
 function is_int(str)
 {
-	for(var ii=0;ii<str.length;++ii)
+	for(let ii=0;ii<str.length;++ii)
 		if(str[ii]<'0'||str[ii]>'9')
 			return false;
 
@@ -97,7 +97,7 @@ function arrays_equal(lhs,rhs)
 	if(!lhs||!rhs||lhs.length!=rhs.length)
 		return false;
 
-	for(var ii=0;ii<lhs.length;++ii)
+	for(let ii=0;ii<lhs.length;++ii)
 		if(lhs[ii]!=rhs[ii])
 			return false;
 
@@ -111,7 +111,7 @@ function parse_identifier(str)
 	if(str.length>0&&!((str[0]>='a'&&str[0]<='z')||str[0]=='_'))
 		return "";
 
-	for(var ii=0;ii<str.length;++ii)
+	for(let ii=0;ii<str.length;++ii)
 	{
 		if((str[ii]>='a'&&str[ii]<='z')||(str[ii]>='0'&&str[ii]<='9')||str[ii]=='_')
 			identifier+=str[ii];
@@ -126,7 +126,7 @@ function parse_argument(str)
 {
 	var argument="";
 
-	for(var ii=0;ii<str.length;++ii)
+	for(let ii=0;ii<str.length;++ii)
 	{
 		if((str[ii]>='a'&&str[ii]<='z')||(str[ii]>='0'&&str[ii]<='9'))
 			argument+=str[ii];

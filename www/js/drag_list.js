@@ -21,7 +21,7 @@ drag_list_t.prototype.get_entries=function()
 {
 	var new_entries=[];
 
-	for(var key in this.entries)
+	for(let key in this.entries)
 		if(this.entries[key])
 			new_entries.push(this.entries[key]);
 
@@ -40,7 +40,7 @@ drag_list_t.prototype.clear=function(callback_enabled)
 {
 	var entries=this.get_entries();
 
-	for(var key in entries)
+	for(let key in entries)
 		this.remove_entry(entries[key],callback_enabled);
 
 	this.entries=[];
@@ -113,7 +113,7 @@ drag_list_t.prototype.remove_entry=function(entry,callback_enabled)
 	{
 		var entries=this.get_entries();
 
-		for(var key in entries)
+		for(let key in entries)
 		{
 			if(entries[key]&&entries[key]===entry)
 			{

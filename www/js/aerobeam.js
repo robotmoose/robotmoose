@@ -11,7 +11,7 @@ function aerobeam_t(renderer)
 
 	myself.models=new Array();
 
-	for(var ii=0;ii<5;++ii)
+	for(let ii=0;ii<5;++ii)
 		myself.models[ii]=new Array();
 
 	myself.models[0][0]=url_path+"models/aerobeam/base.obj";
@@ -35,7 +35,7 @@ function aerobeam_t(renderer)
 	myself.models[2][4]=null;
 	myself.models[2][5]=0xcc0000;
 
-	for(var ii=0;ii<3;++ii)
+	for(let ii=0;ii<3;++ii)
 	{
 		myself.models[ii][4]=renderer.load_obj(myself.models[ii][0]);
 		myself.models[ii][4].rotation.set(3*Math.PI/2,0,0);
@@ -74,7 +74,7 @@ function aerobeam_t(renderer)
 
 	myself.set_position=function(x,y,z)
 	{
-		for(var ii=0;ii<2;++ii)
+		for(let ii=0;ii<2;++ii)
 			myself.models[ii][4].position.set(x+myself.models[ii][1],
 				y+myself.models[ii][2],z+myself.models[ii][3]);
 	};

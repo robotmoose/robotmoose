@@ -75,7 +75,7 @@ chatter_t.prototype.chat=function(msg)
 
 	if(this.robot.sim)
 		return;
-		
+
 	if(valid_robot(this.robot))
 	{
 		var _this=this;
@@ -103,7 +103,7 @@ chatter_t.prototype.create_interval=function()
 				{
 					var data=robot_network.chat;
 					var chat="";
-					for(var key in data)
+					for(let key in data)
 					{
 						try
 						{
