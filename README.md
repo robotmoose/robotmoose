@@ -80,11 +80,24 @@ To make and run your own local copy of superstar:
 cd ~/robotmoose/superstarv2
 make
 ./superstar > log &
-```
+```  
+
+When you first start your superstar, you will not have any robots. You will need to create them by using the make_robot.py utility in [utils/superstarv2](utils/superstarv2).  
 
 Connect a robot backend to this local interface by setting the first dropdown to "127.0.0.1:8081".
 
 You should now be able to point your web browser to [http://localhost:8081/robots/](http://localhost:8081/robots/) and see your local copy of the web user interface.  Edit the files in ~/robotmoose/www/js and hit reload to modify the interface.  You can also manually examine the entries in [http://localhost:8081/superstar/](http://localhost:8081/superstar/) to see how the robot configuration, sensor, and pilot information is exchanged, using superstar get and set operations.
+
+Using the entire robotmoose system on your local network, with robots on different machines accessing your local superstar, requires a few extra steps:
+* First, you must note the local IP address of the machine running your local superstar (for example, "192.168.1.24").
+* Next, you must add this IP address to the Chrome App:
+    * First, open up [tabula_rasa/chromeapp/manifest.json](tabula_rasa/chromeapp/manifest.json). To the permissions array, add the IP address of your local superstar, making sure to add "http" and port "8081" (e.g., "http://192.168.1.24:8081"). Mind the commas in the array!
+    * Then, in [tabula_rasa/chromeapp/js/src/name.js](tabula_rasa/chromeapp/js/src/name.js), search for the `update_superstars_m` function. In the `superstar_options` array, add the IP address and port number of your local superstar (e.g. "192.168.1.24:8081").
+* Finally, you must load the modified chrome app onto all of the backend computers:
+    * Copy the modified chromeapp folder [tabula_rasa/chromeapp](tabula_rasa/chromeapp) and its files to the backend computer(s).
+    * Go to [chrome://extensions/](chrome://extensions/), click the developer mode checkbox. If you have already loaded the chrome app from the git before, you will have to remove it because of the changes to manifest.json.
+    * Click "load unpacked extension", browse to the chromeapp folder, then click ok.
+    * When you launch the chrome app, the IP of your local superstar should appear in the backend dropdown!
 
 
 ### Fun Tricks
