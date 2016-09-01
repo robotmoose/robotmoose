@@ -9,12 +9,12 @@ function robot_map_t(div, modal_div, robot)
 	this.div=div;
 	this.div.title="Shows where the robot thinks it is in the world.  The grid lines are 1 meter apart.  The robot's right and left wheels leave red and purple tracks";
 	this.modal_div = modal_div;
-	
-	
+
+
 	if (robot) this.robot = robot;
-	
+
 	var myself=this;
-	
+
 	this.offset_x = 0;
 	this.offset_y = 0;
 	this.offset_angle = 0;
@@ -85,7 +85,7 @@ function robot_map_t(div, modal_div, robot)
 	//Reset location button...
 	this.reset_location_button=document.createElement("input");
 
-		
+
 	this.reset_location_button.className="btn btn-primary";
 	this.reset_location_button.style.marginBottom="10px";
 	this.reset_location_button.style.width = "50%";
@@ -97,9 +97,9 @@ function robot_map_t(div, modal_div, robot)
 	{
 		myself.reset_location_button_pressed_m();
 	});
-	
 
-	
+
+
 	//Upload button...
 	this.upload_map_button=document.createElement("input");
 	this.controls_div.appendChild(this.upload_map_button);
@@ -130,10 +130,10 @@ function robot_map_t(div, modal_div, robot)
 	this.renderer=new renderer_t(myself.map_display,function() {myself.setup();}, function() {return myself.loop();} );
 	if(!this.renderer.setup()) {
 		var p=document.createElement("p");
-		p.innerHTML="<p>WebGl seems to be disabled: <a target=_blank href=https://get.webgl.org>Click here to test</a><br> <u>If disabled, Try the following steps:</u></p> "
-		p.innerHTML+="<p><b>Firefox:</b> Go to about:config in your address bar,search for webgl and check if webgl.disabled is true <br> No Luck? <a target=_blank href=https://support.mozilla.com/en-US/kb/how-do-i-upgrade-my-graphics-drivers>Help Page</a></p>";
+		p.innerHTML="<p>WebGl seems to be disabled: <a rel='noopener' target='_blank' href='https://get.webgl.org'>Click here to test</a><br> <u>If disabled, Try the following steps:</u></p> "
+		p.innerHTML+="<p><b>Firefox:</b> Go to about:config in your address bar,search for webgl and check if webgl.disabled is true <br> No Luck? <a rel='noopener' target='_blank' href='https://support.mozilla.com/en-US/kb/how-do-i-upgrade-my-graphics-drivers'>Help Page</a></p>";
 		p.innerHTML+="<p><b>Chrome:</b> <ol><li><b>Is hardware acceleration enabled?</b> Type chrome://settings, show advanced settings -> under system > check Use hardware acceleration when available</li><b><li>Check WebGl:</b> Type chrome://flags into the address bar and confirm that Disable WebGl is gray</li></ol></p>";
-		p.innerHTML+= "<p><b>Safari:</b> <ol><li>Go to Safari's Preferences</li><li>Select the Advanced tab</li><li>Check the Show Develop menu in menu bar checkbox</li><li>In the Develop menu, check Enable WebGl</li><li>Confused?<a target=_blank href=http://voicesofaliveness.net/webgl>Pictures</a></li></ol></p>";
+		p.innerHTML+= "<p><b>Safari:</b> <ol><li>Go to Safari's Preferences</li><li>Select the Advanced tab</li><li>Check the Show Develop menu in menu bar checkbox</li><li>In the Develop menu, check Enable WebGl</li><li>Confused?<a rel='noopener' target='_blank' href='http://voicesofaliveness.net/webgl'>Pictures</a></li></ol></p>";
 		div.appendChild(p);
 		this.renderer=null;
 	}
@@ -203,7 +203,7 @@ robot_map_t.prototype.loop=function() {
 	// Convert angle from degrees to radians
 	var angle_rad=sensors.location.angle*Math.PI/180.0;
 	// Convert position from meters to mm (rendering units)
-	
+
 	var P=new vec3(sensors.location.x,sensors.location.y,0.0).te(1000.0);
 
 	// Move onscreen robot there
@@ -248,7 +248,7 @@ robot_map_t.prototype.load_button_pressed_m=function()
 
 	var opt = JSON.parse(myself.last_map_select);
 
-	
+
 	this.make_new(opt.path, opt.width, opt.height);
 
 }
@@ -259,16 +259,16 @@ robot_map_t.prototype.reset_location_button_pressed_m=function()
 {
 
 	var myself = this;
-	
-	
+
+
 
 	var map_json = JSON.parse(myself.map_select.value);
 
-	
+
 	this.modal_location = new modal_location_t(myself.modal_div, myself.robot, map_json, function(){myself.reset_tracks=true})
-	
+
 	this.modal_location.show();
-	
+
 }
 
 
@@ -301,7 +301,7 @@ robot_map_t.prototype.onupload=function(src, width, height, title)
 		opt.height=height; // height
 		myself.uploaded_option.value=JSON.stringify(opt);
 		myself.map_select.appendChild(myself.uploaded_option);
-		
+
 		myself.modal.hide();
 
 		myself.map_select.selectedIndex=myself.map_select.length - 1;
@@ -334,7 +334,7 @@ robot_map_t.prototype.clean_up=function()
 robot_map_t.prototype.make_new=function(filename, width, height)
 {
 	var myself = this;
-	
+
 	this.clean_up();
 
 	this.map_display = document.createElement("div");
@@ -344,10 +344,10 @@ robot_map_t.prototype.make_new=function(filename, width, height)
 	this.renderer=new renderer_t(myself.map_display,function() {myself.setup(filename, width, height);}, function() {return myself.loop();} );
 	if(!this.renderer.setup()) {
 		var p=document.createElement("p");
-		p.innerHTML="<p>WebGl seems to be disabled: <a target=_blank href=https://get.webgl.org>Click here to test</a><br> <u>If disabled, Try the following steps:</u></p> "
-		p.innerHTML+="<p><b>Firefox:</b> Go to about:config in your address bar,search for webgl and check if webgl.disabled is true <br> No Luck? <a target=_blank href=https://support.mozilla.com/en-US/kb/how-do-i-upgrade-my-graphics-drivers>Help Page</a></p>";
+		p.innerHTML="<p>WebGl seems to be disabled: <a rel='noopener' target='_blank' href='https://get.webgl.org'>Click here to test</a><br> <u>If disabled, Try the following steps:</u></p> "
+		p.innerHTML+="<p><b>Firefox:</b> Go to about:config in your address bar,search for webgl and check if webgl.disabled is true <br> No Luck? <a rel='noopener' target='_blank' href='https://support.mozilla.com/en-US/kb/how-do-i-upgrade-my-graphics-drivers'>Help Page</a></p>";
 		p.innerHTML+="<p><b>Chrome:</b> <ol><li><b>Is hardware acceleration enabled?</b> Type chrome://settings, show advanced settings -> under system > check Use hardware acceleration when available</li><b><li>Check WebGl:</b> Type chrome://flags into the address bar and confirm that Disable WebGl is gray</li></ol></p>";
-		p.innerHTML+= "<p><b>Safari:</b> <ol><li>Go to Safari's Preferences</li><li>Select the Advanced tab</li><li>Check the Show Develop menu in menu bar checkbox</li><li>In the Develop menu, check Enable WebGl</li><li>Confused?<a target=_blank href=http://voicesofaliveness.net/webgl>Pictures</a></li></ol></p>";
+		p.innerHTML+= "<p><b>Safari:</b> <ol><li>Go to Safari's Preferences</li><li>Select the Advanced tab</li><li>Check the Show Develop menu in menu bar checkbox</li><li>In the Develop menu, check Enable WebGl</li><li>Confused?<a rel='noopener' target='_blank' href='http://voicesofaliveness.net/webgl'>Pictures</a></li></ol></p>";
 		div.appendChild(p);
 		this.renderer=null;
 	}
