@@ -782,6 +782,7 @@ connection_t.prototype.arduino_send_packet=function()
 					if(!_this.ramping_down && _this.rampdown_trigger === 0) {
 						_this.ramping_down = true;
 						var d = new Date();
+						_this.last_rampdown = d.getTime();
 					}
 					else {
 						var d = new Date();
