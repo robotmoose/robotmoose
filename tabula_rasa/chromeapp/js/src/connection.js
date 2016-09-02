@@ -24,7 +24,13 @@ function connection_t(on_message,on_disconnect,on_connect,on_name_set,on_auth_er
 	_this.robot=null;
 	_this.auth="";
 	_this.serial_delay_ms=50; // milliseconds to wait between sensors and commands (saves CPU, costs some latency though)
+	
 	_this.pilot_connected=false; // If pilot is not connected, write 0 power.
+	// Variables for ramping down power
+	_this.rampdown_power={L:0, R:0};
+	_this.rampdown_trigger = 1; // Set to 0 while driving. Rampdown will only trigger if this is 0.
+	_this.ramping_down = false; // True if currently ramping down
+	_this.last_rampdown = 0; // Time in milliseconds since last rampdown
 
 	// Are there other serial JS apis?  maybe node.js?
 	_this.serial_api=serial_api;
@@ -760,17 +766,34 @@ connection_t.prototype.arduino_send_packet=function()
 	var cmd_data=new Uint8Array(cmd_bytes);
 	var idx=0; // current output index
 	_this.walk_property_list(connection_t.command_property_list,
-	  function(device,property) {
-
-	  	if(!_this.pilot_connected && (
-	  		device == "create2"
-	  		|| device == "bts"
-	  		|| device == "sabertooth1"
-	  		|| device == "sabertooth2"
-	  		))
-	  		_this.power = {L:0, R:0};
-
-		var value=_this.read_JSON_property(_this.power,property);
+	  	function(device,property) {
+	  		var value=_this.read_JSON_property(_this.power,property);
+	  		if(device == "create2"
+		  		|| device == "bts"
+		  		|| device == "sabertooth1"
+		  		|| device == "sabertooth2"
+	  		) {
+	  			if(!((_this.power.L === 0) && (_this.power.R === 0)) || !_this.pilot_connected) {
+	  				_this.rampdown_power = JSON.parse(JSON.stringify(_this.power));
+	  				_this.rampdown_trigger = 0;
+	  				_this.ramping_down = false;
+	  			}
+	  			else {
+					if(!_this.ramping_down && _this.rampdown_trigger === 0) {
+						_this.ramping_down = true;
+						var d = new Date();
+					}
+					else {
+						var d = new Date();
+						if(d.getTime() - _this.last_rampdown < 1000) {
+							++_this.rampdown_trigger;
+							_this.rampdown_power.L = _this.rampdown_power.L*7/8;
+							_this.rampdown_power.R = _this.rampdown_power.R*7/8;
+							value = _this.read_JSON_property(_this.rampdown_power, property);
+						}
+					}
+				}
+			}
 
 		_this.write_JSON_property(_this.sensors.power,property,value);
 		//console.log("|"+device+"|"+value+"|");
@@ -789,8 +812,7 @@ connection_t.prototype.arduino_send_packet=function()
 		connection_t.write_bytes_as[datatype](cmd_data,idx,value);
 		_this.status_message("  Wrote "+property+" as "+cmd_data[idx]);
 		idx+=_this.arduino_property_bytecount(property);
-	  }
-	);
+	});
 
 	// Send to Arduino
 	_this.serial_send_packet(0xC,cmd_data,function() {
