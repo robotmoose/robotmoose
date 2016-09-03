@@ -773,23 +773,26 @@ connection_t.prototype.arduino_send_packet=function()
 		  		|| device == "sabertooth1"
 		  		|| device == "sabertooth2"
 	  		) {
-	  			if(!((_this.power.L === 0) && (_this.power.R === 0)) || !_this.pilot_connected) {
+	  			if(!(_this.power.L === 0) || !(_this.power.R === 0) || !_this.pilot_connected) {
 	  				_this.rampdown_power = JSON.parse(JSON.stringify(_this.power));
 	  				_this.rampdown_trigger = 0;
 	  				_this.ramping_down = false;
 	  			}
 	  			else {
-					if(!_this.ramping_down && _this.rampdown_trigger === 0) {
+					if(!_this.ramping_down && _this.rampdown_trigger === 0
+						&& _this.rampdown_power.L * _this.rampdown_power.R > 0 // No ramp down while turning
+						&& !(_this.rampdown_power.L === 0 || _this.rampdown_power.R === 0)
+					) {
 						_this.ramping_down = true;
 						var d = new Date();
 						_this.last_rampdown = d.getTime();
 					}
 					else {
 						var d = new Date();
-						if(d.getTime() - _this.last_rampdown < 1000) {
+						if(d.getTime() - _this.last_rampdown < 1500) {
 							++_this.rampdown_trigger;
-							_this.rampdown_power.L = _this.rampdown_power.L*7/8;
-							_this.rampdown_power.R = _this.rampdown_power.R*7/8;
+							_this.rampdown_power.L = _this.rampdown_power.L*15/16;
+							_this.rampdown_power.R = _this.rampdown_power.R*15/16;
 							value = _this.read_JSON_property(_this.rampdown_power, property);
 						}
 					}
