@@ -48,7 +48,7 @@ function robot_network_t()
 			ms:1000
 		}
 	];
-	for(var key in this.intervals)
+	for(let key in this.intervals)
 	{
 		this.intervals[key].int=
 			setInterval(this.intervals[key].func,this.intervals[key].ms);
@@ -58,7 +58,7 @@ function robot_network_t()
 
 robot_network_t.prototype.destroy=function()
 {
-	for(var key in this.intervals)
+	for(let key in this.intervals)
 		try
 		{
 			if(this.intervals[key].int)

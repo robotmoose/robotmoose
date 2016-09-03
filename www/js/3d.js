@@ -62,11 +62,11 @@ function cube_t(scene)
 	myself.destroy=function()
 	{
 		myself.scene.remove(myself.mesh);
-	
+
 		if (myself.mesh.geometry) myself.mesh.geometry.dispose();
 		if (myself.mesh.material) myself.mesh.material.dispose();
 		if (myself.mesh.texture) myself.mesh.texture.dispose();
-		
+
 		myself.mesh=null;
 		myself.scene=null;
 		myself.position=null;
@@ -138,11 +138,11 @@ function model_t(scene)
 		if(myself.loaded)
 		{
 			myself.scene.remove(myself.mesh);
-			
+
 			if (myself.mesh.geometry) myself.mesh.geometry.dispose();
 			if (myself.mesh.material) myself.mesh.material.dispose();
 			if (myself.mesh.texture) myself.mesh.texture.dispose();
-			
+
 			myself.loaded=false;
 			myself.mesh=null;
 			myself.scene=null;
@@ -200,7 +200,7 @@ function renderer_t(div,setup_func,loop_func)
 	myself.scene=null;
 	myself.camera=null;
 	myself.controls=null;
-	
+
 	myself.timeout_f=null;
 	myself.light=null;
 
@@ -227,7 +227,7 @@ function renderer_t(div,setup_func,loop_func)
 			myself.controls.lookSpeed=0.2;
 			myself.controls.center.set(0,64,0);
 			myself.controls.object.position.set(0,100,250);
-		
+
 
 			myself.user_setup();
 			myself.loop();
@@ -247,7 +247,7 @@ function renderer_t(div,setup_func,loop_func)
 
 		myself.controls.cleanup();
 		myself.controls=null;
-		if (myself.light) 
+		if (myself.light)
 		{
 		myself.light.destroy();
 		}
@@ -259,17 +259,17 @@ function renderer_t(div,setup_func,loop_func)
 			if (myself.plane.material) myself.plane.material.dispose();
 			if (myself.plane.line) myself.plane.line.dispose();
 			if (myself.plane.texture) myself.plane.texture.dispose();
-			
+
 		}
 		*/
 		myself.div=null;
 		myself.viewport=null;
 		myself.scene=null;
 		myself.camera=null;
-		
+
 		window.removeEventListener("resize",myself.resize,false);
 
-		
+
 		clearTimeout(myself.timeout_f);
 	};
 
@@ -376,8 +376,8 @@ function renderer_t(div,setup_func,loop_func)
 
 	myself.create_grid=function(size,width,height,showOrigin, texture_file)
 	{
-	
-	
+
+
 		var plane_geometry=new THREE.PlaneBufferGeometry(size*width,size*height,1,1);
 		plane_geometry.normalsNeedUpdate=true;
 		if (texture_file)
@@ -388,12 +388,12 @@ function renderer_t(div,setup_func,loop_func)
 				side:THREE.DoubleSide});
 		}
 		else
-		{		
+		{
 			var plane_material=new THREE.MeshBasicMaterial({color:0xd8eef4,depthWrite:false,
 				side:THREE.DoubleSide});
 		}
 
-		
+
 		var plane=new THREE.Mesh(plane_geometry,plane_material);
 		plane.rotation.set(3*Math.PI/2,0,0);
 		myself.scene.add(plane);
@@ -403,16 +403,16 @@ function renderer_t(div,setup_func,loop_func)
 		var line_geometry=new THREE.Geometry();
 		var line_material=new THREE.LineBasicMaterial({color:0x0488c8,linewidth:1.5});
 
-		for(var xx=0;xx<=width;++xx)
+		for(let xx=0;xx<=width;++xx)
 		{
-			
+
 			line_geometry.vertices.push(new THREE.Vector3(-size*width/2+xx*size,-size*height/2.0,0));
 			line_geometry.vertices.push(new THREE.Vector3(-size*width/2+xx*size,size*height/2.0,0));
 		}
 
-		for(var yy=0;yy<=height;++yy)
+		for(let yy=0;yy<=height;++yy)
 		{
-			
+
 			line_geometry.vertices.push(new THREE.Vector3(-size*width/2.0,-size*height/2+yy*size,0));
 			line_geometry.vertices.push(new THREE.Vector3(size*width/2.0,-size*height/2+yy*size,0));
 		}

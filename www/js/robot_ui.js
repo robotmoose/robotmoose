@@ -240,7 +240,7 @@ robot_ui_t.prototype.download_gui=function()
 			_this.doorway_manager.load(json);
 			_this.create_widgets();
 
-			for(var key in _this.widgets)
+			for(let key in _this.widgets)
 				if(_this.widgets[key].download)
 					_this.widgets[key].download(_this.robot);
 
@@ -280,7 +280,7 @@ robot_ui_t.prototype.download_gui=function()
 			_this.doorway_manager.load(json);
 			_this.create_widgets();
 
-			for(var key in _this.widgets)
+			for(let key in _this.widgets)
 				if(_this.widgets[key].download)
 					_this.widgets[key].download(_this.robot);
 

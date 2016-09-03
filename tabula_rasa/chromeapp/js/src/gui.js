@@ -190,13 +190,14 @@ gui_t.prototype.load_gruveo=function(robot)
 	var robot_url="";
 	if(!robot)
 		robot={};
-	if(!robot.auth)
-		robot.auth="";
 	if(valid_robot(robot))
 	{
 		robot_url=superstar.superstar+robot.year+robot.school+robot.name;
+		robot_url=robot_url.replace(/[^A-Za-z0-9\s!?]/g,'');
+		if(!robot.auth)
+			robot.auth="";
 		robot_url=CryptoJS.HmacSHA256(robot_url,robot.auth).toString(CryptoJS.enc.Hex);
 	}
-	url+=encodeURIComponent(robot_url.replace(/[^A-Za-z0-9\s!?]/g,''));
+	url+=encodeURIComponent(robot_url);
 	this.gruveo.src=url;
 }

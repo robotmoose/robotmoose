@@ -149,7 +149,7 @@ state_runner_t.prototype.get_time_ms=function() {
 // Look up this state in our state list, or return null if it's not listed
 state_runner_t.prototype.find_state=function(state_name)
 {
-	for(var key in this.state_list)
+	for(let key in this.state_list)
 	{
 		var s=this.state_list[key];
 		if(s && s.name==state_name) {
@@ -205,11 +205,11 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	var VM={}; // virtual machine with everything the user can access
 
 // Block access to all parent-created members (e.g., inherited locals)
-	for(var key in this)
+	for(let key in this)
 		VM[key]=undefined;
 
 // Import each of their state names (e.g., "start" state)
-	for(var key in states)
+	for(let key in states)
 		if(states[key])
 			VM[states[key].name]=states[key].name;
 
@@ -240,7 +240,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		var t=VM.sequencer.block_start(VM);
 
 		if (VM.sequencer.current()) {
-            for(var key in VM.UI.elements){
+            for(let key in VM.UI.elements){
                 var ele = VM.UI.elements[key] || undefined;
                 if(ele.type == "button" && VM.button(ele.name)){
                     VM.sequencer.advance();
@@ -510,7 +510,7 @@ state_runner_t.prototype.continue_m=function(state_table)
 	var next_state=null;
 	this.continue_timeout=null;
 
-	for(var key in this.state_list)
+	for(let key in this.state_list)
 	{
 		if(this.state_list[key])
 		{

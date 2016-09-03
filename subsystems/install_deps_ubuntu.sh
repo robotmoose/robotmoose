@@ -1,6 +1,6 @@
 #!/bin/bash
-sudo apt-get remove --purge libfreenect-dev
-sudo apt-get install git cmake build-essential libusb-1.0-0-dev freeglut3-dev libxmu-dev libxi-dev libssl-dev libglib2.0-dev
+sudo apt-get remove --purge libfreenect-dev -y --force-yes
+sudo apt-get install git cmake build-essential libusb-1.0-0-dev freeglut3-dev libxmu-dev libxi-dev libssl-dev libglib2.0-dev -y --force-yes
 cd /opt
 sudo rm -rf libfreenect
 sudo git clone https://github.com/OpenKinect/libfreenect.git

@@ -68,7 +68,7 @@ tree_viewer_t.prototype.build=function(json,parent)
 	ul.style.marginBottom=-1;
 	myself.spacing+=myself.indent;
 
-	for(var key in json)
+	for(let key in json)
 	{
 		if(json[key]!=null && typeof json[key]==='object')
 		{
@@ -119,7 +119,7 @@ tree_viewer_t.prototype.build=function(json,parent)
 			text.innerHTML=key+" = ";
 
 			var printed=false;
-			for(var ii in this.special_types)
+			for(let ii in this.special_types)
 			{
 				if(this.special_types[ii].key==key)
 				{

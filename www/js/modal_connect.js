@@ -198,7 +198,7 @@ modal_connect_t.prototype.build_year_list_m=function()
 	this.year_select.appendChild(default_option);
 	this.year_select.selectedIndex=0;
 
-	for(var ii=this.years.length-1;ii>=0;--ii)
+	for(let ii=this.years.length-1;ii>=0;--ii)
 	{
 		var option=document.createElement("option");
 		option.text=this.years[ii];
@@ -233,7 +233,7 @@ modal_connect_t.prototype.build_school_list_m=function()
 				var select_index;
 				_this.schools=school_list;
 
-				for(var key in _this.schools)
+				for(let key in _this.schools)
 				{
 					var option=document.createElement("option");
 					option.text=_this.schools[key];
@@ -275,7 +275,7 @@ modal_connect_t.prototype.build_robot_list_m=function()
 			{
 				_this.robots=robot_list;
 
-				for(var key in _this.robots)
+				for(let key in _this.robots)
 				{
 					var option=document.createElement("option");
 					option.text=_this.robots[key];

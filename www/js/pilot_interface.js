@@ -141,7 +141,7 @@ pilot_interface_t.prototype.reconfigure=function(config_editor)
 
 	// Check if we need to reconfigure at all
 	var entries_string="";
-	for(var key in entries) if(entries[key]) entries_string+=entries[key].type+",";
+	for(let key in entries) if(entries[key]) entries_string+=entries[key].type+",";
 	if (entries_string==this.last_entries_string) return; // no changes to report
 	this.last_entries_string=entries_string;
 
@@ -153,7 +153,7 @@ pilot_interface_t.prototype.reconfigure=function(config_editor)
 
 	// Add pilot GUI elements for each configured device
 	var servos=0, pwms=0, blinks=0;
-	for(var key in entries)
+	for(let key in entries)
 	if(entries[key])
 	{
 		var type=entries[key].type;

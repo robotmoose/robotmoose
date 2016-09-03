@@ -119,7 +119,7 @@ function editor_t()
 	{
 		if(myself.editor)
 		{
-			for(var ii=0;ii<myself.widgets.length;++ii)
+			for(let ii=0;ii<myself.widgets.length;++ii)
 				myself.editor.removeLineWidget(myself.widgets[ii]);
 			myself.widgets.length=0;
 		}
@@ -172,7 +172,7 @@ function editor_t()
 				{
 					myself.clear_errors();
 
-					for(var ii=0;ii<json.errors.length;++ii)
+					for(let ii=0;ii<json.errors.length;++ii)
 						myself.add_error(json.errors[ii].line,json.errors[ii].text);
 
 					if(myself.on_compiled&&json.errors.length==0)

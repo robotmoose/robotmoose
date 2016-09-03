@@ -2,11 +2,12 @@
 	"name":"RobotMoose (roadkill)",
 	"short_name":"RobotMoose",
 	"description":"Robotics backend software (test version from git).",
-	"version":"2016.8.25.1",
+	"version":"2016.8.28.0",
 	"manifest_version":2,
 	"permissions":
 	[
 		"http://127.0.0.1:8081/",
+		"http://10.8.110.36:8081/",
 		"http://robotmoose.com/",
 		"https://robotmoose.com/",
 		"http://test.robotmoose.com/",

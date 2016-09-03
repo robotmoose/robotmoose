@@ -10,7 +10,7 @@ function quizbot_t(renderer)
 
 	myself.models=new Array();
 
-	for(var ii=0;ii<5;++ii)
+	for(let ii=0;ii<5;++ii)
 		myself.models[ii]=new Array();
 
 	myself.models[0][0]="/models/quizbot/base.obj";
@@ -48,7 +48,7 @@ function quizbot_t(renderer)
 	myself.models[4][4]=null;
 	myself.models[4][5]=0xcc0000;
 
-	for(var ii=0;ii<5;++ii)
+	for(let ii=0;ii<5;++ii)
 	{
 		myself.models[ii][4]=renderer.load_obj(myself.models[ii][0]);
 		myself.models[ii][4].rotation.set(3*Math.PI/2,0,0);
@@ -87,7 +87,7 @@ function quizbot_t(renderer)
 
 	myself.set_position=function(x,y,z)
 	{
-		for(var ii=0;ii<4;++ii)
+		for(let ii=0;ii<4;++ii)
 			myself.models[ii][4].position.set(x+myself.models[ii][1],
 				y+myself.models[ii][2],z+myself.models[ii][3]);
 	};

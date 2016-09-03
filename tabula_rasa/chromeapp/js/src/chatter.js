@@ -99,7 +99,7 @@ chatter_t.prototype.set_robot=function(robot)
 		var service=function(data)
 		{
 			var chat="";
-			for(var key in data)
+			for(let key in data)
 			{
 				try
 				{

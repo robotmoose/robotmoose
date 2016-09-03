@@ -94,7 +94,7 @@ config_editor_t.prototype.download=function(robot)
 		return;
 
 	var myself=this;
-	
+
 	if (!robot.sim)
 		superstar_get(robot,"options",function(options)
 		{
@@ -122,13 +122,13 @@ config_editor_t.prototype.upload=function(robot)
 
 	this.get_entries();
 
-	for(var key in this.entries)
+	for(let key in this.entries)
 	{
 		if(this.entries[key])
 		{
 			var str=this.entries[key].type+"(";
 
-			for(var ii=0;ii<this.entries[key].args.length;++ii)
+			for(let ii=0;ii<this.entries[key].args.length;++ii)
 			{
 				if(this.entries[key].args[ii].type=="select-one")
 					str+=this.entries[key].args[ii].options[this.entries[key].args[ii].selectedIndex].value;
@@ -203,11 +203,11 @@ config_editor_t.prototype.download_m=function(robot)
 
 	var myself=this;
 
-	for(var key in this.entries)
+	for(let key in this.entries)
 		this.remove_entry(this.entries[key]);
 
 	this.entries=[];
-	
+
 	if(!robot.sim)
 		superstar_get(robot,"config",function(obj)
 		{
@@ -218,12 +218,12 @@ config_editor_t.prototype.download_m=function(robot)
 
 			var config_text="";
 
-			for(var key in obj.configs)
+			for(let key in obj.configs)
 				config_text+=obj.configs[key]+"\n";
 
 			var configs=myself.lex_m(config_text);
 
-			for(var key in configs)
+			for(let key in configs)
 			{
 				var lookup=myself.find_option_m(configs[key]);
 
@@ -249,12 +249,12 @@ config_editor_t.prototype.download_m=function(robot)
 
 			var config_text="";
 
-			for(var key in obj.configs)
+			for(let key in obj.configs)
 				config_text+=obj.configs[key]+"\n";
 
 			var configs=myself.lex_m(config_text);
 
-			for(var key in configs)
+			for(let key in configs)
 			{
 				var lookup=myself.find_option_m(configs[key]);
 
@@ -270,7 +270,7 @@ config_editor_t.prototype.download_m=function(robot)
 
 			myself.refresh_m();
 		});
-		
+
 }
 
 config_editor_t.prototype.create_entry_m=function(entry,type,arg_types,arg_values)
@@ -294,7 +294,7 @@ config_editor_t.prototype.create_entry_m=function(entry,type,arg_types,arg_value
 	entry.table.cells[0].style.paddingRight=10;
 	entry.table.cells[0].appendChild(entry.table.text);
 
-	for(var ii=0;ii<arg_types.length;++ii)
+	for(let ii=0;ii<arg_types.length;++ii)
 	{
 		entry.table.cells.push(entry.table.row.insertCell(ii+1));
 
@@ -387,7 +387,7 @@ config_editor_t.prototype.create_pin_drop_m=function(value)
 	title_option.selected=true;
 	drop.add(title_option);
 
-	for(var ii=3;ii<=21;++ii)
+	for(let ii=3;ii<=21;++ii)
 	{
 		var option=document.createElement("option");
 		option.text=""+ii;
@@ -398,7 +398,7 @@ config_editor_t.prototype.create_pin_drop_m=function(value)
 		drop.add(option);
 	}
 
-	for(var ii=0;ii<=15;++ii)
+	for(let ii=0;ii<=15;++ii)
 	{
 		var option=document.createElement("option");
 		option.text="A"+ii;
@@ -442,7 +442,7 @@ config_editor_t.prototype.create_serial_drop_m=function(value)
 	title_option.selected=true;
 	drop.add(title_option);
 
-	for(var ii=1;ii<=3;++ii)
+	for(let ii=1;ii<=3;++ii)
 	{
 		var option=document.createElement("option");
 		option.text="X"+ii;
@@ -479,7 +479,7 @@ config_editor_t.prototype.remove_entry_m=function(entry)
 	if(!entry)
 		return;
 
-	for(var key in this.entries)
+	for(let key in this.entries)
 	{
 		if(this.entries[key]&&this.entries[key]===entry)
 		{
@@ -612,7 +612,7 @@ config_editor_t.prototype.find_option_m=function(option)
 	if(!option)
 		return null;
 
-	for(var key in this.tabula.options)
+	for(let key in this.tabula.options)
 		if(this.tabula.options[key].type==option.type&&this.tabula.options[key].args.length==option.args.length)
 			return this.tabula.options[key];
 
@@ -621,7 +621,7 @@ config_editor_t.prototype.find_option_m=function(option)
 
 config_editor_t.prototype.get_options_m=function(options)
 {
-	for(var key in this.tabula.select.options)
+	for(let key in this.tabula.select.options)
 		if(this.tabula.select.options[key].element)
 			this.tabula.select.element.removeChild(this.tabula.select.options[key].element);
 
@@ -633,7 +633,7 @@ config_editor_t.prototype.get_options_m=function(options)
 
 	options.sort();
 
-	for(var ii=0;ii<options.length;++ii)
+	for(let ii=0;ii<options.length;++ii)
 	{
 		var parts=options[ii].split(" ");
 
@@ -647,13 +647,13 @@ config_editor_t.prototype.get_options_m=function(options)
 		obj.type=parts[0];
 		obj.args=[];
 
-		for(var jj=0;jj<parts[1].length;++jj)
+		for(let jj=0;jj<parts[1].length;++jj)
 			obj.args[jj]=parts[1][jj];
 
 		this.tabula.options.push(obj);
 	}
 
-	for(var key in this.tabula.options)
+	for(let key in this.tabula.options)
 	{
 		var option={};
 		option.tabula=this.tabula.options[key];
@@ -675,7 +675,7 @@ config_editor_t.prototype.refresh_m=function()
 
 	var entries_count=0;
 
-	for(var key in this.entries)
+	for(let key in this.entries)
 		if(this.entries[key])
 			++entries_count;
 
@@ -685,11 +685,11 @@ config_editor_t.prototype.refresh_m=function()
 	{
 		configureable=true;
 
-		for(var key in this.entries)
+		for(let key in this.entries)
 		{
 			if(this.entries[key])
 			{
-				for(var drop in this.entries[key].args)
+				for(let drop in this.entries[key].args)
 				{
 					if((this.entries[key].args[drop].type=="select-one"&&this.entries[key].args[drop].selectedIndex==0)||
 						(this.entries[key].args[drop].type=="number")&&!this.entries[key].args[drop].valueAsNumber)

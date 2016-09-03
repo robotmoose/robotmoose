@@ -63,7 +63,7 @@ uint8_t depth_buffer[640*480*3];
 // ***** Constants and Variables needed for DOA Estimation ***** //
 Kinect_DOA kinect_DOA;
 static const bool KINECT_1473 = true; // Need to upload special firmware if using Kinect Model #1473
-//static const bool KINECT_UPSIDE_DOWN = false; // If Kinect is mounted upside down, flip angles.
+static const bool KINECT_UPSIDE_DOWN = true; // If Kinect is mounted upside down, flip angles.
 std::vector<std::deque<int32_t>> sound_buffers;
 
 // ***** Skeltrack Variables ***** //
@@ -103,13 +103,13 @@ int main(int argc, char* argv[]) {
 
 	// ***** Begin Libfreenect Setup ***** //
 	// Initialize gamma correction
-	if(ENABLE_DEPTH) {
-		for (int i=0; i<2048; i++) {
-			float v = i/2048.0;
-			v = powf(v, 3)* 6;
-			t_gamma[i] = v*6*256;
-		}
-	}
+	// if(ENABLE_DEPTH) {
+	// 	for (int i=0; i<2048; i++) {
+	// 		float v = i/2048.0;
+	// 		v = powf(v, 3)* 6;
+	// 		t_gamma[i] = v*6*256;
+	// 	}
+	// }
 
 	// Need to upload special firmware for Kinect #1473
 	// For some reason, if we try to upload this when the camera and motor subdevices are selected, the upload will
@@ -349,7 +349,8 @@ void depth_in_callback(freenect_device* dev, void *v_depth, uint32_t timestamp) 
 		height,
 		dimension_factor,
 		THRESHOLD_BEGIN,
-		THRESHOLD_END
+		THRESHOLD_END,
+		KINECT_UPSIDE_DOWN
 	);
 
 	list = skeltrack_skeleton_track_joints_sync(

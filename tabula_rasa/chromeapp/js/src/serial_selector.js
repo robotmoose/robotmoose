@@ -94,7 +94,7 @@ serial_selector_t.prototype.build_list_m=function(ports)
 	var old=this.dropdown.selected();
 	var found=false;
 
-	for(var ii=0;ii<ports.length;++ii)
+	for(let ii=0;ii<ports.length;++ii)
 	{
 		var name=ports[ii].path;
 		if(/.*Bluetooth.*/.test(name))

@@ -19,7 +19,7 @@ function pilot_status_t(connection,pilot_checkmark,onconnect,ondisconnect)
 	this.num_pilots=0;
 
 	var _this=this;
-	this.timeout_time=3500;
+	this.timeout_time=5000;
 	this.timeout=null;
 	this.video_timer=null;
 	this.videohungup=false;
@@ -166,7 +166,7 @@ pilot_status_t.prototype.update=function(new_pilots)
 	if(new_pilots&&JSON.stringify(this.pilots)!=JSON.stringify(new_pilots))
 	{
 		//Go through pilots that are online, check them against our pilots.
-		for(var ii in new_pilots)
+		for(let ii in new_pilots)
 		{
 			if(ii in this.pilots)
 			{
@@ -212,7 +212,7 @@ pilot_status_t.prototype.update=function(new_pilots)
 	//  and remove them from online (keeps the online array from getting too big).
 	//  This also resets the pilot.
 	var robot=this.connection.robot;
-	for(var ii in old_pilots)
+	for(let ii in old_pilots)
 		if(!(ii in active_pilots)&&(!this.pilot_timers[ii]||(time-this.pilot_timers[ii])>this.timeout_time))
 		{
 			superstar_set(robot,"frontend_status/"+ii,null);
@@ -222,7 +222,7 @@ pilot_status_t.prototype.update=function(new_pilots)
 
 	//Clear up out local timers (probably not needed...but it makes me sleep better...).
 	var new_pilot_timers={};
-	for(var ii in this.pilot_timers)
+	for(let ii in this.pilot_timers)
 		if((time-this.pilot_timers[ii])<this.timeout_time*2)
 			new_pilot_timers[ii]=this.pilot_timers[ii];
 	this.pilot_timers=new_pilot_timers;

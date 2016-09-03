@@ -43,7 +43,7 @@ robot_menu_t.prototype.create=function(title,onclick,tooltip,icon)
 robot_menu_t.prototype.remove=function(doorway)
 {
 	var new_buttons=[];
-	for(var key in this.buttons)
+	for(let key in this.buttons)
 		if(this.buttons[key].doorway!=doorway)
 			new_buttons[key]=this.buttons[key];
 	this.buttons=new_buttons;

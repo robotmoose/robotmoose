@@ -269,9 +269,9 @@ state_table_t.prototype.build=function(json)
 	//if (json)console.log("Experiments: " + json.toString());
 	this.drag_list.clear(false);
 	this.entries=[];
-	for(var key in json)
+	for(let key in json)
 		this.create_entry_m(json[key].name,json[key].time,json[key].code);
-	for(var key in this.entries)
+	for(let key in this.entries)
 		this.validate_state_m(this.entries[key].input);
 }
 
@@ -285,7 +285,7 @@ state_table_t.prototype.get_entries=function()
 
 	var entries=[];
 
-	for(var key in this.entries)
+	for(let key in this.entries)
 		if(this.entries[key])
 			entries.push(this.entries[key]);
 
@@ -298,7 +298,7 @@ state_table_t.prototype.set_active=function(state)
 {
 	var entries=this.get_entries();
 
-	for(var key in entries)
+	for(let key in entries)
 	{
 		var e=entries[key];
 		if(e)
@@ -324,7 +324,7 @@ state_table_t.prototype.get_states=function()
 
 	var entries=this.get_entries();
 
-	for(var key in entries)
+	for(let key in entries)
 	{
 		if(entries[key])
 		{
@@ -514,7 +514,7 @@ state_table_t.prototype.remove_entry_m=function(entry)
 	if(!entry||!entry.drag_list)
 		return;
 
-	for(var key in this.entries)
+	for(let key in this.entries)
 	{
 		if(this.entries[key]&&this.entries[key]===entry)
 		{
@@ -526,7 +526,7 @@ state_table_t.prototype.remove_entry_m=function(entry)
 
 	var new_entries=[];
 
-	for(var key in this.entries)
+	for(let key in this.entries)
 		if(this.entries[key])
 			new_entries.push(this.entries[key]);
 
@@ -561,7 +561,7 @@ state_table_t.prototype.validate_state_m=function(input)
 	var valid=input.text.value.length>0&&input.text.value!="state";
 	var entries=this.get_entries();
 	var counts={};
-	for(var key in entries)
+	for(let key in entries)
 	{
 		if(entries[key])
 		{
@@ -578,7 +578,7 @@ state_table_t.prototype.validate_state_m=function(input)
 
 state_table_t.prototype.update_states_m=function()
 {
-	for(var key in this.entries)
+	for(let key in this.entries)
 		if(this.entries[key])
 			this.set_state_name_valid_m(this.entries[key].input,
 				this.validate_state_m(this.entries[key].input));
@@ -685,7 +685,7 @@ state_table_t.prototype.clear_prints=function()
 {
 	var entries=this.get_entries();
 
-	for(var key in entries)
+	for(let key in entries)
 		if(entries[key])
 			entries[key].prints.textContent="";
 }
@@ -730,7 +730,7 @@ state_table_t.prototype.find_entry=function(state_name)
 {
 	var entries=this.get_entries();
 
-	for(var key in entries)
+	for(let key in entries)
 	{
 		if(entries[key])
 		{

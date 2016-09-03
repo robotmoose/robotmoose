@@ -14,7 +14,7 @@ function input_t(event, DOM)
 	this.keys_released=[]; // currently released
 	this.user_event=function(){event();};
 
-	for(var ii=0;ii<255;++ii)
+	for(let ii=0;ii<255;++ii)
 	{
 		this.keys_down[ii]=false;
 		this.keys_pressed[ii]=false;
@@ -29,7 +29,7 @@ function input_t(event, DOM)
 
 	window.addEventListener("blur",function()
 	{
-		for(var ii=0;ii<255;++ii)
+		for(let ii=0;ii<255;++ii)
 			_this.keys_down[ii]=false;
 		_this.clear();
 		_this.user_event();
@@ -55,7 +55,7 @@ input_t.prototype.keyup=function(evt)
 
 input_t.prototype.clear=function()
 {
-	for(var ii=0;ii<255;++ii)
+	for(let ii=0;ii<255;++ii)
 	{
 		this.keys_pressed[ii]=false;
 		this.keys_released[ii]=false;

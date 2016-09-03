@@ -101,7 +101,7 @@ dropdown_t.prototype.build=function(list,on_loaded_value)
 			old=on_loaded_value;
 		}
 		this.select.options.length=0;
-		for(var ii=0;ii<list.length;++ii)
+		for(let ii=0;ii<list.length;++ii)
 		{
 			var option=document.createElement("option");
 			option.text=option.value=list[ii];

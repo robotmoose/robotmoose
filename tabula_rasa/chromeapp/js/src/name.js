@@ -86,7 +86,7 @@ name_t.prototype.build_select_m=function(select,json,heading,on_loaded_value,sor
 	select.length=0;
 	var list=[];
 	list.push(heading);
-	for(var key in json)
+	for(let key in json)
 		list.push(json[key]);
 	if(sort_func)
 		list.sort(sort_func);
@@ -102,7 +102,8 @@ name_t.prototype.update_superstars_m=function()
 		"test.robotmoose.com",
 		"androidantelope.com",
 		"cyborgcaribou.com",
-		"127.0.0.1:8081"
+		"127.0.0.1:8081",
+		"10.8.110.36:8081"
 	];
 
 	this.build_superstars_m(superstar_options);

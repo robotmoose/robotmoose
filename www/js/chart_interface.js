@@ -49,7 +49,7 @@ function chart_interface_t(div) {
 	this.remove_button.addEventListener("click", function() {
 		_this.remove_chart();
 	});
-	
+
 	// Add created UI elements to tab.
 	this.controls_div.appendChild(this.add_button);
 	this.controls_div.appendChild(this.remove_button);
@@ -75,14 +75,14 @@ chart_interface_t.prototype.Vec2 = function(x_value, y_value) {
 
 chart_interface_t.prototype.refresh=function(json) {
 	var sensor_list = [];
-	for(var prop in json) {
+	for(let prop in json) {
 		if(!json.hasOwnProperty(prop)) {
 			continue;
 		}
 
 		switch(prop) {
 			case "power":
-				for(var subprop in json[prop]) {
+				for(let subprop in json[prop]) {
 					if(!json[prop].hasOwnProperty(subprop)) {
 						continue;
 					}
@@ -123,7 +123,7 @@ chart_interface_t.prototype.refresh=function(json) {
 			case "kinect":
 				sensor_list.push(prop);
 				if(is_value(this.charts.canvas["kinect"])) {
-					for(var subprop in json[prop]) {
+					for(let subprop in json[prop]) {
 						if(!json[prop].hasOwnProperty(subprop)) {
 							continue;
 						}
@@ -142,8 +142,8 @@ chart_interface_t.prototype.refresh=function(json) {
 									Math.cos((json["kinect"]["angle"]-90)*Math.PI/180.0)*arrow_length,
 									Math.sin((json["kinect"]["angle"]-90)*Math.PI/180.0)*arrow_length
 								);
-								
-								
+
+
 								ctx.lineTo(arrow_tip.x,arrow_tip.y);
 								ctx.lineWidth = 5;
 								ctx.strokeStyle="blue";
@@ -195,35 +195,35 @@ chart_interface_t.prototype.refresh=function(json) {
 								var offset = this.Vec2(0,0);//(shoulder_center.x - origin.x, shoulder_center.y - origin.y);
 
 								ctx.fillStyle="yellow";
-								ctx.fillRect(shoulder_center.x-offset.x-5, shoulder_center.y-offset.y-5, 10, 10);							
+								ctx.fillRect(shoulder_center.x-offset.x-5, shoulder_center.y-offset.y-5, 10, 10);
 
 								// Connect joints with lines
 								this.connect_joints(
-									ctx, 
+									ctx,
 									json["kinect"]["joints"]["left_shoulder"],
 									json["kinect"]["joints"]["right_shoulder"],
 									offset
 								);
 								this.connect_joints(
-									ctx, 
+									ctx,
 									json["kinect"]["joints"]["left_shoulder"],
 									json["kinect"]["joints"]["left_elbow"],
 									offset
 								);
 								this.connect_joints(
-									ctx, 
+									ctx,
 									json["kinect"]["joints"]["left_elbow"],
 									json["kinect"]["joints"]["left_hand"],
 									offset
 								);
 								this.connect_joints(
-									ctx, 
+									ctx,
 									json["kinect"]["joints"]["right_shoulder"],
 									json["kinect"]["joints"]["right_elbow"],
 									offset
 								);
 								this.connect_joints(
-									ctx, 
+									ctx,
 									json["kinect"]["joints"]["right_elbow"],
 									json["kinect"]["joints"]["right_hand"],
 									offset
@@ -238,7 +238,7 @@ chart_interface_t.prototype.refresh=function(json) {
 									ctx.stroke();
 								}
 								// Draw points for joints
-								for(var subsubprop in json["kinect"]["joints"]) {
+								for(let subsubprop in json["kinect"]["joints"]) {
 									if(!json["kinect"]["joints"].hasOwnProperty(subsubprop))
 										continue;
 
