@@ -2,7 +2,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 #Flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result -Wno-sign-compare -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result -Wno-sign-compare")
 add_definitions(-DMG_ENABLE_SSL)
 
 #Include Directories

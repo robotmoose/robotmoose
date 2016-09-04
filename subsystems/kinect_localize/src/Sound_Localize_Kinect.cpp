@@ -64,7 +64,7 @@ uint8_t depth_buffer[640*480*3];
 Kinect_DOA kinect_DOA;
 static const bool KINECT_1473 = true; // Need to upload special firmware if using Kinect Model #1473
 static const bool KINECT_UPSIDE_DOWN = true; // If Kinect is mounted upside down, flip angles.
-std::vector<std::deque<int32_t>> sound_buffers;
+std::vector<std::deque<int32_t> > sound_buffers;
 
 // ***** Skeltrack Variables ***** //
 static SkeltrackSkeleton *skeleton = NULL;
@@ -195,14 +195,14 @@ int main(int argc, char* argv[]) {
 	std::cout << "Robot is " << robot_config.get("robot") << std::endl;
 	double angle = 0;
 
-	kinect["joints"] = {};
-	kinect["joints"]["head"] = {};
-	kinect["joints"]["left_hand"] = {};
-	kinect["joints"]["right_hand"] = {};
-	kinect["joints"]["left_shoulder"] = {};
-	kinect["joints"]["right_shoulder"] = {};
-	kinect["joints"]["left_elbow"] = {};
-	kinect["joints"]["right_elbow"] = {};
+	kinect["joints"] = Json::objectValue;
+	kinect["joints"]["head"] = Json::objectValue;
+	kinect["joints"]["left_hand"] = Json::objectValue;
+	kinect["joints"]["right_hand"] = Json::objectValue;
+	kinect["joints"]["left_shoulder"] = Json::objectValue;
+	kinect["joints"]["right_shoulder"] = Json::objectValue;
+	kinect["joints"]["left_elbow"] = Json::objectValue;
+	kinect["joints"]["right_elbow"] = Json::objectValue;
 
 	printf("This is the Kinect localization subsystem. Press Ctrl-C to exit.\n");
 

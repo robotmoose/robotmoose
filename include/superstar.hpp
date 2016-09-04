@@ -53,7 +53,7 @@ class superstar_t
 		//  Note, python version is unique because it is BLOCKING.
 		void get_next(std::string path,success_cb_t success_cb=NULL,error_cb_t error_cb=NULL);
 
-		//Changes auth for the given path&&auth to the given value.
+		//Changes auth for the given path and auth to the given value.
 		//  Calls success_cb on success with the server response.
 		//  Calls error_cb on error with the server error object (as per spec).
 		void change_auth(std::string path,Json::Value value,const std::string& auth="",success_cb_t success_cb=NULL,error_cb_t error_cb=NULL);
@@ -74,7 +74,7 @@ class superstar_t
 		//  Note, won't be sent until .flush() is called.
 		void add_request(Json::Value& request,success_cb_t success_cb,success_cb_t error_cb);
 
-		//Builds the batch request object&&clears out the current queue.
+		//Builds the batch request object and clears out the current queue.
 		void flush();
 
 		//Function to handle errors...
@@ -83,6 +83,7 @@ class superstar_t
 	private:
 		std::string superstar;
 		std::vector<starequest_t> queue;
+
 };
 
 #endif
