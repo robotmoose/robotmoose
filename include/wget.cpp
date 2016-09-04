@@ -8,7 +8,7 @@ struct wget_t
 	bool done;
 };
 
-void wget_ev_handler(mg_connection* connection,int ev,void* ev_data)
+static void wget_ev_handler(mg_connection* connection,int ev,void* ev_data)
 {
 	wget_t& responder=*(wget_t*)(connection->mgr->user_data);
 

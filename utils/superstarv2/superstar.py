@@ -49,7 +49,7 @@ class superstar_t:
 	#Pushes the given value onto path using the given auth.
 	#  Calls success_cb on success with the server response.
 	#  Calls error_cb on error with the server error object (as per spec).
-	#  Note, if the path is not an array, it will be after self.
+	#  Note, if the path is not an array, it will be after this.
 	def push(self,path,value,length,auth="",success_cb=None,error_cb=None):
 		path=self.pathify(path)
 		opts=json.dumps({"value":value,"length":length})
@@ -69,12 +69,12 @@ class superstar_t:
 		try:
 			#Make the request.
 			data=bytes(json.dumps(request),"utf-8")
-			server_response=urllib.request.urlopen("http://"+self.superstar+"/superstar/",data)
+			server_response=urllib.request.urlopen(self.superstar+"/superstar/",data)
 
 			#Parse response, call responses.
 			response=json.loads(server_response.read().decode('utf-8'))
 
-			#Got an array, must be batch data...
+			#Got an object, must be single request...
 			if isinstance(response,dict):
 				#Error callback...
 				if "error" in response:
@@ -170,6 +170,7 @@ class superstar_t:
 		try:
 			#Make the request.
 			data=bytes(json.dumps(batch),"utf-8")
+			print(data)
 			server_response=urllib.request.urlopen(self.superstar+"/superstar/",data)
 
 			#Parse response, call responses.
@@ -212,25 +213,11 @@ class superstar_t:
 			print("Superstar error ("+str(error["code"])+") - "+error["message"])
 
 if __name__=="__main__":
-	def getprint(result):
+	def echo(result):
 		print(result)
-
-	def subprint(result):
-		print(result)
-
-	def errprint(error):
-		print(error)
 
 	ss=superstar_t("127.0.0.1:8081")
 
-	ss.get("/blarg",getprint)
-	ss.set("/blarg",4,"123")
-	#ss.get("/blarg",getprint)
-	#ss.sub("/",subprint)
-	#ss.push("/blarg2",2,3,"123")
-	#ss.get("/blarg2",getprint)
-	#ss.change_auth("/123","12341234","123",getprint)
-	#ss.flush()
-
-	#Again, note this is blocking...
-	ss.get_next("/blarg",getprint,errprint)
+	ss.set("/test",123,"",echo)
+	ss.get("/test",echo)
+	ss.flush()

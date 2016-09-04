@@ -173,6 +173,15 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 			goto error_label;
 		}
 
+		//Write based operations - check value.
+		if((method=="set"||method=="push"||method=="change_auth")&&
+			!opts.isMember("value"))
+		{
+			bad_params=true;
+			error_message="Write based operations require a value.";
+			goto error_label;
+		}
+
 		//Otherwise service method.
 		if(method=="get")
 		{
