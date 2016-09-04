@@ -467,7 +467,6 @@ void* freenect_threadfunc(void* arg) {
 			pthread_mutex_lock(&kinect_json_mutex);
 			superstar -> set(starpath, kinect, auth);
 			pthread_mutex_unlock(&kinect_json_mutex);
-			superstar -> flush();
 			time_last_tx = std::chrono::system_clock::now();
 		}
 	}
@@ -479,4 +478,13 @@ void* freenect_threadfunc(void* arg) {
 	freenect_close_device(f_dev);
 	freenect_shutdown(f_ctx);
 	exit(0);
+}
+
+void* superstar_threadfunc(void* arg)
+{
+	while(true)
+	{
+		superstar->flush();
+		u
+	}
 }

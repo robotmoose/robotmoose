@@ -5,7 +5,7 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
-#include <cstdint>
+#include <stdint.h>
 #include "xcor_td.h"
 
 class Kinect_DOA {
