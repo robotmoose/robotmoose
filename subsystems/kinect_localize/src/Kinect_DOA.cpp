@@ -15,7 +15,7 @@ Kinect_DOA::Kinect_DOA()
 	SAMPLE_FREQUENCY = 16000.0; // 16 kHz per channel.
 
 	// The microphones will be almost nearly in sync, so only need to compute the xcor for a short window.
-	MAX_LAG = std::round(fabs(MIC_POSITIONS[0] - MIC_POSITIONS[3])/SOUND_SPEED*SAMPLE_FREQUENCY);
+	MAX_LAG = fabs(MIC_POSITIONS[0] - MIC_POSITIONS[3])/SOUND_SPEED*SAMPLE_FREQUENCY;
 	XCOR_WIDTH = 2*MAX_LAG;
 
 	NUMSAMPLES_XCOR = 256*16; // Width of the sliding window.

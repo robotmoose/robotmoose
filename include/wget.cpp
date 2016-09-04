@@ -1,5 +1,6 @@
 #include "wget.hpp"
 #include <stdexcept>
+#include "string_util.hpp"
 
 struct wget_t
 {
@@ -25,7 +26,7 @@ static void wget_ev_handler(mg_connection* connection,int ev,void* ev_data)
 		http_message* hm=(http_message*)ev_data;
 
 		if(hm->resp_code!=200)
-			responder.error="Connection error: "+std::to_string(hm->resp_code)+".";
+			responder.error="Connection error: "+to_string(hm->resp_code)+".";
 		else
 			responder.data=std::string(hm->body.p,hm->body.len);
 	}
@@ -44,9 +45,9 @@ std::string wget(const std::string& address,const std::string& post_data)
 
 	mg_mgr mgr;
 	mg_mgr_init(&mgr,&responder);
-	mg_connection* nc=mg_connect_http(&mgr,wget_ev_handler,address.c_str(),nullptr,post_data.c_str());
+	mg_connection* nc=mg_connect_http(&mgr,wget_ev_handler,address.c_str(),NULL,post_data.c_str());
 
-	if(nc==nullptr)
+	if(nc==NULL)
 	{
 		responder.error="Could not open a socket!";
 	}
