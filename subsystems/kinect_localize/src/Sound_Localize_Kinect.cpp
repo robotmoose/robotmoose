@@ -39,7 +39,7 @@
 #include <string>
 #include <superstar.hpp>
 #include <robot_config.h>
-#include <chrono>
+#include <time_util.hpp>
 
 // Libraries needed for DSP
 #include <deque>
@@ -82,6 +82,17 @@ pthread_cond_t batch_cond = PTHREAD_COND_INITIALIZER;
 
 pthread_mutex_t kinect_json_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+
+//Superstar Variables...
+pthread_t superstar_thread;
+struct superstar_thread_request_t
+{
+	std::string path;
+	Json::Value value;
+	std::string auth;
+};
+std::vector<superstar_thread_request_t> superstar_queue;
+
 // ******************** //
 
 // Function Prototypes
@@ -93,6 +104,7 @@ void audio_in_callback(freenect_device* dev, int num_samples,
 				 int16_t* cancelled, void *unknown);
 void depth_in_callback(freenect_device* dev, void *v_depth, uint32_t timestamp);
 void* freenect_threadfunc(void* arg);
+void* superstar_threadfunc(void* arg);
 
 int main(int argc, char* argv[]) {
 
@@ -174,6 +186,13 @@ int main(int argc, char* argv[]) {
 
 	int res = pthread_create(&freenect_thread, NULL, freenect_threadfunc, NULL);
 	if (res) {
+		printf("pthread_create failed\n");
+		freenect_shutdown(f_ctx);
+		return 1;
+	}
+
+	int res2 = pthread_create(&superstar_thread, NULL, superstar_threadfunc, NULL);
+	if (res2) {
 		printf("pthread_create failed\n");
 		freenect_shutdown(f_ctx);
 		return 1;
@@ -398,12 +417,12 @@ void depth_in_callback(freenect_device* dev, void *v_depth, uint32_t timestamp) 
 	}
 	pthread_mutex_unlock(&kinect_json_mutex);
 
-	static std::chrono::time_point<std::chrono::system_clock> time_curr, time_last_detect;
+	static unsigned long time_curr, time_last_detect;
 	// Gesture recognition: Flapping arms
 	if(joint_ptrs[1] && joint_ptrs[2]) { // Check elbows because hands aren't always recognized
 		static const int buff_size = 30; // Store 1 second's worth of values
 
-		time_last_detect = std::chrono::system_clock::now();
+		time_last_detect = msl::millis();
 		// For flapping arms we really only care about the change in y
 		left_elbow_buffer.push_back(joint_ptrs[1] -> y);
 		right_elbow_buffer.push_back(joint_ptrs[2] -> y);
@@ -433,10 +452,10 @@ void depth_in_callback(freenect_device* dev, void *v_depth, uint32_t timestamp) 
 	else
 		kinect["flapping"] = false; // set to false if we can't see hands
 
-	time_curr = std::chrono::system_clock::now();
-	std::chrono::duration<double> elapsed_seconds = time_curr - time_last_detect;
+	time_curr = msl::millis();
+	unsigned long elapsed_ms = time_curr - time_last_detect;
 
-	if(elapsed_seconds.count() >= .25) { // throw out stale data
+	if(elapsed_ms >= 250) { // throw out stale data
 		left_elbow_buffer.clear();
 		right_elbow_buffer.clear();
 	}
@@ -458,16 +477,21 @@ void* freenect_threadfunc(void* arg) {
 		g_object_set (skeleton, "smoothing-factor", 0.5, NULL);
 	}
 
-	static std::chrono::time_point<std::chrono::system_clock> time_curr, time_last_tx;
+	static unsigned long time_curr, time_last_tx;
 	while(!die && freenect_process_events(f_ctx) >= 0) {
-		time_curr = std::chrono::system_clock::now();
-		std::chrono::duration<double> elapsed_seconds = time_curr - time_last_tx;
+		time_curr = msl::millis();
+		unsigned long elapsed_ms = time_curr - time_last_tx;
 
-		if(elapsed_seconds.count() >= 0.1250) {
+		if(elapsed_ms >= 125)
+		{
+			superstar_thread_request_t request;
+			request.path=starpath;
+			request.value=kinect;
+			request.auth=auth;
 			pthread_mutex_lock(&kinect_json_mutex);
-			superstar -> set(starpath, kinect, auth);
+			superstar_queue.push_back(request);
 			pthread_mutex_unlock(&kinect_json_mutex);
-			time_last_tx = std::chrono::system_clock::now();
+			time_last_tx = msl::millis();
 		}
 	}
 	freenect_stop_audio(f_dev);
@@ -484,7 +508,17 @@ void* superstar_threadfunc(void* arg)
 {
 	while(true)
 	{
-		superstar->flush();
-		u
+		if(superstar!=NULL)
+		{
+			std::vector<superstar_thread_request_t> queue;
+			pthread_mutex_lock(&kinect_json_mutex);
+			queue=superstar_queue;
+			superstar_queue.clear();
+			pthread_mutex_unlock(&kinect_json_mutex);
+			if(queue.size()>0)
+				superstar -> set(queue[queue.size()-1].path,queue[queue.size()-1].value,queue[queue.size()-1].auth);
+			superstar->flush();
+		}
+		msl::nsleep(1000);
 	}
 }

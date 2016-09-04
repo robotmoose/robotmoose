@@ -2,7 +2,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 #Flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result -Wno-sign-compare -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result -Wno-sign-compare")
 add_definitions(-DMG_ENABLE_SSL)
 
 #Include Directories
@@ -28,7 +28,7 @@ add_library(kinect ${kinect_src})
 set(skeltrack_src ${skeltrack_inc}/pqueue.c ${skeltrack_inc}/skeltrack-joint.c ${skeltrack_inc}/skeltrack-skeleton.c ${skeltrack_inc}/skeltrack-smooth.c ${skeltrack_inc}/skeltrack-util.c)
 add_library(skeltrack ${skeltrack_src})
 
-set(utility_src ${root_inc}/auth.cpp ${root_inc}/ini.cpp ${root_inc}/json_util.cpp ${root_inc}/robot_config.cpp ${root_inc}/string_util.cpp ${root_inc}/superstar.cpp ${root_inc}/wget.cpp)
+set(utility_src ${root_inc}/auth.cpp ${root_inc}/ini.cpp ${root_inc}/json_util.cpp ${root_inc}/robot_config.cpp ${root_inc}/string_util.cpp ${root_inc}/superstar.cpp ${root_inc}/time_util.cpp ${root_inc}/wget.cpp)
 add_library(utility ${utility_src})
 
 set(jsoncpp_inc ${root_inc}/jsoncpp)
