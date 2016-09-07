@@ -13,7 +13,7 @@ void get(size_t iters,const std::string& hostname,const std::string& path,const 
 	superstar_t ss(hostname);
 	for(size_t ii=0;ii<iters;++ii)
 	{
-		ss.get(path);
+		ss.get("/superstar/"+path);
 		ss.flush();
 	}
 }
@@ -24,7 +24,7 @@ void set(size_t iters,const std::string& hostname,const std::string& path,const 
 	superstar_t ss(hostname);
 	for(size_t ii=0;ii<iters;++ii)
 	{
-		ss.set(path,value,"");
+		ss.set("/superstar/"+path,value,"");
 		ss.flush();
 	}
 }
@@ -48,7 +48,7 @@ int main(int argc,char* argv[])
 	std::cout<<std::endl;
 
 	size_t ITERS=1000;
-	std::string HOSTNAME="http://test.robotmoose.com/superstar";
+	std::string HOSTNAME="http://test.robotmoose.com";
 	std::string PATH="/robots/2016/auto/gen/benchmark";
 
 	if(argc>1)
