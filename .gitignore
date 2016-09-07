@@ -30,6 +30,7 @@ tabula_rasa/tester
 tabula_rasa/arduino/uno.hex
 tabula_rasa/arduino/mega.hex
 utils/expand_db/expand_db
+utils/testing/new_test/benchmark
 www/blog
 www/downloads/files
 www/latest.tar.gz
