@@ -13,7 +13,7 @@ void get(size_t iters,const std::string& hostname,const std::string& path,const 
 	superstar_t ss(hostname);
 	for(size_t ii=0;ii<iters;++ii)
 	{
-		ss.get("/superstar/"+path);
+		ss.get(path);
 		ss.flush();
 	}
 }
@@ -24,7 +24,7 @@ void set(size_t iters,const std::string& hostname,const std::string& path,const 
 	superstar_t ss(hostname);
 	for(size_t ii=0;ii<iters;++ii)
 	{
-		ss.set("/superstar/"+path,value,"");
+		ss.set(path,value,"");
 		ss.flush();
 	}
 }
