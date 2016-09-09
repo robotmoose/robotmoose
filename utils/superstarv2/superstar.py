@@ -170,7 +170,6 @@ class superstar_t:
 		try:
 			#Make the request.
 			data=bytes(json.dumps(batch),"utf-8")
-			print(data)
 			server_response=urllib.request.urlopen(self.superstar+"/superstar/",data)
 
 			#Parse response, call responses.
@@ -211,13 +210,3 @@ class superstar_t:
 			request["error_cb"](error)
 		else:
 			print("Superstar error ("+str(error["code"])+") - "+error["message"])
-
-if __name__=="__main__":
-	def echo(result):
-		print(result)
-
-	ss=superstar_t("127.0.0.1:8081")
-
-	ss.set("/test",123,"",echo)
-	ss.get("/test",echo)
-	ss.flush()
