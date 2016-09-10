@@ -24,7 +24,7 @@ function connection_t(on_message,on_disconnect,on_connect,on_name_set,on_auth_er
 	_this.robot=null;
 	_this.auth="";
 	_this.serial_delay_ms=50; // milliseconds to wait between sensors and commands (saves CPU, costs some latency though)
-	
+
 	_this.pilot_connected=false; // If pilot is not connected, write 0 power.
 	// Variables for ramping down power
 	_this.rampdown_power={L:0, R:0};
@@ -522,7 +522,6 @@ connection_t.prototype.arduino_setup_complete=function()
 	for(let key in this.comets)
 		this.comets[key].abort();
 	this.comets={};
-	console.log(this.comets);
 	this.network_getnext(robot_to_starpath(this.robot)+"pilot/power",function(power)
 	{
 		for(let field in power)
@@ -535,7 +534,6 @@ connection_t.prototype.arduino_setup_complete=function()
 		if(config.counter!=_this.last_config.counter)
 			_this.reconnect();
 	});
-	console.log(this.comets);
 }
 
 // Look up all the properties for our currently configured set of devices,
