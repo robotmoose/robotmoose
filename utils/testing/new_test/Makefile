@@ -1,7 +1,7 @@
 SRC=src
 INC=../../../include
 CXX=g++
-CFLAGS=-O -Wall -Wno-unused-result -I$(INC) -I$(SRC) -std=c++11
+CFLAGS=-O -Wall -Wno-unused-result -I$(INC) -I$(SRC) -std=c++11 -DMG_ENABLE_SSL
 LIB=
 
 JSONCPP_SRC=$(INC)/jsoncpp/json_reader.cpp $(INC)/jsoncpp/json_value.cpp $(INC)/jsoncpp/json_writer.cpp
@@ -10,6 +10,8 @@ UTILITY_SRC=$(INC)/auth.cpp $(INC)/json_util.cpp $(INC)/superstar.cpp $(INC)/str
 
 ifeq ($(OS),Windows_NT)
 	LIB+=-lWs2_32
+else
+	LIB+=-lcrypto -lssl
 endif
 
 ifeq ($(shell uname),Darwin)
@@ -19,7 +21,7 @@ endif
 all: benchmark
 
 benchmark: $(SRC)/main.cpp $(COMMON_SRC) $(JSONCPP_SRC) $(MONGOOSE_SRC) $(UTILITY_SRC)
-	$(CXX) $(CFLAGS) $^ $(LIB) -o $@
+	$(CXX) $^ $(LIB) $(CFLAGS) -o $@
 
 clean:
 	-rm -f benchmark benchmark.exe
