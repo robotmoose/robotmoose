@@ -7,6 +7,7 @@ project(layla_sim)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -43,18 +44,17 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
+#add_message_files(
 #   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+#   benchmark_packet.msg
+#)
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+   FILES
+   get.srv
+   set.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -64,10 +64,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+   DEPENDENCIES
+   std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -101,13 +101,16 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES layla_sim
-#  CATKIN_DEPENDS roscpp std_msgs
+  CATKIN_DEPENDS roscpp std_msgs message_runtime
 #  DEPENDS system_lib
 )
 
 ###########
 ## Build ##
 ###########
+
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
@@ -137,6 +140,12 @@ include_directories(
 # target_link_libraries(layla_sim_node
 #   ${catkin_LIBRARIES}
 # )
+
+add_executable(tester_node src/tester_node.cpp)
+target_link_libraries(tester_node ${catkin_LIBRARIES})
+
+add_executable(tester_server src/tester_server.cpp)
+target_link_libraries(tester_server ${catkin_LIBRARIES})
 
 add_executable(backend_node src/backend_node.cpp)
 target_link_libraries(backend_node ${catkin_LIBRARIES})
