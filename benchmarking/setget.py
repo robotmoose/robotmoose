@@ -4,7 +4,7 @@ import superstar
 import time
 
 auth=''
-ss=superstar.superstar_t('http://test.robotmoose.com')
+ss=superstar.superstar_t('https://test.robotmoose.com')
 tx_start_time=0
 tx_end_time=0
 
@@ -13,7 +13,7 @@ def initial_get(res):
 	tx_start_time=time.time()
 	global auth
 	global ss
-	ss.set('/benchmarks/test',res,auth,end_tx_func)
+	ss.set('/benchmarks/test',res+1,auth,end_tx_func)
 	ss.flush()
 
 def end_tx_func(res):

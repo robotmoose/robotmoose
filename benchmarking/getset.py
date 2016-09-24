@@ -4,11 +4,12 @@ import superstar
 import time
 
 auth=''
-ss=superstar.superstar_t('http://test.robotmoose.com')
+ss=superstar.superstar_t('https://test.robotmoose.com')
 rx_start_time=0
 rx_end_time=0
 
 def end_rx_func(res):
+	print('end_rx_func called')
 	global rx_end_time
 	rx_end_time=time.time()
 	global auth
@@ -17,6 +18,7 @@ def end_rx_func(res):
 	ss.flush()
 
 def end_tx_func(res):
+	print('end_tx_func called')
 	tx_end_time=time.time()
 	global rx_start_time
 	global rx_end_time
