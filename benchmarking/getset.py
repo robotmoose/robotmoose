@@ -14,6 +14,7 @@ def end_rx_func(res):
 	rx_end_time=time.time()
 	global auth
 	global ss
+	time.sleep(0.1) #HACK FOR NOW
 	ss.set('/benchmarks/test',res+1,auth,end_tx_func)
 	ss.flush()
 
