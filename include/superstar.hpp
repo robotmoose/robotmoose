@@ -1,5 +1,5 @@
 //Mike Moss
-//09/03/2016
+//09/24/2016
 //Contains client code to get requests from a superstar server.
 
 #ifndef SUPERSTAR_HPP
@@ -51,7 +51,8 @@ class superstar_t
 		//  Calls success_cb on success with the server response.
 		//  Calls error_cb on error with the server error object (as per spec).
 		//  Note, python version is unique because it is BLOCKING.
-		void get_next(std::string path,success_cb_t success_cb=NULL,error_cb_t error_cb=NULL);
+		void get_next(std::string path,const std::string& last_hash,
+			success_cb_t success_cb=NULL,error_cb_t error_cb=NULL);
 
 		//Changes auth for the given path and auth to the given value.
 		//  Calls success_cb on success with the server response.

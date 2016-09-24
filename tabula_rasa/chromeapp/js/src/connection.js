@@ -11,6 +11,7 @@ function connection_t(on_message,on_disconnect,on_connect,on_name_set,on_auth_er
 		serial_api=chrome.serial;
 	var _this=this;
 	this.comets={};
+	this.last_hashes={};
 	_this.config="";
 	_this.status_message=on_message;
 	_this.on_disconnect=on_disconnect;
@@ -492,12 +493,13 @@ connection_t.prototype.network_getnext=function(path,on_success)
 
 	var func=function()
 	{
-		_this.comets[path]=superstar.get_next(path,function(data)
+		_this.comets[path]=superstar.get_next(path,_this.last_hashes[path],function(data)
 		{
+			_this.last_hashes[path]=data.hash;
 			if(_this.connected)
 			{
 				if(on_success)
-					on_success(data);
+					on_success(data.value);
 				func();
 			}
 		},
@@ -522,6 +524,7 @@ connection_t.prototype.arduino_setup_complete=function()
 	for(let key in this.comets)
 		this.comets[key].abort();
 	this.comets={};
+	this.last_hashes={};
 	this.network_getnext(robot_to_starpath(this.robot)+"pilot/power",function(power)
 	{
 		for(let field in power)

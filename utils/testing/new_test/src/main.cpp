@@ -52,7 +52,7 @@ int main(int argc,char* argv[])
 	std::cout<<std::endl;
 
 	size_t ITERS=1000;
-	std::string HOSTNAME="https://test.robotmoose.com";
+	std::string HOSTNAME="http://test.robotmoose.com";
 	std::string PATH="/robots/2016/auto/gen/benchmark";
 
 	if(argc>1)

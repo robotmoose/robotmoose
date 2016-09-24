@@ -1,5 +1,5 @@
 //Mike Moss
-//09/03/2016
+//09/24/2016
 //Contains client code to get requests from a superstar server.
 
 #include "superstar.hpp"
@@ -72,11 +72,13 @@ void superstar_t::push(std::string path,Json::Value value,const size_t& length,c
 //  Calls success_cb on success with the server response.
 //  Calls error_cb on error with the server error object (as per spec).
 //  Note, python version is unique because it is BLOCKING.
-void superstar_t::get_next(std::string path,success_cb_t success_cb,error_cb_t error_cb)
+void superstar_t::get_next(std::string path,const std::string& last_hash,
+	success_cb_t success_cb,error_cb_t error_cb)
 {
 	path=pathify(path);
 	Json::Value request=build_skeleton_request("get_next",path);
 	request["id"]=0;
+	request["params"]["last_hash"]=last_hash;
 
 	try
 	{

@@ -13,6 +13,7 @@ function pilot_status_t(connection,pilot_checkmark,onconnect,ondisconnect)
 	this.onconnect=onconnect;
 	this.ondisconnect=ondisconnect;
 
+	this.last_pilot_hash=null;
 	this.pilots={};
 	this.pilot_timers={};
 	this.reset();
@@ -30,7 +31,7 @@ function pilot_status_t(connection,pilot_checkmark,onconnect,ondisconnect)
 		var robot=_this.connection.robot;
 		if(valid_robot(robot))
 			superstar.get_next(robot_to_starpath(robot)+
-				"frontend_status",function(data)
+				"frontend_status",_this.last_pilot_hash,function(data)
 				{
 					if(_this.timeout)
 					{
@@ -38,7 +39,8 @@ function pilot_status_t(connection,pilot_checkmark,onconnect,ondisconnect)
 						_this.timeout=null;
 					}
 					_this.timeout=setTimeout(function(){_this.disconnect();},_this.timeout_time);
-					_this.update(data);
+					_this.last_pilot_hash=data.hash;
+					_this.update(data.value);
 					handle_get();
 				},
 				function(error)

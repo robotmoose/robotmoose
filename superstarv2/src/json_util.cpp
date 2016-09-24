@@ -1,5 +1,5 @@
 //Mike Moss
-//07/09/2016
+//09/24/2016
 //Contains helper function for JSONCPP.
 
 #include "json_util.hpp"
@@ -43,7 +43,7 @@ Json::Value JSON_deserialize(const std::string& str)
 //  the desired effect....
 bool JSON_isString(const Json::Value json)
 {
-	return (json.isNull()||
+	return !(json.isNull()||
 		json.isBool()||
 		json.isInt()||
 		json.isUInt()||

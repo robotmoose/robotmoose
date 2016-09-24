@@ -1,5 +1,5 @@
 //Mike Moss
-//08/02/2016
+//09/24/2016
 //Contains client code to get requests from a superstar server.
 
 //Superstar object.
@@ -78,12 +78,14 @@ superstar_t.prototype.push=function(path,value,len,auth,success_cb,error_cb)
 //Gets the value of path when it changes.
 //  Calls success_cb on success with the server response.
 //  Calls error_cb on error with the server error object (as per spec).
-superstar_t.prototype.get_next=function(path,success_cb,error_cb)
+superstar_t.prototype.get_next=function(path,last_hash,success_cb,error_cb)
 {
 	//Build request.
 	path=this.pathify(path);
 	var request=this.build_skeleton_request("get_next",path);
 	request.id=0;
+	if(last_hash)
+		request.params.last_hash=last_hash;
 
 	//Function to handle errors...
 	var handle_error=function(error)
