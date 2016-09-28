@@ -37,6 +37,8 @@ function robot_ui_t(gui_div,menu_div,modal_div)
 	this.doorways={};
 	this.widgets={};
 
+	superstar.superstar=window.location.origin;
+
 	this.create_gui();
 
 	this.request_uuid();
