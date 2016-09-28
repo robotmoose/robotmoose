@@ -53,6 +53,7 @@ function robot_ui_t(gui_div,menu_div,modal_div)
 		// bad robot:
 		function(robot)
 		{
+			superstar.superstar=window.location.origin;
 			if(robot)
 			{
 				localStorage.previous_year=robot.year;
