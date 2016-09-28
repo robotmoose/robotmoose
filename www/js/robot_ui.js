@@ -48,12 +48,10 @@ function robot_ui_t(gui_div,menu_div,modal_div)
 		function(robot)
 		{
 			_this.connect_menu.onconnect(robot);
-			superstar.superstar=window.location.origin;
 		},
 		// bad robot:
 		function(robot)
 		{
-			superstar.superstar=window.location.origin;
 			if(robot)
 			{
 				localStorage.previous_year=robot.year;

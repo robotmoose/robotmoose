@@ -1,5 +1,5 @@
 //Mike Moss
-//09/24/2016
+//09/28/2016
 //Contains client code to get requests from a superstar server.
 
 //Superstar object.
@@ -21,8 +21,10 @@ superstar_t.prototype.destroy=function()
 superstar_t.prototype.fix_url=function(url)
 {
 	if(!url)
-		url=window.location.host;
-	if(url.substr(0,9)=="127.0.0.1"||url.substr(0,9)=="localhost"
+		url=window.location.origin;
+	if(url.substr(0,9)=="chrome://")
+		url="";
+	else if(url.substr(0,9)=="127.0.0.1"||url.substr(0,9)=="localhost"
 		|| url.substr(0,3)=="10." || url.substr(0,4)=="192.")
 			url="http://"+url;
 	else if(url.substr(0,7)!="http://"&&url.substr(0,8)!="https://")
