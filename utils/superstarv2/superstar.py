@@ -190,7 +190,7 @@ class superstar_t:
 					#Error callback...
 					if "error" in response[ii]:
 						response_obj=response[ii]["error"]
-						self.handle_error(old_queue[response[key]["id"]],response_obj)
+						self.handle_error(old_queue[response[ii]["id"]],response_obj)
 						continue
 
 					#Success callback...
