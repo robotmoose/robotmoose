@@ -99,7 +99,7 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES layla_sim
   CATKIN_DEPENDS roscpp std_msgs message_runtime
 #  DEPENDS system_lib
@@ -116,7 +116,9 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+  include/robotmoose_includes
   ${catkin_INCLUDE_DIRS}
+  
 )
 
 ## Declare a C++ library
@@ -141,11 +143,20 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
+set(utility_src include/robotmoose_includes/json_util.cpp include/robotmoose_includes/string_util.cpp)
+add_library(utility ${utility_src})
+
+set(jsoncpp_inc include/robotmoose_includes/jsoncpp)
+set(jsoncpp_src ${jsoncpp_inc}/json_reader.cpp ${jsoncpp_inc}/json_value.cpp ${jsoncpp_inc}/json_writer.cpp)
+add_library(jsoncpp ${jsoncpp_src})
+
+#target_link_libraries(${catkin_LIBRARIES} utility jsoncpp)
+
 add_executable(tester_node src/tester_node.cpp)
 target_link_libraries(tester_node ${catkin_LIBRARIES})
 
 add_executable(tester_server src/tester_server.cpp)
-target_link_libraries(tester_server ${catkin_LIBRARIES})
+target_link_libraries(tester_server ${catkin_LIBRARIES} utility jsoncpp)
 
 add_executable(backend_node src/backend_node.cpp)
 target_link_libraries(backend_node ${catkin_LIBRARIES})

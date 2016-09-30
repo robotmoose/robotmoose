@@ -19,16 +19,15 @@ int main(int argc, char **argv) {
 	ros::NodeHandle n;
 	ros::ServiceClient get_client = n.serviceClient<layla_sim::get>("get");
 	layla_sim::get get_srv;
-	get_srv.request.path = "/";
 
 	ros::ServiceClient set_client = n.serviceClient<layla_sim::set>("set");
 	layla_sim::set set_srv;
-	set_srv.request.path = "/robots/2016/auto/gen/benchmark";
-	set_srv.request.value = R"({"poem":"The berries are nice today"})";
 
 	ROS_INFO("Testing get.");
 	std::chrono::duration<double> total_get=std::chrono::duration<double>::zero();
 	for(size_t i=0; i<ITERS; ++i) {
+		get_srv.request.path = "/";
+
 		auto t0 = std::chrono::high_resolution_clock::now();
 		get_client.call(get_srv);
 		auto t1 = std::chrono::high_resolution_clock::now();
@@ -41,6 +40,10 @@ int main(int argc, char **argv) {
 	ROS_INFO("Testing set.");
 	std::chrono::duration<double> total_set=std::chrono::duration<double>::zero();
 	for(size_t i=0; i<ITERS; ++i) {
+		set_srv.request.path = "/robots/2016/auto/gen/benchmark";
+		set_srv.request.value = R"({"poem":"The berries are nice today"})";
+
+
 		auto t0 = std::chrono::high_resolution_clock::now();
 		set_client.call(set_srv);
 		auto t1 = std::chrono::high_resolution_clock::now();

@@ -1,6 +1,6 @@
 // Arsh Chauhan
 // 06/15/2016
-// Last Edited 06/17/2016
+// Last Edited 09/28/2016
 // sound_player.js: Play sounds on robot via chromeapp backend
 // Public Domain
 
@@ -95,7 +95,7 @@ sound_player_t.prototype.update=function()
 		var _this=this;
 		this.last_robot=this.robot;
 
-		if(this.name.get_robot().name !== this.last_robot.name)
+		if(this.name&&this.name.get_robot().name !== this.last_robot.name)
 			this.load(this.name.get_robot());
 
 		if(this.robot&&this.robot.name&&this.robot.superstar&&this.robot.year&&this.robot.school)
