@@ -1,76 +1,71 @@
 #!/usr/bin/env python3
-import getpass
 import json
 import superstar
 import sys
-import time
 
+#Experiment variables (you should change only these really...)
 auth=''
-ss=superstar.superstar_t('http://137.229.25.252:443')
-rx_start_time=0
-rx_end_time=0
+experiment_path='/test'
+payload_length=5#10**6
+ss=superstar.superstar_t('http://127.0.0.1:8081')
+#ss=superstar.superstar_t('http://137.229.25.252:443')
 
-rx_avg=0
-tx_avg=0
-total_avg=0
-times=2000
-
+#Called on error, print and die...
 def err_func(res):
-	print(res)
+	sys.stderr.write('\nError - '+str(res)+'\n')
+	sys.stderr.flush()
 	exit(1)
 
+#Run when set of initial known value is done...
 def first_set(res):
-	global rx_start_time
-	global ss
-	rx_start_time=time.time()
-	ss.get_next('/benchmarks/test',ss.sha256(json.dumps(0)),end_rx_func,err_func)
 
+	#Globals in python be lame...
+	global experiment_path
+	global ss
+
+	#Wait for a change...
+	ss.get_next(experiment_path,ss.sha256(json.dumps('a'*payload_length)),end_rx_func,err_func)
+
+#On change, write it (reply if you will)
 def end_rx_func(res):
-	global rx_end_time
-	rx_end_time=time.time()
-	global auth
-	global ss
-	if not res or not res['value']:
-		res['value']=0
-	ss.set('/benchmarks/test',res['value']+1,auth,end_tx_func,err_func)
-	ss.flush()
 
-def end_tx_func(res):
-	tx_end_time=time.time()
-	global rx_start_time
-	global rx_end_time
-	global rx_avg
-	global tx_avg
-	global total_avg
-	rx_avg+=(rx_end_time-rx_start_time)
-	tx_avg+=(tx_end_time-rx_end_time)
-	total_avg=(tx_end_time-rx_start_time)
-	#print('RX time:    '+str(rx_end_time-rx_start_time))
-	#print('TX time:    '+str(tx_end_time-rx_end_time))
-	#print('Total time: '+str(tx_end_time-rx_start_time))
+	#Globals in python be lame...
+	global auth
+	global experiment_path
+	global ss
+
+	#Figure out what to write (write a's if b's or b's if a's)
+	new_value='a'*payload_length
+	if 'value' not in res or res['value']=='a'*payload_length:
+		new_value='b'*payload_length
+
+	#Do the "reply"
+	ss.set(experiment_path,new_value,auth,None,err_func)
+	ss.flush()
 
 if __name__=='__main__':
 	try:
-		if len(sys.argv)>1:
-			url=sys.argv[1]
-			ss.superstar=url
-		#auth=getpass.getpass('Auth: ')
-		#for ii in range(times):
+		#Run experiments...forever...
 		ii=0
 		while True:
-			time.sleep(0.01)
-			sys.stdout.write('\rTest '+str(ii+1))#+'/'+str(times))
-			#sys.stdout.write('\rTest '+str(ii+1)+'/'+str(times))
-			sys.stdout.flush()
-			ss.set('/benchmarks/test',0,auth,first_set,err_func)
-			ss.flush()
+
+			#But give us debug while you do it...
 			ii+=1
-		#print('')
-		#print('RX avg time(ms):    '+str(rx_avg/times*1000))
-		#print('TX avg time(ms):    '+str(tx_avg/times*1000))
-		#print('Total avg time(ms): '+str(total_avg/times*1000))
+			sys.stdout.write('\rRunning test '+str(ii))
+			sys.stdout.flush()
+
+			#And do experiment stuff...
+			ss.set(experiment_path,'a'*payload_length,auth,first_set,err_func)
+			ss.flush()
+
+	#Kill on ctrl+c
 	except KeyboardInterrupt:
+		sys.stderr.write('\n')
+		sys.stderr.flush()
 		exit(1)
+
+	#Error, time to die...
 	except Exception as error:
-		print(error)
+		sys.stderr.write('\nError - '+str(error)+'\n')
+		sys.stderr.flush()
 		exit(1)
