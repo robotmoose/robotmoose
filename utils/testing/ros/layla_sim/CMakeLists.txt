@@ -54,6 +54,8 @@ add_service_files(
    FILES
    get.srv
    set.srv
+   duplex.srv
+   test_config.srv
 )
 
 ## Generate actions in the 'action' folder
