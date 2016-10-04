@@ -7,10 +7,11 @@ import time
 #Experiment variables (you should change only these really...)
 auth=''
 experiment_path='/test'
-payload_length=5#10**6
-ss=superstar.superstar_t('http://127.0.0.1:8081')
+#payload_length=128
+payload_length=1000000
+ss=superstar.superstar_t('http://198.199.89.187:8081')
 #ss=superstar.superstar_t('http://137.229.25.252:443')
-total_runs=10000
+total_runs=1000
 
 #Meh...
 old_value=''
@@ -97,7 +98,7 @@ if __name__=='__main__':
 		for ii in range(total_runs):
 
 			#DDOS timeout (note this isn't counted in experiment data)
-			time.sleep(0.01)
+			time.sleep(0.1)
 
 			#Debug output (note this isn't counted in experiment data)
 			sys.stderr.write('\rRunning test '+str(ii+1)+'/'+str(total_runs))

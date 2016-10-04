@@ -6,8 +6,9 @@ import sys
 #Experiment variables (you should change only these really...)
 auth=''
 experiment_path='/test'
-payload_length=5#10**6
-ss=superstar.superstar_t('http://127.0.0.1:8081')
+#payload_length=128
+payload_length=1000000
+ss=superstar.superstar_t('http://198.199.89.187:8081')
 #ss=superstar.superstar_t('http://137.229.25.252:443')
 
 #Called on error, print and die...
