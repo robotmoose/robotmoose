@@ -161,9 +161,11 @@ add_executable(tester_server src/tester_server.cpp)
 target_link_libraries(tester_server ${catkin_LIBRARIES} utility jsoncpp)
 
 add_executable(backend_node src/backend_node.cpp)
+add_dependencies(backend_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(backend_node ${catkin_LIBRARIES})
 
 add_executable(frontend_node src/frontend_node.cpp)
+add_dependencies(frontend_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(frontend_node ${catkin_LIBRARIES})
 
 
