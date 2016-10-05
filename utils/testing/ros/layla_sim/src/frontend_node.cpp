@@ -31,8 +31,8 @@ int main(int argc, char **argv) {
 	layla_sim::test_config test_config_srv;
 	test_config_client.call(test_config_srv);
 
-	latency_test_data  = std::string('A',test_config_srv.response.bytes_latency_test);
-	bandwidth_test_data  = std::string('A',test_config_srv.response.bytes_bandwidth_test);
+	latency_test_data  = std::string(test_config_srv.response.bytes_latency_test,'A');
+	bandwidth_test_data  = std::string(test_config_srv.response.bytes_bandwidth_test,'A');
 
 	ROS_INFO("Bytes to send for latency tests: %lu", test_config_srv.response.bytes_latency_test);
 	ROS_INFO("Bytes to send for bandwidth tests: %lu\n", test_config_srv.response.bytes_bandwidth_test);
