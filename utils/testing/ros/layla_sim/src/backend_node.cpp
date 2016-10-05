@@ -7,7 +7,7 @@
 std::string latency_test_data;
 std::string bandwidth_test_data;
 size_t BYTES_LATENCY_TEST = 128;
-size_t BYTES_BANDWIDTH_TEST = 1024*1024; // 1 MiB
+size_t BYTES_BANDWIDTH_TEST = 1000000; // 1 MiB
 
 bool test_config(layla_sim::test_config::Request &req, layla_sim::test_config::Response &res) {
 	res.bytes_latency_test = BYTES_LATENCY_TEST;
