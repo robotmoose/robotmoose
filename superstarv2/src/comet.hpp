@@ -1,5 +1,5 @@
 //Mike Moss
-//07/21/2016
+//09/24/2016
 //Contains comet manager for long tail based requests.
 
 #ifndef COMET_HPP
@@ -51,7 +51,7 @@ class comet_mgr_t
 
 
 		//Services a connection with the given value.
-		void service(comet_client_t& client,const Json::Value& value);
+		void service(comet_client_t& client,const Json::Value& value,const std::string& last_hash);
 
 	private:
 		std::vector<comet_client_t> clients_m;

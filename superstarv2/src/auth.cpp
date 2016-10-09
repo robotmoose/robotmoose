@@ -1,6 +1,7 @@
 #include "auth.hpp"
 
 #include <picosha2.h>
+#include "string_util.hpp"
 #include <vector>
 
 static const size_t SHA256_HASH_SIZE=32;
@@ -12,6 +13,12 @@ std::string hash_sha256(const std::string& plain)
 	std::vector<unsigned char> hash(SHA256_HASH_SIZE,'\0');
 	picosha2::hash256(plain,hash);
 	return std::string((char*)&(hash[0]),SHA256_HASH_SIZE);
+}
+
+//Same as hash_sha256 but returns the hex string.
+std::string hash_sha256_hex(const std::string& plain)
+{
+	return to_hex_string(hash_sha256(plain));
 }
 
 //Computes HMACSHA256 on given plain text and key, outputs a string of bytes.

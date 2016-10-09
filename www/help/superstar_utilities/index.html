@@ -1,0 +1,75 @@
+<html lang="en">
+	<head>
+		<!--#include virtual="/sources.html"-->
+		<title>RobotMoose - Help</title>
+	</head>
+
+	<body role="document">
+		<!--#include virtual="/navbar.html"-->
+		<div class="container theme-showcase" role="main" style="padding-top: 70px;">
+			<div class="page-header">
+				<h1>Superstar Utilities</h1>
+			</div>
+			<center></center>
+				All utilities are written in python3 and are located in utils/superstarv2.<br/>
+				<br/>
+				<pre><code>superstar.py - This is the python3 library that all the other utilities use.</code></pre>
+				<br/>
+				Robotmoose utilities:<br/>
+				<pre><code>make_robot.py - Used for making robots.</code></pre>
+				<br/>
+				Superstarv2 utilities:<br/>
+				<pre><code>starcat.py (Prints the value of a starpath.)</code></pre>
+				<pre><code>starcp.py (Copies one starpath to another.)</code></pre>
+				<pre><code>starls.py (Prints the keys in a starpath.)</code></pre>
+				<pre><code>starmv.py (Moves one starpath to another.)</code></pre>
+				<pre><code>starpasswd.py (Sets/changes a password for a given starpath.)</code></pre>
+				<pre><code>starrm.py (Removes a starpath.)</code></pre>
+				<br/>
+				All utilities use the same flags:<br/>
+				<br/>
+				Show help menu:
+				<pre><code>-h</code></pre>
+				Use local superstar (http://127.0.0.1:8081):
+				<pre><code>-l</code></pre>
+				Use dev superstar (https://test.robotmoose.com):
+				<pre><code>-d</code></pre>
+				Use the given superstar (you can specify http:// or https://, default is https://robotmoose.com):
+				<pre><code>-s SUPERSTAR</code></pre>
+				<br/>
+				Superstarv2 utilities work just like their UNIX cousins:
+				<pre><code>./starcat.py PATH</code></pre>
+				<pre><code>./starcp.py FROM TO</code></pre>
+				<pre><code>./starls.py PATH</code></pre>
+				<pre><code>./starmv.py FROM TO</code></pre>
+				<pre><code>./starpasswd.py PATH</code></pre>
+				<pre><code>./starrm.py PATH</code></pre>
+				<br/>
+				Examples:<br/>
+				Make a robot on https://robotmoose.com under 2016/uaf/mybot.
+				<pre><code>./make_robot.py 2016/uaf/mybot</code></pre>
+				Make a robot on http://127.0.0.1:8081 under 2016/local/mybot.
+				<pre><code>./make_robot.py -l 2016/local/mybot</code></pre>
+				Make a robot on https://test.robotmoose.com under 2016/test/mybot.
+				<pre><code>./make_robot.py -d 2016/test/mybot</code></pre>
+				Make a robot on the custom superstar running at 192.168.1.2 under 2016/custom/mybot.
+				<pre><code>./make_robot.py -s http://192.168.1.5 2016/custom/mybot</code></pre>
+				Cat the robotmoose.com robot 2016/uaf/mybot and save it to a file for safe keeping:
+				<pre><code>./starcat.py /robots/2016/uaf/mybot > 2016uafmybot.json</code></pre>
+				Copy the robot 2016/uaf/mybot to 2016/uaf/mybotcopy on robotmoose.com:
+				<pre><code>./starcp.py /robots/2016/uaf/mybot /robots/2016/uaf/mybotcopy</code></pre>
+				Show all robots in the school 2016/uaf on robotmoose.com:
+				<pre><code>./starls.py /robots/2016/uaf</code></pre>
+				Move the robot 2016/uaf/mybotcopy to 2016/uaf/mybotclone on robotmoose.com:
+				<pre><code>./starmv.py /robots/2016/uaf/mybotcopy /robots/2016/uaf/mybotclone</code></pre>
+				Set the password for the school 2016/uaf on robotmoose.com:
+				<pre><code>./starpasswd.py /robots/2016/uaf</code></pre>
+				Remove the robot 2016/uaf/mybotclone from robotmoose.com:
+				<pre><code>./starrm.py /robots/2016/uaf/mybotclone</code></pre>
+				* Note, you will be prompted for authentication codes above when needed by the specified superstar server.<br/>
+				<br/>
+				<br/>
+				<br/>
+		</div>
+	</body>
+</html>

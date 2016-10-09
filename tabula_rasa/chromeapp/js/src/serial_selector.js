@@ -31,7 +31,10 @@ function serial_selector_t(div,on_connect,on_disconnect,is_connectable)
 
 	this.checkmark=new checkmark_t(this.el);
 
-	this.dropdown=new dropdown_t(this.checkmark.getElement(),function(){return _this.connected;});
+	this.dropdown=new dropdown_t(this.checkmark.getElement(),function()
+	{
+		return _this.connected;
+	});
 	this.dropdown.set_width("100%");
 
 	this.button=document.createElement("input");

@@ -1,10 +1,12 @@
 //Mike Moss
-//07/21/2016
+//09/24/2016
 //Contains comet manager for long tail based requests.
 
 #include "comet.hpp"
 
+#include "auth.hpp"
 #include "mongoose_util.hpp"
+#include "string_util.hpp"
 #include "time_util.hpp"
 
 //Comet constants.
@@ -72,18 +74,20 @@ void comet_mgr_t::update_path(const std::string& path,superstar_t& superstar)
 			cancel(clients_m[ii]);
 		}
 
-
 		//Note expired, check for an update.
 		else
 		{
 			//Get old/new value.
 			std::string our_path(clients_m[ii].response["path"].asString());
-			std::string old_value(JSON_serialize(clients_m[ii].response["result"]));
+			Json::Value& result=clients_m[ii].response["result"];
+			std::string last_hash(result["hash"].asString());
+			std::string old_value(JSON_serialize(result["value"]));
 			Json::Value current_value(superstar.get(our_path));
+			std::string new_hash(hash_sha256_hex(JSON_serialize(current_value)));
 
 			//New value, update.
-			if(old_value!=JSON_serialize(current_value))
-				service(clients_m[ii],current_value);
+			if(last_hash!=new_hash||old_value!=JSON_serialize(current_value))
+				service(clients_m[ii],current_value,new_hash);
 
 			//Still waiting...
 			else
@@ -118,14 +122,16 @@ void comet_mgr_t::cancel(mg_connection* conn)
 }
 
 //Services a connection with the given value.
-void comet_mgr_t::service(comet_client_t& client,const Json::Value& value)
+void comet_mgr_t::service(comet_client_t& client,const Json::Value& value,
+	const std::string& new_hash)
 {
 	//Clear unexpected members.
 	client.response.removeMember("comet");
 	client.response.removeMember("path");
+	client.response["result"]["hash"]=new_hash;
 
 	//Set response, send response, and close socket.
-	client.response["result"]=value;
+	client.response["result"]["value"]=value;
 	mg_send(client.conn,"200 OK",JSON_serialize(client.response));
 	client.conn->flags&=~MG_F_USER_1;
 }

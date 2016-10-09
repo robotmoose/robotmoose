@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #Mike Moss
-#07/22/2016
+#09/24/2016
 #Contains client code to get requests from a superstar server.
 
 import hashlib
@@ -19,6 +19,10 @@ class superstar_t:
 			else:
 				self.superstar="https://"+self.superstar
 		self.queue=[]
+
+	#Helper to get the hex string sha256 sum of a string.
+	def sha256(self,data):
+		return hashlib.sha256(bytearray(data,"utf-8")).hexdigest()
 
 	#Gets the value of path.
 	#  Calls success_cb on success with the server response.
@@ -49,7 +53,7 @@ class superstar_t:
 	#Pushes the given value onto path using the given auth.
 	#  Calls success_cb on success with the server response.
 	#  Calls error_cb on error with the server error object (as per spec).
-	#  Note, if the path is not an array, it will be after self.
+	#  Note, if the path is not an array, it will be after this.
 	def push(self,path,value,length,auth="",success_cb=None,error_cb=None):
 		path=self.pathify(path)
 		opts=json.dumps({"value":value,"length":length})
@@ -61,20 +65,22 @@ class superstar_t:
 	#  Calls success_cb on success with the server response.
 	#  Calls error_cb on error with the server error object (as per spec).
 	#  Note, python version is unique because it is BLOCKING.
-	def get_next(self,path,success_cb=None,error_cb=None):
+	def get_next(self,path,last_hash=None,success_cb=None,error_cb=None):
 		path=self.pathify(path)
 		request=self.build_skeleton_request("get_next",path)
 		request["id"]=0
+		if last_hash:
+			request["params"]["last_hash"]=last_hash
 		request_error_handler={"error_cb":error_cb}
 		try:
 			#Make the request.
 			data=bytes(json.dumps(request),"utf-8")
-			server_response=urllib.request.urlopen("http://"+self.superstar+"/superstar/",data)
+			server_response=urllib.request.urlopen(self.superstar+"/superstar/",data)
 
 			#Parse response, call responses.
 			response=json.loads(server_response.read().decode('utf-8'))
 
-			#Got an array, must be batch data...
+			#Got an object, must be single request...
 			if isinstance(response,dict):
 				#Error callback...
 				if "error" in response:
@@ -177,26 +183,26 @@ class superstar_t:
 
 			#Got an array, must be batch data...
 			if isinstance(response,list):
-				for key in range(0,len(response)):
-					if not "id" in response[key]:
+				for ii in range(0,len(response)):
+					if not "id" in response[ii]:
 						continue
 
 					#Error callback...
-					if "error" in response[key]:
-						response_obj=response[key]["error"]
-						self.handle_error(old_queue[response[key]["id"]],response_obj)
+					if "error" in response[ii]:
+						response_obj=response[ii]["error"]
+						self.handle_error(old_queue[response[ii]["id"]],response_obj)
 						continue
 
 					#Success callback...
-					if "result" in response[key]:
-						response_obj=response[key]["result"]
-						if old_queue[response[key]["id"]]["success_cb"]:
-							old_queue[response[key]["id"]]["success_cb"](response_obj)
+					if "result" in response[ii]:
+						response_obj=response[ii]["result"]
+						if old_queue[response[ii]["id"]]["success_cb"]:
+							old_queue[response[ii]["id"]]["success_cb"](response_obj)
 
 			#Server error...
 			else:
-				for key in old_queue:
-					self.handle_error(old_queue[key],response["error"])
+				for ii in range(0,len(old_queue)):
+					self.handle_error(old_queue[ii],response["error"])
 		except Exception as error:
 			error_obj={}
 			error_obj["code"]=0
@@ -210,27 +216,3 @@ class superstar_t:
 			request["error_cb"](error)
 		else:
 			print("Superstar error ("+str(error["code"])+") - "+error["message"])
-
-if __name__=="__main__":
-	def getprint(result):
-		print(result)
-
-	def subprint(result):
-		print(result)
-
-	def errprint(error):
-		print(error)
-
-	ss=superstar_t("127.0.0.1:8081")
-
-	ss.get("/blarg",getprint)
-	ss.set("/blarg",4,"123")
-	#ss.get("/blarg",getprint)
-	#ss.sub("/",subprint)
-	#ss.push("/blarg2",2,3,"123")
-	#ss.get("/blarg2",getprint)
-	#ss.change_auth("/123","12341234","123",getprint)
-	#ss.flush()
-
-	#Again, note this is blocking...
-	ss.get_next("/blarg",getprint,errprint)

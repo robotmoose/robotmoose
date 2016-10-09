@@ -30,13 +30,13 @@ function name_t(div,on_message,on_selected)
 	this.superstar_select.onchange=function(){_this.download_years_m();};
 
 	this.name_checkmark=new checkmark_t(this.el);
-	this.year_select=new dropdown_t(this.name_checkmark.getElement(),null,null,"Year");
+	this.year_select=new dropdown_t(this.name_checkmark.getElement());
 	this.year_select.set_width("34%");
 	this.year_select.onchange=function(){_this.download_schools_m();};
-	this.school_select=new dropdown_t(this.name_checkmark.getElement(),null,null,"School");
+	this.school_select=new dropdown_t(this.name_checkmark.getElement());
 	this.school_select.set_width("33%");
 	this.school_select.onchange=function(){_this.download_robots_m();};
-	this.robot_select=new dropdown_t(this.name_checkmark.getElement(),null,null,"Robot");
+	this.robot_select=new dropdown_t(this.name_checkmark.getElement());
 	this.robot_select.set_width("33%");
 	this.robot_select.onchange=function(){_this.on_selected_m();};
 
@@ -100,8 +100,6 @@ name_t.prototype.update_superstars_m=function()
 	[
 		"robotmoose.com",
 		"test.robotmoose.com",
-		"androidantelope.com",
-		"cyborgcaribou.com",
 		"127.0.0.1:8081",
 		"10.8.110.36:8081"
 	];

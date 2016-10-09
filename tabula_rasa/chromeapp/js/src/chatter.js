@@ -17,6 +17,7 @@ function chatter_t(div,maxlines,handle)
 	this.el=document.createElement("div");
 	this.div.appendChild(this.el);
 	this.el.style.height="100%";
+	this.last_chat_hash=null;
 
 	this.table=new_table(this.el,2,1);
 	maximize(this.table);
@@ -121,9 +122,10 @@ chatter_t.prototype.set_robot=function(robot)
 
 		var request=function()
 		{
-			_this.comet=superstar.get_next(robot_to_starpath(_this.robot)+"chat",function(data)
+			_this.comet=superstar.get_next(robot_to_starpath(_this.robot)+"chat",_this.last_chat_hash,function(data)
 			{
-				service(data);
+				_this.last_chat_hash=data.hash;
+				service(data.value);
 			},
 			function()
 			{
@@ -131,19 +133,6 @@ chatter_t.prototype.set_robot=function(robot)
 			});
 		};
 
-		var get_once=function()
-		{
-			if(valid_robot(_this.robot))
-				superstar.get(robot_to_starpath(_this.robot)+"chat",function(data)
-				{
-					service(data);
-				},
-				function()
-				{
-					setTimeout(function(){get_once();},1000);
-				});
-		};
-
-		get_once();
+		request();
 	}
 }

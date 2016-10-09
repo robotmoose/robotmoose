@@ -35,13 +35,13 @@ function modal_connect_t(div)
 	this.modal.set_title("Connect to Robot");
 
 	this.year_select.className="form-control";
-	this.year_select.onchange=function(){_this.build_school_list_m()};
+	this.year_select.onchange=function(){_this.build_school_list_m();};
 	this.modal.get_content().appendChild(this.year_select);
 
 	this.modal.get_content().appendChild(document.createElement("br"));
 
 	this.school_select.className="form-control";
-	this.school_select.onchange=function(){_this.build_robot_list_m()};
+	this.school_select.onchange=function(){_this.build_robot_list_m();};
 	this.modal.get_content().appendChild(this.school_select);
 
 	this.modal.get_content().appendChild(document.createElement("br"));
@@ -171,8 +171,6 @@ modal_connect_t.prototype.show=function()
 			_this.schools=[];
 			_this.robots=[];
 			_this.build_year_list_m();
-			_this.build_school_list_m();
-			_this.build_robot_list_m();
 			_this.modal.show();
 		},
 		function(error)
@@ -190,8 +188,8 @@ modal_connect_t.prototype.hide=function()
 
 modal_connect_t.prototype.build_year_list_m=function()
 {
-	while(this.year_select.firstChild)
-		this.year_select.removeChild(this.year_select.firstChild);
+	var _this=this;
+	this.year_select.length=0;
 
 	var default_option=document.createElement("option");
 	default_option.text="Select a Year";
@@ -205,20 +203,19 @@ modal_connect_t.prototype.build_year_list_m=function()
 		this.year_select.appendChild(option);
 	}
 
-	if (localStorage.previous_year)
+	if(localStorage.previous_year)
 		this.year_select.value = localStorage.previous_year;
 	else if(this.years.length>0)
 		this.year_select.selectedIndex=1;
 
+	this.build_school_list_m();
 	this.update_disables_m();
 }
 
 modal_connect_t.prototype.build_school_list_m=function()
 {
 	var _this=this;
-
-	while(this.school_select.firstChild)
-		this.school_select.removeChild(this.school_select.firstChild);
+	this.school_select.length=0;
 
 	var default_option=document.createElement("option");
 	default_option.text="Select a School";
@@ -237,11 +234,11 @@ modal_connect_t.prototype.build_school_list_m=function()
 				{
 					var option=document.createElement("option");
 					option.text=_this.schools[key];
-					if (localStorage.previous_school == option.text)
+					if (_this.year_select.selectedIndex != 0 && localStorage.previous_school == option.text)
 						option.selected = true;
 					_this.school_select.appendChild(option);
 				}
-
+				_this.build_robot_list_m();
 				_this.update_disables_m();
 			},
 			function(error)
@@ -253,9 +250,7 @@ modal_connect_t.prototype.build_school_list_m=function()
 modal_connect_t.prototype.build_robot_list_m=function()
 {
 	var _this=this;
-
-	while(this.robot_select.firstChild)
-		this.robot_select.removeChild(this.robot_select.firstChild);
+	this.robot_select.length=0;
 
 	var default_option=document.createElement("option");
 	default_option.text="Select a Robot";
@@ -264,7 +259,7 @@ modal_connect_t.prototype.build_robot_list_m=function()
 	this.update_disables_m();
 	var school = "";
 
-	if (this.school_select.selectedIndex == 0 && localStorage.previous_school)
+	if (this.school_select.selectedIndex != 0 && localStorage.previous_school)
 		school = localStorage.previous_school;
 	else if (this.school_select.selectedIndex!=0)
 		school = get_select_value(this.school_select);
@@ -279,9 +274,8 @@ modal_connect_t.prototype.build_robot_list_m=function()
 				{
 					var option=document.createElement("option");
 					option.text=_this.robots[key];
-					if (localStorage.previous_robot == option.text) {
+					if (_this.school_select.selectedIndex>0&&localStorage.previous_robot == option.text)
 						option.selected = true;
-					}
 
 					_this.robot_select.appendChild(option);
 				}

@@ -2,7 +2,7 @@
 	"name":"RobotMoose (roadkill)",
 	"short_name":"RobotMoose",
 	"description":"Robotics backend software (test version from git).",
-	"version":"2016.8.28.0",
+	"version":"2016.9.24.0",
 	"manifest_version":2,
 	"permissions":
 	[
@@ -13,10 +13,6 @@
 		"http://test.robotmoose.com/",
 		"https://test.robotmoose.com/",
 		"https://www.gruveo.com/embed/",
-		"http://androidantelope.com/",
-		"https://androidantelope.com/",
-		"http://cyborgcaribou.com/",
-		"https://cyborgcaribou.com/",
 		"alwaysOnTopWindows",
 		"audioCapture",
 		"fullscreen",

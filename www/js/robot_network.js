@@ -83,7 +83,8 @@ robot_network_t.prototype.update_pilot=function(pilot)
 		var _this=this;
 		superstar_set(this.robot,"pilot",this.pilot,function()
 		{
-			if(_this.sensors.power.L!=_this.pilot.power.L||
+			if(!_this.sensors||!_this.sensors.power||
+				_this.sensors.power.L!=_this.pilot.power.L||
 				_this.sensors.power.R!=_this.pilot.power.R)
 					setTimeout(function()
 					{
@@ -116,9 +117,10 @@ robot_network_t.prototype.set_robot=function(robot)
 
 	var getnext_sensors=function()
 	{
-		superstar.get_next(robot_to_starpath(_this.robot)+"sensors",function(json)
+		superstar.get_next(robot_to_starpath(_this.robot)+"sensors",_this.last_sensors_hash,function(json)
 		{
-			_this.sensors=json;
+			_this.last_sensors_hash=json.hash;
+			_this.sensors=json.value;
 			if(_this.kinect) {
 				//_this.kinect.angle=_this.kinect.angle.toFixed(2);
 				_this.sensors.kinect=_this.kinect;
@@ -133,9 +135,10 @@ robot_network_t.prototype.set_robot=function(robot)
 
 	var getnext_kinect=function()
 	{
-		superstar.get_next(robot_to_starpath(_this.robot)+"kinect",function(json)
+		superstar.get_next(robot_to_starpath(_this.robot)+"kinect",_this.last_kinect_hash,function(json)
 		{
-			_this.kinect=json;
+			_this.last_kinect_hash=json.hash;
+			_this.kinect=json.value;
 			//_this.kinect.angle=_this.kinect.angle.toFixed(2);
 			_this.sensors.kinect=_this.kinect;
 			getnext_kinect();

@@ -1,12 +1,14 @@
 //Mike Moss
-//07/21/2016
+//09/24/2016
 //Contains an implementation of the jsonrpc 2.0 specification:
 //  http://www.jsonrpc.org/specification
 
 #include "jsonrpc.hpp"
 
+#include "auth.hpp"
 #include "json_util.hpp"
 #include "mongoose_util.hpp"
+#include "string_util.hpp"
 
 //Attempts to handle and send the response of the jsonrpc request(s) object in
 //  post_data via the passed superstar object.
@@ -70,7 +72,7 @@ void jsonrpc(superstar_t& superstar,comet_mgr_t& comet_mgr,
 	catch(std::exception& error)
 	{
 		responses=jsonrpc_skeleton();
-		responses["error"]=jsonrpc_error(-32700,"Parse error",error.what());
+		responses["error"]=jsonrpc_error(-32700,"Parse error2",error.what());
 	}
 
 	//Unknown JSON errors...
@@ -94,7 +96,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 	if(!request.isObject()||
 		request["jsonrpc"].asString()!="2.0"||
 		jsonrpc_invalid_id(request["id"])||
-		JSON_isString(request["method"]))
+		!JSON_isString(request["method"]))
 	{
 		response["error"]=jsonrpc_error(-32600,"Invalid Request");
 	}
@@ -121,7 +123,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 		}
 
 		//We only use strings for paths...
-		if(JSON_isString(params["path"]))
+		if(!JSON_isString(params["path"]))
 		{
 			bad_params=true;
 			error_message="Path field must be a string.";
@@ -158,7 +160,7 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 		}
 
 		//We only use strings for auths...
-		if(JSON_isString(params["auth"])&&!params["auth"].isNull())
+		if(!JSON_isString(params["auth"])&&!params["auth"].isNull())
 		{
 			bad_params=true;
 			error_message="Auth field must be a string or null.";
@@ -170,6 +172,15 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 			!superstar.auth_check(path,opts_str,params["auth"],was_immutable))
 		{
 			auth=false;
+			goto error_label;
+		}
+
+		//Write based operations - check value.
+		if((method=="set"||method=="push"||method=="change_auth")&&
+			!opts.isMember("value"))
+		{
+			bad_params=true;
+			error_message="Write based operations require a value.";
 			goto error_label;
 		}
 
@@ -217,9 +228,21 @@ Json::Value jsonrpc_handle(superstar_t& superstar,comet_mgr_t& comet_mgr,
 		}
 		else if(method=="get_next")
 		{
-			response["comet"]=true;
+			Json::Value result=Json::objectValue;
+			result["value"]=superstar.get(path);
+			result["hash"]=params["last_hash"].asString();
+
+			//Check current hash, if different then return immediately.
+			std::string new_hash(hash_sha256_hex(JSON_serialize(result["value"])));
+			if(new_hash!=result["hash"].asString())
+				result["hash"]=new_hash;
+
+			//Hashes match, switch to comet.
+			else
+				response["comet"]=true;
+
 			response["path"]=path;
-			response["result"]=superstar.get(path);
+			response["result"]=result;
 		}
 
 		//What have I become?

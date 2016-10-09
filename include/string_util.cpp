@@ -47,20 +47,30 @@ bool to_bool(const std::string& str)
 	throw std::runtime_error("String \""+str+"\" is not a bool.");
 }
 
-int to_int(const std::string& str)
+int to_int(const std::string& value)
 {
-	if(is_int(str))
-		return atoi(str.c_str());
+	//Convert Variables
+	std::istringstream istr(value,std::ios_base::in);
+	int temp=0;
 
-	throw std::runtime_error("String \""+str+"\" is not an int.");
+	//Convert
+	istr>>temp;
+
+	//Return Converted Value
+	return temp;
 }
 
-double to_double(const std::string& str)
+double to_double(const std::string& value)
 {
-	if(is_double(str))
-		return atof(str.c_str());
+	//Convert Variables
+	std::istringstream istr(value,std::ios_base::in);
+	double temp=0.0;
 
-	throw std::runtime_error("String \""+str+"\" is not a double.");
+	//Convert
+	istr>>temp;
+
+	//Return Converted Value
+	return temp;
 }
 
 bool is_bool(std::string str)
