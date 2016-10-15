@@ -185,26 +185,27 @@ pilot_interface_t.prototype.reconfigure=function(config_editor)
 pilot_interface_t.prototype.make_slider=function(config_entry,name,number, minval,maxval)
 {
 	var _this=this;
-	var pilotpower=_this.pilot.power;
-	if (!pilotpower[name]) pilotpower[name]=[];
-	var value=pilotpower[name][number];
-	if (!value) value=0.0;
-	if(name=="servo") value=90.0;
+	if (!_this.pilot.power[name])
+		_this.pilot.power[name]=[];
+	if (!_this.pilot.power[name][number])
+		_this.pilot.power[name][number]=0.0;
+	if(name=="servo")
+		_this.pilot.power[name][number]=90.0;
 
 	var p=document.createElement("p");
 	var label_name=document.createTextNode(name+"["+number+"] = ");
-	var label_value=document.createTextNode(""+(0xffFFffFF&value));
+	var label_value=document.createTextNode(""+(0xffFFffFF&_this.pilot.power[name][number]));
 
 	var slider=document.createElement("input");
 	slider.type="range";
 	slider.min=minval;
 	slider.max=maxval;
-	slider.value=value;
+	slider.value=_this.pilot.power[name][number];
 
 	var set_power=function()
 	{
-		pilotpower[name][number]=parseInt(slider.value);
-		label_value.nodeValue=""+(0xffFFffFF&pilotpower[name][number]);
+		_this.pilot.power[name][number]=parseInt(slider.value);
+		label_value.nodeValue=""+(0xffFFffFF&_this.pilot.power[name][number]);
 	};
 
 
@@ -215,6 +216,7 @@ pilot_interface_t.prototype.make_slider=function(config_entry,name,number, minva
 	p.appendChild(label_value);
 	p.appendChild(slider);
 	this.element.appendChild(p);
+	robot_network.update_pilot(_this.pilot);
 }
 
 // Add GUI elements for driving around (arrows)
@@ -402,6 +404,7 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 		_this.pilot.power.R=0;
 		robot_network.update_pilot(_this.pilot);
 	});
+	robot_network.update_pilot(_this.pilot);
 }
 
 pilot_interface_t.prototype.update_drive_text=function()
