@@ -20,14 +20,6 @@ function modal_connect_t(div)
 	this.sim_button=document.createElement("input");
 	this.change_auth_button=document.createElement("input");
 
-	//HACK TEMP FIX
-	// Remember selections for later using localStorage API
-	localStorage.previous_year = '';
-	localStorage.previous_school = '';
-	localStorage.previous_robot = '';
-
-
-
 	if(!this.modal)
 	{
 		this.modal=null;
@@ -91,11 +83,10 @@ function modal_connect_t(div)
 			toString(CryptoJS.enc.Hex);
 		_this.robot_auth.value="";
 
-		//HACK TEMP FIX
 		// Remember selections for later using localStorage API
-		//localStorage.previous_year = robot.year;
-		//localStorage.previous_school = robot.school;
-		//localStorage.previous_robot = robot.name;
+		localStorage.previous_year = robot.year;
+		localStorage.previous_school = robot.school;
+		localStorage.previous_robot = robot.name;
 
 		// Check connection validity
 		superstar_set(robot, 'authtest', 'authtest', function()
@@ -208,7 +199,7 @@ modal_connect_t.prototype.build_year_list_m=function()
 		this.year_select.appendChild(option);
 	}
 
-	if(localStorage.previous_year)
+	if(localStorage.previous_year&&is_in_select(this.year_select,localStorage.previous_year))
 		this.year_select.value = localStorage.previous_year;
 	else if(this.years.length>0)
 		this.year_select.selectedIndex=1;
@@ -239,7 +230,7 @@ modal_connect_t.prototype.build_school_list_m=function()
 				{
 					var option=document.createElement("option");
 					option.text=_this.schools[key];
-					if (_this.year_select.selectedIndex > 0 && localStorage.previous_school == option.text)
+					if (_this.schools[key]==localStorage.previous_school && is_in_select(_this.school_select,localStorage.previous_school))
 						option.selected = true;
 					_this.school_select.appendChild(option);
 				}
@@ -262,15 +253,9 @@ modal_connect_t.prototype.build_robot_list_m=function()
 	this.robot_select.appendChild(default_option);
 
 	this.update_disables_m();
-	var school = "";
 
-	if (this.school_select.selectedIndex > 0 && localStorage.previous_school)
-		school = localStorage.previous_school;
-	else if (this.school_select.selectedIndex>0)
-		school = get_select_value(this.school_select);
-
-	if(school != "")
-		superstar.sub("/robots/"+get_select_value(this.year_select)+"/"+school,
+	if(this.school_select.selectedIndex>0)
+		superstar.sub("/robots/"+get_select_value(this.year_select)+"/"+get_select_value(this.school_select),
 			function(robot_list)
 			{
 				_this.robots=robot_list;
@@ -279,8 +264,10 @@ modal_connect_t.prototype.build_robot_list_m=function()
 				{
 					var option=document.createElement("option");
 					option.text=_this.robots[key];
-					if (_this.school_select.selectedIndex>0&&localStorage.previous_robot == option.text)
+					if (_this.robots[key]==localStorage.previous_robot && is_in_select(_this.robot_select,localStorage.previous_robot))
+					{
 						option.selected = true;
+					}
 
 					_this.robot_select.appendChild(option);
 				}

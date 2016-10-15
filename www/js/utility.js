@@ -65,3 +65,11 @@ function get_absolute_offset(el)
 	}
 	return offset;
 };
+
+function is_in_select(select,value)
+{
+	for(var ii in select.options)
+		if(select.options[ii].value)
+			return true;
+	return false;
+}
