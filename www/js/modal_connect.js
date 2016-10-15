@@ -20,7 +20,11 @@ function modal_connect_t(div)
 	this.sim_button=document.createElement("input");
 	this.change_auth_button=document.createElement("input");
 
-
+	//HACK TEMP FIX
+	// Remember selections for later using localStorage API
+	localStorage.previous_year = '';
+	localStorage.previous_school = '';
+	localStorage.previous_robot = '';
 
 
 
@@ -87,10 +91,11 @@ function modal_connect_t(div)
 			toString(CryptoJS.enc.Hex);
 		_this.robot_auth.value="";
 
+		//HACK TEMP FIX
 		// Remember selections for later using localStorage API
-		localStorage.previous_year = robot.year;
-		localStorage.previous_school = robot.school;
-		localStorage.previous_robot = robot.name;
+		//localStorage.previous_year = robot.year;
+		//localStorage.previous_school = robot.school;
+		//localStorage.previous_robot = robot.name;
 
 		// Check connection validity
 		superstar_set(robot, 'authtest', 'authtest', function()
@@ -223,7 +228,7 @@ modal_connect_t.prototype.build_school_list_m=function()
 
 	this.update_disables_m();
 
-	if(this.year_select.selectedIndex!=0)
+	if(this.year_select.selectedIndex>0)
 		superstar.sub("/robots/"+get_select_value(this.year_select),
 			function(school_list)
 			{
@@ -234,7 +239,7 @@ modal_connect_t.prototype.build_school_list_m=function()
 				{
 					var option=document.createElement("option");
 					option.text=_this.schools[key];
-					if (_this.year_select.selectedIndex != 0 && localStorage.previous_school == option.text)
+					if (_this.year_select.selectedIndex > 0 && localStorage.previous_school == option.text)
 						option.selected = true;
 					_this.school_select.appendChild(option);
 				}
@@ -259,9 +264,9 @@ modal_connect_t.prototype.build_robot_list_m=function()
 	this.update_disables_m();
 	var school = "";
 
-	if (this.school_select.selectedIndex != 0 && localStorage.previous_school)
+	if (this.school_select.selectedIndex > 0 && localStorage.previous_school)
 		school = localStorage.previous_school;
-	else if (this.school_select.selectedIndex!=0)
+	else if (this.school_select.selectedIndex>0)
 		school = get_select_value(this.school_select);
 
 	if(school != "")
