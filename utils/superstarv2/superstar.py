@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #Mike Moss
-#09/24/2016
+#10/14/2016
 #Contains client code to get requests from a superstar server.
 
 import hashlib
