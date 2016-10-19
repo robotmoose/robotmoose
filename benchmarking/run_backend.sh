@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -ne 3 ]
+if [ $# -ne 1 ]
 then
-	echo "Usage: ./run_backend.sh superstar quiet|real testnum"
+	echo "Usage: ./run_backend.sh superstar"
 	exit 1
 fi
 
