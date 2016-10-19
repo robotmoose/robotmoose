@@ -2,14 +2,14 @@
 import json
 import superstar
 import sys
+total_runs=1000
 
 #Experiment variables (you should change only these really...)
 auth=''
 experiment_path='/test'
-#payload_length=128
-payload_length=1000000
+payload_length=128
 ss=superstar.superstar_t('http://198.199.89.187:8081')
-#ss=superstar.superstar_t('http://137.229.25.252:443')
+total_runs=1000
 
 #Called on error, print and die...
 def err_func(res):
@@ -37,7 +37,7 @@ def end_rx_func(res):
 
 	#Figure out what to write (write a's if b's or b's if a's)
 	new_value='a'*payload_length
-	if 'value' not in res or res['value']=='a'*payload_length:
+	if 'value' not in res or (len(res['value'])>0 and res['value'][0]=='a'):
 		new_value='b'*payload_length
 
 	#Do the "reply"
@@ -46,18 +46,34 @@ def end_rx_func(res):
 
 if __name__=='__main__':
 	try:
+		#Print Usage
+		sys.stderr.write('Usage: ./getset.py superstar payload_size\n')
+		sys.stderr.flush()
+
+		#Parse Settings
+		if len(sys.argv)>1:
+			ss=superstar.superstar_t(sys.argv[1])
+		if len(sys.argv)>2:
+			payload_length=int(sys.argv[2])
+
+		#Print Settings
+		sys.stderr.write('Superstar:      '+sys.argv[1]+'\n')
+		sys.stderr.write('Payload Length: '+str(payload_length)+'\n')
+		sys.stderr.flush()
+
 		#Run experiments...forever...
-		ii=0
-		while True:
+		for ii in range(0,total_runs):
 
 			#But give us debug while you do it...
-			ii+=1
-			sys.stdout.write('\rRunning test '+str(ii))
+			sys.stderr.write('\rRunning test '+str(ii+1)+'/'+str(total_runs))
 			sys.stdout.flush()
 
 			#And do experiment stuff...
 			ss.set(experiment_path,'a'*payload_length,auth,first_set,err_func)
 			ss.flush()
+
+		sys.stderr.write('\n')
+		sys.stderr.flush()
 
 	#Kill on ctrl+c
 	except KeyboardInterrupt:
