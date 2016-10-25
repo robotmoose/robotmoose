@@ -876,18 +876,24 @@ connection_t.prototype.arduino_recv_packet=function(p)
 			", expected "+idx+" (firmware/app mismatch?)");
 
 
+	if(!_this.sensors.backend)
+		_this.sensors.backend={};
+
+	var manifest=chrome.runtime.getManifest();
+	_this.sensors.backend.name=manifest.name;
+	_this.sensors.backend.version=manifest.version;
 
 	// Merge backend laptop battery information with sensor packet
 	if(!(typeof navigator.getBattery() === 'undefined' ||  navigator.getBattery() === null)) {
 		navigator.getBattery().then(function(battery) {
 			// Have to add each individually
-			_this.sensors["backend_battery"] = {};
-			_this.sensors["backend_battery"]["charging"] = battery.charging;
+			_this.sensors.backend.battery={};
+			_this.sensors.backend.battery.is_charging = battery.charging;
 			if(battery.chargingTime !== Number.POSITIVE_INFINITY)
-				_this.sensors["backend_battery"]["chargingTime"] = ((battery.chargingTime/60.0).toFixed(2)).toString()+" minutes";
+				_this.sensors.backend.battery.time_till_charged = ((battery.chargingTime/60.0).toFixed(2)).toString()+" minutes";
 			else if(battery.dischargingTime !== Number.POSITIVE_INFINITY)
-				_this.sensors["backend_battery"]["dischargingTime"] = ((battery.dischargingTime/60.0).toFixed(2)).toString()+" minutes";
-			_this.sensors["backend_battery"]["percent"] = ((battery.level*100).toFixed(2)).toString()+"%";
+				_this.sensors.backend.battery.time_till_discharged = ((battery.dischargingTime/60.0).toFixed(2)).toString()+" minutes";
+			_this.sensors.backend.battery.percent = ((battery.level*100).toFixed(2)).toString()+"%";
 		});
 	}
 
@@ -1191,7 +1197,9 @@ connection_t.prototype.serial_send_packet=function(command,array_data,done_callb
 connection_t.prototype.save=function()
 {
 	var _this=this;
-	var robot=this.robot;
+	var robot=JSON.parse(JSON.stringify(this.robot));
+	delete robot.auth;
+
 	robot.serial=this.port_name;
 	chrome.storage.local.set({"robot":robot},
 		function(){_this.status_message("Saved robot.");});
