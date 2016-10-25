@@ -227,6 +227,7 @@ function renderer_t(div,setup_func,loop_func)
 			myself.controls.lookSpeed=0.2;
 			myself.controls.center.set(0,64,0);
 			myself.controls.object.position.set(0,100,250);
+			myself.controls.enabled=false;
 
 
 			myself.user_setup();

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #Mike Moss
-#08/24/2016
+#10/14/2016
 #Sets password for path.
 
 import argparse
@@ -62,9 +62,9 @@ if __name__=="__main__":
 		while True:
 			robot_auth=""
 			try:
-				robot_auth=getpass.getpass(prompt='Enter new auth (at least 8 characters):  ')
-				if len(robot_auth)<8 and robot_auth!='!' and robot_auth!='-' and len(robot_auth)!=0:
-					raise Exception('Auth code must be at least 8 characters.')
+				robot_auth=getpass.getpass(prompt='Enter new auth (at least 4 characters):  ')
+				if len(robot_auth)<4 and robot_auth!='!' and robot_auth!='-' and len(robot_auth)!=0:
+					raise Exception('Auth code must be at least 4 characters.')
 				for ii in robot_auth:
 					if ord(ii)<33 or ord(ii)>126:
 						raise Exception('Auth code can only contain non-whitespace ascii characters.')

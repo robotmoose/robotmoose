@@ -49,6 +49,11 @@ function gui_t(div)
 	this.chat_div.style.height="100%";
 	this.chat=new chatter_t(this.chat_div,20,"Caretaker");
 
+	this.version_div=document.createElement(this.version_div);
+	this.main_div.appendChild(this.version_div);
+	var manifest=chrome.runtime.getManifest();
+	this.version_div.appendChild(document.createTextNode('Version: '+manifest.name+' '+manifest.version));
+
 	this.name=new name_t
 	(
 		this.main_div,

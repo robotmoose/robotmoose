@@ -1,5 +1,5 @@
 //Mike Moss
-//07/09/2016
+//10/14/2016
 //Contains the superstar "database" object (actually does the set/get operations).
 
 #include "superstar.hpp"
@@ -275,10 +275,10 @@ void superstar_t::push(const std::string& path,const Json::Value& val,
 		new_array.append((*obj)[(Json::ArrayIndex)(obj->size()-min_size+ii)]);
 	*obj=new_array;
 }
-
+#include <iostream>
 //Changes auth code for a given path to the given value.
 //  Returns whether new auth was set or not.
-//  Note, min auth code length is 8 characters (SEE NOTE BELOW).
+//  Note, min auth code length is 4 characters (SEE NOTE BELOW).
 //  Note, "-" indicates to REMOVE auth code and "!" indicates to set path to IMMUTABLE.
 //  Note, valid characters are ASCII 33-126 inclusive.
 //  Note, relies on HTTPS for secure transport.
@@ -291,7 +291,7 @@ bool superstar_t::change_auth(std::string path,const Json::Value& value)
 	std::string new_auth_str="";
 	if(!value.isNull())
 		new_auth_str=value.asString();
-	if(new_auth_str.size()<8&&new_auth_str!="!"&&new_auth_str!="-"&&new_auth_str.size()>0)
+	if(new_auth_str.size()<4&&new_auth_str!="!"&&new_auth_str!="-"&&new_auth_str.size()>0)
 		return false;
 
 	//Check for invalid characters.
@@ -301,6 +301,8 @@ bool superstar_t::change_auth(std::string path,const Json::Value& value)
 
 	//Remove multiple,leading, and trailing slashes...
 	path=remove_double_slashes(strip(path,"/"));
+	if(path.size()==0)
+		path="/";
 
 	//Try to open auth file.
 	std::ifstream ifstr(auth_file_m.c_str());
@@ -332,7 +334,10 @@ bool superstar_t::change_auth(std::string path,const Json::Value& value)
 	//Open auth file in write mode.
 	std::ofstream ofstr(auth_file_m.c_str());
 	if(!ofstr.good())
+	{
+		std::cout<<"ERROR!"<<std::endl;
 		return false;
+	}
 
 	//Write all auths and replace the one with our path with the new auth code.
 	bool found=false;
@@ -386,6 +391,7 @@ bool superstar_t::auth_check(std::string path,const std::string& opts,
 	//Open auth file and parse passwords in line based format "PATH PASSWORD" (without quotes).
 	std::string line;
 	std::map<std::string,std::string> table;
+	size_t table_count=0;
 	while(std::getline(ifstr,line))
 	{
 		std::istringstream istr(line);
@@ -402,8 +408,13 @@ bool superstar_t::auth_check(std::string path,const std::string& opts,
 			auth="";
 
 		table[path]=auth;
+		++table_count;
 	}
 	ifstr.close();
+
+	//Empty auth file
+	if(table_count==0)
+		return true;
 
 	//Iteratively go up through entire tree structure.
 	std::string parent_path(path);

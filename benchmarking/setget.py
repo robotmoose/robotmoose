@@ -7,10 +7,8 @@ import time
 #Experiment variables (you should change only these really...)
 auth=''
 experiment_path='/test'
-#payload_length=128
-payload_length=1000000
+payload_length=128
 ss=superstar.superstar_t('http://198.199.89.187:8081')
-#ss=superstar.superstar_t('http://137.229.25.252:443')
 total_runs=1000
 
 #Meh...
@@ -42,7 +40,7 @@ def initial_get(res):
 	global tx_start_time
 
 	#Figure out what to write (write a's if b's or b's if a's)
-	if res=='a'*payload_length:
+	if len(res)>0 and res[0]=='a':
 		old_value='b'*payload_length
 	else:
 		old_value='a'*payload_length
@@ -90,6 +88,21 @@ def end_rx_func(res):
 
 if __name__=='__main__':
 	try:
+		#Print Usage
+		sys.stderr.write('Usage: ./setget.py superstar payload_size\n')
+		sys.stderr.flush()
+
+		#Parse Settings
+		if len(sys.argv)>1:
+			ss=superstar.superstar_t(sys.argv[1])
+		if len(sys.argv)>2:
+			payload_length=int(sys.argv[2])
+
+		#Print Settings
+		sys.stderr.write('Superstar:      '+sys.argv[1]+'\n')
+		sys.stderr.write('Payload Length: '+str(payload_length)+'\n')
+		sys.stderr.flush()
+
 		#Print file header
 		sys.stdout.write('rx,tx,total\n')
 		sys.stdout.flush()
@@ -113,10 +126,12 @@ if __name__=='__main__':
 		sys.stderr.write('RX avg time(ms):    '+str(rx_avg/total_runs)+'\n')
 		sys.stderr.write('TX avg time(ms):    '+str(tx_avg/total_runs)+'\n')
 		sys.stderr.write('Total avg time(ms): '+str(total_avg/total_runs)+'\n')
-		sys.stderr.flush();
+		sys.stderr.flush()
 
 	#Kill on ctrl+c
 	except KeyboardInterrupt:
+		sys.stderr.write('\n')
+		sys.stderr.flush()
 		exit(1)
 
 	#Error, time to die...

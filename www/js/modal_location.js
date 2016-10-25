@@ -28,6 +28,27 @@ function modal_location_t(div, robot, map_json, onreset){
 	//this.modal_location.get_content().appendChild(myself.minimap_img);
 	
 	
+
+	
+	/*
+	this.minimap_roomba_ring_div=document.createElement("div");
+	this.minimap_roomba_ring_img=document.createElement("img");
+	this.minimap_roomba_ring=document.createElement("div");
+	
+	this.minimap_roomba_ring_div.appendChild(this.minimap_roomba_ring_img);
+	this.minimap_roomba_ring_div.appendChild(this.minimap_roomba_ring);
+	this.modal_img_col.appendChild(this.minimap_roomba_ring_div);
+	
+	this.minimap_roomba_ring_img.className="pulse";
+	//this.minimap_roomba_ring_img.src="http://freevector.co/wp-content/uploads/2012/02/51770-placeholder-in-a-circle-outline.png";
+	this.minimap_roomba_ring.className="pulse-ring";
+	*/
+	
+	
+
+	
+	
+	// Mini roomba image
 	this.minimap_img = document.createElement("img");
 	
 	if (map_json.path)
@@ -41,15 +62,25 @@ function modal_location_t(div, robot, map_json, onreset){
 	this.modal_img_col.appendChild(myself.minimap_img);
 	
 	
-
-	
 	this.minimap_roomba=document.createElement("img");
 	this.minimap_roomba.src="maps/minimap_roomba.png";
 
 	this.modal_img_col.appendChild(myself.minimap_roomba);
 
+	
+	
+	// Expanding pulse behind mini roomba 
+	this.minimap_roomba_pulse=document.createElement("div");
+	this.minimap_roomba_pulse_ring=document.createElement("div");
+	
+	this.minimap_roomba_pulse.className="pulse";
+	this.minimap_roomba_pulse_ring.className="pulse_ring";
+	
+	this.modal_img_col.appendChild(this.minimap_roomba_pulse_ring);
+	this.modal_img_col.appendChild(this.minimap_roomba_pulse);
 
 
+	// UI
 	this.posX = myself.minimap_img.offsetLeft;
 	this.posY = myself.minimap_img.offsetTop;
 	var coord_text = "X= " + myself.posX + ", Y= " + myself.posY;
@@ -128,7 +159,7 @@ function modal_location_t(div, robot, map_json, onreset){
 	
 	this.modal_img_col.addEventListener("click", function(event){myself.minimap_onclick(event)});
 	this.modal_img_col.addEventListener("mousemove", function(event){myself.get_coords(event)});
-	
+	window.addEventListener("resize", function(event){myself.set_minimap_roomba(myself.posX_input.value, myself.posY_input.value)});
 	
 	
 	
@@ -153,36 +184,55 @@ modal_location_t.prototype.set_minimap_roomba=function(posX, posY, angle)
 	if (this.minimap_roomba_scale < 30) this.minimap_roomba_scale = 30; 
 	console.log("test width: " + this.minimap_roomba_scale);
 	
-	this.minimap_roomba.style.position="absolute";
-	this.minimap_roomba.style.width=this.minimap_roomba_scale;
-	this.minimap_roomba.style.height=this.minimap_roomba_scale;
-	this.minimap_roomba_width=this.minimap_roomba_scale;
-	this.minimap_roomba_height=this.minimap_roomba_scale;
+	this.minimap_pulse_scale = this.minimap_roomba_scale*1.5;
+	this.minimap_ring_scale = this.minimap_roomba_scale*4;
+	
+	var scale = this.minimap_roomba_scale;
+	var pulse_scale = this.minimap_pulse_scale;
+	var ring_scale = this.minimap_ring_scale;
+	
+	Object.assign(myself.minimap_roomba.style, {position: "absolute", width : scale, height : scale, "z-index" : 100});
+	Object.assign(myself.minimap_roomba_pulse.style, {position: "absolute", width : pulse_scale, height : pulse_scale});
+	Object.assign(myself.minimap_roomba_pulse_ring.style, {width : ring_scale, height : ring_scale, "border_radius" : ring_scale*2});
+	
 	}
 	
 	var viewport = myself.minimap_img.getBoundingClientRect();
 	
 
+	// set location of minimap roomba
 	
 	var offset_posX = 0;
 	var offset_posY = 0;
 	
-	
-	// FIX:
-	
+	// get offset of mouse click
 	if(posX&&posY)
 	{
 		offset_posX = posX*(myself.minimap_img.width/myself.map_json.width);
 		offset_posY = -posY*(myself.minimap_img.height/myself.map_json.height);
 	}
 	
+	var margin_left = 15; // margin on div to the left of minimap (determined experimentally)
 	
-	var offset_left = myself.minimap_img.width/2- myself.minimap_roomba_width/2 + 15 + offset_posX;
-	var offset_top = myself.minimap_img.height/2 - myself.minimap_roomba_height/2 + offset_posY;
+	// mini roomba offset
+	var offset_left = myself.minimap_img.width/2- myself.minimap_roomba_scale/2 + margin_left + offset_posX;
+	var offset_top = myself.minimap_img.height/2 - myself.minimap_roomba_scale/2 + offset_posY;
 	
 	
+	// pulse offset
+	var offset_left_pulse = myself.minimap_img.width/2- myself.minimap_pulse_scale/2 + margin_left + offset_posX;
+	var offset_top_pulse = myself.minimap_img.height/2- myself.minimap_pulse_scale/2 + offset_posY;
+	
+	// pulse ring offset
+	var offset_left_ring = myself.minimap_img.width/2- myself.minimap_ring_scale/2 + margin_left + offset_posX;
+	var offset_top_ring = myself.minimap_img.height/2 - myself.minimap_ring_scale/2 + offset_posY;
+	
+	Object.assign(myself.minimap_roomba_pulse.style, {left : offset_left_pulse, top : offset_top_pulse});
+	Object.assign(myself.minimap_roomba_pulse_ring.style, {left : offset_left_ring, top : offset_top_ring});
 	myself.minimap_roomba.style.left=offset_left;
 	myself.minimap_roomba.style.top=offset_top;
+	
+	
 	
 	if(!angle) 
 		angle = 0;
@@ -191,6 +241,7 @@ modal_location_t.prototype.set_minimap_roomba=function(posX, posY, angle)
 	var angle_adj = -angle + 90;
 	
 	myself.minimap_roomba.style["transform"]="rotate(" + angle_adj + "deg)"; 
+	
 	
 	console.log("left: " + offset_left + " top: " + offset_top)
 

@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 	if(argc > 1)
 		BYTES_LATENCY_TEST=std::stoi(argv[1]);
 	if(argc > 2)
-		BYTES_BANDWIDTH_TEST=std::stoi(argv[1]);
+		BYTES_BANDWIDTH_TEST=std::stoi(argv[2]);
 
 	ROS_INFO("Bytes to send for latency tests: %lu", BYTES_LATENCY_TEST);
 	ROS_INFO("Bytes to send for bandwidth tests: %lu", BYTES_BANDWIDTH_TEST);
