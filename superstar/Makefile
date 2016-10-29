@@ -1,32 +1,26 @@
+SRC=src
+INC=include
 CXX=g++
-OPTS=-O
-CFLAGS=$(OPTS) -Wall -I../include
-# CFLAGS+=-DLISTEN80
-LIBS=
+CFLAGS=-O -Wall -Wno-unused-result -I$(INC) -I$(SRC)
+LIB=
+
+JSONCPP_SRC=$(INC)/jsoncpp/json_reader.cpp $(INC)/jsoncpp/json_value.cpp $(INC)/jsoncpp/json_writer.cpp
+MONGOOSE_SRC=$(INC)/mongoose/mongoose.c
+UTILITY_SRC=$(SRC)/json_util.cpp $(SRC)/mongoose_util.cpp $(SRC)/string_util.cpp
+COMMON_SRC=$(SRC)/auth.cpp $(SRC)/comet.cpp $(SRC)/jsonrpc.cpp $(SRC)/superstar.cpp $(SRC)/time_util.cpp $(SRC)/web_util.cpp
 
 ifeq ($(OS),Windows_NT)
-	LIBS+=-lWs2_32
+	LIB+=-lWs2_32
+endif
+
+ifeq ($(shell uname),Darwin)
+	CFLAGS+=-Wno-deprecated-register
 endif
 
 all: superstar
 
-superstar: superstar.cpp
-	$(CXX) $(CFLAGS) $< ../include/mongoose/mongoose.c -o $@ $(LIBS)
-
-# This is needed to allow access to port 80
-supercap: superstar
-	sudo setcap 'cap_net_bind_service=+ep' superstar
-
-netbench: netbench.cpp
-	$(CXX) $(CFLAGS) $< -o $@ $(LIBS)
-
-netbench_keepalive: netbench_keepalive.cpp
-	$(CXX) $(CFLAGS) $< -o $@ $(LIBS)
+superstar: $(SRC)/main.cpp $(COMMON_SRC) $(JSONCPP_SRC) $(MONGOOSE_SRC) $(UTILITY_SRC)
+	$(CXX) $(CFLAGS) $^ $(LIB) -o $@
 
 clean:
-	- rm -f superstar
-	- rm -f superstar.exe
-
-# Windows make:
-#  cl superstar.cpp mongoose/mongoose.c /I. /Imongoose /EHsc /MT
-
+	-rm -f superstar superstar.exe
