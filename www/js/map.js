@@ -91,8 +91,8 @@ function robot_map_t(div, modal_div, robot)
 	this.reset_location_button.style.width = "50%";
 	this.reset_location_button.disabled=false;
 	this.reset_location_button.type="button";
-	this.reset_location_button.value="Reset Location";
-	this.reset_location_button.title="Click here to reset robot location";
+	this.reset_location_button.value="Navigation";
+	this.reset_location_button.title="Click here to reset robot location or plan a path";
 	this.reset_location_button.addEventListener("click",function(event)
 	{
 		myself.reset_location_button_pressed_m();
