@@ -71,7 +71,7 @@ function gui_t(div)
 		var pilot=null;
 		//if(_this.pilot_status)
 		//	pilot=_this.pilot_status.current_pilot;
-		//_this.load_gruveo(_this.connection.robot,pilot);
+		_this.load_gruveo(_this.connection.robot,pilot);
 		_this.chat.set_robot(_this.connection.robot);
 	});
 

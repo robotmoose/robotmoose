@@ -18,7 +18,6 @@ function auth_input_t(div, on_change)
 	var change=function()
 	{
 		on_change(CryptoJS.SHA256(this.value).toString(CryptoJS.enc.Hex));
-		this.value="";
 	};
 	this.input.addEventListener("change",change);
 	change();
