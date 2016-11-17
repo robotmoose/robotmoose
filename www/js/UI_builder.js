@@ -47,7 +47,7 @@ UI_builder_t.prototype.start_state=function(state_name) {
 */
 UI_builder_t.prototype.create_element=function(name,type,opts) {
 	opts=opts||{}; // allow empty opts
-	console.log("UI: Adding "+type+" named '"+name+"'");
+	//console.log("UI: Adding "+type+" named '"+name+"'");
 
 	var e={};
 	e.name=name;
