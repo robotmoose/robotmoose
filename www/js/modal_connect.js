@@ -110,16 +110,19 @@ function modal_connect_t(div)
 	};
 	this.modal.get_footer().appendChild(this.connect_button);
 
+	/* 
 	this.cancel_button.className="btn btn-primary";
 	this.cancel_button.type="button";
 	this.cancel_button.value="Cancel";
 	this.cancel_button.onclick=function(){_this.hide();};
-	this.modal.get_footer().appendChild(this.cancel_button);
+	//this.modal.get_footer().appendChild(this.cancel_button);
+	*/
 
 	this.sim_button.className="btn btn-primary";
 	this.sim_button.type="button";
 	this.sim_button.value="Simulate a Robot";
 	this.sim_button.style.left=10;
+	this.sim_button.style.float="left";
 	this.sim_button.onclick=function()
 	{
 		var robot= new robot_sim_t();
