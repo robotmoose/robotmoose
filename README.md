@@ -17,20 +17,17 @@ To get started with a simulated robot, just visit [robotmoose.com/robots/](https
 
 ### Firmware Installation and Physical Backend
 
-You need Google Chrome to run the backend, the version control system git to get this code, and the Arduino IDE to flash the Arduino firmware.
+You need [Google Chrome](https://www.google.com/chrome/browser/desktop/index.html) to run the backend, the version control system git to get this code, and the Arduino IDE to flash the Arduino firmware.
 
 Windows:
-* [Google Chrome](https://www.google.com/chrome/browser/desktop/index.html)
 * [Git for Windows](https://msysgit.github.io/)
 * [Arduino IDE](https://www.arduino.cc/en/Main/Software)
 
 macOS:
-* [Google Chrome](https://www.google.com/chrome/browser/desktop/index.html)
 * [GitHub for Mac](https://desktop.github.com/)
 * [Arduino IDE](https://www.arduino.cc/en/Main/Software)
 
 Ubuntu:
-* [Google Chrome](https://www.google.com/chrome/browser/desktop/index.html)
 * Terminal command: `sudo apt-get install git arduino`
 
 Now open Terminal (macOS/Ubuntu) or Command Prompt (Windows), and run this command to download the code:
@@ -43,7 +40,7 @@ On Ubuntu, you'll need to run this command to give yourself access to serial dev
 
 You'll need to log out and log back in to be in the new group.
 
-Now plug in the Arduino and open the Arduino IDE. Open the project at `robotmoose/arduino/arduino.ino`, and click the upload button.
+Now plug in the Arduino and open the Arduino IDE. Open the project at `robotmoose/tabula_rasa/arduino/arduino.ino`, and click the upload button.
 
 You can double check the installation by opening the Arduino as a serial port at 57600 baud. You should get a welcome message.
 

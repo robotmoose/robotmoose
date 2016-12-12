@@ -15,9 +15,9 @@ function modal_location_t(div, robot, map_json, onreset){
 	this.modal_location= new modal_t(div);
 	this.modal_location.set_title("Navigation");
 	this.modal_location.dialog.className="modal-dialog modal-lg";
+	this.minimap_mode="location";
 	this.minimap_action_onclick="location"; // action when minimap is clicked
 	
-	//this.minimap_img.style["max-width"]=myself.modal_location.get_content().offsetWidth - 30;
 
 	// Div format
 	this.modal_loc_row=document.createElement("div");
@@ -30,7 +30,6 @@ function modal_location_t(div, robot, map_json, onreset){
 	this.modal_loc_row.appendChild(myself.modal_img_col);
 	this.modal_loc_row.appendChild(myself.modal_ui_col);
 	this.modal_location.get_content().appendChild(myself.modal_loc_row);
-	//this.modal_location.get_content().appendChild(myself.minimap_img);
 		
 	
 	// Mini roomba image
@@ -63,6 +62,7 @@ function modal_location_t(div, robot, map_json, onreset){
 	
 	this.modal_img_col.appendChild(this.minimap_roomba_pulse_ring);
 	this.modal_img_col.appendChild(this.minimap_roomba_pulse);
+
 
 
 	// UI
@@ -116,26 +116,42 @@ function modal_location_t(div, robot, map_json, onreset){
 	this.set_loc_button=document.createElement("input");
 	this.set_loc_button.className="btn btn-primary";
 	this.set_loc_button.style.marginBottom="10px";
-	this.set_loc_button.style.width = "50%";
+	this.set_loc_button.style.width = "30%";
 	this.set_loc_button.disabled=true;
 	this.set_loc_button.type="button";
 	this.set_loc_button.value="Set Robot";
 	this.set_loc_button.title="Click here to set robot location";
 	this.set_loc_button.addEventListener("click",function(event)
 	{
+		myself.minimap_mode="location";
 		myself.set_loc_button_pressed_m();
 	});
 	
 	this.set_waypoint_button=document.createElement("input");
 	this.set_waypoint_button.className="btn btn-primary";
 	this.set_waypoint_button.style.marginBottom="10px";
-	this.set_waypoint_button.style.width = "50%";
+	this.set_waypoint_button.style.width = "30%";
 	this.set_waypoint_button.disabled=false;
 	this.set_waypoint_button.type="button";
 	this.set_waypoint_button.value="Set Waypoint";
-	this.set_waypoint_button.title="Click here to set robot location";
+	this.set_waypoint_button.title="Click here to set waypoints";
 	this.set_waypoint_button.addEventListener("click",function(event)
 	{
+		myself.minimap_mode="waypoint";
+		myself.set_loc_button_pressed_m();
+	});
+	
+	this.set_obstacle_button=document.createElement("input");
+	this.set_obstacle_button.className="btn btn-primary";
+	this.set_obstacle_button.style.marginBottom="10px";
+	this.set_obstacle_button.style.width = "30%";
+	this.set_obstacle_button.disabled=false;
+	this.set_obstacle_button.type="button";
+	this.set_obstacle_button.value="Set Obstacle";
+	this.set_obstacle_button.title="Click here to set obstacles";
+	this.set_obstacle_button.addEventListener("click",function(event)
+	{
+		myself.minimap_mode="obstacle";
 		myself.set_loc_button_pressed_m();
 	});
 	
@@ -168,6 +184,7 @@ function modal_location_t(div, robot, map_json, onreset){
 	this.modal_ui_col.appendChild(this.pos_row);
 	this.modal_ui_col.appendChild(this.set_loc_button);
 	this.modal_ui_col.appendChild(this.set_waypoint_button);
+	this.modal_ui_col.appendChild(this.set_obstacle_button);
 	this.modal_ui_col.appendChild(this.reset_loc_button);
 	
 	
@@ -192,6 +209,23 @@ function modal_location_t(div, robot, map_json, onreset){
 	this.modal_img_col.addEventListener("mousemove", function(event){myself.get_coords(event)});
 	window.addEventListener("resize", function(event){myself.set_minimap_roomba(myself.posX_input.value, myself.posY_input.value)});
 	
+
+	
+	window.setTimeout(function(){myself.setup_images();}, 1); // setTimeout used so that width of divs will be set
+	
+}
+
+modal_location_t.prototype.setup_images=function()
+{
+
+	this.set_minimap_roomba();
+	this.generate_grid();
+}
+
+// Set location of mini roomba image
+modal_location_t.prototype.set_minimap_roomba=function(posX, posY, angle)
+{
+	var myself = this;
 	
 	// set minimap roomba scale
 	if(!myself.minimap_roomba_scale)
@@ -205,7 +239,6 @@ function modal_location_t(div, robot, map_json, onreset){
 		this.minimap_roomba_scale=roomba_width*(px_real_img_ratio);
 	
 		if (this.minimap_roomba_scale < 30) this.minimap_roomba_scale = 30; 
-		console.log("test width: " + this.minimap_roomba_scale);
 	
 		this.minimap_pulse_scale = this.minimap_roomba_scale*1.5;
 		this.minimap_ring_scale = this.minimap_roomba_scale*4;
@@ -221,15 +254,6 @@ function modal_location_t(div, robot, map_json, onreset){
 	
 	}
 	
-	window.setTimeout(function(){myself.set_minimap_roomba();}, 1);
-	
-}
-
-// Set location of mini roomba image
-modal_location_t.prototype.set_minimap_roomba=function(posX, posY, angle)
-{
-	var myself = this;
-	
 
 	// set location of minimap roomba
 	
@@ -243,7 +267,7 @@ modal_location_t.prototype.set_minimap_roomba=function(posX, posY, angle)
 		offset_posY = -posY*(myself.minimap_img.height/myself.map_json.height);
 	}
 	
-	var margin_left = 15; // margin on div to the left of minimap (determined experimentally)
+	var margin_left = this.minimap_img.offsetLeft; // margin on div to the left of minimap (determined experimentally)
 	
 	// mini roomba offset
 	var offset_left = myself.minimap_img.width/2- myself.minimap_roomba_scale/2 + margin_left + offset_posX;
@@ -297,7 +321,6 @@ modal_location_t.prototype.set_temp_waypoint=function(posX, posY, option)
 	else 
 		this.minimap_temp_waypoint.style["background"]="#1ee";
 			
-	// set location of minimap roomba
 
 	var offset_posX = 0;
 	var offset_posY = 0;
@@ -309,7 +332,7 @@ modal_location_t.prototype.set_temp_waypoint=function(posX, posY, option)
 		offset_posY = -posY*(myself.minimap_img.height/myself.map_json.height);
 	}
 
-	var margin_left = 15; // margin on div to the left of minimap (determined experimentally)
+	var margin_left = this.minimap_img.offsetLeft; // margin on div to the left of minimap (determined experimentally)
 
 	// offset
 	var offset_left = myself.minimap_img.width/2- myself.minimap_roomba_scale/2 + margin_left + offset_posX;
@@ -366,7 +389,7 @@ modal_location_t.prototype.add_waypoint=function(posX, posY)
 		offset_posY = -posY*(myself.minimap_img.height/myself.map_json.height);
 	}
 
-	var margin_left = 15; // margin on div to the left of minimap (determined experimentally)
+	var margin_left = this.minimap_img.offsetLeft; // margin on div to the left of minimap (determined experimentally)
 
 	// offset
 	var offset_left = myself.minimap_img.width/2 - scale/2 + margin_left + offset_posX;
@@ -455,44 +478,56 @@ modal_location_t.prototype.reset_loc_button_pressed_m=function()
 	var new_x = myself.posX_set;
 	var new_y = myself.posY_set;
 	var new_angle = myself.angle_set;
-	if (myself.reset_loc_button.value=="Reset Location")
+	if (myself.minimap_mode=="location")
 	{
 		console.log("Resetting location - x: " + new_x + ", y: " + new_y);
 		myself.set_minimap_roomba(new_x, new_y, new_angle);
 		myself.reset_location(new_x, new_y, new_angle);
 		if(myself.onreset) myself.onreset();
 	}
-	else 
+	else if (myself.minimap_mode=="waypoint")
+	{
 		myself.add_waypoint(new_x, new_y);
+	}
 
 }
 
 modal_location_t.prototype.set_loc_button_pressed_m=function()
 {
 	var myself = this;
-	if (myself.minimap_action_onclick == "location") // switch from location mode to waypoint mode
-	{
-		if (myself.minimap_temp_waypoint)
-		{
-			this.minimap_temp_waypoint.style["background"]="#1ee";
-		}
-	
-		myself.minimap_action_onclick = "waypoint";
-		myself.set_loc_button.disabled=false;
-		myself.set_waypoint_button.disabled=true;
-		this.reset_loc_button.value="Add Waypoint";
-	}
-	else // switch from waypoint mode to location mode
+	if (myself.minimap_mode == "location") // set location pressed
 	{
 		if (myself.minimap_temp_waypoint)
 		{
 			this.minimap_temp_waypoint.style["background"]="#4cf78e";
 		}
 			
-		myself.minimap_action_onclick = "location";
 		myself.set_loc_button.disabled=true;
 		myself.set_waypoint_button.disabled=false;
+		myself.set_obstacle_button.disabled=false;
 		this.reset_loc_button.value="Reset Location";
+		this.reset_loc_button.disabled=false;
+	}
+	else if (myself.minimap_mode == "waypoint") // set location pressed
+	{
+		if (myself.minimap_temp_waypoint)
+		{
+			this.minimap_temp_waypoint.style["background"]="#1ee";
+		}
+	
+		myself.set_loc_button.disabled=false;
+		myself.set_waypoint_button.disabled=true;
+		myself.set_obstacle_button.disabled=false;
+		this.reset_loc_button.value="Add Waypoint";
+		this.reset_loc_button.disabled=false;
+		
+	}
+	else // set obstacle pressed
+	{
+		myself.set_loc_button.disabled=false;
+		myself.set_waypoint_button.disabled=false;
+		myself.set_obstacle_button.disabled=true;
+		this.reset_loc_button.disabled=true;
 	}
 		
 
@@ -523,6 +558,54 @@ modal_location_t.prototype.get_coords=function(event)
 	}
 }
 
+modal_location_t.prototype.generate_grid=function()
+{
+	var myself = this;
+	this.cell_size = 0.5; // square meters
+	this.grid_width = Math.floor(this.map_json.width/this.cell_size); // number of cells horizontally in grid
+	this.grid_height = Math.floor(this.map_json.height/this.cell_size); // number of cells vertically in grid
+	this.cell_size_pixels = this.minimap_img.width/this.grid_width;
+	console.log("grid width: " + this.grid_width);
+	console.log("grid height: " + this.grid_height);
+	console.log("cell size: " + this.cell_size_pixels);
+	
+	// Grid overlay
+	this.minimap_grid_box=document.createElement("div");
+	this.minimap_grid_box.style.width=this.cell_size_pixels;
+	this.minimap_grid_box.style.height=this.cell_size_pixels;
+	this.minimap_grid_box.style.background="#EE6B6B";
+	this.minimap_grid_box.style.opacity=0.6;
+	this.minimap_grid_box.style.position="absolute";
+	this.minimap_grid_box.style.left=0 + this.minimap_img.offsetLeft;
+	this.minimap_grid_box.style.top=0;
+	this.minimap_grid_box.style["z-index"]=101;
+	this.minimap_grid_box.style
+	//this.modal_img_col.appendChild(this.minimap_grid_box);
+	
+	this.cell_array=[];
+	var w=this.grid_height;
+	for (j = 0; j < this.grid_height; j++)
+	{
+		for (i = 0; i < this.grid_width; i++)
+		{
+			var k = j*w + i;
+			this.cell_array[k]=this.minimap_grid_box.cloneNode(true);
+			this.cell_array[k].style.left=this.minimap_img.offsetLeft + i*this.cell_size_pixels;
+			this.cell_array[k].style.top=j*this.cell_size_pixels;
+			this.modal_img_col.appendChild(this.cell_array[k]);
+			
+			this.cell_array[k].hidden=true;
+			
+			//Test: checkered board
+			//var x = k;
+			//if (j%2 == 0) x++;
+			//if (x%2 == 0) this.cell_array[k].hidden=true;
+		}
+	}
+	
+	
+}
+
 modal_location_t.prototype.minimap_onclick=function(event)
 {
 
@@ -535,12 +618,29 @@ modal_location_t.prototype.minimap_onclick=function(event)
 		myself.posX_set=myself.posX;
 		myself.posY_set=myself.posY;
 	
-		if (myself.minimap_action_onclick == "location")
+		if (myself.minimap_mode == "location")
 			myself.set_temp_waypoint(myself.posX, myself.posY, "location");
-		else
+		else if (myself.minimap_mode == "waypoint")
 			myself.set_temp_waypoint(myself.posX, myself.posY);
-	}
+		else
+		{
+			myself.change_grid_cell(myself.posX, myself.posY);
+		}
+	}	
+}
+
+modal_location_t.prototype.change_grid_cell=function(posX, posY)
+{
+	var myself = this;
 	
+	var left = parseFloat(this.map_json.width/2) + parseFloat(posX);
+	var top = parseFloat(this.map_json.height/2) - parseFloat(posY);
+	
+	var w=this.grid_height;
+	var i = Math.floor(left/myself.cell_size);
+	var j = Math.floor(top/myself.cell_size);
+	var k = j*w + i;
+	myself.cell_array[k].hidden = !myself.cell_array[k].hidden;
 }
 
 modal_location_t.prototype.show=function()
