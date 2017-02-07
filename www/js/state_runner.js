@@ -192,7 +192,7 @@ function state_runner_t()
 			dist = -dist;
 		}
 
-		var slow_dist=70.0; // scale back on approach
+		var slow_dist=90.0; // scale back on approach
 		if (dist<slow_dist) speed*=0.1+0.85*dist/slow_dist;
 		//console.log("Turn: distance: "+dist+" -> speed "+speed);
 		VM.power.L=+speed; VM.power.R=-speed;
@@ -497,7 +497,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 				dist=-dist;
 			}
 
-			var slow_dist=70.0; // scale back on approach
+			var slow_dist=90.0; // scale back on approach
 			if (dist<slow_dist) speed*=0.1+0.85*dist/slow_dist;
 			console.log("Turn: distance: "+dist+" -> speed "+speed);
 			VM.power.L=+speed; VM.power.R=-speed;
