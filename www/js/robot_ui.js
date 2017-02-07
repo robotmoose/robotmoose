@@ -218,6 +218,7 @@ robot_ui_t.prototype.download_gui=function()
 				charts:_this.create_doorway("Charts", "Chart sensor data received from robot",null),
 				states:_this.create_doorway("Code","Automatically drive the robot",help_text_states),
 				map:_this.create_doorway("Map","See where the robot thinks it is",help_text_map),
+				navigation: _this.create_doorway("Navigation", "Plan a path for the robot", null),
 				video:_this.create_doorway("Video","Show the robot's video camera",null),
 				UI:_this.create_doorway("UI","Customized robot user interface",help_text_ui),
 				sound:_this.create_doorway("Sound","Play sounds on the backend to get attention",null),
@@ -230,6 +231,7 @@ robot_ui_t.prototype.download_gui=function()
 			clear_out(_this.doorways.charts.content);
 			clear_out(_this.doorways.states.content);
 			clear_out(_this.doorways.map.content);
+			clear_out(_this.doorways.navigation.content);
 			clear_out(_this.doorways.video.content);
 			clear_out(_this.doorways.UI.content);
 			clear_out(_this.doorways.sound.content);
@@ -258,6 +260,7 @@ robot_ui_t.prototype.download_gui=function()
 				charts:_this.create_doorway("Charts", "Chart sensor data received from robot",null, 'stats'),
 				states:_this.create_doorway("Code","Automatically drive the robot",help_text_states, 'list-alt'),
 				map:_this.create_doorway("Map","See where the robot thinks it is",help_text_map, 'globe'),
+				navigation:_this.create_doorway("Navigation","Plan a path for the robot",null, 'road'),
 				video:_this.create_doorway("Video","Show the robot's video camera",null, 'facetime-video'),
 				UI:_this.create_doorway("UI","Customized robot user interface",help_text_ui, 'object-align-top'),
 				sound:_this.create_doorway("Sound","Play sounds on the backend to get attention",null, 'volume-up'),
@@ -270,6 +273,7 @@ robot_ui_t.prototype.download_gui=function()
 			clear_out(_this.doorways.charts.content);
 			clear_out(_this.doorways.states.content);
 			clear_out(_this.doorways.map.content);
+			clear_out(_this.doorways.navigation.content);
 			clear_out(_this.doorways.video.content);
 			clear_out(_this.doorways.UI.content);
 			clear_out(_this.doorways.sound.content);
@@ -348,11 +352,13 @@ robot_ui_t.prototype.create_widgets=function()
 			{key:"bumper",type:"binary"}
 		]),
 		map:new robot_map_t(this.doorways.map.content,this.modal_div, _this.robot),
+		navigation:new navigation_t(this.doorways.navigation.content, _this.state_runner, _this.robot),
 		video:new video_widget_t(this.doorways.video,_this.pilot_heartbeat),
 		UI:new UI_builder_t(this.doorways.UI.content),
 		sound:new sound_player_t(this.doorways.sound.content,_this.robot),
 		chat:new chatter_t(this.doorways.chat.content,_this.robot,20,"Pilot")
 	};
+	this.widgets.map.navigation=this.widgets.navigation;
 	this.state_runner.set_UI(this.widgets.UI);
 
 	this.widgets.config.onchange=function() { // recreate pilot GUI when configuration changes
@@ -392,6 +398,13 @@ robot_ui_t.prototype.create_widgets=function()
 	var _this = this;
 	this.doorways.map.resizer.onresize=function(){_this.widgets.map.resize_map()};
 	}
+	if(this.doorways.navigation&&this.widgets.navigation)
+	{
+		var _this = this;
+		this.doorways.navigation.resizer.onresize=function(){_this.widgets.navigation.on_resize();};
+		this.widgets.navigation.pilot=this.widgets.pilot.pilot;
+	}
+	
 }
 
 robot_ui_t.prototype.create_doorway=function(title,tooltip,help_text,icon)

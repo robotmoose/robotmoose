@@ -7,6 +7,7 @@
 
 function state_runner_t()
 {
+
 	var _this=this;
 	this.execution_interval=30; // milliseconds between runs
 
@@ -200,7 +201,6 @@ function state_runner_t()
 		{ // done with move
 			VM.power.L=VM.power.R=0.0;
 			done = true;
-			console.log("DONE TURNING")
 		}
 		// Commit these new power values:
 		myself.do_writes(VM);
@@ -227,11 +227,143 @@ function state_runner_t()
 		{ 
 			VM.power.L=VM.power.R=0.0;
 			done = true;
+			//console.log("forward: done with move!");
 		}
 		// Commit these new power values:
 		myself.do_writes(VM);
 		
 		return done;
+	}
+	
+	nav.checkCell=function(i, j, swap, VM) // returns 0 if obstacle is found in this cell; returns 1 otherwise
+	{
+	
+		if (swap)
+		{
+			var t = i;
+			i = j;
+			j = t;
+		}
+		
+		var cell_size = myself.grid_data.cell_size;
+		var w = myself.grid_data.width;
+		
+		var k = j*w + i;
+		
+		if (myself.grid_data.array[k]) // check for obstacle
+		{
+			//console.log("obstacle detected") // TESTING 
+			return 0;
+		}
+		
+		if (!myself.grid_data.test_cell) myself.grid_data.test_cell = []; // TEST - send data back to navigation.js for display
+		
+		myself.grid_data.test_cell[k] = 1;
+		
+		return 1;
+	}
+	
+	nav.checkPath=function(x_target, y_target, VM) // returns 0 if obstacle is found in path, or returns 1 if path is clear
+	{
+	
+		var cell_size = myself.grid_data.cell_size;
+		var x_curr = VM.sensors.location.x;
+		var y_curr = VM.sensors.location.y;	
+		
+		
+		// convert to coordinates where origin is at top left of map
+		
+		var rw = myself.grid_data.map_width/2;
+		var rh = myself.grid_data.map_height/2;
+		var x_curr = x_curr + rw;
+		var y_curr= (y_curr - rh)*-1;
+		var x_target = x_target + rw;
+		var y_target = (y_target - rh)*-1;
+		
+		
+		var cell_size = myself.grid_data.cell_size;
+		var w = myself.grid_data.width;
+
+		
+		
+		var dx = x_target - x_curr;
+		var dy = y_target - y_curr;
+		var m = dy/dx;
+		var m_abs = Math.abs(m);
+		
+		
+		if (m_abs < 1)
+		{
+		 	var u = x_curr;
+		 	var sign_u = Math.sign(dx);
+		 	var v = y_curr;
+		 	var sign_v = Math.sign(dy);
+		 	var u_target = x_target;
+		 	var swap = "";
+		}
+		else 
+		{
+			var u = y_curr;
+			var sign_u = Math.sign(dy);
+			var v = x_curr;
+			var sign_v = Math.sign(dx);
+			var u_target = y_target;
+			var swap = 1;
+			m_abs = 1/m_abs;
+		}
+		
+		
+	 	var cell_dist_u = (Math.floor(u/cell_size)+1)*cell_size;
+	 	
+	 	if (sign_v>0)
+	 		var cell_dist_v = (Math.floor(v/cell_size)+1)*cell_size;
+	 	else
+	 		var cell_dist_v = Math.floor(v/cell_size)*cell_size;
+	 		
+	 	var e = v*sign_v - cell_dist_v*sign_v + m_abs*(cell_dist_u - u);
+		
+		var i = Math.floor(u/cell_size);
+		var j = Math.floor(v/cell_size);
+		
+		
+		VM.nav.checkCell(i, j, swap, VM); // remove? Should it check current cell?
+		
+		// Modified bresenham algorithm
+		var i_limit = Math.floor(u_target/cell_size);
+		var done = false;
+		while (!done)
+		{
+			i = i + 1*sign_u;
+			e = e + m_abs*cell_size;
+			if (e > 0) 
+			{
+				if (!VM.nav.checkCell(i, j, swap, VM)) // extra width
+					return 0;
+				j = j + 1*sign_v;
+				if (!VM.nav.checkCell(i-1*sign_u, j, swap, VM)) // option for extra width
+					return 0;
+				e = e - cell_size;
+			}
+			if (!VM.nav.checkCell(i, j, swap, VM))
+				return 0;
+			
+			if ((sign_u > 0 && i < i_limit) || (sign_u < 0 && i > i_limit)) 
+				done = false;
+			else
+				done = true;
+		}
+	
+		// TESTING:
+		//console.log("x_curr adjusted: " + x_curr);
+		//console.log("y_curr adjusted: " + y_curr);
+		//console.log("y_target adjusted: " + y_target);
+		//console.log("x_target adjusted: " + x_target);
+		//console.log("sign u: " + sign_u);
+		//console.log("m: " + m);
+		//console.log("e: " + e);
+		
+		return 1;
+		
 	}
 }
 
@@ -249,6 +381,8 @@ state_runner_t.prototype.run=function(robot,state_table)
 	//state_table.upload(robot);
 
 	state_table.run();
+	myself.robot = robot;
+	myself.robot.target_wp = 0;
 
 	// Clear out old state
 	myself.state=null;
@@ -264,7 +398,6 @@ state_runner_t.prototype.run=function(robot,state_table)
 
 state_runner_t.prototype.stop=function(state_table)
 {
-	//console.log("stopping");
 	this.kill=true;
 
 	// Make sure continue doesn't fire after a stop
@@ -519,7 +652,6 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	// Drive straight to point (cartesian coordinate) 
 	VM.driveToPoint=function(x_target, y_target)
 	{
-
 		var t=VM.sequencer.block_start(VM);
 		if (VM.sequencer.current()) {
 			if (!t.data) // calculate angle and distance
@@ -530,7 +662,6 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 				var temp = VM.nav.getPhi(t.data.theta, VM); // get angle to turn (phi), direction
 				t.data.dir = temp.dir;
 				t.data.phi = temp.phi;
-				console.log("Theta: " + t.data.theta)
 				var dist_m = Math.sqrt(t.data.x_dist*t.data.x_dist + t.data.y_dist*t.data.y_dist)
 				t.data.dist = dist_m*100;
 				t.data.start=new vec3(VM.sensors.location.x,VM.sensors.location.y,0.0); // vector of starting position
@@ -538,15 +669,52 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 			}
 			if (!t.done_turn) // turn until
 				t.done_turn = VM.nav.turn(t.data, VM);
-			else if (!t.done_forward)
+			else if (!t.done_forward) // move until
 				t.done_forward = VM.nav.forward(t.data, VM);
-			else
+			else // waypoint reached
 				VM.sequencer.advance();
+
 	
 		}
 		VM.sequencer.block_end();
 		
-		//return t.data.dist; // testing
+		
+	};
+	
+	// Drive to point (cartesian coordinate) with path finding
+	// INCOMPLETE (currently detects if path is clear, but does not use this information)
+	VM.driveToPointSmart=function(x_target, y_target)
+	{
+		var t=VM.sequencer.block_start(VM);
+		
+		if (VM.sequencer.current()) {
+			if(!VM.nav.checkPath(x_target, y_target, VM))
+			{
+				console.log("Obstacle detected in driveToPointSmart()"); // TODO: replace with path finding function
+			}
+			if (!t.data) // calculate angle and distance
+			{
+				t.data = VM.nav.getTheta(x_target, y_target, VM); // get target angle (theta), x y distances
+				t.data.x_target = x_target;
+				t.data.y_target = y_target;
+				var temp = VM.nav.getPhi(t.data.theta, VM); // get angle to turn (phi), direction
+				t.data.dir = temp.dir;
+				t.data.phi = temp.phi;
+				//console.log("Theta: " + t.data.theta)
+				var dist_m = Math.sqrt(t.data.x_dist*t.data.x_dist + t.data.y_dist*t.data.y_dist)
+				t.data.dist = dist_m*100;
+				t.data.start=new vec3(VM.sensors.location.x,VM.sensors.location.y,0.0); // vector of starting position
+				
+			}
+			if (!t.done_turn) // turn until
+				t.done_turn = VM.nav.turn(t.data, VM);
+			else if (!t.done_forward) // move until
+				t.done_forward = VM.nav.forward(t.data, VM);
+			else // goal reached
+				VM.sequencer.advance();
+	
+		}
+		VM.sequencer.block_end();
 		
 		
 	};

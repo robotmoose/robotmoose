@@ -80,25 +80,6 @@ function robot_map_t(div, modal_div, robot)
 		//option3.value="maps/map3.jpg";
 		this.map_select.appendChild(option3);
 
-// UNFINISHED: reset location button
-
-	//Reset location button...
-	this.reset_location_button=document.createElement("input");
-
-
-	this.reset_location_button.className="btn btn-primary";
-	this.reset_location_button.style.marginBottom="10px";
-	this.reset_location_button.style.width = "50%";
-	this.reset_location_button.disabled=false;
-	this.reset_location_button.type="button";
-	this.reset_location_button.value="Navigation";
-	this.reset_location_button.title="Click here to reset robot location or plan a path";
-	this.reset_location_button.addEventListener("click",function(event)
-	{
-		myself.reset_location_button_pressed_m();
-	});
-
-
 
 	//Upload button...
 	this.upload_map_button=document.createElement("input");
@@ -116,11 +97,6 @@ function robot_map_t(div, modal_div, robot)
 	});
 
 
-	if (robot.sim)
-	{
-		this.upload_map_button.style.width = "50%";
-		this.controls_div.appendChild(this.reset_location_button);
-	}
 
 
 	this.map_display = document.createElement("div");
@@ -247,29 +223,18 @@ robot_map_t.prototype.load_button_pressed_m=function()
 
 
 	var opt = JSON.parse(myself.last_map_select);
+	this.robot.map_json=opt;
 
 
 	this.make_new(opt.path, opt.width, opt.height);
+	if (this.navigation)
+	{
+		this.navigation.status="done";
+		this.navigation = new navigation_t(this.navigation.div, this.navigation.state_runner, this.robot)
+	}
 
 }
 
-// UNFINISHED: reset location button
-
-robot_map_t.prototype.reset_location_button_pressed_m=function()
-{
-
-	var myself = this;
-
-
-
-	var map_json = JSON.parse(myself.map_select.value);
-
-
-	this.modal_location = new modal_location_t(myself.modal_div, myself.robot, map_json, function(){myself.reset_tracks=true})
-
-	this.modal_location.show();
-
-}
 
 
 
