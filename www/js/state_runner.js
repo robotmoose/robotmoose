@@ -477,6 +477,18 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	// Turn right (clockwise) specified distance (deg)
 	VM.right=function(target,speed) {
 		if (!target) target=90; // degrees
+
+		//Control undershooting
+		var min_target=10;
+		if (target>0&&target<min_target) target=min_target;
+		if (target<0&&target>-min_target) target=-min_target;
+
+		//Hack to make 180 work (since you can only go <180)
+		if (target>179&&target<=181)
+			target=179;
+		if (target<-179&&target>=-181)
+			target=-179;
+
 		if (!speed) speed=0.25*100; // --- scaled for percentage
 		else if (speed > 100.0) speed = 100.0; // cap speed at 100 percent
 		else if (speed < -100.0) speed = -100.0;
