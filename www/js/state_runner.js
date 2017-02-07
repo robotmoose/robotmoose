@@ -193,7 +193,7 @@ function state_runner_t()
 		}
 		var p_constant=0.05;
 		var p_multiplier=0.006;
-		speed*=dist/*p_multiplier+p_constant;
+		speed*=dist*p_multiplier+p_constant;
 		VM.power.L=+speed; VM.power.R=-speed;
 		if (dist <= 0.0)
 		{ // done with move
