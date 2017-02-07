@@ -180,7 +180,7 @@ function state_runner_t()
 	nav.turn=function(data, VM) // turn until reach target angle
 	{
 		var done = false;
-		var speed = 30;
+		var speed = 25;
 		var curr_angle=VM.sensors.location.angle;
 
 		var dist=curr_angle-data.theta;
@@ -191,10 +191,9 @@ function state_runner_t()
 			speed = -speed;
 			dist = -dist;
 		}
-
-		var slow_dist=90.0; // scale back on approach
-		if (dist<slow_dist) speed*=0.1+0.85*dist/slow_dist;
-		//console.log("Turn: distance: "+dist+" -> speed "+speed);
+		var p_constant=0.05;
+		var p_multiplier=0.006;
+		speed*=dist/*p_multiplier+p_constant;
 		VM.power.L=+speed; VM.power.R=-speed;
 		if (dist <= 0.0)
 		{ // done with move
@@ -497,9 +496,10 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 				dist=-dist;
 			}
 
-			var slow_dist=90.0; // scale back on approach
-			if (dist<slow_dist) speed*=0.1+0.85*dist/slow_dist;
-			console.log("Turn: distance: "+dist+" -> speed "+speed);
+			var p_constant=0.05;
+			var p_multiplier=0.006;
+			speed*=dist*p_multiplier+p_constant;
+			console.log("PMult: "+p_multiplier+" Turn distance: "+dist+" -> speed: "+speed);
 			VM.power.L=+speed; VM.power.R=-speed;
 			if (dist <= 0.0)
 			{ // done with move
