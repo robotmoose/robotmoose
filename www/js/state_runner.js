@@ -89,51 +89,51 @@ function state_runner_t()
 	seq.block_end=function() {
 		seq.code_count++; // increment count for each phase
 	}
-	
-	
+
+
 	// VM navigator: object with functions used by VM for path planning
 	this.VM_nav= {};
 	var nav = this.VM_nav;
-	
+
 	nav.getTheta=function(x_target, y_target, VM) // get angle between +x axis and target point
 	{
-		if (!VM||!VM.sensors||!VM.sensors.location) 
+		if (!VM||!VM.sensors||!VM.sensors.location)
 		{
 			console.log("Error: nav.getTheta called without VM sensors");
 			return;
 		}
-		
+
 		var x_curr = VM.sensors.location.x;
 		var y_curr = VM.sensors.location.y;
-		
+
 		var data = {};
 		data.x_dist = x_target - x_curr;
 		data.y_dist = y_target - y_curr;
 
 		var ratio_y_x = data.y_dist / data.x_dist;
 
-		var atan_deg = Math.atan(ratio_y_x)*180/Math.PI; 
-		
+		var atan_deg = Math.atan(ratio_y_x)*180/Math.PI;
+
 		if (x_curr < x_target) data.theta = atan_deg;
 		else if (atan_deg >= 0) data.theta = - 180 + atan_deg;
 		else data.theta = 180 + atan_deg;
-		
-		
-		
+
+
+
 		return data;
-		
+
 	}
-	
+
 	nav.getPhi=function(theta, VM) // get angle and direction (right/left) between current direction and theta
 	{
-		if (!VM||!VM.sensors||!VM.sensors.location) 
+		if (!VM||!VM.sensors||!VM.sensors.location)
 		{
 			console.log("Error: nav.getPhi called without VM sensors");
 			return;
-		} 
-		
+		}
+
 		var data = {};
-		
+
 		var curr = VM.sensors.location.angle;
 		if (theta*curr >= 0) // same sign
 		{
@@ -176,7 +176,7 @@ function state_runner_t()
 		}
 		return data;
 	}
-	
+
 	nav.turn=function(data, VM) // turn until reach target angle
 	{
 		var done = false;
@@ -186,14 +186,14 @@ function state_runner_t()
 		var dist=curr_angle-data.theta;
 		while (dist>+180.0) dist-=360.0; // reduce mod 360
 		while (dist<-180.0) dist+=360.0;
-		if (data.dir == "L") 
+		if (data.dir == "L")
 		{
 			speed = -speed;
 			dist = -dist;
 		}
 
-		var slow_dist=40.0; // scale back on approach
-		if (dist<slow_dist) speed*=0.1+0.9*dist/slow_dist;
+		var slow_dist=70.0; // scale back on approach
+		if (dist<slow_dist) speed*=0.1+0.85*dist/slow_dist;
 		//console.log("Turn: distance: "+dist+" -> speed "+speed);
 		VM.power.L=+speed; VM.power.R=-speed;
 		if (dist <= 0.0)
@@ -205,32 +205,32 @@ function state_runner_t()
 		// Commit these new power values:
 		myself.do_writes(VM);
 
-		
+
 		return done;
 	}
-	
+
 	nav.forward=function(data, VM)
 	{
 		var done = false
-		
+
 		var speed = 40;
 
 		var p=new vec3(VM.sensors.location.x,VM.sensors.location.y,0.0); // vector of current position
-		
+
 		var dist=data.dist - 100.0*p.distanceTo(data.start); // distance remaining = starting distance - distance traveled
 		var slow_dist=10.0; // scale back on approach
 		if (dist<slow_dist) speed*=0.1+0.9*dist/slow_dist;
 		//console.log("Forward: distance: "+dist+" -> speed "+speed);
 		VM.power.L=VM.power.R=speed;
-		
+
 		if (dist <= 0.0) // done with move
-		{ 
+		{
 			VM.power.L=VM.power.R=0.0;
 			done = true;
 		}
 		// Commit these new power values:
 		myself.do_writes(VM);
-		
+
 		return done;
 	}
 }
@@ -361,7 +361,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 // Sequencer
 	VM.sequencer=this.VM_seq;
 	VM.sequencer.code_count=0;
-	
+
 // Navigator
 	VM.nav = this.VM_nav;
 
@@ -478,7 +478,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 	// Turn right (clockwise) specified distance (deg)
 	VM.right=function(target,speed) {
 		if (!target) target=90; // degrees
-		if (!speed) speed=0.3*100; // --- scaled for percentage
+		if (!speed) speed=0.25*100; // --- scaled for percentage
 		else if (speed > 100.0) speed = 100.0; // cap speed at 100 percent
 		else if (speed < -100.0) speed = -100.0;
 
@@ -497,9 +497,9 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 				dist=-dist;
 			}
 
-			var slow_dist=40.0; // scale back on approach
-			if (dist<slow_dist) speed*=0.1+0.9*dist/slow_dist;
-			//console.log("Turn: distance: "+dist+" -> speed "+speed);
+			var slow_dist=70.0; // scale back on approach
+			if (dist<slow_dist) speed*=0.1+0.85*dist/slow_dist;
+			console.log("Turn: distance: "+dist+" -> speed "+speed);
 			VM.power.L=+speed; VM.power.R=-speed;
 			if (dist <= 0.0)
 			{ // done with move
@@ -515,8 +515,8 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		if (!target) target=90; // degrees
 		VM.right(-target,speed);
 	}
-	
-	// Drive straight to point (cartesian coordinate) 
+
+	// Drive straight to point (cartesian coordinate)
 	VM.driveToPoint=function(x_target, y_target)
 	{
 
@@ -534,7 +534,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 				var dist_m = Math.sqrt(t.data.x_dist*t.data.x_dist + t.data.y_dist*t.data.y_dist)
 				t.data.dist = dist_m*100;
 				t.data.start=new vec3(VM.sensors.location.x,VM.sensors.location.y,0.0); // vector of starting position
-				
+
 			}
 			if (!t.done_turn) // turn until
 				t.done_turn = VM.nav.turn(t.data, VM);
@@ -542,13 +542,13 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 				t.done_forward = VM.nav.forward(t.data, VM);
 			else
 				VM.sequencer.advance();
-	
+
 		}
 		VM.sequencer.block_end();
-		
+
 		//return t.data.dist; // testing
-		
-		
+
+
 	};
 
 
