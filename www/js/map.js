@@ -230,7 +230,8 @@ robot_map_t.prototype.load_button_pressed_m=function()
 	if (this.navigation)
 	{
 		this.navigation.status="done";
-		this.navigation = new navigation_t(this.navigation.div, this.navigation.state_runner, this.robot)
+		this.navigation.setup();
+		//this.navigation = new navigation_t(this.navigation.div, this.navigation.state_runner, this.robot)
 	}
 
 }
