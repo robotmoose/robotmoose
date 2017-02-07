@@ -499,7 +499,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 			var p_constant=0.05;
 			var p_multiplier=0.006;
 			speed*=dist*p_multiplier+p_constant;
-			console.log("PMult: "+p_multiplier+" Turn distance: "+dist+" -> speed: "+speed);
+			//console.log("PMult: "+p_multiplier+" Turn distance: "+dist+" -> speed: "+speed);
 			VM.power.L=+speed; VM.power.R=-speed;
 			if (dist <= 0.0)
 			{ // done with move
