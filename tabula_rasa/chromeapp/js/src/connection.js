@@ -410,6 +410,8 @@ To traverse, see https://gist.github.com/wmbenedetto/5078940
 connection_t.sensor_property_list={
 
 "analog":["analog#<u16>"],
+"input":["input#<u16>"],
+"input_pullup":["input_pullup#<u16>"],
 "blink":["blink#<u8>"],
 "bms":["battery.charge<u8>","battery.state<u8>"],
 "encoder":["encoder_raw#<u16>"],
@@ -449,6 +451,8 @@ connection_t.sensor_property_list={
 //   (same format as above)
 connection_t.command_property_list={
 "analog":[],
+"input":[],
+"input_pullup":[],
 "bms":[],
 "blink":["blink#<u8>"],
 "encoder":[],

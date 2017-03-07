@@ -157,6 +157,55 @@ REGISTER_TABULA_DEVICE(analog,"P",
 	actions_10ms.add(device);
 )
 
+/*// Simple input pin example:
+class input_sensor : public action {
+public:
+    int pin; // I/O pin used
+    tabula_sensor<uint16_t> value; // read-in value
+
+    input_sensor(int pin_):pin(pin_)
+    {
+        pinMode(pin,INPUT);
+    }
+
+    virtual void loop()
+    {
+        value=digitalRead(pin);
+    }
+};
+
+REGISTER_TABULA_DEVICE(input,"P",
+    int pin=src.read_pin();
+    input_sensor *device=new input_sensor(pin);
+    src.sensor_index("value",F("digital input value"),device->value.get_index());
+    actions_10ms.add(device);
+)
+
+// Simple input_pullup pin example:
+class input_pullup_sensor : public action {
+public:
+    int pin; // I/O pin used
+    tabula_sensor<uint16_t> value; // read-in value
+
+    input_pullup_sensor(int pin_):pin(pin_)
+    {
+        pinMode(pin,INPUT_PULLUP);
+    }
+
+    virtual void loop()
+    {
+        value=digitalRead(pin);
+    }
+};
+
+REGISTER_TABULA_DEVICE(input_pullup,"P",
+    int pin=src.read_pin();
+    input_pullup_sensor *device=new input_pullup_sensor(pin);
+    src.sensor_index("value",F("digital input value (pulled up)"),device->value.get_index());
+    actions_10ms.add(device);
+)*/
+
+
 // Battery Management System
 class BMS : public action {
 public:
