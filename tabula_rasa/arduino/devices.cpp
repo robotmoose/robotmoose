@@ -157,7 +157,7 @@ REGISTER_TABULA_DEVICE(analog,"P",
 	actions_10ms.add(device);
 )
 
-/*// Simple input pin example:
+// Simple input pin example:
 class input_sensor : public action {
 public:
     int pin; // I/O pin used
@@ -203,7 +203,7 @@ REGISTER_TABULA_DEVICE(input_pullup,"P",
     input_pullup_sensor *device=new input_pullup_sensor(pin);
     src.sensor_index("value",F("digital input value (pulled up)"),device->value.get_index());
     actions_10ms.add(device);
-)*/
+)
 
 
 // Battery Management System
