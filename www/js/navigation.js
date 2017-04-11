@@ -4,7 +4,7 @@ function navigation_t(div, state_runner, robot)
 	this.div = div;
 	this.robot = robot;
 	this.state_runner = state_runner;
-	console.log("navigation construction")
+	//if (this.robot&&!this.robot.sim&&!this.robot.sensors&&robot_network.sensors) this.robot.sensors = robot_network.sensors;
 	this.on_resize=function() {
 	
 		if (this.status) return;
@@ -730,7 +730,7 @@ navigation_t.prototype.generate_grid=function()
 	
 	this.grid_width = Math.ceil(this.map_json.width/this.cell_size); // number of cells horizontally in grid
 	this.grid_height = Math.ceil(this.map_json.height/this.cell_size); // number of cells vertically in grid
-	console.log("Generating grid. map_json.width: " + this.map_json.width + ", map_json.height: " + this.map_json.height);
+	//console.log("Generating grid. map_json.width: " + this.map_json.width + ", map_json.height: " + this.map_json.height);
 	//this.cell_size_pixels = this.minimap_img.width/this.grid_width;
 	
 	// Grid overlay
@@ -791,7 +791,7 @@ navigation_t.prototype.move_grid=function()
 {
 	if (!this.grid_width)
 		return;
-	console.log("moving grid");
+	//console.log("moving grid");
 	this.cell_size_pixels = (this.minimap_img.width/this.map_json.width)*this.cell_size;
 	
 	this.minimap_grid_box.style.width=this.cell_size_pixels;
@@ -884,13 +884,13 @@ navigation_t.prototype.hide_grid=function()
 navigation_t.prototype.update_pos_loop=function()
 {
 	var myself = this;
-	console.log("updating pos loop");
-	
+	//console.log("navigation: updating pos loop");
 	
 	//TESTING ONLY - for visualizing path found in driveToPointSmart()
 	var DEBUG_MAP_OUTPUT = "";
 	
 	if(DEBUG_MAP_OUTPUT)
+	{
 		if (myself.state_runner.grid_data.test_cell)
 		{
 			for (var i in myself.state_runner.grid_data.test_cell)
@@ -926,18 +926,19 @@ navigation_t.prototype.update_pos_loop=function()
 				myself.state_runner.grid_data.test_cell[i] = 0;
 			}
 		}
+	}
 	
 	
 	
 	
 	
-	if (!this.robot.sensors.location)
+	if (!myself.robot.sensors||!myself.robot.sensors.location)
 		return;
 	
 	
 	
 	//console.log("looping - posX_curr: " + this.posX_curr)
-	var location = this.robot.sensors.location;
+	var location = myself.robot.sensors.location;
 	if (this.posX_curr != location.x ||this.posY_curr != location.y || this.angle_curr != location.angle)
 	{
 
@@ -956,7 +957,7 @@ navigation_t.prototype.update_pos_loop=function()
 
 navigation_t.prototype.generateObstacleSingleCell=function(i, j, context, canvas)
 {
-	console.log("generating obstacle single cell")
+	//console.log("generating obstacle single cell")
 	var myself = this;
 	
 	//console.log("canvas width: " + canvas.width + ", img width: " + myself.minimap_img.width);
@@ -1025,7 +1026,7 @@ navigation_t.prototype.generateObstacleSingleCell=function(i, j, context, canvas
 navigation_t.prototype.generateObstaclesFromImage=function()
 {
 	
-	console.log("Generating obstacles from image");
+	//console.log("Generating obstacles from image");
 	var canvas = document.createElement('canvas');
 	var context = canvas.getContext('2d');
 	var img = this.minimap_img;

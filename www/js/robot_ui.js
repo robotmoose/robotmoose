@@ -301,6 +301,7 @@ robot_ui_t.prototype.run_interval=function() {
 	if(!_this.robot.sim)
 		_this.robot.sensors = robot_network.sensors;
 
+
 	if (!_this.doorways.sensors.minimized)
 		_this.widgets.sensors.refresh(JSON.parse(JSON.stringify(_this.robot.sensors)));
 
@@ -339,7 +340,8 @@ robot_ui_t.prototype.create_widgets=function()
 			if(this.widgets[key].destroy)
 				this.widgets[key].destroy();
 
-
+	if (!_this.robot.sim)
+		_this.robot.sensors=robot_network.sensors;
 	this.widgets=
 	{
 		config:new config_editor_t(this.doorways.config.content),
