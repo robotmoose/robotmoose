@@ -4,13 +4,23 @@ function navigation_t(div, state_runner, robot)
 	this.div = div;
 	this.robot = robot;
 	this.state_runner = state_runner;
-	
+	console.log("navigation construction")
 	this.on_resize=function() {
 	
 		if (this.status) return;
 		var myself = this;
 		
-		var location = this.robot.sensors.location;
+		var location = {};
+		if (this.robot.sensors&&this.robot.sensors.location)
+		{
+			location = this.robot.sensors.location;
+		}
+		else
+		{
+			location.x = 0.0;
+			location.y = 0.0;
+			location.angle = 0.0;
+		}
 		this.posX_set = location.x;
 		this.posY_set = location.y;
 		this.angle_set = location.angle;
@@ -38,10 +48,20 @@ navigation_t.prototype.setup=function()
 	this.waypoints="";
 	this.waypoint_count="";
 	
-	this.posX_set=this.robot.sensors.location.x;
-	//console.log("posX_set initial: " + this.posX_set);
-	this.posY_set=this.robot.sensors.location.y;
-	this.angle_set=this.robot.sensors.location.angle;
+	if (this.robot.sensors&&this.robot.sensors.location)
+	{
+		this.posX_set=this.robot.sensors.location.x;
+		//console.log("posX_set initial: " + this.posX_set);
+		this.posY_set=this.robot.sensors.location.y;
+		this.angle_set=this.robot.sensors.location.angle;
+	}
+	else
+	{
+		this.posX_set = 0.0;
+		this.posY_set = 0.0;
+		this.angle_set = 0.0;
+	}
+	
 	
 	this.map_json = this.robot.map_json;
 
@@ -84,9 +104,11 @@ navigation_t.prototype.setup=function()
 	
 	this.minimap_roomba=document.createElement("img");
 	this.minimap_roomba.src="maps/minimap_roomba.png";
+	this.minimap_arrow=document.createElement("img");
+	this.minimap_arrow.src="maps/pink-arrow.png";
 
 	this.modal_img_col.appendChild(myself.minimap_roomba);
-
+	this.modal_img_col.appendChild(myself.minimap_arrow);
 	
 	
 	// Expanding pulse behind mini roomba 
@@ -205,6 +227,20 @@ navigation_t.prototype.setup=function()
 		myself.reset_loc_button_pressed_m();
 	});
 	
+	this.gen_obstacles_button=document.createElement("input");
+	this.gen_obstacles_button.className="btn btn-primary";
+	this.gen_obstacles_button.style.marginBottom="10px";
+	this.gen_obstacles_button.style.width = "50%";
+	this.gen_obstacles_button.disabled=false;
+	this.gen_obstacles_button.style.visibility="hidden";
+	this.gen_obstacles_button.type="button";
+	this.gen_obstacles_button.value="Generate Obstacles from Map";
+	this.gen_obstacles_button.title="Click here to generate obstacles from map";
+	this.gen_obstacles_button.addEventListener("click",function(event)
+	{
+		myself.gen_obstacles_button_pressed_m();
+	});
+	
 	this.pos_colX.appendChild(this.posX_input);
 	this.pos_colX.appendChild(this.posX_label);
 	this.pos_colY.appendChild(this.posY_input);
@@ -218,7 +254,7 @@ navigation_t.prototype.setup=function()
 	this.modal_ui_col.appendChild(document.createElement("br"));
 	this.modal_ui_col.appendChild(document.createElement("br"));
 	this.modal_ui_col.appendChild(this.pos_row);
-	if (this.robot&&this.robot.sim)
+	if (this.robot)//&&this.robot.sim)
 		this.modal_ui_col.appendChild(this.set_loc_button);
 	else // disable reset location for real robot (replace when reset location is implemented for real robots)
 	{
@@ -232,6 +268,7 @@ navigation_t.prototype.setup=function()
 	this.modal_ui_col.appendChild(this.set_waypoint_button);
 	this.modal_ui_col.appendChild(this.set_obstacle_button);
 	this.modal_ui_col.appendChild(this.reset_loc_button);
+	this.modal_ui_col.appendChild(this.gen_obstacles_button);
 	
 	
 	this.code_box_div=document.createElement("div");
@@ -304,15 +341,18 @@ navigation_t.prototype.set_minimap_roomba=function(posX, posY, angle, resize)
 	
 		if (this.minimap_roomba_scale < 30) this.minimap_roomba_scale = 30; 
 	
+		this.minimap_arrow_scale = this.minimap_roomba_scale*1.4;
 		this.minimap_pulse_scale = this.minimap_roomba_scale*1.5;
 		this.minimap_ring_scale = this.minimap_roomba_scale*4;
 		this.minimap_waypoint_scale = this.minimap_roomba_scale/2;
 	
 		var scale = this.minimap_roomba_scale;
+		var arrow_scale = this.minimap_arrow_scale;
 		var pulse_scale = this.minimap_pulse_scale;
 		var ring_scale = this.minimap_ring_scale;
 	
 		Object.assign(myself.minimap_roomba.style, {position: "absolute", width : scale, height : scale, "z-index" : 100});
+		Object.assign(myself.minimap_arrow.style, {position: "absolute", width : arrow_scale, height : arrow_scale, "z-index" : 99});
 		Object.assign(myself.minimap_roomba_pulse.style, {position: "absolute", width : pulse_scale, height : pulse_scale});
 		Object.assign(myself.minimap_roomba_pulse_ring.style, {width : ring_scale, height : ring_scale, "border_radius" : ring_scale*2});
 	
@@ -326,7 +366,7 @@ navigation_t.prototype.set_minimap_roomba=function(posX, posY, angle, resize)
 	
 	// get offset of mouse click
 	
-	if(posX&&posY) // don't waste time if both == 0
+	if(posX||posY) // don't waste time if both == 0
 	{
 		offset_posX = posX*(myself.minimap_img.width/myself.map_json.width);
 		offset_posY = -posY*(myself.minimap_img.height/myself.map_json.height);
@@ -337,8 +377,10 @@ navigation_t.prototype.set_minimap_roomba=function(posX, posY, angle, resize)
 	// mini roomba offset
 	var offset_left = myself.minimap_img.width/2- myself.minimap_roomba_scale/2 + margin_left + offset_posX;
 	var offset_top = myself.minimap_img.height/2 - myself.minimap_roomba_scale/2 + offset_posY;
-	//console.log("mini roomba offset left: " + offset_left);
-	//console.log("map width: " + myself.minimap_img.width);
+	
+	// arrow offset
+	var offset_left_arrow = myself.minimap_img.width/2- myself.minimap_arrow_scale/2 + margin_left + offset_posX;
+	var offset_top_arrow = myself.minimap_img.height/2 - myself.minimap_arrow_scale/2 + offset_posY;
 	
 	// pulse offset
 	var offset_left_pulse = myself.minimap_img.width/2- myself.minimap_pulse_scale/2 + margin_left + offset_posX;
@@ -352,6 +394,7 @@ navigation_t.prototype.set_minimap_roomba=function(posX, posY, angle, resize)
 	Object.assign(myself.minimap_roomba_pulse.style, {left : offset_left_pulse, top : offset_top_pulse});
 	Object.assign(myself.minimap_roomba_pulse_ring.style, {left : offset_left_ring, top : offset_top_ring});
 	Object.assign(myself.minimap_roomba.style, {left : offset_left, top : offset_top});
+	Object.assign(myself.minimap_arrow.style, {left : offset_left_arrow, top : offset_top_arrow});
 	//myself.minimap_roomba.style.left=offset_left;
 	//myself.minimap_roomba.style.top=offset_top;
 	
@@ -359,9 +402,9 @@ navigation_t.prototype.set_minimap_roomba=function(posX, posY, angle, resize)
 		
 	myself.angle = angle;
 	var angle_adj = -angle + 90;
-	
+	var angle_arrow = angle_adj + 90;
 	myself.minimap_roomba.style["transform"]="rotate(" + angle_adj + "deg)"; 
-
+	myself.minimap_arrow.style["transform"]="rotate(" + angle_arrow + "deg)"; 
 
 	this.posX_curr = posX;
 	this.posY_curr = posY;
@@ -472,9 +515,9 @@ navigation_t.prototype.add_waypoint=function(posX, posY)
 	this.modal_img_col.appendChild(myself.waypoints[index]);
 	
 	if (this.waypoint_count==1)
-		this.code_box.innerHTML+="driveToPoint(" + posX + ", " + posY + ")";
+		this.code_box.innerHTML+="driveToPointSmart(" + posX + ", " + posY + ")";
 	else 
-		this.code_box.innerHTML+="\ndriveToPoint(" + posX + ", " + posY + ")";
+		this.code_box.innerHTML+="\ndriveToPointSmart(" + posX + ", " + posY + ")";
 		
 	this.code_box.rows=this.waypoint_count;
 	this.code_box_div.hidden=false;
@@ -559,25 +602,19 @@ navigation_t.prototype.reset_location=function(x_cor, y_cor, angle)
 	if (!angle) angle = 0;
 	
 	if (this.robot&&this.robot.sim) this.robot.change_location(x_cor, y_cor, 0, angle);
-	else
-	{
-	
-		console.log("Error: cannot currently reset location for real robot")
-		/*
-		// Implement later: reset location for real robot
-		
-		if (!this.pilot.power.power.reset) 
+	else if (this.robot&&this.pilot&&this.pilot.power)
+	{	
+		if (!this.pilot.power.reset) 
 		{
 			this.pilot.power.reset={};
 			this.pilot.power.reset.location={}
-			this.pilot.power.reset.counter=0;
 		}
-		this.pilot.power.reset.counter++;
+		var timestamp = Number(new Date());
+		this.pilot.power.reset.id=timestamp;
 		this.pilot.power.reset.location.x = x_cor;
 		this.pilot.power.reset.location.y = y_cor;
 		this.pilot.power.reset.location.angle = angle;
 		robot_network.update_pilot(myself.pilot);
-		*/
 	}
 }
 
@@ -618,6 +655,7 @@ navigation_t.prototype.set_loc_button_pressed_m=function()
 		this.reset_loc_button.value="Reset Location";
 		this.reset_loc_button.disabled=false;
 		this.reset_loc_button.style.visibility="";
+		this.gen_obstacles_button.style.visibility="hidden";
 		if (this.minimap_temp_waypoint)
 			this.minimap_temp_waypoint.hidden=false;
 	}
@@ -634,6 +672,7 @@ navigation_t.prototype.set_loc_button_pressed_m=function()
 		this.reset_loc_button.value="Add Waypoint";
 		this.reset_loc_button.disabled=false;
 		this.reset_loc_button.style.visibility="";
+		this.gen_obstacles_button.style.visibility="hidden";
 		if (this.minimap_temp_waypoint)
 			this.minimap_temp_waypoint.hidden=false;		
 	}
@@ -644,11 +683,17 @@ navigation_t.prototype.set_loc_button_pressed_m=function()
 		myself.set_obstacle_button.disabled=true;
 		this.reset_loc_button.disabled=true;
 		this.reset_loc_button.style.visibility="hidden";
+		this.gen_obstacles_button.style.visibility="";
 		if (this.minimap_temp_waypoint)
 			this.minimap_temp_waypoint.hidden=true;
 	}
 		
 
+}
+
+navigation_t.prototype.gen_obstacles_button_pressed_m=function()
+{
+	this.generateObstaclesFromImage();
 }
 
 navigation_t.prototype.get_coords=function(event)
@@ -679,10 +724,14 @@ navigation_t.prototype.get_coords=function(event)
 navigation_t.prototype.generate_grid=function()
 {
 	var myself = this;
-	this.cell_size = 0.5; // square meters
-	this.grid_width = Math.floor(this.map_json.width/this.cell_size); // number of cells horizontally in grid
-	this.grid_height = Math.floor(this.map_json.height/this.cell_size); // number of cells vertically in grid
-	this.cell_size_pixels = this.minimap_img.width/this.grid_width;
+	this.cell_size = 0.2; // square meters
+	
+	this.cell_size_pixels = (this.minimap_img.width/this.map_json.width)*this.cell_size;
+	
+	this.grid_width = Math.ceil(this.map_json.width/this.cell_size); // number of cells horizontally in grid
+	this.grid_height = Math.ceil(this.map_json.height/this.cell_size); // number of cells vertically in grid
+	console.log("Generating grid. map_json.width: " + this.map_json.width + ", map_json.height: " + this.map_json.height);
+	//this.cell_size_pixels = this.minimap_img.width/this.grid_width;
 	
 	// Grid overlay
 	this.minimap_grid_box=document.createElement("div");
@@ -705,10 +754,16 @@ navigation_t.prototype.generate_grid=function()
 		for (i = 0; i < this.grid_width; i++)
 		{
 			var k = j*w + i;
+			
 			this.cell_array[k]=this.minimap_grid_box.cloneNode(true);
 			this.cell_array[k].style.left=this.minimap_img.offsetLeft + i*this.cell_size_pixels;
 			this.cell_array[k].style.top=j*this.cell_size_pixels;
 			this.modal_img_col.appendChild(this.cell_array[k]);
+			
+
+			//this.cell_array[k]={};
+			//this.cell_array[k].style={};
+			//this.cell_array[k].style.background="";
 			
 			this.cell_array[k].hidden=true;
 			
@@ -720,6 +775,7 @@ navigation_t.prototype.generate_grid=function()
 	}
 	
 	this.grid_data = {}; // data to pass to state_runner
+	this.grid_data.wheelbase=0.3;
 	this.grid_data.cell_size = this.cell_size;
 	this.grid_data.width = this.grid_width;
 	this.grid_data.height = this.grid_height;
@@ -735,13 +791,13 @@ navigation_t.prototype.move_grid=function()
 {
 	if (!this.grid_width)
 		return;
-	
-	this.cell_size_pixels = this.minimap_img.width/this.grid_width;
+	console.log("moving grid");
+	this.cell_size_pixels = (this.minimap_img.width/this.map_json.width)*this.cell_size;
 	
 	this.minimap_grid_box.style.width=this.cell_size_pixels;
 	this.minimap_grid_box.style.height=this.cell_size_pixels;
 	
-	var w=this.grid_height;
+	var w=this.grid_width;
 	for (j = 0; j < this.grid_height; j++)
 	{
 		for (i = 0; i < this.grid_width; i++)
@@ -801,8 +857,19 @@ navigation_t.prototype.change_grid_cell=function(posX, posY)
 		console.log("Error: attempted to access undefined cell_array element in navigation_t.change_grid_cell()");
 		return;
 	}
-	myself.cell_array[k].hidden = !myself.cell_array[k].hidden;
-	myself.grid_data.array[k] = 1 - myself.grid_data.array[k]; // change between 0 and 1
+	if (myself.grid_data.array[k] == 1) 
+	{
+		myself.cell_array[k].hidden = true;
+		myself.grid_data.array[k]=0;
+	}
+	else
+	{
+		myself.cell_array[k].hidden = false;
+		myself.grid_data.array[k]=1;
+	}
+	//myself.cell_array[k].hidden = !myself.cell_array[k].hidden;
+	//myself.grid_data.array[k] = 1 - myself.grid_data.array[k]; // change between 0 and 1
+	myself.cell_array[k].style.background="#EE6B6B";
 }
 
 navigation_t.prototype.hide_grid=function()
@@ -817,21 +884,57 @@ navigation_t.prototype.hide_grid=function()
 navigation_t.prototype.update_pos_loop=function()
 {
 	var myself = this;
+	console.log("updating pos loop");
 	
-	//TESTING ONLY
-	/*
-	if (myself.state_runner.grid_data.test_cell)
-	{
-		for (var i in myself.state_runner.grid_data.test_cell)
+	
+	//TESTING ONLY - for visualizing path found in driveToPointSmart()
+	var DEBUG_MAP_OUTPUT = "";
+	
+	if(DEBUG_MAP_OUTPUT)
+		if (myself.state_runner.grid_data.test_cell)
 		{
-			if (myself.state_runner.grid_data.test_cell[i] == 1)
-				myself.cell_array[i].hidden = false;
+			for (var i in myself.state_runner.grid_data.test_cell)
+			{
+				if (myself.state_runner.grid_data.test_cell[i] == 1) // checked cell (light blue)
+				{
+					myself.cell_array[i].hidden = false;
+					myself.cell_array[i].style.background="#00FFFF";
+				}
+				else if (myself.state_runner.grid_data.test_cell[i] == 2) // best path (light green)
+				{
+					myself.cell_array[i].hidden = false;
+					myself.cell_array[i].style.background="#00ff00";
+				}
+				else if (myself.state_runner.grid_data.test_cell[i] == 3) // checked obstacle (light purple)
+				{
+					myself.cell_array[i].hidden = false;
+					myself.cell_array[i].style.background="#cc99ff";
+				}
+				else if (myself.state_runner.grid_data.test_cell[i] == 4) // waypoint added (dark green)
+				{
+					myself.cell_array[i].hidden = false;
+					myself.cell_array[i].style.background="#336600";
+				}
+				else if (myself.state_runner.grid_data.test_cell[i] == 5) // obstacle padding (orange)
+				{
+					myself.cell_array[i].hidden = false;
+					myself.cell_array[i].style.background="#ff9933";
+				}
+			
+			
+			
+				myself.state_runner.grid_data.test_cell[i] = 0;
+			}
 		}
-	}
-	*/
+	
+	
+	
+	
 	
 	if (!this.robot.sensors.location)
 		return;
+	
+	
 	
 	//console.log("looping - posX_curr: " + this.posX_curr)
 	var location = this.robot.sensors.location;
@@ -848,6 +951,106 @@ navigation_t.prototype.update_pos_loop=function()
 	{
 		setTimeout(function(){myself.update_pos_loop()}, 60);
 	}
+}
+
+
+navigation_t.prototype.generateObstacleSingleCell=function(i, j, context, canvas)
+{
+	console.log("generating obstacle single cell")
+	var myself = this;
+	
+	//console.log("canvas width: " + canvas.width + ", img width: " + myself.minimap_img.width);
+	var w = this.grid_width;
+	var k = j*w + i;
+	if (!this.cell_array[k])
+	{
+		console.log("Error: attempted to access undefined cell_array element in navigation_t.generateObstacleSingleCell()");
+		return;
+	}
+	
+	var cell_size = canvas.width/this.grid_width;
+	cell_size = cell_size;
+	var left_offset = i*cell_size;
+	var top_offset = j*cell_size
+	
+	//cell_size = cell_size*1.2;
+	
+	//console.log("i: " + i + ", j: " + j + ", offset_left: " + left_offset + ", offset_top: " + top_offset)
+	var pixel_data = context.getImageData(left_offset, top_offset, cell_size, cell_size).data;
+	
+	var threshold = 0.80;
+	
+	var brightness = 0;
+	var pixels = 0;
+	var delta = 0;
+	var mean = 0;
+	var deltaSqr = 0;
+	var obstacle_present = false;
+	
+	//console.log("pixel data length: " + pixel_data.length)
+	
+	for (var l = 0; l < pixel_data.length; l += 4)
+	{
+		pixels++;
+		brightness = (0.2126 * pixel_data[l]) + (0.7152 * pixel_data[l + 1]) + (0.0722 * pixel_data[l + 2]);
+		delta = brightness - mean;
+		deltaSqr += delta * delta;
+		mean = mean + delta / pixels;
+	}
+	
+	variance = Math.sqrt(deltaSqr / pixels) / 255;
+	mean = mean / 255;
+	
+	
+	if (mean < threshold)
+	{
+		obstacle_present = true;
+		
+		this.cell_array[k].hidden = false;
+		this.cell_array[k].style.background="#EE6B6B";
+		this.grid_data.array[k] = 1;
+
+	}
+	else
+	{
+		this.cell_array[k].hidden = true;
+		this.grid_data.array[k] = 0;
+	}
+	
+	
+	//console.log('checking brightness - lum: ' + mean + ' var: ' + variance + ', obstacle present: ' + obstacle_present);
+
+}
+
+navigation_t.prototype.generateObstaclesFromImage=function()
+{
+	
+	console.log("Generating obstacles from image");
+	var canvas = document.createElement('canvas');
+	var context = canvas.getContext('2d');
+	var img = this.minimap_img;
+	canvas.width = img.width;
+	canvas.height = img.height;
+	context.drawImage(img, 0, 0, img.width, img.height);
+	
+	
+	for (var i = 0; i < this.grid_width; i++)
+	{
+		for (var j = 0; j < this.grid_height; j++)
+		{
+			this.generateObstacleSingleCell(i,j,context, canvas);
+		}
+	}
+	
+	/*
+	this.generateObstacleSingleCell(0,0,context, canvas);
+	this.generateObstacleSingleCell(1,1,context, canvas);
+	this.generateObstacleSingleCell(0,5,context, canvas);
+	this.generateObstacleSingleCell(5,0,context, canvas);
+	this.generateObstacleSingleCell(8,6,context, canvas);
+	this.generateObstacleSingleCell(14,10,context, canvas);
+	this.generateObstacleSingleCell(13,10,context, canvas);
+	*/
 }
 
 
