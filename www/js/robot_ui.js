@@ -219,7 +219,7 @@ robot_ui_t.prototype.download_gui=function()
 				states:_this.create_doorway("Code","Automatically drive the robot",help_text_states, 'list-alt'),
 				map:_this.create_doorway("Map","See where the robot thinks it is",help_text_map, 'globe'),
 				navigation: _this.create_doorway("Navigation", "Plan a path for the robot", null, 'road'),
-				video:_this.create_doorway("Video","Show the robot's video camera",null, 'facetime-video'),
+				video:_this.create_doorway("Video","Show the robot's video camera",null, 'facetime-video),
 				UI:_this.create_doorway("UI","Customized robot user interface",help_text_ui, 'object-align-top'),
 				sound:_this.create_doorway("Sound","Play sounds on the backend to get attention",null, 'volume-up'),
 				chat:_this.create_doorway("Chat","Chat with the caretaker of the robot.",null, 'comment')
