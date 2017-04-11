@@ -66,6 +66,8 @@ connection_t.prototype.reset=function() {
 	// Localization
 	_this.location=new vec3(0,0,0);
 	_this.angle=0;
+	
+	_this.reset_id=0;
 
 	_this.serial_startup=true;
 	_this.sends_in_progress=0;
@@ -532,7 +534,25 @@ connection_t.prototype.arduino_setup_complete=function()
 	this.network_getnext(robot_to_starpath(this.robot)+"pilot/power",function(power)
 	{
 		for(let field in power)
-			_this.power[field]=power[field];
+			_this.power[field]=power[field];		
+		
+		
+		if(_this.power.reset&&_this.power.reset.id&&_this.reset_id!=_this.power.reset.id) // check for location reset
+		{
+			//console.log("RESETTING LOCATION");
+			if(_this.reset_id<2) // stay at (0,0,0) when first connecting
+				_this.reset_id++;
+			else
+			{
+				_this.location.x = +_this.power.reset.location.x;
+				_this.location.y = +_this.power.reset.location.y;
+				_this.angle = +_this.power.reset.location.angle;
+				_this.reset_id=_this.power.reset.id;
+			}
+		}
+		
+		
+		
 	});
 
 	this.network_getnext(robot_to_starpath(this.robot)+"config",function(config)

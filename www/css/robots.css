@@ -185,3 +185,7 @@ head,.robot.body
     font: 24px Arial, sans-serif;
 }
 
+body{
+  overflow-y:scroll;
+}
+
