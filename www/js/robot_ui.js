@@ -351,7 +351,8 @@ robot_ui_t.prototype.create_widgets=function()
 
 		sensors:new tree_viewer_t(this.doorways.sensors.content,{},
 		[
-			{key:"bumper",type:"binary"}
+			{key:"bumper",type:"binary"},
+			{key:"buttons",type:"binary"}
 		]),
 		map:new robot_map_t(this.doorways.map.content,this.modal_div, _this.robot),
 		navigation:new navigation_t(this.doorways.navigation.content, _this.state_runner, _this.robot),
@@ -406,7 +407,7 @@ robot_ui_t.prototype.create_widgets=function()
 		this.doorways.navigation.resizer.onresize=function(){_this.widgets.navigation.on_resize();};
 		this.widgets.navigation.pilot=this.widgets.pilot.pilot;
 	}
-	
+
 }
 
 robot_ui_t.prototype.create_doorway=function(title,tooltip,help_text,icon)
