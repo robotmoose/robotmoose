@@ -43,8 +43,13 @@ function modal_uploadmap_t(div, onupload)
 					}
 
 
-					var dim_text = "Image Dimensions (in pixels): "  + myself.uploaded_map.width + ":" + myself.uploaded_map.height;
-					myself.dim_text_node = document.createTextNode(dim_text);
+					
+					myself.uploaded_map.onload = function() { 
+						var dim_text = "Image Dimensions (in pixels): "  + myself.uploaded_map.width + ":" + myself.uploaded_map.height;;
+						console.log(myself.uploaded_map.width)
+						myself.dim_text_node = document.createTextNode(dim_text);
+						myself.upload_preview_div.appendChild(myself.dim_text_node);
+					};
 
 					myself.upload_preview_div=document.createElement("div");
 
@@ -52,14 +57,16 @@ function modal_uploadmap_t(div, onupload)
 					myself.upload_preview_div.appendChild(document.createElement("br"));
 					myself.upload_preview_div.appendChild(myself.uploaded_map);
 					myself.upload_preview_div.appendChild(document.createElement("br"));
-					myself.upload_preview_div.appendChild(myself.dim_text_node);
 
 
 					myself.modal.get_content().appendChild(myself.upload_opts_div);
 					myself.modal.get_content().appendChild(myself.upload_preview_div);
+					
 
 				}
 				reader.readAsDataURL(myself.file_input.files[0]);
+				myself.upload_height.value="";
+				myself.upload_width.value="";
 
 		}
 		else
@@ -99,7 +106,7 @@ function modal_uploadmap_t(div, onupload)
 	this.upload_opts_div=document.createElement("div");
 
 	// text prompt
-	var scale_prompt="A preview of your map image is shown below. Choose a width and height between 1 and 100 meters and click \"Load Map Image\" to confirm."
+	var scale_prompt="Set the scale of the map by entering the height or width. The other dimension will be set automatically based on the dimensions of your image. The height and width must each be between 1 and 100 meters. Click \"Load Map Image\" to confirm."
 	this.upload_text=document.createTextNode(scale_prompt)
 
 	// map title (optional)
@@ -123,15 +130,16 @@ function modal_uploadmap_t(div, onupload)
 	this.upload_width.placeholder="width (in meters)";
 	this.upload_width.addEventListener("change",function(event)
 	{
-		myself.scale_onchange_m();
+		myself.scale_onchange_m("width");
 	});
 
 	this.upload_height=document.createElement("input"); // height input
 	this.upload_height.className="form-control";
 	this.upload_height.placeholder="height (in meters)";
+	//this.upload_height.readOnly=true;
 	this.upload_height.addEventListener("change",function(event)
 	{
-		myself.scale_onchange_m();
+		myself.scale_onchange_m("height");
 	});
 
 
@@ -180,11 +188,15 @@ function modal_uploadmap_t(div, onupload)
 
 }
 
-modal_uploadmap_t.prototype.scale_onchange_m=function() // when height or width are changed
+modal_uploadmap_t.prototype.scale_onchange_m=function(dimension) // when height or width are changed
 {
 	var myself = this;
 	if (myself.upload_width && myself.upload_height)
 	{
+		if (dimension == "width")
+			myself.upload_height.value = (myself.uploaded_map.height/myself.uploaded_map.width)*myself.upload_width.value;
+		else
+			myself.upload_width.value = (myself.uploaded_map.width/myself.uploaded_map.height)*myself.upload_height.value;
 		if (myself.upload_width.value >= 1 && myself.upload_width.value <= 100 && myself.upload_height.value >= 1 && myself.upload_height.value <= 100)
 			myself.confirm_upload_button.disabled=false;
 		else

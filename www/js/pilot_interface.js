@@ -341,12 +341,15 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 
 	var upfunc=function()
 	{
-		_this.dragging=false;
-		rotate(_this.images.wheel,0);
-		rotate(_this.images.needle,-77.5);
-		_this.pilot.power.L=0;
-		_this.pilot.power.R=0;
-		robot_network.update_pilot(_this.pilot);
+		if(_this.dragging)
+		{
+			_this.dragging=false;
+			rotate(_this.images.wheel,0);
+			rotate(_this.images.needle,-77.5);
+			_this.pilot.power.L=0;
+			_this.pilot.power.R=0;
+			robot_network.update_pilot(_this.pilot);
+		}
 	};
 
 	var rotatefunc=function(evt)

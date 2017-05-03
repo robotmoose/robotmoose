@@ -185,10 +185,13 @@ robot_sim_t.prototype.drive_loop=function(){
 	this.drive_wheels(dist_L, dist_R);	
 
 		
-	if ((this.pilot.power.L==0&&this.pilot.power.R==0)||!robot_network.sim) this.loop = false;
+	if ((this.pilot.power.L==0&&this.pilot.power.R==0)||!robot_network.sim)
+	{
+		this.loop = false;
+	}
 	else 
 	{
-		setTimeout(function(){_this.drive_loop()}, 30);
+		setTimeout(function(){_this.drive_loop()}, 60);
 	}
 }
 
