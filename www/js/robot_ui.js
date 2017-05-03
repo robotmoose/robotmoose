@@ -352,7 +352,8 @@ robot_ui_t.prototype.create_widgets=function()
 		sensors:new tree_viewer_t(this.doorways.sensors.content,{},
 		[
 			{key:"bumper",type:"binary"},
-			{key:"buttons",type:"binary"}
+			{key:"buttons",type:"binary"},
+			{key:"light_field",type:"binary"}
 		]),
 		map:new robot_map_t(this.doorways.map.content,this.modal_div, _this.robot),
 		navigation:new navigation_t(this.doorways.navigation.content, _this.state_runner, _this.robot),
