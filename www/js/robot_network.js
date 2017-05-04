@@ -3,6 +3,7 @@ function robot_network_t()
 	var _this=this;
 	this.robot=null;
 	this.pilot={};
+	this.trim=0;
 	this.intervals=
 	[
 		{
