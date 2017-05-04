@@ -1156,7 +1156,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 				t.done_forward = VM.nav.forward(t.data, VM);
 			else // waypoint reached
 				VM.sequencer.advance();
-
+		}
 		VM.sequencer.block_end();
 
 
