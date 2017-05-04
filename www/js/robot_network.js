@@ -71,10 +71,10 @@ robot_network_t.prototype.destroy=function()
 
 robot_network_t.prototype.update_pilot=function(pilot)
 {
-	
+
 	if(valid_robot(this.robot))
 	{
-		
+
 		this.pilot=pilot;
 		if(this.robot.sim)
 		{

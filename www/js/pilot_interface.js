@@ -101,6 +101,8 @@ function pilot_interface_t(div,doorway)
 		/* Power to each actuator */
 		power: emptyPower(),
 
+		trim:0,
+
 		/* Time, in seconds, of last pilot command */
 		time:0,
 
@@ -240,20 +242,22 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	{
 		div:document.createElement("div"),
 		label:document.createElement("label"),
-		slider:document.createElement("input")
+		slider:document.createElement("input"),
+		trim_label:document.createElement("label"),
+		trim:document.createElement("input")
 	};
 
 	this.drive.div.className="form-group";
 	this.drive.div.style.marginTop=column_padding;
 	this.element.appendChild(this.drive.div);
 
+	var update_drive_text=function(){_this.update_drive_text();};
+
 	this.drive.label.style.width=column_left_width;
 	this.drive.label.style.float="left";
 	this.drive.label.style.marginRight=column_padding;
-
-	var update_text=function(){_this.update_drive_text();};
-	this.drive.slider.addEventListener("change",update_text);
-	this.drive.slider.addEventListener("input",update_text);
+	this.drive.slider.addEventListener("change",update_drive_text);
+	this.drive.slider.addEventListener("input",update_drive_text);
 	this.drive.div.appendChild(this.drive.label);
 
 	this.drive.slider.type="range";
@@ -266,6 +270,29 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	this.drive.div.appendChild(this.drive.slider);
 
 	this.update_drive_text();
+
+	this.drive.div.appendChild(document.createElement("br"));
+
+	var update_trim_text=function(){_this.update_trim_text();};
+
+	this.drive.trim_label.style.width=column_left_width;
+	this.drive.trim_label.style.float="left";
+	this.drive.trim_label.style.marginRight=column_padding;
+	this.drive.trim.addEventListener("change",update_trim_text);
+	this.drive.trim.addEventListener("input",update_trim_text);
+	this.drive.div.appendChild(this.drive.trim_label);
+
+	this.drive.max_trim=100;
+	this.drive.trim.type="range";
+	this.drive.trim.size=8;
+	this.drive.trim.min=-this.drive.max_trim;
+	this.drive.trim.max=this.drive.max_trim;
+	this.drive.trim.step=1;
+	this.drive.trim.value=0;
+	this.drive.trim.style.width=column_right_width;
+	this.drive.div.appendChild(this.drive.trim);
+
+	this.update_trim_text();
 
 	var _this=this;
 
@@ -386,12 +413,17 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 			rotate(_this.images.needle,speed_rot);
 
 			var max_power=parseInt(""+_this.get_pilot_power()*100);
-			var forward=max_power*(pos.x-focal_point.x)/size.w*2;
-			var turn=max_power*(pos.y-focal_point.y)/size.h*2;
+			var turn=(pos.x-focal_point.x)/size.w*2;
+			var forward=(pos.y-focal_point.y)/size.h*2;
 
-			_this.pilot.power.L=parseInt(""+clamp(forward-turn,
+			if(forward>0)
+				turn-=_this.pilot.trim/_this.drive.max_trim;
+			else if(forward<0)
+				turn+=_this.pilot.trim/_this.drive.max_trim;
+
+			_this.pilot.power.L=parseInt(""+clamp(max_power*(turn-forward),
 				-max_power,max_power));
-			_this.pilot.power.R=parseInt(""+clamp(-forward-turn,
+			_this.pilot.power.R=parseInt(""+clamp(max_power*(-turn-forward),
 				-max_power,max_power));
 			robot_network.update_pilot(_this.pilot);
 		}
@@ -413,6 +445,13 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 pilot_interface_t.prototype.update_drive_text=function()
 {
 	this.drive.label.innerHTML="Drive power ("+this.drive.slider.value+"%):";
+}
+
+pilot_interface_t.prototype.update_trim_text=function()
+{
+	this.drive.trim_label.innerHTML="Drive trim ("+this.drive.trim.value+"%):";
+	this.pilot.trim=parseInt(this.drive.trim.value);
+	robot_network.update_pilot(this.pilot);
 }
 
 
@@ -486,6 +525,12 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 
 	if(this.images&&this.images.wheel)
 		rotate(this.images.wheel,dir);
+
+	//Trim
+	if(forward>0)
+		turn+=this.pilot.trim/this.drive.max_trim;
+	else if(forward<0)
+		turn-=this.pilot.trim/this.drive.max_trim;
 
 	//spedometer needle rotation
 	var ang = maxPower * 65.75 - 77.5;
