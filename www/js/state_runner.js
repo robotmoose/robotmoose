@@ -90,51 +90,51 @@ function state_runner_t()
 	seq.block_end=function() {
 		seq.code_count++; // increment count for each phase
 	}
-	
-	
+
+
 	// VM navigator: object with functions used by VM for path planning
 	this.VM_nav= {};
 	var nav = this.VM_nav;
-	
+
 	nav.getTheta=function(x_target, y_target, VM) // get angle between +x axis and target point
 	{
-		if (!VM||!VM.sensors||!VM.sensors.location) 
+		if (!VM||!VM.sensors||!VM.sensors.location)
 		{
 			console.log("Error: nav.getTheta called without VM sensors");
 			return;
 		}
-		
+
 		var x_curr = VM.sensors.location.x;
 		var y_curr = VM.sensors.location.y;
-		
+
 		var data = {};
 		data.x_dist = x_target - x_curr;
 		data.y_dist = y_target - y_curr;
 
 		var ratio_y_x = data.y_dist / data.x_dist;
 
-		var atan_deg = Math.atan(ratio_y_x)*180/Math.PI; 
-		
+		var atan_deg = Math.atan(ratio_y_x)*180/Math.PI;
+
 		if (x_curr < x_target) data.theta = atan_deg;
 		else if (atan_deg >= 0) data.theta = - 180 + atan_deg;
 		else data.theta = 180 + atan_deg;
-		
-		
-		
+
+
+
 		return data;
-		
+
 	}
-	
+
 	nav.getPhi=function(theta, VM) // get angle and direction (right/left) between current direction and theta
 	{
-		if (!VM||!VM.sensors||!VM.sensors.location) 
+		if (!VM||!VM.sensors||!VM.sensors.location)
 		{
 			console.log("Error: nav.getPhi called without VM sensors");
 			return;
-		} 
-		
+		}
+
 		var data = {};
-		
+
 		var curr = VM.sensors.location.angle;
 		if (theta*curr >= 0) // same sign
 		{
@@ -177,7 +177,7 @@ function state_runner_t()
 		}
 		return data;
 	}
-	
+
 	nav.turn=function(data, VM) // turn until reach target angle
 	{
 		var done = false;
@@ -187,7 +187,7 @@ function state_runner_t()
 		var dist=curr_angle-data.theta;
 		while (dist>+180.0) dist-=360.0; // reduce mod 360
 		while (dist<-180.0) dist+=360.0;
-		if (data.dir == "L") 
+		if (data.dir == "L")
 		{
 			speed = -speed;
 			dist = -dist;
@@ -205,50 +205,50 @@ function state_runner_t()
 		// Commit these new power values:
 		myself.do_writes(VM);
 
-		
+
 		return done;
 	}
-	
+
 	nav.forward=function(data, VM)
 	{
 		var done = false
-		
+
 		var speed = 40;
 
 		var p=new vec3(VM.sensors.location.x,VM.sensors.location.y,0.0); // vector of current position
-		
+
 		var dist=data.dist - 100.0*p.distanceTo(data.start); // distance remaining = starting distance - distance traveled
 		var slow_dist=10.0; // scale back on approach
 		if (dist<slow_dist) speed*=0.1+0.9*dist/slow_dist;
 		//console.log("Forward: distance: "+dist+" -> speed "+speed);
 		VM.power.L=VM.power.R=speed;
-		
+
 		if (dist <= 0.0) // done with move
-		{ 
+		{
 			VM.power.L=VM.power.R=0.0;
 			done = true;
 		}
 		// Commit these new power values:
 		myself.do_writes(VM);
-		
+
 		return done;
 	}
-	
+
 	nav.checkCell=function(i, j, VM, swap, pad) // returns 0 if obstacle is found in this cell; returns 1 otherwise
 	{
-	
+
 		if (swap)
 		{
 			var t = i;
 			i = j;
 			j = t;
 		}
-		
+
 		var cell_size = myself.grid_data.cell_size;
 		var w = myself.grid_data.width;
-		
+
 		var k = j*w + i;
-		
+
 		// check for obstacle
 		if (pad) // use padded grid
 		{
@@ -259,50 +259,50 @@ function state_runner_t()
 		{
 			return 0;
 		}
-		
+
 		if (!myself.grid_data.test_cell) myself.grid_data.test_cell = []; // TESTING - send data back to navigation.js for display
-		
+
 		//myself.grid_data.test_cell[k] = 1; // TESTING
-		
+
 		return 1;
 	}
-	
+
 	nav.checkPath=function(x_target, y_target, VM, x_curr0, y_curr0, pad) // returns 0 if obstacle is found in path, or returns 1 if path is clear
 	{
-	
+
 		var cell_size = myself.grid_data.cell_size;
-		
-		
+
+
 		var x_curr = VM.sensors.location.x;
 		var y_curr = VM.sensors.location.y;
 		if (x_curr0 && y_curr0)
 		{
 			x_curr = x_curr0;
 			y_curr = y_curr0;
-		}	
-		
-		
+		}
+
+
 		// convert to coordinates where origin is at top left of map
-		
+
 		var rw = myself.grid_data.map_width/2;
 		var rh = myself.grid_data.map_height/2;
 		var x_curr = x_curr + rw;
 		var y_curr= (y_curr - rh)*-1;
 		var x_target = x_target + rw;
 		var y_target = (y_target - rh)*-1;
-		
-		
+
+
 		var cell_size = myself.grid_data.cell_size;
 		var w = myself.grid_data.width;
 
-		
-		
+
+
 		var dx = x_target - x_curr;
 		var dy = y_target - y_curr;
 		var m = dy/dx;
 		var m_abs = Math.abs(m);
-		
-		
+
+
 		if (m_abs < 1)
 		{
 		 	var u = x_curr;
@@ -312,7 +312,7 @@ function state_runner_t()
 		 	var u_target = x_target;
 		 	var swap = "";
 		}
-		else 
+		else
 		{
 			var u = y_curr;
 			var sign_u = Math.sign(dy);
@@ -322,33 +322,33 @@ function state_runner_t()
 			var swap = 1;
 			m_abs = 1/m_abs;
 		}
-		
-		
+
+
 	 	var cell_dist_u = (Math.floor(u/cell_size)+1)*cell_size;
-	 	
+
 	 	if (sign_v>0)
 	 		var cell_dist_v = (Math.floor(v/cell_size)+1)*cell_size;
 	 	else
 	 		var cell_dist_v = Math.floor(v/cell_size)*cell_size;
-	 		
+
 	 	var e = v*sign_v - cell_dist_v*sign_v + m_abs*(cell_dist_u - u);
-		
+
 		var i = Math.floor(u/cell_size);
 		var j = Math.floor(v/cell_size);
-		
+
 		var padding = 0;
-		
+
 		if (!pad) // if no padded grid, add padding
-		{ 
+		{
 			var wheelbase = myself.grid_data.wheelbase;
-			if (!VM.nav.pad) 
+			if (!VM.nav.pad)
 				VM.nav.pad = Math.ceil(0.5*wheelbase/myself.grid_data.cell_size);
 			padding = VM.nav.pad;
 		}
-		
-		
+
+
 		VM.nav.checkCell(i, j, VM, swap, pad); // remove? Should it check current cell?
-		
+
 		// Modified bresenham algorithm
 		var i_limit = Math.floor(u_target/cell_size);
 		var done = false;
@@ -356,7 +356,7 @@ function state_runner_t()
 		{
 			i = i + 1*sign_u;
 			e = e + m_abs*cell_size;
-			if (e > 0) 
+			if (e > 0)
 			{
 				//if (!VM.nav.checkCell(i, j, VM, swap, pad)) // extra width
 				//	return 0;
@@ -366,7 +366,7 @@ function state_runner_t()
 					if (!VM.nav.checkCell(i-1*sign_u, j1, VM, swap, pad)) // mod to accomodate width
 						return 0;
 				}
-				
+
 				e = e - cell_size;
 			}
 			for (var j1 = j-padding; j1 < j+padding+1; j1++)
@@ -374,34 +374,34 @@ function state_runner_t()
 				if (!VM.nav.checkCell(i, j1, VM, swap, pad))
 					return 0;
 			}
-			
-			
-			if ((sign_u > 0 && i < i_limit) || (sign_u < 0 && i > i_limit)) 
+
+
+			if ((sign_u > 0 && i < i_limit) || (sign_u < 0 && i > i_limit))
 				done = false;
 			else
 				done = true;
 		}
-	
-		
+
+
 		return 1;
-		
+
 	}
-	
+
 	nav.padObstacles=function(k_curr, VM) // enlarge obstacles to ensure the robot will not collide with one after A* algorithm
 	{
 		var k_target = VM.nav.data.k_target;
 		var w = myself.grid_data.width;
 		var h = myself.grid_data.height;
 		var grid_copy = myself.grid_data.array.slice();
-		
+
 		var wheelbase = myself.grid_data.wheelbase;
 		if (!VM.nav.pad) VM.nav.pad = Math.ceil(0.5*wheelbase/myself.grid_data.cell_size);
 		var pad = VM.nav.pad;
 		//if (pad == 1) pad="";
 		//console.log("Padding obstacles, grid length: " + grid_copy.length);
-		
+
 		for (var k = 0; k < grid_copy.length; k++)
-		{		
+		{
 			if (grid_copy[k]==1)
 			{
 				var j0 = Math.floor(k/w);
@@ -414,26 +414,26 @@ function state_runner_t()
 						{
 							var k1 = j*w + i;
 							if (grid_copy[k1]==0 && k1!=k_target && k1!=k_curr)
-							{	
+							{
 								grid_copy[k1] = 2;
 								myself.grid_data.test_cell[k1] = 5;
 							}
 						}
 					}
 				}
-				
+
 			}
 		}
 		for (var k = 0; k < grid_copy.length; k++)
-		{		
-			if (grid_copy[k]==2) 
+		{
+			if (grid_copy[k]==2)
 				grid_copy[k] = 1;
 		}
-		
+
 		VM.nav.padded_grid=grid_copy;
-		
+
 	}
-	
+
 	nav.aStarDist=function(i,j,x2,y2)
 	{
 		var cell_size = myself.grid_data.cell_size;
@@ -442,12 +442,12 @@ function state_runner_t()
 		var y = j*cell_size+cell_size/2;
 		var dy = Math.abs(y - y2);
 		//console.log("aStarDist - cell_size: " + cell_size + ", x_curr: " + x2 + ", y_curr " + y2 + ", x: " + x + ", y: " + y);
-		return Math.sqrt(dx*dx + dy*dy);	
+		return Math.sqrt(dx*dx + dy*dy);
 	}
-	
+
 	nav.aStarEval=function(dist, i1, j1, diag, VM)
 	{
-	
+
 		var result = {};
 		var i_target=VM.nav.data.i_target;
 		var j_target=VM.nav.data.j_target;
@@ -456,7 +456,7 @@ function state_runner_t()
 		var x_curr=VM.nav.data.x_curr;
 		var y_curr=VM.nav.data.y_curr;
 		var cell_size = myself.grid_data.cell_size;
-		
+
 		if(i1==i_target && j1 == j_target)
 		{
 			var result = {}
@@ -465,7 +465,7 @@ function state_runner_t()
 			return result;
 		}
 		var d = 0;
-			
+
 		if (dist==0)
 			d = VM.nav.aStarDist(i1,j1,x_curr,y_curr);
 		else if (diag)
@@ -478,16 +478,16 @@ function state_runner_t()
 		result.val = val;
 		result.d = d;
 		return result;
-	
+
 	}
-	
+
 	nav.aStarVisit=function(obj0, obj, diag, VM)
 	{
 		var i1 = obj.i;
 		var j1 = obj.j;
 		var w = myself.grid_data.width;
 		var k = j1*w+i1
-		
+
 		if (k == VM.nav.data.k_target) // goal reached
 		{
 			obj.k0=obj0.k;
@@ -500,7 +500,7 @@ function state_runner_t()
 			{
 				if (!VM.nav.visited[k]) // if not yet visited
 				{
-					
+
 					var result = VM.nav.aStarEval(obj0.d, i1,j1,diag,VM);
 					obj.v = result.val;
 					obj.d = result.d;
@@ -508,7 +508,7 @@ function state_runner_t()
 					obj.k0=obj0.k;
 					VM.nav.p_queue.add(obj);
 					VM.nav.visited[k]=obj;
-					myself.grid_data.test_cell[k]=1; // TESTING			
+					myself.grid_data.test_cell[k]=1; // TESTING
 				}
 				else // if already visited
 				{
@@ -529,16 +529,16 @@ function state_runner_t()
 			}
 
 		}
-			
+
 		return 0;
-		
+
 	}
-	
+
 	nav.aStar=function(obj0, VM, onfinished, counter)
 	{
 		if(!counter)
 			counter=0;
-	
+
 		var w = myself.grid_data.width;
 		var h = myself.grid_data.height;
 		var cell_size = myself.grid_data.cell_size;
@@ -546,9 +546,9 @@ function state_runner_t()
 		var j = obj0.j;
 		var k = obj0.k;
 		VM.nav.expanded[k]=1;
-		
+
 		var dist = obj0.d;
-		
+
 		var e_bound = i+1 < w;
 		var w_bound = i - 1 >= 0;
 		var s_bound = j + 1 < h;
@@ -557,8 +557,8 @@ function state_runner_t()
 		//console.log("w_bound: " + w_bound);
 		//console.log("s_bound: " + s_bound);
 		//console.log("n_bound: " + n_bound);
-		
-		
+
+
 		if (e_bound) // east
 		{
 			var obj = {i : i+1, j : j, dir : 0};
@@ -568,7 +568,7 @@ function state_runner_t()
 				VM.nav.astar_result = 1;
 				if (onfinished) onfinished();
 				return;
-			} 
+			}
 		}
 		if (s_bound&&e_bound) // southeast
 		{
@@ -579,7 +579,7 @@ function state_runner_t()
 				VM.nav.astar_result = 1;
 				if (onfinished) onfinished();
 				return;
-			} 
+			}
 		}
 		if (s_bound) // south
 		{
@@ -590,7 +590,7 @@ function state_runner_t()
 				VM.nav.astar_result = 1;
 				if (onfinished) onfinished();
 				return;
-			} 
+			}
 		}
 		if (s_bound&&w_bound) // southwest
 		{
@@ -601,7 +601,7 @@ function state_runner_t()
 				VM.nav.astar_result = 1;
 				if (onfinished) onfinished();
 				return;
-			} 
+			}
 		}
 		if (w_bound) // west
 		{
@@ -612,7 +612,7 @@ function state_runner_t()
 				VM.nav.astar_result = 1;
 				if (onfinished) onfinished();
 				return;
-			} 
+			}
 		}
 		if (n_bound&&w_bound) // northwest
 		{
@@ -623,7 +623,7 @@ function state_runner_t()
 				VM.nav.astar_result = 1;
 				if (onfinished) onfinished();
 				return;
-			} 
+			}
 		}
 		if (n_bound) // north
 		{
@@ -634,7 +634,7 @@ function state_runner_t()
 				VM.nav.astar_result = 1;
 				if (onfinished) onfinished();
 				return;
-			} 
+			}
 		}
 		if (n_bound&&e_bound) // northeast
 		{
@@ -646,9 +646,9 @@ function state_runner_t()
 				VM.nav.astar_result = 1;
 				if (onfinished) onfinished();
 				return
-			} 
+			}
 		}
-		
+
 		if (VM.nav.p_queue.isEmpty())
 		{
 			console.log("Error: No path to waypoint found");
@@ -659,7 +659,7 @@ function state_runner_t()
 		//console.log("Finished round " + counter + " of A*. Size of priority queue: " + VM.nav.p_queue.size);
 		obj1 = VM.nav.p_queue.poll();
 		counter+=1;
-		
+
 		if (counter > 3000)
 		{
 			counter=0;
@@ -667,13 +667,13 @@ function state_runner_t()
 			setTimeout(function(){VM.nav.aStar(obj1, VM, onfinished, counter);},0);
 		}
 		else
-		
-		
+
+
 		VM.nav.aStar(obj1, VM, onfinished, counter);
-	
-		
+
+
 	}
-	
+
 	nav.aStarMakeWaypoint=function(i,j)
 	{
 		var cell_size = myself.grid_data.cell_size;
@@ -684,12 +684,12 @@ function state_runner_t()
 		wp.x = wp.x - myself.grid_data.map_width/2;
 		wp.y = -wp.y + myself.grid_data.map_height/2;
 		return wp;
-	
+
 	}
-	
+
 	nav.aStarBuildPath=function(k0, x_target, y_target, VM)
 	{
-    		
+
     		var waypoints = [];
     		var wp_t = {};
     		wp_t.x = x_target;
@@ -699,7 +699,7 @@ function state_runner_t()
     		//console.log("k0_target: " + VM.nav.visited[VM.nav.data.k_target].k0);
     		var wp_counter=0;
     		waypoints[wp_counter] = wp_t;
-    		
+
     		var k = VM.nav.data.k_target
     		var obj_target = VM.nav.visited[k];
     		myself.grid_data.test_cell[k] = 2;
@@ -724,10 +724,10 @@ function state_runner_t()
     			k = obj.k0;
     		}
     		myself.grid_data.test_cell[k0] = 2;
-    		
+
     		waypoints.reverse();
-    		
-    		
+
+
     		if (waypoints.length>1) // check if the path is clear between the robot and any waypoint (if so, remove all intermediate waypoints)
     		{
     			for (var i=waypoints.length-1; i > 0; i--)
@@ -740,7 +740,7 @@ function state_runner_t()
 				}
     			}
     		}
-    		
+
 		if (waypoints.length>2) // check if the path is clear between any waypoints (if so, remove all intermediate waypoints)
 		{
 			for (var i = 0; i < waypoints.length-2; i++)
@@ -762,18 +762,18 @@ function state_runner_t()
 				}
 			}
 		}
-		
-		
+
+
 		for (var i in waypoints)
 		{
 			var index = waypoints[i].k;
 			//console.log("setting index k: " + index);
 			myself.grid_data.test_cell[waypoints[i].k] = 4;
 		}
-	
+
 		VM.nav.waypoints_temp=waypoints;
 	}
-	
+
 	nav.findPath=function(x_target, y_target, VM, onfinished)
 	{
 		// Data structures for A* algorithm
@@ -782,15 +782,15 @@ function state_runner_t()
 		VM.nav.expanded=[];
 
 		if (!myself.grid_data.test_cell) myself.grid_data.test_cell = []; // for testing (to display colors on map)
-	
+
 		VM.nav.data={};
-	
+
 		var cell_size = myself.grid_data.cell_size;
 		var x_curr = VM.sensors.location.x;
 		var y_curr = VM.sensors.location.y;
-	
+
 		// convert to coordinates where origin is at top left of map
-	
+
 		var rw = myself.grid_data.map_width/2;
 		var rh = myself.grid_data.map_height/2;
 		VM.nav.data.x_curr = x_curr + rw;
@@ -799,19 +799,19 @@ function state_runner_t()
 		VM.nav.data.y_target = (y_target - rh)*-1;
 		VM.nav.data.i_target = Math.floor(VM.nav.data.x_target/cell_size);
 		VM.nav.data.j_target = Math.floor(VM.nav.data.y_target/cell_size);
-	
+
 		var w= myself.grid_data.width;
 		VM.nav.data.k_target=VM.nav.data.j_target*w + VM.nav.data.i_target;
-	
+
 		var obj = {};
 		obj.i = Math.floor(VM.nav.data.x_curr/cell_size);
 		obj.j = Math.floor(VM.nav.data.y_curr/cell_size);
 		obj.k = obj.j*w + obj.i;
 		obj.d=0;
 		VM.nav.visited[obj.k]=obj;
-	
+
 		VM.nav.padObstacles(obj.k, VM);
-		
+
 		var onfinished_astar=function()
 		{
 			if (VM.nav.astar_result == -1)
@@ -827,7 +827,7 @@ function state_runner_t()
 		}
 
 		VM.nav.aStar(obj, VM, onfinished_astar);
-			
+
 	}
 }
 
@@ -958,10 +958,10 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 // Sequencer
 	VM.sequencer=this.VM_seq;
 	VM.sequencer.code_count=0;
-	
+
 // Navigator
 	VM.nav = this.VM_nav;
-	
+
 
 // Import all needed I/O functionality
 	VM.console=console;
@@ -1057,7 +1057,13 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 			var slow_dist=10.0; // scale back on approach
 			if (dist<slow_dist) speed*=0.1+0.9*dist/slow_dist;
 			//console.log("Forward: distance: "+dist+" -> speed "+speed);
+			var trim=myself.VM_pilot.trim/100*speed;
 			VM.power.L=VM.power.R=speed;
+			if(trim<0)
+				VM.power.L+=trim;
+			else
+				VM.power.R-=trim;
+
 			if (dist <= 0.0)
 			{ // done with move
 				VM.power.L=VM.power.R=0.0;
@@ -1113,8 +1119,8 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		if (!target) target=90; // degrees
 		VM.right(-target,speed);
 	}
-	
-	// Drive straight to point (cartesian coordinate) 
+
+	// Drive straight to point (cartesian coordinate)
 	VM.driveToPoint=function(x_target, y_target)
 	{
 		var t=VM.sequencer.block_start(VM);
@@ -1130,7 +1136,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 				var dist_m = Math.sqrt(t.data.x_dist*t.data.x_dist + t.data.y_dist*t.data.y_dist)
 				t.data.dist = dist_m*100;
 				t.data.start=new vec3(VM.sensors.location.x,VM.sensors.location.y,0.0); // vector of starting position
-				
+
 			}
 			if (!t.done_turn) // turn until
 				t.done_turn = VM.nav.turn(t.data, VM);
@@ -1139,19 +1145,19 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 			else // waypoint reached
 				VM.sequencer.advance();
 
-	
+
 		}
 		VM.sequencer.block_end();
-		
-		
+
+
 	};
-	
+
 	// Drive to point (cartesian coordinate) with path finding
 	// INCOMPLETE (currently detects if path is clear, but does not use this information)
 	VM.driveToPointSmart=function(x_target, y_target)
 	{
 		var t=VM.sequencer.block_start(VM);
-		
+
 		// check that current and target locations are on map
 		if (Math.abs(x_target)*2 > myself.grid_data.map_width || Math.abs(y_target)*2 > myself.grid_data.map_height)
 		{
@@ -1164,8 +1170,8 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		else{
 			var x_target_f = x_target;
 			var y_target_f = y_target;
-			
-		
+
+
 			if (VM.sequencer.current()) {
 				if (!t.path_blocked && t.waypoints)
 				{
@@ -1196,16 +1202,16 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 								t.path_blocked = true;
 								VM.label("ERROR in driveToPointSmart(): Path to goal blocked");
 								VM.power.L=VM.power.R=0.0;
-							
+
 							}
 							else
 							{
 								t.path_blocked="";
 								t.waypoint_counter = 0;
-				
+
 								t.grid_copy = myself.grid_data.array.slice();
-								
-						
+
+
 								var wp = t.waypoints[t.waypoint_counter];
 								x_target = wp.x;
 								y_target = wp.y;
@@ -1226,9 +1232,9 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 						t.done_turn = "";
 						t.done_forward = "";
 					}
-				
-				
-				
+
+
+
 				}
 				if(!t.path_blocked && !t.waiting)
 				{
@@ -1247,7 +1253,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 						var dist_m = Math.sqrt(t.data.x_dist*t.data.x_dist + t.data.y_dist*t.data.y_dist)
 						t.data.dist = dist_m*100;
 						t.data.start=new vec3(VM.sensors.location.x,VM.sensors.location.y,0.0); // vector of starting position
-				
+
 					}
 					if (!t.done_turn) // turn until
 						t.done_turn = VM.nav.turn(t.data, VM);
@@ -1274,50 +1280,50 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 								t.done_forward="";
 								console.log("driveToSmart(): Advancing waypoint counter");
 							}
-						
+
 						}
 						else
 							VM.sequencer.advance();
 					}
 				}
-	
+
 			}
 		}
 		VM.sequencer.block_end();
-		
-		
+
+
 	};
-	
+
 	VM.testSuiteSingle=function(x_target, y_target, VM, onfinished)
 	{
 		//console.log("testing path - x: " + x_target + ", y: " + y_target + ", x_c: " + VM.sensors.location.x + ", y_c: " + VM.sensors.location.y);
 		// callback for findpath
 		var onfinished_findpath=function(){
-		
-			
+
+
 			VM.nav.test_t1 = performance.now(); // end timing
 			//console.log("ending timer")
-			
-			
+
+
 			VM.nav.test_time_total+= (VM.nav.test_t1 - VM.nav.test_t0); // record time
-				
+
 				// Advance to next positions
 				if(VM.nav.test_x_t >= VM.nav.test_x_lim) // x_target reached limit
 				{
 					if(VM.nav.test_x_c >= VM.nav.test_x_lim) // x_curr reached limit (finished)
 					{
 						var t_ave = VM.nav.test_time_total/VM.nav.test_count;
-		
-						console.log("Test Suite. Cell size: " + myself.grid_data.cell_size + 
-						"\nNumber of runs: " + VM.nav.test_count + 
+
+						console.log("Test Suite. Cell size: " + myself.grid_data.cell_size +
+						"\nNumber of runs: " + VM.nav.test_count +
 						"\nTotal time: " + VM.nav.test_time_total + " ms." +
 						"\nAverage time: " + t_ave + " ms.");
-						
+
 						VM.nav.test_suite_done = true;
 						if(onfinished) onfinished();
 						return;
-					
-					}	
+
+					}
 					else
 					{
 						VM.nav.test_x_c+=1.0; // advance x_curr
@@ -1338,41 +1344,41 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 		VM.nav.test_t0 = performance.now(); // start timing
 		VM.nav.findPath(x_target, y_target, VM, onfinished_findpath);
 	}
-	
+
 	VM.testSuite=function() // benchmark A* performance
 	{
-		
+
 		if (!VM.nav.test_suite_started) // first time - set parameters
-		{	
+		{
 			console.log("Test suite")
 			VM.nav.test_t0=0.0; // test start time
 			VM.nav.test_t1=0.0; // test end time
 			VM.nav.test_time_total=0.0; // total time of all tests
 			VM.nav.test_count=0; // number of tests (used for average)
 			VM.nav.test_suite_started=true;
-			
+
 			VM.nav.test_x_lim = 8.00;
 			VM.nav.test_y_c = 9.00;
 			VM.nav.test_y_t = -VM.nav.test_y_c;
-			
+
 			VM.nav.test_x_c = -VM.nav.test_x_lim;
 			VM.nav.test_x_t = -VM.nav.test_x_lim;
-			
-			
+
+
 			//VM.sensors.location.y = VM.nav.test_y_c;
 			//VM.sensors.location.x = VM.nav.test_x_c;
-			
+
 			var onfinished_single=function(){
 				VM.nav.test_suite_done=true;
 				//console.log("test suite finished")
 				//VM.stop();
 			}
-			
+
 			VM.testSuiteSingle(VM.nav.test_x_t, VM.nav.test_y_t, VM, onfinished_single);
-			
+
 		}
-		
-		
+
+
 		if (VM.nav.test_suite_done) // finished test suite - display result
 		{
 			VM.nav.test_suite_started="";
@@ -1380,10 +1386,10 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 
 			VM.stop();
 		}
-		
-		
+
+
 	}
-	
+
 
 
 
