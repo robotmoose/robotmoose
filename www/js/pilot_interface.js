@@ -282,11 +282,11 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	this.drive.trim.addEventListener("input",update_trim_text);
 	this.drive.div.appendChild(this.drive.trim_label);
 
-	this.drive.max_trim=100;
+	this.drive.max_trim=400;
 	this.drive.trim.type="range";
 	this.drive.trim.size=8;
-	this.drive.trim.min=-this.drive.max_trim;
-	this.drive.trim.max=this.drive.max_trim;
+	this.drive.trim.min=-this.drive.max_trim/4;
+	this.drive.trim.max=this.drive.max_trim/4;
 	this.drive.trim.step=1;
 	this.drive.trim.value=0;
 	this.drive.trim.style.width=column_right_width;
@@ -547,6 +547,7 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 	this.pilot.power.L=100.0*clamp(maxPower*(forward+turn),-maxPower,+maxPower);
 	this.pilot.power.R=100.0*clamp(maxPower*(forward-turn),-maxPower,+maxPower);
 	robot_network.update_pilot(this.pilot);
+	console.log(this.pilot.power.L+" "+this.pilot.power.R);
 }
 
 
