@@ -1057,7 +1057,7 @@ state_runner_t.prototype.make_user_VM=function(code,states)
 			var slow_dist=10.0; // scale back on approach
 			if (dist<slow_dist) speed*=0.1+0.9*dist/slow_dist;
 			//console.log("Forward: distance: "+dist+" -> speed "+speed);
-			var trim=myself.VM_pilot.trim/100*speed;
+			var trim=robot_network.trim/100*speed;
 			VM.power.L=VM.power.R=speed;
 			if(trim<0)
 				VM.power.L+=trim;

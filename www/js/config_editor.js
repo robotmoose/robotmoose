@@ -119,6 +119,7 @@ config_editor_t.prototype.upload=function(robot)
 	var data={};
 	data.counter=this.counter++;
 	data.configs=[];
+	data.trim=robot_network.trim;
 
 	this.get_entries();
 
