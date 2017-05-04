@@ -547,7 +547,6 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 	this.pilot.power.L=100.0*clamp(maxPower*(forward+turn),-maxPower,+maxPower);
 	this.pilot.power.R=100.0*clamp(maxPower*(forward-turn),-maxPower,+maxPower);
 	robot_network.update_pilot(this.pilot);
-	console.log(this.pilot.power.L+" "+this.pilot.power.R);
 }
 
 
