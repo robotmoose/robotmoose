@@ -282,11 +282,11 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 	this.drive.trim.addEventListener("input",update_trim_text);
 	this.drive.div.appendChild(this.drive.trim_label);
 
-	this.drive.max_trim=100;
+	this.drive.max_trim=400;
 	this.drive.trim.type="range";
 	this.drive.trim.size=8;
-	this.drive.trim.min=-this.drive.max_trim;
-	this.drive.trim.max=this.drive.max_trim;
+	this.drive.trim.min=-this.drive.max_trim/4;
+	this.drive.trim.max=this.drive.max_trim/4;
 	this.drive.trim.step=1;
 	this.drive.trim.value=0;
 	this.drive.trim.style.width=column_right_width;
@@ -416,10 +416,11 @@ pilot_interface_t.prototype.make_drive=function(config_entry)
 			var turn=(pos.x-focal_point.x)/size.w*2;
 			var forward=(pos.y-focal_point.y)/size.h*2;
 
+			//Trim
 			if(forward>0)
-				turn-=_this.pilot.trim/_this.drive.max_trim;
+				turn-=robot_network.trim/_this.drive.max_trim;
 			else if(forward<0)
-				turn+=_this.pilot.trim/_this.drive.max_trim;
+				turn+=robot_network.trim/_this.drive.max_trim;
 
 			_this.pilot.power.L=parseInt(""+clamp(max_power*(turn-forward),
 				-max_power,max_power));
@@ -447,11 +448,15 @@ pilot_interface_t.prototype.update_drive_text=function()
 	this.drive.label.innerHTML="Drive power ("+this.drive.slider.value+"%):";
 }
 
-pilot_interface_t.prototype.update_trim_text=function()
+pilot_interface_t.prototype.update_trim_text=function(value)
 {
-	this.drive.trim_label.innerHTML="Drive trim ("+this.drive.trim.value+"%):";
-	this.pilot.trim=parseInt(this.drive.trim.value);
-	robot_network.update_pilot(this.pilot);
+	if(!value)
+		value=this.drive.trim.value;
+	else
+		this.drive.trim.value=value;
+	this.drive.trim_label.innerHTML="Drive trim ("+value+"%):";
+	robot_network.trim=parseInt(value);
+	superstar_set(robot_network.robot,"config/trim",value);
 }
 
 
@@ -528,9 +533,9 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 
 	//Trim
 	if(forward>0)
-		turn+=this.pilot.trim/this.drive.max_trim;
+		turn+=robot_network.trim/this.drive.max_trim;
 	else if(forward<0)
-		turn-=this.pilot.trim/this.drive.max_trim;
+		turn-=robot_network.trim/this.drive.max_trim;
 
 	//spedometer needle rotation
 	var ang = maxPower * 65.75 - 77.5;
@@ -547,6 +552,24 @@ pilot_interface_t.prototype.pilot_keyboard=function()
 
 pilot_interface_t.prototype.download=function(robot)
 {
+	var _this=this;
+	superstar_get(robot,"config/trim",function(data)
+	{
+		var set_trim_once=function()
+		{
+			try
+			{
+				var value=parseInt(data);
+				_this.update_trim_text(value);
+			}
+			catch(error)
+			{
+				console.log('get trim error - '+error);
+				setTimeout(set_trim_once,100);
+			}
+		}
+		setTimeout(set_trim_once,100);
+	});
 }
 
 pilot_interface_t.prototype.upload=function(robot)
