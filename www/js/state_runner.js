@@ -181,7 +181,7 @@ function state_runner_t()
 	nav.turn=function(data, VM) // turn until reach target angle
 	{
 		var done = false;
-		var speed = 25;
+		var speed = 26;
 		var curr_angle=VM.sensors.location.angle;
 
 		var dist=curr_angle-data.theta;
