@@ -79,9 +79,19 @@ make
 ./superstar > log &
 ```  
 
-When you first start your superstar, you will not have any robots. You will need to create them by using the make_robot.py utility in [utils/superstarv2](utils/superstarv2).  
+When you first start your superstar, you will not have an admin password, or have any robots. You will need to create them by using the superstar utility programs:
+```
+cd ~/robotmoose/utils/superstarv2
+./starpasswd.py -s localhost:8081
+./make_robot.py -s localhost:8081  2018/testschool/testbot
+```
+That starpasswd command creates an admin password.
 
-Connect a robot backend to this local interface by setting the first dropdown to "127.0.0.1:8081".
+That make_robot command creates a robot named "testbot" at "testschool".
+
+(If you have password problems, the password paths and hashes are stored in a plain text file named "robotmoose/superstarv2/auth".)
+
+Start a robot backend and connect it to this local interface by changing the "robotmoose.com" dropdown to "127.0.0.1:8081".
 
 You should now be able to point your web browser to [http://localhost:8081/robots/](http://localhost:8081/robots/) and see your local copy of the web user interface.  Edit the files in ~/robotmoose/www/js and hit reload to modify the interface.  You can also manually examine the entries in [http://localhost:8081/superstar/](http://localhost:8081/superstar/) to see how the robot configuration, sensor, and pilot information is exchanged, using superstar get and set operations.
 
