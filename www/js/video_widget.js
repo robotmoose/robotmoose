@@ -82,6 +82,7 @@ video_widget_t.prototype.download=function(robot,option)
 		robot_url=CryptoJS.HmacSHA256(robot_url,this.robot.auth).toString(CryptoJS.enc.Hex);
 		var url=option.video_link+option.video_uri+robot_url;
 		this.frame=document.createElement("iframe");
+		this.frame.allow="microphone; camera";
 		this.frame.src=url;
 		this.frame.style.width="100%";
 		this.frame.style.height="100%";
