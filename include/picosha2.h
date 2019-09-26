@@ -38,11 +38,11 @@ typedef unsigned char byte_t;
 
 namespace detail
 {
-byte_t mask_8bit(byte_t x){
+inline byte_t mask_8bit(byte_t x){
 	return x&0xff;
 }
 
-word_t mask_32bit(word_t x){
+inline word_t mask_32bit(word_t x){
 	return x&0xffffffff;
 }
 
@@ -70,37 +70,37 @@ const word_t initial_message_digest[8] = {
 	0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
 };
 
-word_t ch(word_t x, word_t y, word_t z){
+inline word_t ch(word_t x, word_t y, word_t z){
 	return (x&y)^((~x)&z);
 }
 
-word_t maj(word_t x, word_t y, word_t z){
+inline word_t maj(word_t x, word_t y, word_t z){
 	return (x&y)^(x&z)^(y&z);
 }
 
-word_t rotr(word_t x, std::size_t n){
+inline word_t rotr(word_t x, std::size_t n){
 	assert(n < 32);
 	return mask_32bit((x>>n)|(x<<(32-n)));
 }
 
-word_t bsig0(word_t x){
+inline word_t bsig0(word_t x){
 	return rotr(x, 2)^rotr(x, 13)^rotr(x, 22);
 }
 
-word_t bsig1(word_t x){
+inline word_t bsig1(word_t x){
 	return rotr(x, 6)^rotr(x, 11)^rotr(x, 25);
 }
 
-word_t shr(word_t x, std::size_t n){
+inline word_t shr(word_t x, std::size_t n){
 	assert(n < 32);
 	return x >> n;
 }
 
-word_t ssig0(word_t x){
+inline word_t ssig0(word_t x){
 	return rotr(x, 7)^rotr(x, 18)^shr(x, 3);
 }
 
-word_t ssig1(word_t x){
+inline word_t ssig1(word_t x){
 	return rotr(x, 17)^rotr(x, 19)^shr(x, 10);
 }
 

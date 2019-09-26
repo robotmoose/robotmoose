@@ -1,6 +1,6 @@
 CXX=g++
 OPTS=-O
-CFLAGS=$(OPTS) -Wall -I../include
+CFLAGS=$(OPTS) -Wall -I../../include
 # CFLAGS+=-DLISTEN80
 LIBS=
 
@@ -11,7 +11,7 @@ endif
 all: superstar
 
 superstar: superstar.cpp
-	$(CXX) $(CFLAGS) $< ../include/mongoose/mongoose.c -o $@ $(LIBS)
+	$(CXX) $(CFLAGS) $< ../../include/mongoose/mongoose.c -o $@ $(LIBS)
 
 # This is needed to allow access to port 80
 supercap: superstar
