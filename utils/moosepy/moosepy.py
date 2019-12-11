@@ -55,9 +55,22 @@ class Robot:
         self.getData("pilot")
 
 
+    def recursivelySetOpt(self, level, opt_name, opt_value):
+        if not isinstance(level, dict):
+            return
+
+        if isinstance(opt_value, dict):
+            for key, val in opt_value.items():
+                if key in level[opt_name]:
+                    self.recursivelySetOpt(level[opt_name], key, val)
+                else:
+                    raise ValueError("Opt key '{key}' does not exist.".format(key))
+        else:
+            level[opt_name] = opt_value
+
     def setOpt(self, opt_name, opt_value):
         if opt_name in self.opts["value"]:
-            self.opts["value"][opt_name] = opt_value
+            self.recursivelySetOpt(opt_name, opt_value)
         else:
             raise ValueError("Opt name '{opt_name}' does not exist.".format(opt_name))
 
@@ -79,10 +92,15 @@ class Robot:
         
         return auth.hexdigest()
 
+    def setLeftPower(self, leftMotorPower):
+        self.setOpt("power", {"L": leftMotorPower})
 
-    def setMotorSpeed(self, leftMotorPower, rightMotorPower):
-        self.opts["value"]["power"]["L"] = leftMotorPower
-        self.opts["value"]["power"]["R"] = rightMotorPower
+    def setLeftPower(self, rightMotorPower):
+        self.setOpt("power", {"R": rightMotorPower})
+
+
+    def setMotorPower(self, leftMotorPower, rightMotorPower):
+        self.setOpt("power", {"L": leftMotorPower, "R": rightMotorPower})
 
 
     def setRequestParams(self):
@@ -97,7 +115,7 @@ class Robot:
 
 
     def drive(self, leftMotorPower, rightMotorPower):
-        self.setMotorSpeed(leftMotorPower, rightMotorPower)
+        self.setMotorPower(leftMotorPower, rightMotorPower)
         self.setRequestParams()
         self.sendRequest()
 
