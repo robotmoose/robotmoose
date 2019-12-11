@@ -22,7 +22,7 @@ import time
 class Robot:
     def __init__(self, superstar_path, password, superstar_url="https://robotmoose.com/superstar", refresh_rate=0):
         """
-        An interface to control a RobotMoose robot via python.
+        A python controller interface for RobotMoose defined robots. 
         """
         self.password = password
         self.path = superstar_path
@@ -50,15 +50,15 @@ class Robot:
     
     def hasRefreshed(self):
         """
-        Checks to see if the time that has passed since the last get request is
-        greater than refreash_rate
+        Checks to see if the elapsed time since the last robot value
+        check is greater than the set refresh_rate.
         """
         return time.time() - self.last_time > self.refresh_rate
 
 
     def getData(self, path):
         """
-        Gets sub-JSONs indicated by path from the robot's main JSON
+        Gets nested JSONs indicated by path from the robot's main JSON
         in superstar.
         """
         if self.hasRefreshed():
@@ -70,9 +70,8 @@ class Robot:
     
     def getPilot(self):
         """
-        Gets pilot sub-JSONs (includes motor power and other command varibles)
-        indicated from the robot's main JSON in superstar, also stores value
-        in opts.
+        Gets the pilot JSON, including motor power and other command
+        variables, and caches values according to the refresh_rate.
         """
         opts = self.getData("pilot")
         if opts:
@@ -97,9 +96,9 @@ class Robot:
 
     def setOpt(self, opt_name, opt_value):
         """
-        Sets values in the opts JSON that will be sent to superstar to command
-        the robot. Insertion is non-destructive leaving all unmodified values
-        alone, and can only be used to write to existing values
+        Sets value(s) in the opts JSON that will be sent to superstar to command
+        the robot. Insertion is non-destructive and leaves all unspecified values
+        untouched and can only be used to write existing fields.
         """
         if opt_name in self.getPilot():
             self.recursivelySetOpt(self.getPilot(), opt_name, opt_value)
@@ -109,9 +108,8 @@ class Robot:
 
     def getSensors(self):
         """
-        Gets sensors sub-JSONs (includes all current sensor data) indicated
-        from the robot's main JSON in superstar, also stores value
-        in sensors.
+        Gets sensors JSON indicated from the robot's main JSON 
+        in superstar and caches values according to the refresh_rate.
         """
         sensors = self.getData("sensors")
         if sensors:
@@ -122,9 +120,6 @@ class Robot:
 
 
     def getAuth(self):
-        """
-        Calculates and returns the hash of the message to be sent to superstar.
-        """
         formatedPass = hashlib.sha256()
         formatedPass.update(bytearray(self.password, "utf-8"))
         formatedPass = formatedPass.hexdigest()
@@ -138,31 +133,27 @@ class Robot:
 
     def setLeftPower(self, leftMotorPower):
         """
-        Sets the power level of the left motor in opts which then can be sent
-        to superstar to control the robot.
+        Sets the power level of the left motor locally, but does not send to robot.
         """
         self.setOpt("power", {"L": leftMotorPower})
 
     def setRightPower(self, rightMotorPower):
         """
-        Sets the power level of the right motor in opts which then can be sent
-        to superstar to control the robot.
+        Sets the power level of the right motor locally, but does not send to robot.
         """
         self.setOpt("power", {"R": rightMotorPower})
 
 
     def setMotorPower(self, leftMotorPower, rightMotorPower):
         """
-        Sets the power level of both motors in opts which then can be sent to
-        superstar to control the robot.
+        Sets the power level of both motors locally, but does not send to robot.
         """
         self.setOpt("power", {"L": leftMotorPower, "R": rightMotorPower})
 
 
     def setRequestParams(self):
         """
-        Formats the request message to be sent to superstar to control the
-        robot.
+        Loads the request parameters to prepare to send data to the robot.
         """
         self.request["params"]["path"] = str(self.pilot_path)
         self.request["params"]["opts"] = str(json.dumps(self.opts, separators=(',', ':')))
@@ -171,7 +162,7 @@ class Robot:
 
     def sendRequest(self):
         """
-        Formats and sends the requst message to superstar to control the robot.
+        Sends a request parameters to superstar to control the robot.
         """
         self.setRequestParams()
         data = [self.request]
@@ -181,7 +172,7 @@ class Robot:
 
     def drive(self, leftMotorPower=None, rightMotorPower=None):
         """
-        Sets the motor power and sends the command to superstar.
+        Optionally Sets the motor power levels and sends commands to superstar.
         """
         if leftMotorPower is not None:
             self.setLeftPower(leftMotorPower)
