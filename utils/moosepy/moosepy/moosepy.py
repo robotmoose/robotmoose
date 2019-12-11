@@ -50,15 +50,15 @@ class Robot:
     
     def hasRefreshed(self):
         """
-        Checks to see if enough time has passed since the last get to superstar
-        has passed to preform another get.
+        Checks to see if the time that has passed since the last get request is
+        greater than refreash_rate
         """
         return time.time() - self.last_time > self.refresh_rate
 
 
     def getData(self, path):
         """
-        Gets and returns sub JSONs indicated by path from the robot's main JSON
+        Gets sub-JSONs indicated by path from the robot's main JSON
         in superstar.
         """
         if self.hasRefreshed():
@@ -70,8 +70,9 @@ class Robot:
     
     def getPilot(self):
         """
-        Gets and returns the pilot sub JSON from the robot's main JSON in
-        superstar also stores value in opts. 
+        Gets pilot sub-JSONs (includes motor power and other command varibles)
+        indicated from the robot's main JSON in superstar, also stores value
+        in opts.
         """
         opts = self.getData("pilot")
         if opts:
@@ -82,10 +83,6 @@ class Robot:
 
 
     def recursivelySetOpt(self, level, opt_name, opt_value):
-        """
-        Used to recusivly access opts JSON, used by setOpt.
-        DO NOT CALL DIRECTLY! 
-        """
         if not isinstance(level, dict):
             return
 
@@ -101,7 +98,8 @@ class Robot:
     def setOpt(self, opt_name, opt_value):
         """
         Sets values in the opts JSON that will be sent to superstar to command
-        the robot. 
+        the robot. Insertion is non-destructive leaving all unmodified values
+        alone, and can only be used to write to existing values
         """
         if opt_name in self.getPilot():
             self.recursivelySetOpt(self.getPilot(), opt_name, opt_value)
@@ -111,8 +109,9 @@ class Robot:
 
     def getSensors(self):
         """
-        Gets and returns the sensors sub JSON from the robot's main JSON in
-        superstar also stores value in sensors.
+        Gets sensors sub-JSONs (includes all current sensor data) indicated
+        from the robot's main JSON in superstar, also stores value
+        in sensors.
         """
         sensors = self.getData("sensors")
         if sensors:
@@ -172,8 +171,9 @@ class Robot:
 
     def sendRequest(self):
         """
-        Sends the requst message to superstar to control the robot.
+        Formats and sends the requst message to superstar to control the robot.
         """
+        self.setRequestParams()
         data = [self.request]
         if data:
             requests.post(self.superstar_url, json=data)
@@ -187,5 +187,4 @@ class Robot:
             self.setLeftPower(leftMotorPower)
         if rightMotorPower is not None:
             self.setLeftPower(rightMotorPower)
-        self.setRequestParams()
         self.sendRequest()
