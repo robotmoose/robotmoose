@@ -1,3 +1,3 @@
-![logo](docs/moosepy.PNG)
+![logo](docs/moosepy.png)
 # MoosePy
-
+A library for interfacing with 
