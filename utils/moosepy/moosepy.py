@@ -48,7 +48,7 @@ class Robot:
     def getData(self, path):
         if self.hasRefreshed():
             self.last_time = time.time()
-            return requests.get("{superstar_url}/{path}}".format(self.superstar_url, path))
+            return requests.get("{superstar_url}/{path}".format(self.superstar_url, path))
 
     
     def getOpts(self):
