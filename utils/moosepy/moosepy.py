@@ -23,17 +23,21 @@ class Robot:
     def __init__(self, superstar_path, password, superstar_url="https://robotmoose.com/superstar", refresh_rate=0):
         self.password = password
         self.path = superstar_path
+        self.pilot_path = "{}/pilot".format(self.path)
         self.superstar_url = superstar_url
+        self.robot_url = "{}/{}".format(superstar_url, superstar_path)
         self.refresh_rate = refresh_rate
         self.last_time = time.time()
+        self.sensors = {}
         self.opts = {
-            "value": self.getOpts()
+            "value": {}
         }
+        self.getPilot()
         self.request = {
             "jsonrpc": "2.0",
             "method": "set",
             "params": {
-                "path": self.superstar_path,
+                "path": self.path,
                 "opts": "",
                 "auth": ""
             },
@@ -48,11 +52,18 @@ class Robot:
     def getData(self, path):
         if self.hasRefreshed():
             self.last_time = time.time()
-            return requests.get("{superstar_url}/{path}".format(self.superstar_url, path))
+            url = "{}/{}".format(self.robot_url, path)
+            return requests.get(url).json()
+        return False
 
     
-    def getOpts(self):
-        self.getData("pilot")
+    def getPilot(self):
+        opts = self.getData("pilot")
+        if opts:
+            self.opts["value"] = opts
+            return opts
+        else:
+            return self.opts["value"]
 
 
     def recursivelySetOpt(self, level, opt_name, opt_value):
@@ -69,24 +80,28 @@ class Robot:
             level[opt_name] = opt_value
 
     def setOpt(self, opt_name, opt_value):
-        if opt_name in self.opts["value"]:
-            self.recursivelySetOpt(opt_name, opt_value)
+        if opt_name in self.getPilot():
+            self.recursivelySetOpt(self.getPilot(), opt_name, opt_value)
         else:
-            raise ValueError("Opt name '{opt_name}' does not exist.".format(opt_name))
+            raise ValueError("Opt name '{}' does not exist.".format(opt_name))
 
 
     def getSensors(self):
-        self.getData("sensors")
+        sensors = self.getData("sensors")
+        if sensors:
+            self.sensors = sensors
+            return sensors
+        else:
+            return self.sensors
 
 
     def getAuth(self):
         formatedPass = hashlib.sha256()
         formatedPass.update(bytearray(self.password, "utf-8"))
         formatedPass = formatedPass.hexdigest()
-        
         auth = hmac.new(
             bytearray(formatedPass, "utf-8"), 
-            bytearray(self.path+json.dumps(self.opts, separators=(',', ':')), "utf-8"), 
+            bytearray(self.pilot_path+json.dumps(self.opts, separators=(',', ':')), "utf-8"), 
             digestmod=hashlib.sha256
         )
         
@@ -95,7 +110,7 @@ class Robot:
     def setLeftPower(self, leftMotorPower):
         self.setOpt("power", {"L": leftMotorPower})
 
-    def setLeftPower(self, rightMotorPower):
+    def setRightPower(self, rightMotorPower):
         self.setOpt("power", {"R": rightMotorPower})
 
 
@@ -104,23 +119,21 @@ class Robot:
 
 
     def setRequestParams(self):
-        self.request["params"]["path"] = str(self.path)
-        self.request["params"]["opts"] = json.dumps(self.opts, separators=(',', ':'))
+        self.request["params"]["path"] = str(self.pilot_path)
+        self.request["params"]["opts"] = str(json.dumps(self.opts, separators=(',', ':')))
         self.request["params"]["auth"] = str(self.getAuth())
 
 
     def sendRequest(self):
         data = [self.request]
-        requests.post("{superstar_url}/pilot".format(self.superstar_url), json=data)
+        if data:
+            requests.post(self.superstar_url, json=data)
 
 
-    def drive(self, leftMotorPower, rightMotorPower):
-        self.setMotorPower(leftMotorPower, rightMotorPower)
+    def drive(self, leftMotorPower=None, rightMotorPower=None):
+        if leftMotorPower is not None:
+            self.setLeftPower(leftMotorPower)
+        if rightMotorPower is not None:
+            self.setLeftPower(rightMotorPower)
         self.setRequestParams()
         self.sendRequest()
-
-
-if __name__ == "__main__":
-    superstar_path = "robots/2019-09/uaf/coffeebot"
-    password = "example_password"
-    robot = Robot(superstar_path, password, "https://robotmoose.com/superstar")
