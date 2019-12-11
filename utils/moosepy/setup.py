@@ -5,7 +5,7 @@ with open("README.md", "r") as readme:
 
 setuptools.setup(
      name='moosepy',  
-     version='0.1',
+     version='1.0',
      scripts=[],
      author="Ryan Stonebraker, Tristan Van Cise, Dain Harmon, Frank Cline",
      author_email="ryanastonebraker@gmail.com",
@@ -17,6 +17,7 @@ setuptools.setup(
      install_requires=[
          "requests"
      ],
+     include_package_data=True,
      classifiers=[
          "Programming Language :: Python :: 3",
          "License :: OSI Approved :: Apache Software License",
