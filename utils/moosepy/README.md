@@ -96,23 +96,23 @@ print(json.dumps(sensor_data, indent=4))
 Example Output:
 ``` json
 {
-    'backend': {
-        'battery': {
-            'is_charging': False,
-            'percent': '2.00%',
-            'time_till_discharged': '7.63 minutes'
+    "backend": {
+        "battery": {
+            "is_charging": false,
+            "percent": "2.00%",
+            "time_till_discharged": "7.63 minutes"
         },
-        'name': 'RobotMoose',
-        'version': '2017.3.6.0'
+        "name": "RobotMoose",
+        "version": "2017.3.6.0"
     },
-    'battery': {
-        'charge': 43,
-        'state': 16
+    "battery": {
+        "charge": 43,
+        "state": 16
     },
-    'heartbeats': 188,
-    'power': {
-        'L': 0,
-        'R': 0
+    "heartbeats": 188,
+    "power": {
+        "L": 0,
+        "R": 0
     }
 }
 ```
