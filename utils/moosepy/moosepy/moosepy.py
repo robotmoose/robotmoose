@@ -21,6 +21,9 @@ import time
 
 class Robot:
     def __init__(self, superstar_path, password, superstar_url="https://robotmoose.com/superstar", refresh_rate=0):
+        """
+        A class to control a RobotMoose robot via python. The path to the robot in superstar is needed as well as the robot's superstar password
+        """
         self.password = password
         self.path = superstar_path
         self.pilot_path = "{}/pilot".format(self.path)
@@ -46,10 +49,16 @@ class Robot:
 
     
     def hasRefreshed(self):
+        """
+        Checks to see if enough time has passed since the last get to superstar has passed to preform another get.
+        """
         return time.time() - self.last_time > self.refresh_rate
 
 
     def getData(self, path):
+        """
+        Gets and returns sub JSONs indicated by path from the robot's main JSON in superstar 
+        """
         if self.hasRefreshed():
             self.last_time = time.time()
             url = "{}/{}".format(self.robot_url, path)
@@ -58,6 +67,9 @@ class Robot:
 
     
     def getPilot(self):
+        """
+        Gets and returns the pilot sub JSON from the robot's main JSON in superstar also stores value in opts 
+        """
         opts = self.getData("pilot")
         if opts:
             self.opts["value"] = opts
@@ -67,6 +79,9 @@ class Robot:
 
 
     def recursivelySetOpt(self, level, opt_name, opt_value):
+        """
+        Used to recusivly access opts JSON, used by setOpt. DO NOT CALL DIRECTLY! 
+        """
         if not isinstance(level, dict):
             return
 
@@ -80,6 +95,9 @@ class Robot:
             level[opt_name] = opt_value
 
     def setOpt(self, opt_name, opt_value):
+        """
+        Sets values in the opts JSON that will be sent to superstar to command the robot 
+        """
         if opt_name in self.getPilot():
             self.recursivelySetOpt(self.getPilot(), opt_name, opt_value)
         else:
@@ -87,6 +105,9 @@ class Robot:
 
 
     def getSensors(self):
+        """
+        Gets and returns the sensors sub JSON from the robot's main JSON in superstar also stores value in sensors 
+        """
         sensors = self.getData("sensors")
         if sensors:
             self.sensors = sensors
@@ -96,6 +117,9 @@ class Robot:
 
 
     def getAuth(self):
+        """
+        Calculates and returns the hash of the message to be sent to superstar 
+        """
         formatedPass = hashlib.sha256()
         formatedPass.update(bytearray(self.password, "utf-8"))
         formatedPass = formatedPass.hexdigest()
@@ -108,29 +132,47 @@ class Robot:
         return auth.hexdigest()
 
     def setLeftPower(self, leftMotorPower):
+        """
+        Sets the power level of the left motor in opts which then can be sent to superstar to control the robot
+        """
         self.setOpt("power", {"L": leftMotorPower})
 
     def setRightPower(self, rightMotorPower):
+        """
+        Sets the power level of the right motor in opts which then can be sent to superstar to control the robot
+        """
         self.setOpt("power", {"R": rightMotorPower})
 
 
     def setMotorPower(self, leftMotorPower, rightMotorPower):
+        """
+        Sets the power level of both motors in opts which then can be sent to superstar to control the robot
+        """
         self.setOpt("power", {"L": leftMotorPower, "R": rightMotorPower})
 
 
     def setRequestParams(self):
+        """
+        Formats the request message to be sent to superstar to control the robot
+        """
         self.request["params"]["path"] = str(self.pilot_path)
         self.request["params"]["opts"] = str(json.dumps(self.opts, separators=(',', ':')))
         self.request["params"]["auth"] = str(self.getAuth())
 
 
     def sendRequest(self):
+        """
+        Sends the requst message to superstar to control the robot
+        """
         data = [self.request]
         if data:
             requests.post(self.superstar_url, json=data)
 
 
     def drive(self, leftMotorPower=None, rightMotorPower=None):
+        """
+        Sets the motor power and sends the command to superstar
+        """
         if leftMotorPower is not None:
             self.setLeftPower(leftMotorPower)
         if rightMotorPower is not None:
