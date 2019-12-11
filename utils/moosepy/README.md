@@ -24,8 +24,7 @@ Instantiating a robot object is dependent on two parameters:
 
 | Required Parameter |      Description     |
 |:------------------:|:--------------------:|
-|  `superstar_path`  |The path after https://robotmoose.com/superstar/\|
-|                    |For example, if the path to your robot is https://robotmoose.com/superstar/robots/20xx-yy/uaf/robotName then `superstar_path = robots/20xx-yy/uaf/robotName`|
+|  `superstar_path`  |The path after https://robotmoose.com/superstar/ For example, if the path to your robot is https://robotmoose.com/superstar/robots/20xx-yy/uaf/robotName then `superstar_path = robots/20xx-yy/uaf/robotName`|
 |      `password`    | The robot's password |
 
 ``` python
