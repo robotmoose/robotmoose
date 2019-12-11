@@ -19,7 +19,7 @@ import json
 import requests
 
 class Robot:
-    def __init__(self, superstar_url, superstar_path, password, verbose=False):
+    def __init__(self, superstar_path, password, superstar_url="https://robotmoose.com/superstar", verbose=False):
         self.password = password
         self.verbose = verbose
         self.path = superstar_path
@@ -112,4 +112,4 @@ class Robot:
 if __name__ == "__main__":
     superstar_path = "robots/2019-09/uaf/coffeebot/pilot"
     password = "example_password"
-    robot = Robot(superstar_path, password)
+    robot = Robot(superstar_path, password, "https://robotmoose.com/superstar")
