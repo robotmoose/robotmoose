@@ -1,3 +1,26 @@
 ![logo](docs/moosepy.png)
 # MoosePy
-A library for interfacing with 
+A python robotics library for interfacing with [RobotMoose](https://github.com/robotmoose/robotmoose) 
+
+## Summary
+MoosePy offers functionality for driving and retreiving sensors values from robots deployed using RobotMoose. It supports arbitrary robot configurations using the JSON structure found on the central command server.
+
+## Installation
+1. Download the latest supported version of Python3
+
+2. Install the library with following pip command:
+   ``` shell
+    pip3 install moosepy
+   ```
+
+   MoosePy uses the `requests` library, which can be installed using the following command if you are experiencing dependency issues:
+   ``` shell
+   pip3 install requests
+   ```
+
+## Setup
+``` python
+import moosepy
+
+
+```
