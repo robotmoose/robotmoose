@@ -37,3 +37,90 @@ password = "password"
 
 robot = moosepy.Robot(superstar_path, password) 
 ```
+
+## Examples
+
+### Drive Forward
+``` python
+import moosepy
+import time
+
+robot = moosepy.Robot("superstar_path", "password")
+
+# Drive forward with left and right motors at 10% speed for 1 second
+robot.drive(10,10)
+time.sleep(1)
+
+# Stop the robot
+robot.drive(0,0)
+```
+
+### Drive Forward, Backward, Left, and Right
+``` python
+import moosepy
+import time
+
+robot = moosepy.Robot("superstar_path", "password")
+
+# Forward
+robot.drive(10,10)
+time.sleep(1)
+
+# Backward
+robot.drive(-10,-10)
+time.sleep(1)
+
+# Left
+robot.drive(-10, 10)
+time.sleep(1)
+
+# Right
+robot.drive(10, -10)
+time.sleep(1)
+
+# Stop
+robot.drive(0,0)
+```
+
+### Get Sensor Data JSON
+``` python
+import moosepy
+
+robot = moosepy.Robot("superstar_path", "password")
+sensor_data = robot.getSensors()
+
+print(json.dumps(sensor_data, indent=4))
+```
+
+Example Output:
+``` json
+{
+    'backend': {
+        'battery': {
+            'is_charging': False,
+            'percent': '2.00%',
+            'time_till_discharged': '7.63 minutes'
+        },
+        'name': 'RobotMoose',
+        'version': '2017.3.6.0'
+    },
+    'battery': {
+        'charge': 43,
+        'state': 16
+    },
+    'heartbeats': 188,
+    'power': {
+        'L': 0,
+        'R': 0
+    }
+}
+```
+
+### Control a Servo
+``` python
+import moosepy
+
+robot = moosepy.Robot("superstar_path", "password")
+robot.setOpt("servo", {"degree": 70})
+robot.sendRequest()
+```
