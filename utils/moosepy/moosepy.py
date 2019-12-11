@@ -20,9 +20,8 @@ import requests
 import time
 
 class Robot:
-    def __init__(self, superstar_path, password, superstar_url="https://robotmoose.com/superstar", refresh_rate=0, verbose=False):
+    def __init__(self, superstar_path, password, superstar_url="https://robotmoose.com/superstar", refresh_rate=0):
         self.password = password
-        self.verbose = verbose
         self.path = superstar_path
         self.superstar_url = superstar_url
         self.refresh_rate = refresh_rate
@@ -42,27 +41,29 @@ class Robot:
         }
 
     
+    def hasRefreshed(self):
+        return time.time() - self.last_time > self.refresh_rate
+
+
+    def getData(self, path):
+        if self.hasRefreshed():
+            self.last_time = time.time()
+            return requests.get("{superstar_url}/{path}}".format(self.superstar_url, path))
+
+    
     def getOpts(self):
-        current_time = time.time()
-        if current_time - self.last_time > self.refresh_rate:
-            self.last_time = current_time
-            return requests.get("{}/pilot".format(self.superstar_url))
+        self.getData("pilot")
 
 
-    def setPassword(self, newPass):
-        self.password = newPass
+    def setOpt(self, opt_name, opt_value):
+        if opt_name in self.opts["value"]:
+            self.opts["value"][opt_name] = opt_value
+        else:
+            raise ValueError("Opt name '{opt_name}' does not exist.".format(opt_name))
 
 
-    def setPath(self, newPath):
-        self.path = newPath
-
-
-    def setOpts(self, newOpts):
-        self.opts = newOpts
-
-
-    def setVerbosity(self, value):
-        self.verbose = value
+    def getSensors(self):
+        self.getData("sensors")
 
 
     def getAuth(self):
@@ -91,20 +92,13 @@ class Robot:
 
 
     def sendRequest(self):
-        if self.verbose:
-            print("\nRequest Data:\n", json.dumps(self.request, indent=4, sort_keys=True), "\n")
-            
         data = [self.request]
-        requests.post("{}/pilot".format(self.superstar_url), json=data)
+        requests.post("{superstar_url}/pilot".format(self.superstar_url), json=data)
 
 
     def drive(self, leftMotorPower, rightMotorPower):
         self.setMotorSpeed(leftMotorPower, rightMotorPower)
         self.setRequestParams()
-
-        if self.verbose:
-            print("Motor power set to:", "Left: {}% \nRight: {}%".format(leftMotorPower,rightMotorPower), "\n")
-
         self.sendRequest()
 
 
