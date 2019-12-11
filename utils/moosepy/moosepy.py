@@ -17,26 +17,18 @@ import hashlib
 import hmac
 import json
 import requests
+import time
 
 class Robot:
-    def __init__(self, superstar_path, password, superstar_url="https://robotmoose.com/superstar", verbose=False):
+    def __init__(self, superstar_path, password, superstar_url="https://robotmoose.com/superstar", refresh_rate=0, verbose=False):
         self.password = password
         self.verbose = verbose
         self.path = superstar_path
         self.superstar_url = superstar_url
+        self.refresh_rate = refresh_rate
+        self.last_time = time.time()
         self.opts = {
-            "value": {
-                "power": {
-                    "L": 10,
-                    "R": 10
-                },
-                "trim": 0,
-                "time": 0,
-                "cmd": {
-                    "run": "",
-                    "arg": ""
-                }
-            }
+            "value": self.getOpts()
         }
         self.request = {
             "jsonrpc": "2.0",
@@ -48,6 +40,13 @@ class Robot:
             },
             "id":4
         }
+
+    
+    def getOpts(self):
+        current_time = time.time()
+        if current_time - self.last_time > self.refresh_rate:
+            self.last_time = current_time
+            return requests.get("{}/pilot".format(self.superstar_url))
 
 
     def setPassword(self, newPass):
@@ -96,7 +95,7 @@ class Robot:
             print("\nRequest Data:\n", json.dumps(self.request, indent=4, sort_keys=True), "\n")
             
         data = [self.request]
-        requests.post(self.superstar_url, json=data)
+        requests.post("{}/pilot".format(self.superstar_url), json=data)
 
 
     def drive(self, leftMotorPower, rightMotorPower):
@@ -110,6 +109,6 @@ class Robot:
 
 
 if __name__ == "__main__":
-    superstar_path = "robots/2019-09/uaf/coffeebot/pilot"
+    superstar_path = "robots/2019-09/uaf/coffeebot"
     password = "example_password"
     robot = Robot(superstar_path, password, "https://robotmoose.com/superstar")
