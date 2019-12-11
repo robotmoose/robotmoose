@@ -3,7 +3,7 @@
 A python robotics library for interfacing with [RobotMoose](https://github.com/robotmoose/robotmoose) 
 
 ## Summary
-MoosePy offers functionality for driving and retreiving sensors values from robots deployed using RobotMoose. It supports arbitrary robot configurations using the JSON structure found on the central command server.
+MoosePy offers functionality for driving and retreiving sensors values from robots deployed using RobotMoose. It supports arbitrary robot configurations using the JSON structure found on the Superstar server.
 
 ## Installation
 1. Download the latest supported version of Python3
