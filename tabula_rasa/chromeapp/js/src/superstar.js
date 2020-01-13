@@ -378,7 +378,7 @@ var superstar=new superstar_t();
 setInterval(function()
 {
 	superstar.flush();
-},300);
+},100);
 
 function robot_to_starpath(robot)
 {
